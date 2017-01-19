@@ -41,7 +41,6 @@ module powerbi.extensibility.visual {
 
     // powerbi.extensibility.utils.svg
     import translate = powerbi.extensibility.utils.svg.translate;
-    import ClassAndSelector = powerbi.extensibility.utils.svg.CssConstants.ClassAndSelector;
     import createClassAndSelector = powerbi.extensibility.utils.svg.CssConstants.createClassAndSelector;
 
     // powerbi.extensibility.utils.formatting
@@ -55,1113 +54,34 @@ module powerbi.extensibility.visual {
     import getLabelFormattedText = powerbi.extensibility.utils.chart.dataLabel.utils.getLabelFormattedText;
     import LabelFormattedTextOptions = powerbi.extensibility.utils.chart.dataLabel.LabelFormattedTextOptions;
 
+    // persistPropertiesAdapter
+    import PersistPropertiesAdapter = persistPropertiesAdapter.PersistPropertiesAdapter;
+
+    // scaleUtils
+    import getScale = scaleUtils.getScale;
+    import ElementScale = scaleUtils.ElementScale;
+
+    // settings
+    import TimelineSettings = settings.TimelineSettings;
+    import TimelineCellsSettings = settings.TimelineCellsSettings;
+    import TimelineLabelsSettings = settings.TimelineLabelsSettings;
+    import TimelineCalendarSettings = settings.TimelineCalendarSettings;
+    import TimelineGranularitySettings = settings.TimelineGranularitySettings;
+
+    // granularity
+    import GranularityType = granularity.GranularityType;
+    import GranularityNames = granularity.GranularityNames;
+    import TimelineGranularityData = granularity.TimelineGranularityData;
+
+    // datePeriod
+    import TimelineDatePeriod = datePeriod.TimelineDatePeriod;
+    import ITimelineDatePeriod = datePeriod.ITimelineDatePeriod;
+    import TimelineDatePeriodBase = datePeriod.TimelineDatePeriodBase;
+
+    // utils
+    import Utils = utils.Utils;
+
     export interface SQColumnRefExpr { } // TODO: It's a temporary interface. We have to remove it soon.
-
-    export enum GranularityType {
-        year,
-        quarter,
-        month,
-        week,
-        day
-    }
-
-    export interface GranularityName {
-        granularityType: GranularityType;
-        name: string;
-    }
-
-    export interface TimelineMargins {
-        LeftMargin: number;
-        RightMargin: number;
-        TopMargin: number;
-        BottomMargin: number;
-        CellWidth: number;
-        CellHeight: number;
-        StartXpoint: number;
-        StartYpoint: number;
-        ElementWidth: number;
-        MinCellWidth: number;
-        MaxCellHeight: number;
-        PeriodSlicerRectWidth: number;
-        PeriodSlicerRectHeight: number;
-    }
-
-    export interface TimelineSelectors {
-        TimelineVisual: ClassAndSelector;
-        SelectionRangeContainer: ClassAndSelector;
-        textLabel: ClassAndSelector;
-        LowerTextCell: ClassAndSelector;
-        UpperTextCell: ClassAndSelector;
-        UpperTextArea: ClassAndSelector;
-        LowerTextArea: ClassAndSelector;
-        RangeTextArea: ClassAndSelector;
-        CellsArea: ClassAndSelector;
-        CursorsArea: ClassAndSelector;
-        MainArea: ClassAndSelector;
-        SelectionCursor: ClassAndSelector;
-        Cell: ClassAndSelector;
-        CellRect: ClassAndSelector;
-        VertLine: ClassAndSelector;
-        TimelineSlicer: ClassAndSelector;
-        PeriodSlicerGranularities: ClassAndSelector;
-        PeriodSlicerSelection: ClassAndSelector;
-        PeriodSlicerSelectionRect: ClassAndSelector;
-        PeriodSlicerRect: ClassAndSelector;
-    }
-
-    export interface TimelineLabel {
-        title: string;
-        text: string;
-        id: number;
-    }
-
-    export interface ExtendedLabel {
-        yearLabels?: TimelineLabel[];
-        quarterLabels?: TimelineLabel[];
-        monthLabels?: TimelineLabel[];
-        weekLabels?: TimelineLabel[];
-        dayLabels?: TimelineLabel[];
-    }
-
-    const GranularityNames: GranularityName[] = [
-        {
-            granularityType: GranularityType.year,
-            name: "year"
-        }, {
-            granularityType: GranularityType.quarter,
-            name: "quarter"
-        }, {
-            granularityType: GranularityType.month,
-            name: "month"
-        }, {
-            granularityType: GranularityType.week,
-            name: "week"
-        }, {
-            granularityType: GranularityType.day,
-            name: "day"
-        }
-    ];
-
-    export interface ITimelineJSONDatePeriod {
-        startDate: string;
-        endDate: string;
-    }
-
-    export interface ITimelineDatePeriod {
-        startDate: Date;
-        endDate: Date;
-    }
-
-    export interface TimelineSettingsTypeValidator {
-        (value: any, defaultValue: any): any;
-    }
-
-    export class TimelineSettings {
-        public static get Default() {
-            return new this();
-        }
-
-        public static parse(dataView: DataView): TimelineSettings {
-            return new this();
-        }
-
-        public originalSettings: TimelineSettings;
-        public createOriginalSettings(): void {
-            this.originalSettings = _.cloneDeep(this);
-        }
-
-        //Default Settings
-        public general: TimelineGeneralSettings = {
-            datePeriod: TimelineDatePeriodBase.createEmpty(),
-            filter: null
-        };
-
-        public calendar: TimelineCalendarSettings = {
-            month: 0,
-            day: 1
-        };
-
-        public weekDay: TimelineWeekDaySettings = {
-            day: 0
-        };
-
-        public rangeHeader: TimelineLabelsSettings = {
-            show: true,
-            fontColor: "#777777",
-            textSize: 9
-        };
-
-        public cells: TimelineCellsSettings = {
-            fillSelected: "#ADD8E6",
-            fillUnselected: "" // transparent by default
-        };
-
-        public granularity: TimelineGranularitySettings = {
-            scaleColor: "#000000",
-            sliderColor: "#AAAAAA",
-            granularity: GranularityType.month
-        };
-
-        public labels: TimelineLabelsSettings = {
-            show: true,
-            fontColor: "#777777",
-            textSize: 9
-        };
-    }
-
-    export class TimelineDatePeriodBase implements ITimelineDatePeriod {
-        public startDate: Date = null;
-        public endDate: Date = null;
-
-        public static parse(jsonString: string): TimelineDatePeriodBase {
-            var datePeriod: ITimelineJSONDatePeriod,
-                startDate: Date = null,
-                endDate: Date = null;
-
-            try {
-                datePeriod = JSON.parse(jsonString);
-            } finally { }
-
-            if (datePeriod) {
-                startDate = TimelineUtils.parseDateWithoutTimezone(datePeriod.startDate);
-                endDate = TimelineUtils.parseDateWithoutTimezone(datePeriod.endDate);
-            }
-
-            return TimelineDatePeriodBase.create(startDate, endDate);
-        }
-
-        public static create(startDate: Date, endDate: Date): TimelineDatePeriodBase {
-            return new TimelineDatePeriodBase(startDate, endDate);
-        }
-
-        public static createEmpty(): TimelineDatePeriodBase {
-            return TimelineDatePeriodBase.create(null, null);
-        }
-
-        constructor(startDate: Date, endDate: Date) {
-            this.startDate = startDate;
-            this.endDate = endDate;
-        }
-
-        public toString(): string {
-            let jsonDatePeriod: ITimelineJSONDatePeriod = {
-                startDate: TimelineUtils.toStringDateWithoutTimezone(this.startDate),
-                endDate: TimelineUtils.toStringDateWithoutTimezone(this.endDate)
-            };
-
-            return JSON.stringify(jsonDatePeriod);
-        }
-    }
-
-    export interface TimelineDatePeriod extends ITimelineDatePeriod {
-        identifierArray: (string | number)[];
-        year: number;
-        week: number[];
-        fraction: number;
-        index: number;
-    }
-
-    export interface Granularity {
-        getType?(): GranularityType;
-        splitDate(date: Date): (string | number)[];
-        getDatePeriods(): TimelineDatePeriod[];
-        resetDatePeriods(): void;
-        getExtendedLabel(): ExtendedLabel;
-        setExtendedLabel(extendedLabel: ExtendedLabel): void;
-        createLabels(granularity: Granularity): TimelineLabel[];
-        sameLabel?(firstDatePeriod: TimelineDatePeriod, secondDatePeriod: TimelineDatePeriod): boolean;
-        generateLabel?(datePeriod: TimelineDatePeriod): TimelineLabel;
-        addDate(date: Date);
-        setNewEndDate(date: Date): void;
-        splitPeriod(index: number, newFraction: number, newDate: Date): void;
-    }
-
-    export interface TimelineCursorOverElement {
-        index: number;
-        datapoint: TimelineDatapoint;
-    }
-
-    export class TimelineGranularityBase implements Granularity {
-        protected calendar: Calendar;
-
-        private datePeriods: TimelineDatePeriod[] = [];
-        private extendedLabel: ExtendedLabel;
-
-        constructor(calendar: Calendar) {
-            this.calendar = calendar;
-        }
-
-        public splitDate(date: Date): (string | number)[] {
-            return [];
-        }
-
-        /**
-        * Returns the short month name of the given date (e.g. Jan, Feb, Mar)
-        */
-        public shortMonthName(date: Date): string {
-            return date.toString().split(' ')[1];
-        }
-
-        public resetDatePeriods(): void {
-            this.datePeriods = [];
-        }
-
-        public getDatePeriods() {
-            return this.datePeriods;
-        }
-
-        public getExtendedLabel(): ExtendedLabel {
-            return this.extendedLabel;
-        }
-
-        public setExtendedLabel(extendedLabel: ExtendedLabel): void {
-            this.extendedLabel = extendedLabel;
-        }
-
-        public createLabels(granularity: Granularity): TimelineLabel[] {
-            let labels: TimelineLabel[] = [],
-                lastDatePeriod: TimelineDatePeriod;
-
-            this.datePeriods.forEach((x) => {
-                if (_.isEmpty(labels) || !granularity.sameLabel(x, lastDatePeriod)) {
-                    lastDatePeriod = x;
-                    labels.push(granularity.generateLabel(x));
-                }
-            });
-
-            return labels;
-        }
-
-        /**
-        * Adds the new date into the given datePeriods array
-        * If the date corresponds to the last date period, given the current granularity,
-        * it will be added to that date period. Otherwise, a new date period will be added to the array.
-        * i.e. using Month granularity, Feb 2 2015 corresponds to Feb 3 2015.
-        * It is assumed that the given date does not correspond to previous date periods, other than the last date period
-        */
-        public addDate(date: Date): void {
-            let datePeriods: TimelineDatePeriod[] = this.getDatePeriods(),
-                lastDatePeriod: TimelineDatePeriod = datePeriods[datePeriods.length - 1],
-                identifierArray: (string | number)[] = this.splitDate(date);
-
-            if (datePeriods.length === 0 || !_.isEqual(lastDatePeriod.identifierArray, identifierArray)) {
-                if (datePeriods.length > 0) {
-                    lastDatePeriod.endDate = date;
-                }
-
-                datePeriods.push({
-                    identifierArray: identifierArray,
-                    startDate: date,
-                    endDate: date,
-                    week: this.determineWeek(date),
-                    year: this.determineYear(date),
-                    fraction: 1,
-                    index: datePeriods.length
-                });
-            }
-            else {
-                lastDatePeriod.endDate = date;
-            }
-        }
-
-        public setNewEndDate(date: Date): void {
-            _.last(this.datePeriods).endDate = date;
-        }
-
-        /**
-         * Splits a given period into two periods.
-         * The new period is added after the index of the old one, while the old one is simply updated.
-         * @param index The index of the date priod to be split
-         * @param newFraction The fraction value of the new date period
-         * @param newDate The date in which the date period is split
-         */
-        public splitPeriod(index: number, newFraction: number, newDate: Date): void {
-            let oldDatePeriod: TimelineDatePeriod = this.datePeriods[index];
-
-            oldDatePeriod.fraction -= newFraction;
-
-            let newDateObject: TimelineDatePeriod = {
-                identifierArray: oldDatePeriod.identifierArray,
-                startDate: newDate,
-                endDate: oldDatePeriod.endDate,
-                week: this.determineWeek(newDate),
-                year: this.determineYear(newDate),
-                fraction: newFraction,
-                index: oldDatePeriod.index + oldDatePeriod.fraction
-            };
-
-            oldDatePeriod.endDate = newDate;
-
-            this.datePeriods.splice(index + 1, 0, newDateObject);
-        }
-
-        public determineWeek(date: Date): number[] {
-            var year = this.determineYear(date);
-
-            if (this.inPreviousYear(date)) {
-                year--;
-            }
-
-            let dateOfFirstWeek: Date = this.calendar.getDateOfFirstWeek(year),
-                weeks: number = TimelineUtils.getAmountOfWeeksBetweenDates(dateOfFirstWeek, date);
-
-            return [weeks, year];
-        }
-
-        private inPreviousYear(date: Date): boolean {
-            let dateOfFirstWeek: Date = this.calendar.getDateOfFirstWeek(this.determineYear(date));
-            return date < dateOfFirstWeek;
-        }
-
-        public determineYear(date: Date): number {
-            let firstDay: Date = new Date(
-                date.getFullYear(),
-                this.calendar.getFirstMonthOfYear(),
-                this.calendar.getFirstDayOfYear());
-
-            return date.getFullYear() - ((firstDay <= date) ? 0 : 1);
-        }
-    }
-
-    export class DayGranularity extends TimelineGranularityBase {
-        public getType(): GranularityType {
-            return GranularityType.day;
-        }
-
-        public splitDate(date: Date): (string | number)[] {
-            return [
-                this.shortMonthName(date),
-                date.getDate(),
-                this.determineYear(date)
-            ];
-        }
-
-        public sameLabel(firstDatePeriod: TimelineDatePeriod, secondDatePeriod: TimelineDatePeriod): boolean {
-            return firstDatePeriod.startDate.getTime() === secondDatePeriod.startDate.getTime();
-        }
-
-        public generateLabel(datePeriod: TimelineDatePeriod): TimelineLabel {
-            return {
-                title: this.shortMonthName(datePeriod.startDate)
-                + ' '
-                + datePeriod.startDate.getDate()
-                + ' - '
-                + datePeriod.year,
-                text: datePeriod.startDate.getDate().toString(),
-                id: datePeriod.index
-            };
-        }
-    }
-
-    export class MonthGranularity extends TimelineGranularityBase {
-        public getType(): GranularityType {
-            return GranularityType.month;
-        }
-
-        public splitDate(date: Date): (string | number)[] {
-            return [this.shortMonthName(date), this.determineYear(date)];
-        }
-
-        public sameLabel(firstDatePeriod: TimelineDatePeriod, secondDatePeriod: TimelineDatePeriod): boolean {
-            return this.shortMonthName(firstDatePeriod.startDate) === this.shortMonthName(secondDatePeriod.startDate)
-                && this.determineYear(firstDatePeriod.startDate) === this.determineYear(secondDatePeriod.startDate);
-        }
-
-        public generateLabel(datePeriod: TimelineDatePeriod): TimelineLabel {
-            let shortMonthName = this.shortMonthName(datePeriod.startDate);
-
-            return {
-                title: shortMonthName,
-                text: shortMonthName,
-                id: datePeriod.index
-            };
-        }
-    }
-
-    export class WeekGranularity extends TimelineGranularityBase {
-        public getType(): GranularityType {
-            return GranularityType.week;
-        }
-
-        public splitDate(date: Date): (string | number)[] {
-            return this.determineWeek(date);
-        }
-
-        public sameLabel(firstDatePeriod: TimelineDatePeriod, secondDatePeriod: TimelineDatePeriod): boolean {
-            return _.isEqual(firstDatePeriod.week, secondDatePeriod.week);
-        }
-
-        public generateLabel(datePeriod: TimelineDatePeriod): TimelineLabel {
-            return {
-                title: 'Week ' + datePeriod.week[0] + ' - ' + datePeriod.week[1],
-                text: 'W' + datePeriod.week[0],
-                id: datePeriod.index
-            };
-        }
-    }
-
-    export class QuarterGranularity extends TimelineGranularityBase {
-        /**
-         * Returns the date's quarter name (e.g. Q1, Q2, Q3, Q4)
-         * @param date A date 
-         */
-        private quarterText(date: Date): string {
-            let quarter: number = 3,
-                year: number = this.determineYear(date);
-
-            while (date < this.calendar.getQuarterStartDate(year, quarter))
-                if (quarter > 0)
-                    quarter--;
-                else {
-                    quarter = 3;
-                    year--;
-                }
-
-            quarter++;
-
-            return 'Q' + quarter;
-        }
-
-        public getType(): GranularityType {
-            return GranularityType.quarter;
-        }
-
-        public splitDate(date: Date): (string | number)[] {
-            return [
-                this.quarterText(date),
-                this.determineYear(date)
-            ];
-        }
-
-        public sameLabel(firstDatePeriod: TimelineDatePeriod, secondDatePeriod: TimelineDatePeriod): boolean {
-            return this.quarterText(firstDatePeriod.startDate) === this.quarterText(secondDatePeriod.startDate)
-                && firstDatePeriod.year === secondDatePeriod.year;
-        }
-
-        public generateLabel(datePeriod: TimelineDatePeriod): TimelineLabel {
-            let quarter: string = this.quarterText(datePeriod.startDate);
-
-            return {
-                title: quarter + ' ' + datePeriod.year,
-                text: quarter,
-                id: datePeriod.index
-            };
-        }
-    }
-
-    export class YearGranularity extends TimelineGranularityBase {
-        public getType(): GranularityType {
-            return GranularityType.year;
-        }
-
-        public splitDate(date: Date): (string | number)[] {
-            return [this.determineYear(date)];
-        }
-
-        public sameLabel(firstDatePeriod: TimelineDatePeriod, secondDatePeriod: TimelineDatePeriod): boolean {
-            return firstDatePeriod.year === secondDatePeriod.year;
-        }
-
-        public generateLabel(datePeriod: TimelineDatePeriod): TimelineLabel {
-            return {
-                title: 'Year ' + datePeriod.year,
-                text: datePeriod.year.toString(),
-                id: datePeriod.index
-            };
-        }
-    }
-
-    export class TimelineGranularityData {
-        private dates: Date[];
-        private granularities: Granularity[];
-        private endingDate: Date;
-
-        /**
-         * Returns the date of the previos day 
-         * @param date The following date
-         */
-        public static previousDay(date: Date): Date {
-            let prevDay: Date = TimelineUtils.resetTime(date);
-
-            prevDay.setDate(prevDay.getDate() - 1);
-
-            return prevDay;
-        }
-
-        /**
-         * Returns the date of the next day 
-         * @param date The previous date
-         */
-        public static nextDay(date: Date): Date {
-            let nextDay: Date = TimelineUtils.resetTime(date);
-
-            nextDay.setDate(nextDay.getDate() + 1);
-
-            return nextDay;
-        }
-
-        /**
-        * Returns an array of dates with all the days between the start date and the end date
-        */
-        private setDatesRange(startDate: Date, endDate: Date): void {
-            let date: Date = startDate;
-
-            this.dates = [];
-
-            while (date <= endDate) {
-                this.dates.push(date);
-                date = TimelineGranularityData.nextDay(date);
-            }
-        }
-
-        constructor(startDate: Date, endDate: Date) {
-            this.granularities = [];
-            this.setDatesRange(startDate, endDate);
-
-            let lastDate: Date = this.dates[this.dates.length - 1];
-
-            this.endingDate = TimelineGranularityData.nextDay(lastDate);
-        }
-
-        /**
-         * Adds a new granularity to the array of granularities.
-         * Resets the new granularity, adds all dates to it, and then edits the last date period with the ending date.
-         * @param granularity The new granularity to be added
-         */
-        public addGranularity(granularity: Granularity): void {
-            granularity.resetDatePeriods();
-
-            for (let date of this.dates) {
-                granularity.addDate(date);
-            }
-
-            granularity.setNewEndDate(this.endingDate);
-
-            this.granularities.push(granularity);
-        }
-
-        /**
-         * Returns a specific granularity from the array of granularities
-         * @param index The index of the requested granularity
-         */
-        public getGranularity(index: number): Granularity {
-            return this.granularities[index];
-        }
-
-        public createGranularities(calendar: Calendar): void {
-            this.granularities = [];
-
-            this.addGranularity(new YearGranularity(calendar));
-            this.addGranularity(new QuarterGranularity(calendar));
-            this.addGranularity(new MonthGranularity(calendar));
-            this.addGranularity(new WeekGranularity(calendar));
-            this.addGranularity(new DayGranularity(calendar));
-        }
-
-        public createLabels(): void {
-            this.granularities.forEach((x) => {
-                x.setExtendedLabel({
-                    dayLabels: x.getType() >= GranularityType.day
-                        ? x.createLabels(this.granularities[GranularityType.day])
-                        : [],
-                    weekLabels: x.getType() >= GranularityType.week
-                        ? x.createLabels(this.granularities[GranularityType.week])
-                        : [],
-                    monthLabels: x.getType() >= GranularityType.month
-                        ? x.createLabels(this.granularities[GranularityType.month])
-                        : [],
-                    quarterLabels: x.getType() >= GranularityType.quarter
-                        ? x.createLabels(this.granularities[GranularityType.quarter])
-                        : [],
-                    yearLabels: x.getType() >= GranularityType.year
-                        ? x.createLabels(this.granularities[GranularityType.year])
-                        : [],
-                });
-            });
-        }
-    }
-
-    export class TimelineUtils {
-        public static TotalMilliseconds: number = 1000;
-        public static TotalSeconds: number = 60;
-        public static TotalMinutes: number = 60;
-        public static TotalHours: number = 24;
-
-        /**
-         * We should reduce the latest date of selection using this value,
-         * because, as far as I understand, PBI Framework rounds off milliseconds.
-         */
-        private static OffsetMilliseconds: number = 999;
-
-        private static TotalMillisecondsInADay: number =
-        TimelineUtils.TotalMilliseconds
-        * TimelineUtils.TotalSeconds
-        * TimelineUtils.TotalMinutes
-        * TimelineUtils.TotalHours;
-
-        public static convertToDaysFromMilliseconds(milliseconds: number): number {
-            return milliseconds / (TimelineUtils.TotalMillisecondsInADay);
-        }
-
-        public static getAmountOfDaysBetweenDates(startDate: Date, endDate: Date): number {
-            var totalMilliseconds: number = endDate.getTime() - startDate.getTime();
-
-            return TimelineUtils.convertToDaysFromMilliseconds(Math.abs(totalMilliseconds));
-        }
-
-        public static getAmountOfWeeksBetweenDates(startDate: Date, endDate: Date): number {
-            let totalDays: number = TimelineUtils.getAmountOfDaysBetweenDates(startDate, endDate);
-
-            return 1 + Math.floor(totalDays / 7);
-        }
-
-        public static getMillisecondsWithoutTimezone(date: Date): number {
-            if (!date) {
-                return 0;
-            }
-
-            return date.getTime()
-                - date.getTimezoneOffset()
-                * TimelineUtils.TotalMilliseconds
-                * TimelineUtils.TotalSeconds;
-        }
-
-        public static getDateWithoutTimezone(date: Date): Date {
-            return new Date(TimelineUtils.getMillisecondsWithoutTimezone(date));
-        }
-
-        public static toStringDateWithoutTimezone(date: Date): string {
-            if (!date) {
-                return null;
-            }
-
-            return TimelineUtils.getDateWithoutTimezone(date).toISOString();
-        }
-
-        public static getEndOfThePreviousDate(date: Date): Date {
-            var currentDate: Date = TimelineUtils.resetTime(date);
-
-            currentDate.setMilliseconds(-TimelineUtils.OffsetMilliseconds);
-
-            return currentDate;
-        }
-
-        public static parseDateWithoutTimezone(dateString: string): Date {
-            if (dateString === null) {
-                return null;
-            }
-
-            let timeInMilliseconds: number,
-                date: Date = new Date(dateString);
-
-            if (date.toString() === "Invalid Date") {
-                return null;
-            }
-
-            timeInMilliseconds = date.getTime()
-                + date.getTimezoneOffset() * TimelineUtils.TotalMilliseconds * TimelineUtils.TotalSeconds;
-
-            return new Date(timeInMilliseconds);
-        }
-
-        public static resetTime(date: Date): Date {
-            return new Date(
-                date.getFullYear(),
-                date.getMonth(),
-                date.getDate());
-        }
-
-        public static getDatePeriod(values: any[]): ITimelineDatePeriod {
-            let startDate: Date,
-                endDate: Date;
-
-            values = [].concat(values);
-
-            values.forEach((value: any) => {
-                let date: Date = TimelineUtils.parseDate(value);
-
-                if (date < startDate || startDate === undefined) {
-                    startDate = date;
-                }
-
-                if (date > endDate || endDate === undefined) {
-                    endDate = date;
-                }
-            });
-
-            return { startDate, endDate };
-        }
-
-        public static parseDate(value: any): Date {
-            let typeOfValue: string = typeof value,
-                date: Date = value;
-
-            if (typeOfValue === "number") {
-                date = new Date(value, 0);
-            }
-
-            if (typeOfValue === "string") {
-                date = new Date(value);
-            }
-
-            if (date && _.isDate(date) && date.toString() !== "Invalid Date") {
-                return TimelineUtils.resetTime(date);
-            }
-
-            return undefined;
-        }
-
-        public static areBoundsOfSelectionAndAvailableDatesTheSame(timelineData: TimelineData): boolean {
-            let datePeriod: TimelineDatePeriod[] = timelineData.currentGranularity.getDatePeriods(),
-                startDate: Date = TimelineUtils.getStartSelectionDate(timelineData),
-                endDate: Date = TimelineUtils.getEndSelectionDate(timelineData);
-
-            return datePeriod
-                && datePeriod.length >= 1
-                && startDate
-                && endDate
-                && datePeriod[0].startDate.getTime() === startDate.getTime()
-                && datePeriod[datePeriod.length - 1].endDate.getTime() === endDate.getTime();
-        }
-
-        public static getTheLatestDayOfMonth(monthId: number): number {
-            let date: Date = new Date(2008, monthId + 1, 0); // leap year, so the latest day of February is 29.
-
-            return date.getDate();
-        }
-
-        public static isSemanticFilterAvailableInTheDataView(filter: ISemanticFilter): boolean {
-            if (!filter /*|| SemanticFilter.isAnyFilter(filter)*/) {
-
-                return false;
-            }
-
-            return true;
-        }
-
-        public static isValueEmpty(value: any): boolean {
-            return value === undefined || value === null || isNaN(value);
-        }
-
-        /**
-         * Returns the date of the start of the selection
-         * @param timelineData The TimelineData which contains all the date periods
-         */
-        public static getStartSelectionDate(timelineData: TimelineData): Date {
-            return timelineData.currentGranularity.getDatePeriods()[timelineData.selectionStartIndex].startDate;
-        }
-
-        /**
-         * Returns the date of the end of the selection
-         * @param timelineData The TimelineData which contains all the date periods
-         */
-        public static getEndSelectionDate(timelineData: TimelineData): Date {
-            return timelineData.currentGranularity.getDatePeriods()[timelineData.selectionEndIndex].endDate;
-        }
-
-        /**
-         * Returns the date period of the end of the selection
-         * @param timelineData The TimelineData which contains all the date periods
-         */
-        public static getEndSelectionPeriod(timelineData: TimelineData): TimelineDatePeriod {
-            return timelineData.currentGranularity.getDatePeriods()[timelineData.selectionEndIndex];
-        }
-
-        /**
-         * Returns the color of a cell, depending on whether its date period is between the selected date periods.
-         * CellRects should be transparent filled by default if there isn't any color sets.
-         * @param d The TimelineDataPoint of the cell
-         * @param timelineData The TimelineData with the selected date periods
-         * @param timelineFormat The TimelineFormat with the chosen colors
-         */
-        public static getCellColor(d: TimelineDatapoint, timelineData: TimelineData, cellSettings: TimelineCellsSettings): string {
-            let inSelectedPeriods: boolean = d.datePeriod.startDate >= TimelineUtils.getStartSelectionDate(timelineData)
-                && d.datePeriod.endDate <= TimelineUtils.getEndSelectionDate(timelineData);
-
-            return inSelectedPeriods
-                ? cellSettings.fillSelected
-                : (cellSettings.fillUnselected || 'transparent');
-        }
-
-        /**
-         * Returns the granularity type of the given granularity name
-         * @param granularityName The name of the granularity
-         */
-        public static getGranularityType(granularityName: string): GranularityType {
-            let index: number = _.findIndex(GranularityNames, x => x.name === granularityName);
-            return GranularityNames[index].granularityType;
-        }
-
-        /**
-         * Returns the name of the granularity type
-         * @param granularity The type of granularity
-         */
-        public static getGranularityName(granularity: GranularityType): string {
-            let index: number = _.findIndex(GranularityNames, x => x.granularityType === granularity);
-            return GranularityNames[index].name;
-        }
-
-        /**
-         * Splits the date periods of the current granularity, in case the stard and end of the selection is in between a date period.
-         * i.e. for a quarter granularity and a selection between Feb 6 and Dec 23, the date periods for Q1 and Q4 will be split accordingly
-         * @param timelineData The TimelineData that contains the date periods
-         * @param startDate The starting date of the selection
-         * @param endDate The ending date of the selection
-         */
-        public static separateSelection(timelineData: TimelineData, startDate: Date, endDate: Date): void {
-            let datePeriods: TimelineDatePeriod[] = timelineData.currentGranularity.getDatePeriods(),
-                startDateIndex: number = _.findIndex(datePeriods, x => startDate < x.endDate),
-                endDateIndex: number = _.findIndex(datePeriods, x => endDate <= x.endDate);
-
-            startDateIndex = startDateIndex >= 0 ? startDateIndex : 0;
-            endDateIndex = endDateIndex >= 0 ? endDateIndex : datePeriods.length - 1;
-
-            timelineData.selectionStartIndex = startDateIndex;
-            timelineData.selectionEndIndex = endDateIndex;
-
-            let startRatio: number = TimelineUtils.getDateRatio(datePeriods[startDateIndex], startDate, true),
-                endRatio: number = TimelineUtils.getDateRatio(datePeriods[endDateIndex], endDate, false);
-
-            if (endRatio > 0) {
-                timelineData.currentGranularity.splitPeriod(endDateIndex, endRatio, endDate);
-            }
-
-            if (startRatio > 0) {
-                let startFration: number = datePeriods[startDateIndex].fraction - startRatio;
-
-                timelineData.currentGranularity.splitPeriod(startDateIndex, startFration, startDate);
-
-                timelineData.selectionStartIndex++;
-                timelineData.selectionEndIndex++;
-            }
-        }
-
-        /**
-         * Returns the ratio of the given date compared to the whole date period.
-         * The ratio is calculated either from the start or the end of the date period.
-         * i.e. the ratio of Feb 7 2016 compared to the month of Feb 2016,
-         * is 0.2142 from the start of the month, or 0.7857 from the end of the month.
-         * @param datePeriod The date period that contain the specified date
-         * @param date The date
-         * @param fromStart Whether to calculater the ratio from the start of the date period.
-         */
-        public static getDateRatio(datePeriod: TimelineDatePeriod, date: Date, fromStart: boolean): number {
-            let dateDifference: number = fromStart
-                ? date.getTime() - datePeriod.startDate.getTime()
-                : datePeriod.endDate.getTime() - date.getTime();
-
-            let periodDifference: number = datePeriod.endDate.getTime() - datePeriod.startDate.getTime();
-
-            return periodDifference === 0
-                ? 0
-                : dateDifference / periodDifference;
-        }
-
-        /**
-        * Returns the time range text, depending on the given granularity (e.g. "Feb 3 2014 - Apr 5 2015", "Q1 2014 - Q2 2015")
-        */
-        public static timeRangeText(timelineData: TimelineData): string {
-            let startSelectionDateArray: (string | number)[] = timelineData.currentGranularity
-                .splitDate(TimelineUtils.getStartSelectionDate(timelineData));
-
-            let endSelectionDateArray: (string | number)[] = timelineData.currentGranularity
-                .splitDate(TimelineUtils.getEndSelectionPeriod(timelineData).startDate);
-
-            return startSelectionDateArray.join(' ') + ' - ' + endSelectionDateArray.join(' ');
-        }
-
-        public static dateRangeText(datePeriod: TimelineDatePeriod): string {
-            return datePeriod.startDate.toDateString()
-                + ' - '
-                + TimelineGranularityData.previousDay(datePeriod.endDate).toDateString();
-        }
-
-        /**
-         * Combines the first two partial date periods, into a single date period.
-         * i.e. combines "Feb 1 2016 - Feb 5 2016" with "Feb 5 2016 - Feb 29 2016" into "Feb 1 2016 - Feb 29 2016"
-         * @param datePeriods The list of date periods
-         */
-        public static unseparateSelection(datePeriods: TimelineDatePeriod[]): void {
-            let separationIndex: number = _.findIndex(datePeriods, x => x.fraction < 1);
-
-            if (separationIndex < 0) {
-                return;
-            }
-
-            datePeriods[separationIndex].endDate = datePeriods[separationIndex + 1].endDate;
-            datePeriods[separationIndex].fraction += datePeriods[separationIndex + 1].fraction;
-
-            datePeriods.splice(separationIndex + 1, 1);
-        }
-
-        public static getIndexByPosition(
-            elements: number[],
-            widthOfElement: number,
-            position: number,
-            offset: number = 0): number {
-
-            elements = elements || [];
-
-            let length: number = elements.length;
-
-            if (!TimelineUtils.isValueEmpty(elements[0])
-                && !TimelineUtils.isValueEmpty(elements[1])
-                && position <= elements[1] * widthOfElement + offset) {
-
-                return 0;
-            } else if (
-                !TimelineUtils.isValueEmpty(elements[length - 1])
-                && position >= elements[length - 1] * widthOfElement + offset) {
-                return length - 1;
-            }
-
-            for (var i: number = 1; i < length; i++) {
-                var left: number = elements[i] * widthOfElement + offset,
-                    right: number = elements[i + 1] * widthOfElement + offset;
-
-                if (position >= left && position <= right) {
-                    return i;
-                }
-            }
-
-            return 0;
-        }
-    }
-
-    export interface TimelineProperties {
-        leftMargin: number;
-        rightMargin: number;
-        topMargin: number;
-        bottomMargin: number;
-        textYPosition: number;
-        startXpoint: number;
-        startYpoint: number;
-        elementWidth: number;
-        cellWidth: number;
-        cellHeight: number;
-        cellsYPosition: number;
-    }
-
-    export interface TimelineGeneralSettings {
-        datePeriod: TimelineDatePeriodBase | string;
-        filter: ISemanticFilter;
-    }
-
-    export interface TimelineCalendarSettings {
-        month: number;
-        day: number;
-    }
-
-    export interface TimelineWeekDaySettings {
-        day: number;
-    }
-
-    export interface TimelineLabelsSettings {
-        show: boolean;
-        fontColor: string;
-        textSize: number;
-    }
-
-    export interface TimelineCellsSettings {
-        fillSelected: string;
-        fillUnselected: string;
-    }
-
-    export interface TimelineGranularitySettings {
-        scaleColor: string;
-        sliderColor: string;
-        granularity: GranularityType;
-    }
-
-    export interface TimelineData {
-        columnIdentity?: SQColumnRefExpr;
-        timelineDatapoints?: TimelineDatapoint[];
-        selectionStartIndex?: number;
-        selectionEndIndex?: number;
-        cursorDataPoints?: CursorDatapoint[];
-        currentGranularity?: Granularity;
-    }
-
-    export interface CursorDatapoint {
-        x: number;
-        y: number;
-        cursorIndex: number;
-        selectionIndex: number;
-    }
-
-    export interface TimelineDatapoint {
-        index: number;
-        datePeriod: TimelineDatePeriod;
-    }
-
-    export interface DateDictionary {
-        [year: number]: Date;
-    }
-
-    export class Calendar {
-        private firstDayOfWeek: number;
-        private firstMonthOfYear: number;
-        private firstDayOfYear: number;
-        private dateOfFirstWeek: DateDictionary;
-        private quarterFirstMonths: number[];
-
-        public getFirstDayOfWeek(): number {
-            return this.firstDayOfWeek;
-        }
-
-        public getFirstMonthOfYear(): number {
-            return this.firstMonthOfYear;
-        }
-
-        public getFirstDayOfYear(): number {
-            return this.firstDayOfYear;
-        }
-
-        public getQuarterStartDate(year: number, quarterIndex: number): Date {
-            return new Date(year, this.quarterFirstMonths[quarterIndex], this.firstDayOfYear);
-        }
-
-        public isChanged(
-            calendarSettings: TimelineCalendarSettings,
-            weekDaySettings: TimelineWeekDaySettings): boolean {
-            return this.firstMonthOfYear !== calendarSettings.month
-                || this.firstDayOfYear !== calendarSettings.day
-                || this.firstDayOfWeek !== weekDaySettings.day;
-        }
-
-        constructor(
-            calendarFormat: TimelineCalendarSettings,
-            weekDaySettings: TimelineWeekDaySettings) {
-
-            this.firstDayOfWeek = weekDaySettings.day;
-            this.firstMonthOfYear = calendarFormat.month;
-            this.firstDayOfYear = calendarFormat.day;
-
-            this.dateOfFirstWeek = {};
-
-            this.quarterFirstMonths = [0, 3, 6, 9].map((x: number) => {
-                return x + this.firstMonthOfYear;
-            });
-        }
-
-        private calculateDateOfFirstWeek(year: number): Date {
-            let date: Date = new Date(year, this.firstMonthOfYear, this.firstDayOfYear);
-
-            while (date.getDay() !== this.firstDayOfWeek) {
-                date = TimelineGranularityData.nextDay(date);
-            }
-
-            return date;
-        }
-
-        public getDateOfFirstWeek(year: number): Date {
-            if (!this.dateOfFirstWeek[year]) {
-                this.dateOfFirstWeek[year] = this.calculateDateOfFirstWeek(year);
-            }
-
-            return this.dateOfFirstWeek[year];
-        }
-    }
 
     export class Timeline implements IVisual {
         private static MinSizeOfViewport: number = 0;
@@ -1183,26 +103,26 @@ module powerbi.extensibility.visual {
         };
 
         private static TimelineSelectors: TimelineSelectors = {
-            TimelineVisual: createClassAndSelector('timeline'),
-            SelectionRangeContainer: createClassAndSelector('selectionRangeContainer'),
-            textLabel: createClassAndSelector('label'),
-            LowerTextCell: createClassAndSelector('lowerTextCell'),
-            UpperTextCell: createClassAndSelector('upperTextCell'),
-            UpperTextArea: createClassAndSelector('upperTextArea'),
-            LowerTextArea: createClassAndSelector('lowerTextArea'),
-            RangeTextArea: createClassAndSelector('rangeTextArea'),
-            CellsArea: createClassAndSelector('cellsArea'),
-            CursorsArea: createClassAndSelector('cursorsArea'),
-            MainArea: createClassAndSelector('mainArea'),
-            SelectionCursor: createClassAndSelector('selectionCursor'),
-            Cell: createClassAndSelector('cell'),
-            CellRect: createClassAndSelector('cellRect'),
-            VertLine: createClassAndSelector('timelineVertLine'),
-            TimelineSlicer: createClassAndSelector('timelineSlicer'),
-            PeriodSlicerGranularities: createClassAndSelector('periodSlicerGranularities'),
-            PeriodSlicerSelection: createClassAndSelector('periodSlicerSelection'),
-            PeriodSlicerSelectionRect: createClassAndSelector('periodSlicerSelectionRect'),
-            PeriodSlicerRect: createClassAndSelector('periodSlicerRect')
+            TimelineVisual: createClassAndSelector("timeline"),
+            SelectionRangeContainer: createClassAndSelector("selectionRangeContainer"),
+            textLabel: createClassAndSelector("label"),
+            LowerTextCell: createClassAndSelector("lowerTextCell"),
+            UpperTextCell: createClassAndSelector("upperTextCell"),
+            UpperTextArea: createClassAndSelector("upperTextArea"),
+            LowerTextArea: createClassAndSelector("lowerTextArea"),
+            RangeTextArea: createClassAndSelector("rangeTextArea"),
+            CellsArea: createClassAndSelector("cellsArea"),
+            CursorsArea: createClassAndSelector("cursorsArea"),
+            MainArea: createClassAndSelector("mainArea"),
+            SelectionCursor: createClassAndSelector("selectionCursor"),
+            Cell: createClassAndSelector("cell"),
+            CellRect: createClassAndSelector("cellRect"),
+            VertLine: createClassAndSelector("timelineVertLine"),
+            TimelineSlicer: createClassAndSelector("timelineSlicer"),
+            PeriodSlicerGranularities: createClassAndSelector("periodSlicerGranularities"),
+            PeriodSlicerSelection: createClassAndSelector("periodSlicerSelection"),
+            PeriodSlicerSelectionRect: createClassAndSelector("periodSlicerSelectionRect"),
+            PeriodSlicerRect: createClassAndSelector("periodSlicerRect")
         };
 
         private settings: TimelineSettings;
@@ -1236,7 +156,7 @@ module powerbi.extensibility.visual {
         private textLabelsSelection: Selection<any>;
         private clearCatcherSelection: Selection<any>;
 
-        private granularitySelectors: string[] = ['Y', 'Q', 'M', 'W', 'D'];
+        private granularitySelectors: string[] = ["Y", "Q", "M", "W", "D"];
 
         private selectionManager: ISelectionManager;
 
@@ -1253,7 +173,7 @@ module powerbi.extensibility.visual {
 
         private calendar: Calendar;
 
-        private persistPropertiesAdapter: timelineAdapters.PersistPropertiesAdapter;
+        private persistPropertiesAdapter: PersistPropertiesAdapter;
 
         /**
          * Changes the current granularity depending on the given granularity type
@@ -1262,11 +182,11 @@ module powerbi.extensibility.visual {
          * @param granularity The new granularity type
          */
         public changeGranularity(granularity: GranularityType, startDate: Date, endDate: Date): void {
-            if (TimelineUtils.unseparateSelection(this.timelineData.currentGranularity.getDatePeriods())) {
+            if (Utils.unseparateSelection(this.timelineData.currentGranularity.getDatePeriods())) {
             }
 
             this.timelineData.currentGranularity = this.timelineGranularityData.getGranularity(granularity);
-            TimelineUtils.separateSelection(this.timelineData, startDate, endDate);
+            Utils.separateSelection(this.timelineData, startDate, endDate);
         }
 
         constructor(options: VisualConstructorOptions) {
@@ -1277,7 +197,7 @@ module powerbi.extensibility.visual {
             let element: HTMLElement = options.element,
                 host: IVisualHost = options.host;
 
-            this.persistPropertiesAdapter = timelineAdapters.PersistPropertiesAdapter.create(host);
+            this.persistPropertiesAdapter = PersistPropertiesAdapter.create(host);
 
             this.initialized = false;
 
@@ -1298,10 +218,10 @@ module powerbi.extensibility.visual {
             };
 
             this.rootSelection = d3.select(element)
-                .append('div');
+                .append("div");
 
             this.mainSvgSelection = this.rootSelection
-                .append('svg')
+                .append("svg")
                 .classed(Timeline.TimelineSelectors.TimelineVisual.class, true);
 
             this.addElements();
@@ -1314,26 +234,26 @@ module powerbi.extensibility.visual {
                 .on("click", () => this.clear())
                 .on("touchstart", () => this.clear());
 
-            this.rangeTextSelection = this.mainSvgSelection.append('g')
+            this.rangeTextSelection = this.mainSvgSelection.append("g")
                 .classed(Timeline.TimelineSelectors.RangeTextArea.class, true)
-                .append('text');
+                .append("text");
 
             this.mainGroupSelection = this.mainSvgSelection
-                .append('g')
+                .append("g")
                 .classed(Timeline.TimelineSelectors.MainArea.class, true);
 
-            this.yearLabelsSelection = this.mainGroupSelection.append('g');
-            this.quarterLabelsSelection = this.mainGroupSelection.append('g');
-            this.monthLabelsSelection = this.mainGroupSelection.append('g');
-            this.weekLabelsSelection = this.mainGroupSelection.append('g');
-            this.dayLabelsSelection = this.mainGroupSelection.append('g');
+            this.yearLabelsSelection = this.mainGroupSelection.append("g");
+            this.quarterLabelsSelection = this.mainGroupSelection.append("g");
+            this.monthLabelsSelection = this.mainGroupSelection.append("g");
+            this.weekLabelsSelection = this.mainGroupSelection.append("g");
+            this.dayLabelsSelection = this.mainGroupSelection.append("g");
 
             this.cellsSelection = this.mainGroupSelection
-                .append('g')
+                .append("g")
                 .classed(Timeline.TimelineSelectors.CellsArea.class, true);
 
             this.cursorGroupSelection = this.mainSvgSelection
-                .append('g')
+                .append("g")
                 .classed(Timeline.TimelineSelectors.CursorsArea.class, true);
         }
 
@@ -1376,7 +296,7 @@ module powerbi.extensibility.visual {
                 selectorPeriods: string[] = this.granularitySelectors;
 
             this.selectorSelection = this.mainSvgSelection
-                .append('g')
+                .append("g")
                 .classed(Timeline.TimelineSelectors.TimelineSlicer.class, true);
 
             let dragPeriodRect: Drag<any> = d3.behavior.drag()
@@ -1387,7 +307,7 @@ module powerbi.extensibility.visual {
             this.selectorSelection.call(dragPeriodRect);
 
             // create horiz. line
-            this.horizLineSelection = this.selectorSelection.append('rect');
+            this.horizLineSelection = this.selectorSelection.append("rect");
 
             this.horizLineSelection.attr({
                 x: convertToPx(startXpoint),
@@ -1401,7 +321,7 @@ module powerbi.extensibility.visual {
                 .selectAll("vertLines")
                 .data(selectorPeriods)
                 .enter()
-                .append('rect');
+                .append("rect");
 
             this.vertLineSelection
                 .classed(Timeline.TimelineSelectors.VertLine.class, true)
@@ -1434,7 +354,7 @@ module powerbi.extensibility.visual {
                 .classed(Timeline.TimelineSelectors.PeriodSlicerSelection.class, true);
 
             this.selectedTextSelection
-                .text(TimelineUtils.getGranularityName(type))
+                .text(Utils.getGranularityName(type))
                 .attr({
                     x: convertToPx(startXpoint + 2 * elementWidth),
                     y: convertToPx(startYpoint + 17),
@@ -1444,7 +364,7 @@ module powerbi.extensibility.visual {
                 .selectAll(Timeline.TimelineSelectors.PeriodSlicerSelectionRect.selector)
                 .data(selectorPeriods)
                 .enter()
-                .append('rect')
+                .append("rect")
                 .classed(Timeline.TimelineSelectors.PeriodSlicerSelectionRect.class, true);
 
             let clickHandler = (d: any, index: number) => {
@@ -1458,11 +378,11 @@ module powerbi.extensibility.visual {
                     width: convertToPx(elementWidth),
                     height: convertToPx(23)
                 })
-                .on('mousedown', clickHandler)
-                .on('touchstart', clickHandler);
+                .on("mousedown", clickHandler)
+                .on("touchstart", clickHandler);
 
             this.periodSlicerRectSelection = this.selectorSelection
-                .append('rect')
+                .append("rect")
                 .classed(Timeline.TimelineSelectors.PeriodSlicerRect.class, true)
                 .attr({
                     y: convertToPx(startYpoint - 16),
@@ -1476,14 +396,14 @@ module powerbi.extensibility.visual {
 
         public getGranularityIndexByPosition(position: number): number {
             let selectorIndexes: number[],
-                scale: TimelineScale = timelineScaleUtils.getScale(this.rootSelection.node() as HTMLElement),
+                scale: ElementScale = getScale(this.rootSelection.node() as HTMLElement),
                 scaledPosition: number = position / scale.x; // It takes account of scaling when we use "Fit to page" or "Fit to width".
 
             selectorIndexes = this.granularitySelectors.map((selector: string, index: number) => {
                 return index;
             });
 
-            return TimelineUtils.getIndexByPosition(
+            return Utils.getIndexByPosition(
                 selectorIndexes,
                 this.timelineProperties.elementWidth,
                 scaledPosition,
@@ -1507,7 +427,7 @@ module powerbi.extensibility.visual {
                         * this.timelineProperties.elementWidth)
                 });
 
-            this.selectedTextSelection.text(TimelineUtils.getGranularityName(granularity));
+            this.selectedTextSelection.text(Utils.getGranularityName(granularity));
         }
 
         public fillColorGranularity(granularitySettings: TimelineGranularitySettings): void {
@@ -1515,10 +435,10 @@ module powerbi.extensibility.visual {
                 scaleColor: string = granularitySettings.scaleColor;
 
             this.periodSlicerRectSelection.style("stroke", sliderColor);
-            this.selectedTextSelection.attr('fill', scaleColor);
-            this.textLabelsSelection.attr('fill', scaleColor);
-            this.vertLineSelection.attr('fill', scaleColor);
-            this.horizLineSelection.attr('fill', scaleColor);
+            this.selectedTextSelection.attr("fill", scaleColor);
+            this.textLabelsSelection.attr("fill", scaleColor);
+            this.vertLineSelection.attr("fill", scaleColor);
+            this.horizLineSelection.attr("fill", scaleColor);
         }
 
         public redrawPeriod(granularity: GranularityType): void {
@@ -1528,8 +448,8 @@ module powerbi.extensibility.visual {
 
                 this.renderGranularitySlicerRect(granularity);
 
-                startDate = TimelineUtils.getStartSelectionDate(this.timelineData);
-                endDate = TimelineUtils.getEndSelectionDate(this.timelineData);
+                startDate = Utils.getStartSelectionDate(this.timelineData);
+                endDate = Utils.getEndSelectionDate(this.timelineData);
 
                 this.changeGranularity(granularity, startDate, endDate);
             }
@@ -1577,7 +497,7 @@ module powerbi.extensibility.visual {
         }
 
         private createDatePeriod(dataView: DataView): ITimelineDatePeriod {
-            return TimelineUtils.getDatePeriod(dataView.categorical.categories[0].values);
+            return Utils.getDatePeriod(dataView.categorical.categories[0].values);
         }
 
         private createTimelineData(dataView: DataView) {
@@ -1592,8 +512,8 @@ module powerbi.extensibility.visual {
             datePeriod = <TimelineDatePeriodBase>this.settings.general.datePeriod;
 
             if (datePeriod.startDate && datePeriod.endDate) {
-                resetedStartDate = TimelineUtils.resetTime(datePeriod.startDate);
-                resetedEndDate = TimelineUtils.resetTime(TimelineUtils.getEndOfThePreviousDate(datePeriod.endDate));
+                resetedStartDate = Utils.resetTime(datePeriod.startDate);
+                resetedEndDate = Utils.resetTime(Utils.getEndOfThePreviousDate(datePeriod.endDate));
 
                 startDate = this.datePeriod.startDate < resetedStartDate
                     ? this.datePeriod.startDate
@@ -1636,7 +556,7 @@ module powerbi.extensibility.visual {
                     actualEndDate.getTime() !== prevEndDate.getTime();
 
                 isSemanticFilterAvailableInTheDataView =
-                    TimelineUtils.isSemanticFilterAvailableInTheDataView(this.settings.general.filter);
+                    Utils.isSemanticFilterAvailableInTheDataView(this.settings.general.filter);
 
                 if (!changedSelection && !isSemanticFilterAvailableInTheDataView) {
                     this.changeGranularity(
@@ -1679,7 +599,7 @@ module powerbi.extensibility.visual {
 
             if (!(dataView.categorical.categories[0].source.type.dateTime
                 || (dataView.categorical.categories[0].source.type.numeric
-                    && (valueType === 'Year' || valueType === 'Date')))) {
+                    && (valueType === "Year" || valueType === "Date")))) {
                 return false;
             }
 
@@ -1851,8 +771,8 @@ module powerbi.extensibility.visual {
             isCalendarChanged = previousCalendar && previousCalendar.isChanged(timelineSettings.calendar, timelineSettings.weekDay);
 
             if (timelineData && timelineData.currentGranularity) {
-                startDate = TimelineUtils.getStartSelectionDate(timelineData);
-                endDate = TimelineUtils.getEndSelectionDate(timelineData);
+                startDate = Utils.getStartSelectionDate(timelineData);
+                endDate = Utils.getEndSelectionDate(timelineData);
             }
 
             if (!initialized || isCalendarChanged) {
@@ -1877,7 +797,7 @@ module powerbi.extensibility.visual {
             }
 
             if (isCalendarChanged && startDate && endDate) {
-                TimelineUtils.separateSelection(timelineData, startDate, endDate);
+                Utils.separateSelection(timelineData, startDate, endDate);
             }
 
             timelineElements = timelineData.currentGranularity.getDatePeriods();
@@ -1936,11 +856,11 @@ module powerbi.extensibility.visual {
                 .attr({
                     height: convertToPx(options.viewport.height),
                     width: convertToPx(options.viewport.width),
-                    'drag-resize-disabled': true
+                    "drag-resize-disabled": true
                 })
                 .style({
-                    'overflow-x': 'auto',
-                    'overflow-y': 'auto'
+                    "overflow-x": "auto",
+                    "overflow-y": "auto"
                 });
 
             this.mainSvgSelection.attr({
@@ -1960,9 +880,9 @@ module powerbi.extensibility.visual {
                 timelineProperties.cellHeight / 2,
                 timelineProperties.topMargin);
 
-            this.mainGroupSelection.attr('transform', translateString);
-            this.selectorSelection.attr('transform', fixedTranslateString);
-            this.cursorGroupSelection.attr('transform', translateString);
+            this.mainGroupSelection.attr("transform", translateString);
+            this.selectorSelection.attr("transform", fixedTranslateString);
+            this.cursorGroupSelection.attr("transform", translateString);
 
             let extendedLabels = this.timelineData.currentGranularity.getExtendedLabel(),
                 granularityType = this.timelineData.currentGranularity.getType();
@@ -2016,7 +936,7 @@ module powerbi.extensibility.visual {
 
             labelsGroupSelection
                 .enter()
-                .append('text')
+                .append("text")
                 .classed(Timeline.TimelineSelectors.textLabel.class, true);
 
             labelsGroupSelection
@@ -2026,7 +946,7 @@ module powerbi.extensibility.visual {
 
                         let textProperties: TextProperties = {
                             text: labels[0].text,
-                            fontFamily: 'arial',
+                            fontFamily: "arial",
                             fontSize: fontSize
                         };
 
@@ -2034,7 +954,7 @@ module powerbi.extensibility.visual {
 
                         textProperties = {
                             text: labels[1].text,
-                            fontFamily: 'arial',
+                            fontFamily: "arial",
                             fontSize: fontSize
                         };
 
@@ -2054,14 +974,14 @@ module powerbi.extensibility.visual {
 
                     return getLabelFormattedText(labelFormattedTextOptions);
                 })
-                .style('font-size', convertToPt(this.settings.labels.textSize))
+                .style("font-size", convertToPt(this.settings.labels.textSize))
                 .attr({
                     x: (x: TimelineLabel) => (x.id + 0.5) * this.timelineProperties.cellWidth,
                     y: this.timelineProperties.textYPosition
                     + (1 + index) * fromPointToPixel(this.settings.labels.textSize),
                     fill: this.settings.labels.fontColor
                 })
-                .append('title')
+                .append("title")
                 .text((x: TimelineLabel) => x.title);
 
             labelsGroupSelection
@@ -2119,7 +1039,7 @@ module powerbi.extensibility.visual {
          */
         public static setValidCalendarSettings(calendarSettings: TimelineCalendarSettings): void {
             let defaultSettings: TimelineSettings = TimelineSettings.Default,
-                theLatestDayOfMonth: number = TimelineUtils.getTheLatestDayOfMonth(calendarSettings.month);
+                theLatestDayOfMonth: number = Utils.getTheLatestDayOfMonth(calendarSettings.month);
 
             calendarSettings.day = Math.max(
                 defaultSettings.calendar.day,
@@ -2132,8 +1052,8 @@ module powerbi.extensibility.visual {
                     .selectAll(Timeline.TimelineSelectors.CellRect.selector)
                     .data(dataPoints);
 
-            cellSelection.attr('fill', (dataPoint: TimelineDatapoint) => {
-                return TimelineUtils.getCellColor(dataPoint, this.timelineData, cellsSettings);
+            cellSelection.attr("fill", (dataPoint: TimelineDatapoint) => {
+                return Utils.getCellColor(dataPoint, this.timelineData, cellsSettings);
             });
         }
 
@@ -2147,7 +1067,7 @@ module powerbi.extensibility.visual {
 
             cellsSelection
                 .enter()
-                .append('rect')
+                .append("rect")
                 .classed(Timeline.TimelineSelectors.CellRect.class, true);
 
             cellsSelection
@@ -2173,8 +1093,8 @@ module powerbi.extensibility.visual {
             };
 
             cellsSelection
-                .on('click', clickHandler)
-                .on('touchstart', clickHandler);
+                .on("click", clickHandler)
+                .on("touchstart", clickHandler);
 
             this.fillCells(this.settings.cells);
 
@@ -2263,7 +1183,7 @@ module powerbi.extensibility.visual {
                 return datapoint.index;
             });
 
-            index = TimelineUtils.getIndexByPosition(
+            index = Utils.getIndexByPosition(
                 timelineDatapointIndexes,
                 cellWidth,
                 position);
@@ -2306,12 +1226,12 @@ module powerbi.extensibility.visual {
 
             cursorSelection
                 .enter()
-                .append('path')
+                .append("path")
                 .classed(Timeline.TimelineSelectors.SelectionCursor.class, true);
 
             cursorSelection
                 .attr("transform", (cursorDataPoint: CursorDatapoint) => {
-                    var dx: number,
+                    let dx: number,
                         dy: number;
 
                     dx = cursorDataPoint.selectionIndex * this.timelineProperties.cellWidth;
@@ -2347,7 +1267,7 @@ module powerbi.extensibility.visual {
                     - rangeHeaderSettings.textSize;
 
             if (rangeHeaderSettings.show && maxWidth > 0) {
-                let timeRangeText: string = TimelineUtils.timeRangeText(timelineData);
+                let timeRangeText: string = Utils.timeRangeText(timelineData);
 
                 let labelFormattedTextOptions: LabelFormattedTextOptions = {
                     label: timeRangeText,
@@ -2366,10 +1286,11 @@ module powerbi.extensibility.visual {
                         fill: rangeHeaderSettings.fontColor
                     })
                     .style({
-                        'font-size': convertToPt(rangeHeaderSettings.textSize)
+                        "font-size": convertToPt(rangeHeaderSettings.textSize)
                     })
                     .text(actualText)
-                    .append('title').text(timeRangeText);;
+                    .append("title")
+                    .text(timeRangeText);
             }
             else {
                 this.rangeTextSelection.text("");
@@ -2377,15 +1298,15 @@ module powerbi.extensibility.visual {
         }
 
         public setSelection(timelineData: TimelineData): void {
-            if (TimelineUtils.areBoundsOfSelectionAndAvailableDatesTheSame(timelineData)) {
+            if (Utils.areBoundsOfSelectionAndAvailableDatesTheSame(timelineData)) {
                 this.clearSelection(timelineData.columnIdentity);
 
                 return;
             }
 
             this.applyDatePeriod(
-                TimelineUtils.getStartSelectionDate(timelineData),
-                TimelineUtils.getEndSelectionDate(timelineData),
+                Utils.getStartSelectionDate(timelineData),
+                Utils.getEndSelectionDate(timelineData),
                 timelineData.columnIdentity);
         }
 
@@ -2451,140 +1372,6 @@ module powerbi.extensibility.visual {
             //     Timeline.capabilities);
 
             return [];
-        }
-    }
-
-    export module timelineAdapters {
-        export interface PersistPropertiesAdapterVisualObjectInstance {
-            objectInstance: VisualObjectInstance;
-            callback?: () => void;
-        }
-
-        export interface PersistPropertiesAdapterFrame {
-            [objectName: string]: PersistPropertiesAdapterVisualObjectInstance;
-        }
-
-        /**
-         * PersistPropertiesAdapter is an adapter for IVisualHostServices.persistProperties.
-         * We are going to remove it when IVisualHostServices will be fixed.
-         */
-        export class PersistPropertiesAdapter {
-            private persistPropertiesTimeout: number = 250; //ms
-            private timeoutId: number = null;
-
-            private frame: PersistPropertiesAdapterFrame;
-
-            private host: IVisualHost;
-            public get hostServices(): IVisualHost {
-                return this.host;
-            };
-
-            constructor(host: IVisualHost) {
-                this.host = host;
-            }
-
-            public static create(host: IVisualHost): PersistPropertiesAdapter {
-                return new PersistPropertiesAdapter(host);
-            }
-
-            public persistProperties(instance: PersistPropertiesAdapterVisualObjectInstance): void {
-                if (!instance || !instance.objectInstance || !instance.objectInstance.objectName) {
-                    return;
-                }
-
-                this.mergeInstances(instance);
-
-                this.sheduleToPersistProperties();
-            }
-
-            private mergeInstances(instance: PersistPropertiesAdapterVisualObjectInstance): void {
-                if (!this.frame) {
-                    this.createFrame();
-                }
-
-                var objectName: string = instance.objectInstance.objectName;
-
-                if (!this.frame[objectName]) {
-                    this.frame[objectName] = instance;
-                } else if (this.frame[objectName]) {
-                    var propertyNames: string[] = Object.keys(instance.objectInstance.properties);
-
-                    propertyNames.forEach((propertyName: string) => {
-                        this.frame[objectName].objectInstance.properties[propertyName] =
-                            instance.objectInstance.properties[propertyName];
-                    });
-
-                    this.frame[objectName].callback = instance.callback;
-                }
-            }
-
-            private sheduleToPersistProperties(): void {
-                if (this.timeoutId) {
-                    return;
-                }
-
-                this.timeoutId = setTimeout(() => {
-                    this.corePersistProperties();
-
-                    this.timeoutId = null;
-                }, this.persistPropertiesTimeout);
-            }
-
-            private corePersistProperties(): void {
-                var changes: VisualObjectInstancesToPersist,
-                    frameKeys: string[];
-
-                changes = { merge: [] };
-                frameKeys = Object.keys(this.frame);
-
-                frameKeys.forEach((frameKey: string) => {
-                    changes.merge.push(this.frame[frameKey].objectInstance);
-                });
-
-                if (changes.merge.length > 0) {
-                    this.host.persistProperties(changes);
-
-                    this.executeCallbacks();
-                }
-
-                this.createFrame();
-            }
-
-            private executeCallbacks(): void {
-                if (!this.frame) {
-                    return;
-                }
-
-                var frameKeys: string[] = Object.keys(this.frame);
-
-                frameKeys.forEach((frameKey: string) => {
-                    var instance: PersistPropertiesAdapterVisualObjectInstance = this.frame[frameKey];
-
-                    if (instance.callback) {
-                        instance.callback();
-                    }
-                });
-            }
-
-            private createFrame(): void {
-                this.frame = {};
-            }
-        }
-    }
-
-    export interface TimelineScale {
-        x: number;
-        y: number;
-    }
-
-    export module timelineScaleUtils {
-        export function getScale(element: HTMLElement): TimelineScale {
-            var clientRect = element.getBoundingClientRect();
-
-            return {
-                x: clientRect.width / element.offsetWidth,
-                y: clientRect.height / element.offsetHeight
-            };
         }
     }
 }
