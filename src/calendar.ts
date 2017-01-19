@@ -29,8 +29,8 @@ module powerbi.extensibility.visual {
     import TimelineGranularityData = granularity.TimelineGranularityData;
 
     // settings
-    import TimelineWeekDaySettings = settings.TimelineWeekDaySettings;
-    import TimelineCalendarSettings = settings.TimelineCalendarSettings;
+    import WeekDaySettings = settings.WeekDaySettings;
+    import CalendarSettings = settings.CalendarSettings;
 
     interface DateDictionary {
         [year: number]: Date;
@@ -60,16 +60,16 @@ module powerbi.extensibility.visual {
         }
 
         public isChanged(
-            calendarSettings: TimelineCalendarSettings,
-            weekDaySettings: TimelineWeekDaySettings): boolean {
+            calendarSettings: CalendarSettings,
+            weekDaySettings: WeekDaySettings): boolean {
             return this.firstMonthOfYear !== calendarSettings.month
                 || this.firstDayOfYear !== calendarSettings.day
                 || this.firstDayOfWeek !== weekDaySettings.day;
         }
 
         constructor(
-            calendarFormat: TimelineCalendarSettings,
-            weekDaySettings: TimelineWeekDaySettings) {
+            calendarFormat: CalendarSettings,
+            weekDaySettings: WeekDaySettings) {
 
             this.firstDayOfWeek = weekDaySettings.day;
             this.firstMonthOfYear = calendarFormat.month;

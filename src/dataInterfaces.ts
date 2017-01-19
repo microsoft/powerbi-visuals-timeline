@@ -92,10 +92,6 @@ module powerbi.extensibility.visual {
         endDate: string;
     }
 
-    export interface TimelineSettingsTypeValidator {
-        (value: any, defaultValue: any): any;
-    }
-
     export interface TimelineCursorOverElement {
         index: number;
         datapoint: TimelineDatapoint;

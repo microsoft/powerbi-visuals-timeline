@@ -33,7 +33,7 @@ module powerbi.extensibility.visual.utils {
     import ITimelineDatePeriod = datePeriod.ITimelineDatePeriod;
 
     // settings
-    import TimelineCellsSettings = settings.TimelineCellsSettings;
+    import CellsSettings = settings.CellsSettings;
 
     // granularity
     import GranularityType = granularity.GranularityType;
@@ -233,7 +233,7 @@ module powerbi.extensibility.visual.utils {
          * @param timelineData The TimelineData with the selected date periods
          * @param timelineFormat The TimelineFormat with the chosen colors
          */
-        public static getCellColor(d: TimelineDatapoint, timelineData: TimelineData, cellSettings: TimelineCellsSettings): string {
+        public static getCellColor(d: TimelineDatapoint, timelineData: TimelineData, cellSettings: CellsSettings): string {
             let inSelectedPeriods: boolean = d.datePeriod.startDate >= Utils.getStartSelectionDate(timelineData)
                 && d.datePeriod.endDate <= Utils.getEndSelectionDate(timelineData);
 

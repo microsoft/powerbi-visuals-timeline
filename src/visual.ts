@@ -62,11 +62,11 @@ module powerbi.extensibility.visual {
     import ElementScale = scaleUtils.ElementScale;
 
     // settings
-    import TimelineSettings = settings.TimelineSettings;
-    import TimelineCellsSettings = settings.TimelineCellsSettings;
-    import TimelineLabelsSettings = settings.TimelineLabelsSettings;
-    import TimelineCalendarSettings = settings.TimelineCalendarSettings;
-    import TimelineGranularitySettings = settings.TimelineGranularitySettings;
+    import VisualSettings = settings.VisualSettings;
+    import CellsSettings = settings.CellsSettings;
+    import LabelsSettings = settings.LabelsSettings;
+    import CalendarSettings = settings.CalendarSettings;
+    import GranularitySettings = settings.GranularitySettings;
 
     // granularity
     import GranularityType = granularity.GranularityType;
@@ -125,7 +125,7 @@ module powerbi.extensibility.visual {
             PeriodSlicerRect: createClassAndSelector("periodSlicerRect")
         };
 
-        private settings: TimelineSettings;
+        private settings: VisualSettings;
 
         private timelineProperties: TimelineProperties;
 
@@ -430,7 +430,7 @@ module powerbi.extensibility.visual {
             this.selectedTextSelection.text(Utils.getGranularityName(granularity));
         }
 
-        public fillColorGranularity(granularitySettings: TimelineGranularitySettings): void {
+        public fillColorGranularity(granularitySettings: GranularitySettings): void {
             let sliderColor: string = granularitySettings.sliderColor,
                 scaleColor: string = granularitySettings.scaleColor;
 
@@ -456,7 +456,7 @@ module powerbi.extensibility.visual {
         }
 
         private static setMeasures(
-            labelsSettings: TimelineLabelsSettings,
+            labelsSettings: LabelsSettings,
             granularityType: GranularityType,
             datePeriodsCount: number,
             viewport: IViewport,
@@ -701,7 +701,7 @@ module powerbi.extensibility.visual {
             this.render(this.timelineData, this.settings, this.timelineProperties, this.options);
         }
 
-        private updateCalendar(timelineFormat: TimelineSettings): void {
+        private updateCalendar(timelineFormat: VisualSettings): void {
             this.calendar = Timeline.converter(
                 this.timelineData,
                 this.timelineProperties,
@@ -737,7 +737,7 @@ module powerbi.extensibility.visual {
             timelineGranularityData: TimelineGranularityData,
             dataView: DataView,
             initialized: boolean,
-            timelineSettings: TimelineSettings,
+            timelineSettings: VisualSettings,
             viewport: IViewport,
             previousCalendar: Calendar): Calendar {
 
@@ -835,7 +835,7 @@ module powerbi.extensibility.visual {
 
         private render(
             timelineData: TimelineData,
-            timelineSettings: TimelineSettings,
+            timelineSettings: VisualSettings,
             timelineProperties: TimelineProperties,
             options: VisualUpdateOptions): void {
 
@@ -1024,12 +1024,12 @@ module powerbi.extensibility.visual {
             timelineData.cursorDataPoints[1].selectionIndex = (endDate.index + endDate.fraction);
         }
 
-        private static parseSettings(dataView: DataView): TimelineSettings {
-            let settings: TimelineSettings = TimelineSettings.parse(dataView); // TODO: fix it
+        private static parseSettings(dataView: DataView): VisualSettings {
+            const settings: VisualSettings = VisualSettings.parse<VisualSettings>(dataView);
 
             Timeline.setValidCalendarSettings(settings.calendar);
 
-            settings.general.datePeriod = TimelineDatePeriodBase.parse(<string>settings.general.datePeriod);
+            settings.general.datePeriod = TimelineDatePeriodBase.parse(settings.general.datePeriod as string);
 
             return settings;
         }
@@ -1037,8 +1037,8 @@ module powerbi.extensibility.visual {
         /**
          * Public for testability.
          */
-        public static setValidCalendarSettings(calendarSettings: TimelineCalendarSettings): void {
-            let defaultSettings: TimelineSettings = TimelineSettings.Default,
+        public static setValidCalendarSettings(calendarSettings: CalendarSettings): void {
+            let defaultSettings: VisualSettings = VisualSettings.getDefault() as VisualSettings,
                 theLatestDayOfMonth: number = Utils.getTheLatestDayOfMonth(calendarSettings.month);
 
             calendarSettings.day = Math.max(
@@ -1046,7 +1046,7 @@ module powerbi.extensibility.visual {
                 Math.min(theLatestDayOfMonth, calendarSettings.day));
         }
 
-        public fillCells(cellsSettings: TimelineCellsSettings): void {
+        public fillCells(cellsSettings: CellsSettings): void {
             let dataPoints = this.timelineData.timelineDatapoints,
                 cellSelection = this.mainGroupSelection
                     .selectAll(Timeline.TimelineSelectors.CellRect.selector)
@@ -1259,7 +1259,7 @@ module powerbi.extensibility.visual {
             return cursorSelection;
         }
 
-        public renderTimeRangeText(timelineData: TimelineData, rangeHeaderSettings: TimelineLabelsSettings): void {
+        public renderTimeRangeText(timelineData: TimelineData, rangeHeaderSettings: LabelsSettings): void {
             let leftMargin: number = (GranularityNames.length + 2) * this.timelineProperties.elementWidth,
                 maxWidth: number = this.svgWidth
                     - leftMargin
@@ -1356,7 +1356,7 @@ module powerbi.extensibility.visual {
         }
 
         /**
-         * This function retruns the values to be displayed in the property pane for each object.
+         * This function returns the values to be displayed in the property pane for each object.
          * Usually it is a bind pass of what the property pane gave you, but sometimes you may want to do
          * validation and return other values/defaults.
          */
@@ -1365,13 +1365,12 @@ module powerbi.extensibility.visual {
                 return [];
             }
 
-            // TODO: fix 
-            // let enumeration: VisualObjectInstanceEnumeration = TimelineSettings.enumerateObjectInstances(
-            //     this.settings,
-            //     options,
-            //     Timeline.capabilities);
+            const settings: VisualSettings = this.settings
+                || VisualSettings.getDefault() as VisualSettings;
 
-            return [];
+            return VisualSettings.enumerateObjectInstances(
+                settings,
+                options);
         }
     }
 }

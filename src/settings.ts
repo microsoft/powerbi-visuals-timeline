@@ -34,87 +34,47 @@ module powerbi.extensibility.visual.settings {
     // granularity
     import GranularityType = granularity.GranularityType;
 
-    export interface TimelineGeneralSettings {
-        datePeriod: TimelineDatePeriodBase | string;
-        filter: ISemanticFilter;
+    // powerbi.extensibility.utils.dataview
+    import DataViewObjectsParser = powerbi.extensibility.utils.dataview.DataViewObjectsParser;
+
+    export class GeneralSettings {
+        public datePeriod: TimelineDatePeriodBase | string = TimelineDatePeriodBase.createEmpty();
+        public filter: ISemanticFilter = null;
     }
 
-    export interface TimelineCalendarSettings {
-        month: number;
-        day: number;
+    export class CalendarSettings {
+        public month: number = 0;
+        public day: number = 1;
     }
 
-    export interface TimelineWeekDaySettings {
-        day: number;
+    export class WeekDaySettings {
+        public day: number = 0;
     }
 
-    export interface TimelineLabelsSettings {
-        show: boolean;
-        fontColor: string;
-        textSize: number;
+    export class LabelsSettings {
+        show: boolean = true;
+        fontColor: string = "#777777";
+        textSize: number = 9;
     }
 
-    export interface TimelineCellsSettings {
-        fillSelected: string;
-        fillUnselected: string;
+    export class CellsSettings {
+        public fillSelected: string = "#ADD8E6";
+        public fillUnselected: string = "";
     }
 
-    export interface TimelineGranularitySettings {
-        scaleColor: string;
-        sliderColor: string;
-        granularity: GranularityType;
+    export class GranularitySettings {
+        public scaleColor: string = "#000000";
+        public sliderColor: string = "#AAAAAA";
+        public granularity: GranularityType = GranularityType.month;
     }
 
-    export class TimelineSettings {
-        public static get Default() {
-            return new this();
-        }
-
-        public static parse(dataView: DataView): TimelineSettings {
-            return new this();
-        }
-
-        public originalSettings: TimelineSettings;
-        public createOriginalSettings(): void {
-            this.originalSettings = _.cloneDeep(this);
-        }
-
-        // Default Settings
-        public general: TimelineGeneralSettings = {
-            datePeriod: TimelineDatePeriodBase.createEmpty(),
-            filter: null
-        };
-
-        public calendar: TimelineCalendarSettings = {
-            month: 0,
-            day: 1
-        };
-
-        public weekDay: TimelineWeekDaySettings = {
-            day: 0
-        };
-
-        public rangeHeader: TimelineLabelsSettings = {
-            show: true,
-            fontColor: "#777777",
-            textSize: 9
-        };
-
-        public cells: TimelineCellsSettings = {
-            fillSelected: "#ADD8E6",
-            fillUnselected: "" // transparent by default
-        };
-
-        public granularity: TimelineGranularitySettings = {
-            scaleColor: "#000000",
-            sliderColor: "#AAAAAA",
-            granularity: GranularityType.month
-        };
-
-        public labels: TimelineLabelsSettings = {
-            show: true,
-            fontColor: "#777777",
-            textSize: 9
-        };
+    export class VisualSettings extends DataViewObjectsParser {
+        public general: GeneralSettings = new GeneralSettings();
+        public calendar: CalendarSettings = new CalendarSettings();
+        public weekDay: WeekDaySettings = new WeekDaySettings();
+        public rangeHeader: LabelsSettings = new LabelsSettings();
+        public cells: CellsSettings = new CellsSettings();
+        public granularity: GranularitySettings = new GranularitySettings();
+        public labels: LabelsSettings = new LabelsSettings();
     }
 }
