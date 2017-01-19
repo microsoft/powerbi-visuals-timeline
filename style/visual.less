@@ -23,3 +23,71 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
  */
+ 
+.timeline {
+    font-family: helvetica, arial, sans-serif;
+
+    cursor: default;
+
+    .label,
+    .mainArea .label,
+    .upperTextCell,
+    .lowerTextCell {
+        text-anchor: middle;
+    }
+
+    .cellRect {
+        stroke: #333444;
+    }
+
+    .selection {
+        &Cursor {
+            fill: gray;
+        }
+
+        &RangeContainer {
+            text-anchor: start;
+        }
+    }
+
+    .timelineSlicer {
+        fill: #000000;
+
+        .periodSlicer {
+            &Rect {
+                stroke: #aaa;
+                stroke-width: 2px;
+                fill: transparent;
+            }
+
+            &Granularities,
+            &Selection {
+                font-size: 10px;
+                text-anchor: middle;
+            }
+
+            &SelectionRect {
+                fill: transparent;
+            }
+
+            &Rect,
+            &SelectionRect {
+                -webkit-tap-highlight-color: transparent;
+            }
+        }
+
+        .periodSlicerRect {
+            pointer-events: none;
+        }
+    }
+
+    .periodSlicerSelectionRect,
+    .timelineVertLine,
+    .cellRect {
+        cursor: pointer;
+    }
+
+    .selectionCursor {
+        cursor: ew-resize;
+    }
+}
