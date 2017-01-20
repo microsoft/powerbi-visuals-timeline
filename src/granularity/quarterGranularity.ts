@@ -29,19 +29,22 @@ module powerbi.extensibility.visual.granularity {
     import TimelineDatePeriod = datePeriod.TimelineDatePeriod;
 
     export class QuarterGranularity extends TimelineGranularityBase {
+        private static DefaultQuarter: number = 3;
+
         /**
          * Returns the date's quarter name (e.g. Q1, Q2, Q3, Q4)
          * @param date A date 
          */
         private quarterText(date: Date): string {
-            let quarter: number = 3,
+            let quarter: number = QuarterGranularity.DefaultQuarter,
                 year: number = this.determineYear(date);
 
             while (date < this.calendar.getQuarterStartDate(year, quarter))
-                if (quarter > 0)
+                if (quarter > 0) {
                     quarter--;
+                }
                 else {
-                    quarter = 3;
+                    quarter = QuarterGranularity.DefaultQuarter;
                     year--;
                 }
 

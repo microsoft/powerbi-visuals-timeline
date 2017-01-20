@@ -25,6 +25,9 @@
  */
 
 module powerbi.extensibility.visual {
+    // powerbi.data
+    import ISQExpr = powerbi.data.ISQExpr;
+
     // powerbi.extensibility.utils.svg
     import ClassAndSelector = powerbi.extensibility.utils.svg.CssConstants.ClassAndSelector;
 
@@ -112,7 +115,7 @@ module powerbi.extensibility.visual {
     }
 
     export interface TimelineData {
-        columnIdentity?: SQColumnRefExpr;
+        columnIdentity?: ISQExpr;
         timelineDatapoints?: TimelineDatapoint[];
         selectionStartIndex?: number;
         selectionEndIndex?: number;

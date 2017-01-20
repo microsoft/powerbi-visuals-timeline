@@ -69,7 +69,10 @@ module powerbi.extensibility.visual.test.mocks {
             return [];
         }
 
-        public sameLabel(firstDatePeriod: TimelineDatePeriod, secondDatePeriod: TimelineDatePeriod): boolean {
+        public sameLabel(
+            firstDatePeriod: TimelineDatePeriod,
+            secondDatePeriod: TimelineDatePeriod): boolean {
+
             return false;
         }
 

@@ -37,10 +37,22 @@ module powerbi.extensibility.visual.utils {
 
     // granularity
     import GranularityType = granularity.GranularityType;
+    import GranularityName = granularity.GranularityName;
     import GranularityNames = granularity.GranularityNames;
     import TimelineGranularityData = granularity.TimelineGranularityData;
 
     export class Utils {
+        private static DateSplitter: string = " - ";
+
+        private static MinFraction: number = 1;
+
+        private static TotalDaysInWeek: number = 7;
+        private static WeekDayOffset: number = 1;
+
+        private static DefaultCellColor: string = "transparent";
+
+        private static DateArrayJoiner: string = " ";
+
         public static TotalMilliseconds: number = 1000;
         public static TotalSeconds: number = 60;
         public static TotalMinutes: number = 60;
@@ -69,9 +81,9 @@ module powerbi.extensibility.visual.utils {
         }
 
         public static getAmountOfWeeksBetweenDates(startDate: Date, endDate: Date): number {
-            let totalDays: number = Utils.getAmountOfDaysBetweenDates(startDate, endDate);
+            const totalDays: number = Utils.getAmountOfDaysBetweenDates(startDate, endDate);
 
-            return 1 + Math.floor(totalDays / 7);
+            return Utils.WeekDayOffset + Math.floor(totalDays / Utils.TotalDaysInWeek);
         }
 
         public static getMillisecondsWithoutTimezone(date: Date): number {
@@ -171,7 +183,7 @@ module powerbi.extensibility.visual.utils {
         }
 
         public static areBoundsOfSelectionAndAvailableDatesTheSame(timelineData: TimelineData): boolean {
-            let datePeriod: TimelineDatePeriod[] = timelineData.currentGranularity.getDatePeriods(),
+            const datePeriod: TimelineDatePeriod[] = timelineData.currentGranularity.getDatePeriods(),
                 startDate: Date = Utils.getStartSelectionDate(timelineData),
                 endDate: Date = Utils.getEndSelectionDate(timelineData);
 
@@ -184,7 +196,7 @@ module powerbi.extensibility.visual.utils {
         }
 
         public static getTheLatestDayOfMonth(monthId: number): number {
-            let date: Date = new Date(2008, monthId + 1, 0); // leap year, so the latest day of February is 29.
+            const date: Date = new Date(2008, monthId + 1, 0); // leap year, so the latest day of February is 29.
 
             return date.getDate();
         }
@@ -233,13 +245,17 @@ module powerbi.extensibility.visual.utils {
          * @param timelineData The TimelineData with the selected date periods
          * @param timelineFormat The TimelineFormat with the chosen colors
          */
-        public static getCellColor(d: TimelineDatapoint, timelineData: TimelineData, cellSettings: CellsSettings): string {
-            let inSelectedPeriods: boolean = d.datePeriod.startDate >= Utils.getStartSelectionDate(timelineData)
-                && d.datePeriod.endDate <= Utils.getEndSelectionDate(timelineData);
+        public static getCellColor(
+            dataPoint: TimelineDatapoint,
+            timelineData: TimelineData,
+            cellSettings: CellsSettings): string {
+
+            const inSelectedPeriods: boolean = dataPoint.datePeriod.startDate >= Utils.getStartSelectionDate(timelineData)
+                && dataPoint.datePeriod.endDate <= Utils.getEndSelectionDate(timelineData);
 
             return inSelectedPeriods
                 ? cellSettings.fillSelected
-                : (cellSettings.fillUnselected || "transparent");
+                : (cellSettings.fillUnselected || Utils.DefaultCellColor);
         }
 
         /**
@@ -247,7 +263,10 @@ module powerbi.extensibility.visual.utils {
          * @param granularityName The name of the granularity
          */
         public static getGranularityType(granularityName: string): GranularityType {
-            let index: number = _.findIndex(GranularityNames, x => x.name === granularityName);
+            const index: number = _.findIndex(GranularityNames, (granularity: GranularityName) => {
+                return granularity.name === granularityName;
+            });
+
             return GranularityNames[index].granularityType;
         }
 
@@ -255,13 +274,16 @@ module powerbi.extensibility.visual.utils {
          * Returns the name of the granularity type
          * @param granularity The type of granularity
          */
-        public static getGranularityName(granularity: GranularityType): string {
-            let index: number = _.findIndex(GranularityNames, x => x.granularityType === granularity);
+        public static getGranularityName(granularityType: GranularityType): string {
+            const index: number = _.findIndex(GranularityNames, (granularity: GranularityName) => {
+                return granularity.granularityType === granularityType;
+            });
+
             return GranularityNames[index].name;
         }
 
         /**
-         * Splits the date periods of the current granularity, in case the stard and end of the selection is in between a date period.
+         * Splits the date periods of the current granularity, in case the start and end of the selection is in between a date period.
          * i.e. for a quarter granularity and a selection between Feb 6 and Dec 23, the date periods for Q1 and Q4 will be split accordingly
          * @param timelineData The TimelineData that contains the date periods
          * @param startDate The starting date of the selection
@@ -272,13 +294,18 @@ module powerbi.extensibility.visual.utils {
                 startDateIndex: number = _.findIndex(datePeriods, x => startDate < x.endDate),
                 endDateIndex: number = _.findIndex(datePeriods, x => endDate <= x.endDate);
 
-            startDateIndex = startDateIndex >= 0 ? startDateIndex : 0;
-            endDateIndex = endDateIndex >= 0 ? endDateIndex : datePeriods.length - 1;
+            startDateIndex = startDateIndex >= 0
+                ? startDateIndex
+                : 0;
+
+            endDateIndex = endDateIndex >= 0
+                ? endDateIndex
+                : datePeriods.length - 1;
 
             timelineData.selectionStartIndex = startDateIndex;
             timelineData.selectionEndIndex = endDateIndex;
 
-            let startRatio: number = Utils.getDateRatio(datePeriods[startDateIndex], startDate, true),
+            const startRatio: number = Utils.getDateRatio(datePeriods[startDateIndex], startDate, true),
                 endRatio: number = Utils.getDateRatio(datePeriods[endDateIndex], endDate, false);
 
             if (endRatio > 0) {
@@ -286,7 +313,7 @@ module powerbi.extensibility.visual.utils {
             }
 
             if (startRatio > 0) {
-                let startFration: number = datePeriods[startDateIndex].fraction - startRatio;
+                const startFration: number = datePeriods[startDateIndex].fraction - startRatio;
 
                 timelineData.currentGranularity.splitPeriod(startDateIndex, startFration, startDate);
 
@@ -305,11 +332,11 @@ module powerbi.extensibility.visual.utils {
          * @param fromStart Whether to calculater the ratio from the start of the date period.
          */
         public static getDateRatio(datePeriod: TimelineDatePeriod, date: Date, fromStart: boolean): number {
-            let dateDifference: number = fromStart
+            const dateDifference: number = fromStart
                 ? date.getTime() - datePeriod.startDate.getTime()
                 : datePeriod.endDate.getTime() - date.getTime();
 
-            let periodDifference: number = datePeriod.endDate.getTime() - datePeriod.startDate.getTime();
+            const periodDifference: number = datePeriod.endDate.getTime() - datePeriod.startDate.getTime();
 
             return periodDifference === 0
                 ? 0
@@ -326,11 +353,11 @@ module powerbi.extensibility.visual.utils {
             let endSelectionDateArray: (string | number)[] = timelineData.currentGranularity
                 .splitDate(Utils.getEndSelectionPeriod(timelineData).startDate);
 
-            return `${startSelectionDateArray.join(" ")}` + ` - ` + `${endSelectionDateArray.join(" ")}`;
+            return `${startSelectionDateArray.join(Utils.DateArrayJoiner)}${Utils.DateSplitter}${endSelectionDateArray.join(Utils.DateArrayJoiner)}`;
         }
 
         public static dateRangeText(datePeriod: TimelineDatePeriod): string {
-            return `${datePeriod.startDate.toDateString()} - ${TimelineGranularityData.previousDay(datePeriod.endDate).toDateString()}`;
+            return `${datePeriod.startDate.toDateString()}${Utils.DateSplitter}${TimelineGranularityData.previousDay(datePeriod.endDate).toDateString()}`;
         }
 
         /**
@@ -339,7 +366,11 @@ module powerbi.extensibility.visual.utils {
          * @param datePeriods The list of date periods
          */
         public static unseparateSelection(datePeriods: TimelineDatePeriod[]): void {
-            let separationIndex: number = _.findIndex(datePeriods, x => x.fraction < 1);
+            const separationIndex: number = _.findIndex(
+                datePeriods,
+                (datePeriod: TimelineDatePeriod) => {
+                    return datePeriod.fraction < Utils.MinFraction;
+                });
 
             if (separationIndex < 0) {
                 return;
@@ -359,7 +390,7 @@ module powerbi.extensibility.visual.utils {
 
             elements = elements || [];
 
-            let length: number = elements.length;
+            const length: number = elements.length;
 
             if (!Utils.isValueEmpty(elements[0])
                 && !Utils.isValueEmpty(elements[1])
@@ -369,6 +400,7 @@ module powerbi.extensibility.visual.utils {
             } else if (
                 !Utils.isValueEmpty(elements[length - 1])
                 && position >= elements[length - 1] * widthOfElement + offset) {
+
                 return length - 1;
             }
 

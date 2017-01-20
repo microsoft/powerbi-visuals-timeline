@@ -81,10 +81,63 @@ module powerbi.extensibility.visual {
     // utils
     import Utils = utils.Utils;
 
-    export interface SQColumnRefExpr { } // TODO: It's a temporary interface. We have to remove it soon.
-
     export class Timeline implements IVisual {
         private static MinSizeOfViewport: number = 0;
+
+        private static DefaultTextYPosition: number = 50;
+
+        private static CellsYPositionFactor: number = 3;
+        private static CellsYPositionOffset: number = 65;
+
+        private static HorizLineSelectionYOffset: number = 2;
+        private static DefaultHorizLineSelectionHeight: number = 1;
+
+        private static DefaultVertLineSelectionWidth: number = 2;
+        private static DefaultVertLineSelectionHeight: number = 3;
+
+        private static TextLabelsSelectionOffset: number = 3;
+
+        private static SelectedTextSelectionFactor: number = 2;
+        private static SelectedTextSelectionYOffset: number = 17;
+
+        private static SelectorPeriodsFactor: number = 2;
+        private static DefaultSelectorPeriodsY: number = 3;
+        private static DefaultSelectorPeriodsHeight: number = 23;
+
+        private static PeriodSlicerRectSelectionXOffset: number = 6;
+        private static PeriodSlicerRectSelectionYOffset: number = 16;
+        private static DefaultPeriodSlicerRectSelectionRx: number = 4;
+        private static DefaultPeriodSlicerRectSelectionWidth: number = 15;
+        private static DefaultPeriodSlicerRectSelectionHeight: number = 23;
+
+        private static LabelSizeFactor: number = 1.5;
+        private static TimelinePropertiesHeightOffset: number = 20;
+
+        private static DefaultCursorDatapointX: number = 0;
+        private static DefaultCursorDatapointY: number = 0;
+        private static DefaultSelectionStartIndex: number = 0;
+
+        private static CellHeightDivider: number = 2;
+
+        private static DefaultFontFamily: string = "arial";
+
+        private static TextWidthMiddleDivider: number = 2;
+
+        private static SvgWidthOffset: number = 1;
+
+        private static DefaultYDiff: number = 1.5;
+
+        private static DefaultOverflow: string = "auto";
+
+        private static TextLabelsSelectionDx: string = "0.5em";
+
+        private static CellWidthLastFactor: number = 0.9;
+        private static CellWidthNotLastFactor: number = 3;
+
+        private static LabelIdOffset: number = 0.5;
+        private static GranularityNamesLength: number = 2;
+
+        private static DefaultRangeTextSelectionY: number = 40;
 
         private static TimelineMargins: TimelineMargins = {
             LeftMargin: 15,
@@ -182,8 +235,7 @@ module powerbi.extensibility.visual {
          * @param granularity The new granularity type
          */
         public changeGranularity(granularity: GranularityType, startDate: Date, endDate: Date): void {
-            if (Utils.unseparateSelection(this.timelineData.currentGranularity.getDatePeriods())) {
-            }
+            Utils.unseparateSelection(this.timelineData.currentGranularity.getDatePeriods());
 
             this.timelineData.currentGranularity = this.timelineGranularityData.getGranularity(granularity);
             Utils.separateSelection(this.timelineData, startDate, endDate);
@@ -204,8 +256,9 @@ module powerbi.extensibility.visual {
             this.selectionManager = host.createSelectionManager();
 
             this.timelineProperties = {
-                textYPosition: 50,
-                cellsYPosition: Timeline.TimelineMargins.TopMargin * 3 + 65,
+                textYPosition: Timeline.DefaultTextYPosition,
+                cellsYPosition: Timeline.TimelineMargins.TopMargin
+                * Timeline.CellsYPositionFactor + Timeline.CellsYPositionOffset,
                 topMargin: Timeline.TimelineMargins.TopMargin,
                 bottomMargin: Timeline.TimelineMargins.BottomMargin,
                 leftMargin: Timeline.TimelineMargins.LeftMargin,
@@ -262,12 +315,15 @@ module powerbi.extensibility.visual {
                 this.selectionManager.clear();
 
                 if (this.timelineData) {
-                    this.timelineData.selectionStartIndex = 0;
+                    this.timelineData.selectionStartIndex = Timeline.DefaultSelectionStartIndex;
 
                     this.timelineData.selectionEndIndex =
                         this.timelineData.currentGranularity.getDatePeriods().length - 1;
 
-                    if (this.timelineData.timelineDatapoints.some((x) => x.index % 1 !== 0)) {
+                    const hasIrregularDataPoint: boolean = this.timelineData.timelineDatapoints
+                        .some((dataPoint: TimelineDatapoint) => dataPoint.index % 1 !== 0);
+
+                    if (hasIrregularDataPoint) {
                         this.selectPeriod(this.timelineData.currentGranularity.getType());
                     }
                     else {
@@ -290,7 +346,7 @@ module powerbi.extensibility.visual {
         }
 
         private drawGranular(timelineProperties: TimelineProperties, type: GranularityType): void {
-            let startXpoint: number = timelineProperties.startXpoint,
+            const startXpoint: number = timelineProperties.startXpoint,
                 startYpoint: number = timelineProperties.startYpoint,
                 elementWidth: number = timelineProperties.elementWidth,
                 selectorPeriods: string[] = this.granularitySelectors;
@@ -299,7 +355,7 @@ module powerbi.extensibility.visual {
                 .append("g")
                 .classed(Timeline.TimelineSelectors.TimelineSlicer.class, true);
 
-            let dragPeriodRect: Drag<any> = d3.behavior.drag()
+            const dragPeriodRect: Drag<any> = d3.behavior.drag()
                 .on("drag", () => {
                     this.selectPeriod(this.getGranularityIndexByPosition((d3.event as MouseEvent).x));
                 });
@@ -311,8 +367,8 @@ module powerbi.extensibility.visual {
 
             this.horizLineSelection.attr({
                 x: convertToPx(startXpoint),
-                y: convertToPx(startYpoint + 2),
-                height: convertToPx(1),
+                y: convertToPx(startYpoint + Timeline.HorizLineSelectionYOffset),
+                height: convertToPx(Timeline.DefaultHorizLineSelectionHeight),
                 width: convertToPx((selectorPeriods.length - 1) * elementWidth)
             });
 
@@ -328,8 +384,8 @@ module powerbi.extensibility.visual {
                 .attr({
                     x: (d, index) => convertToPx(startXpoint + index * elementWidth),
                     y: convertToPx(startYpoint),
-                    width: convertToPx(2),
-                    height: convertToPx(3)
+                    width: convertToPx(Timeline.DefaultVertLineSelectionWidth),
+                    height: convertToPx(Timeline.DefaultVertLineSelectionHeight)
                 });
 
             // create text lables
@@ -343,9 +399,10 @@ module powerbi.extensibility.visual {
             this.textLabelsSelection = text
                 .text((value: string) => value)
                 .attr({
-                    x: (d, index) => convertToPx(startXpoint - 3 + index * elementWidth),
-                    y: convertToPx(startYpoint - 3),
-                    dx: "0.5em"
+                    x: (d, index: number) => convertToPx(startXpoint
+                        - Timeline.TextLabelsSelectionOffset + index * elementWidth),
+                    y: convertToPx(startYpoint - Timeline.TextLabelsSelectionOffset),
+                    dx: Timeline.TextLabelsSelectionDx
                 });
 
             // create selected period text
@@ -356,27 +413,29 @@ module powerbi.extensibility.visual {
             this.selectedTextSelection
                 .text(Utils.getGranularityName(type))
                 .attr({
-                    x: convertToPx(startXpoint + 2 * elementWidth),
-                    y: convertToPx(startYpoint + 17),
+                    x: convertToPx(startXpoint + Timeline.SelectedTextSelectionFactor * elementWidth),
+                    y: convertToPx(startYpoint + Timeline.SelectedTextSelectionYOffset),
                 });
 
-            let selRects = this.selectorSelection
+            const selRects: Selection<string> = this.selectorSelection
                 .selectAll(Timeline.TimelineSelectors.PeriodSlicerSelectionRect.selector)
                 .data(selectorPeriods)
                 .enter()
                 .append("rect")
                 .classed(Timeline.TimelineSelectors.PeriodSlicerSelectionRect.class, true);
 
-            let clickHandler = (d: any, index: number) => {
+            const clickHandler = (d: any, index: number) => {
                 this.selectPeriod(index);
             };
 
             selRects
                 .attr({
-                    x: (d, index) => convertToPx(startXpoint - elementWidth / 2 + index * elementWidth),
-                    y: convertToPx(3),
+                    x: (d, index: number) => convertToPx(startXpoint
+                        - elementWidth / Timeline.SelectorPeriodsFactor
+                        + index * elementWidth),
+                    y: convertToPx(Timeline.DefaultSelectorPeriodsY),
                     width: convertToPx(elementWidth),
-                    height: convertToPx(23)
+                    height: convertToPx(Timeline.DefaultSelectorPeriodsHeight)
                 })
                 .on("mousedown", clickHandler)
                 .on("touchstart", clickHandler);
@@ -385,10 +444,10 @@ module powerbi.extensibility.visual {
                 .append("rect")
                 .classed(Timeline.TimelineSelectors.PeriodSlicerRect.class, true)
                 .attr({
-                    y: convertToPx(startYpoint - 16),
-                    rx: convertToPx(4),
-                    width: convertToPx(15),
-                    height: convertToPx(23)
+                    y: convertToPx(startYpoint - Timeline.PeriodSlicerRectSelectionYOffset),
+                    rx: convertToPx(Timeline.DefaultPeriodSlicerRectSelectionRx),
+                    width: convertToPx(Timeline.DefaultPeriodSlicerRectSelectionWidth),
+                    height: convertToPx(Timeline.DefaultPeriodSlicerRectSelectionHeight)
                 });
 
             this.renderGranularitySlicerRect(type);
@@ -422,7 +481,7 @@ module powerbi.extensibility.visual {
                 .attr({
                     x: convertToPx(
                         this.timelineProperties.startXpoint
-                        - 6
+                        - Timeline.PeriodSlicerRectSelectionXOffset
                         + granularity
                         * this.timelineProperties.elementWidth)
                 });
@@ -431,7 +490,7 @@ module powerbi.extensibility.visual {
         }
 
         public fillColorGranularity(granularitySettings: GranularitySettings): void {
-            let sliderColor: string = granularitySettings.sliderColor,
+            const sliderColor: string = granularitySettings.sliderColor,
                 scaleColor: string = granularitySettings.scaleColor;
 
             this.periodSlicerRectSelection.style("stroke", sliderColor);
@@ -474,7 +533,9 @@ module powerbi.extensibility.visual {
             labelSize = fromPointToPixel(labelsSettings.textSize);
 
             if (labelsSettings.show) {
-                timelineProperties.cellsYPosition += labelSize * 1.5 * (granularityType + 1);
+                timelineProperties.cellsYPosition += labelSize
+                    * Timeline.LabelSizeFactor
+                    * (granularityType + 1);
             }
 
             svgHeight = Math.max(0, viewport.height - timelineMargins.TopMargin);
@@ -486,7 +547,9 @@ module powerbi.extensibility.visual {
                 Math.min(
                     timelineMargins.MaxCellHeight,
                     maxHeight,
-                    svgHeight - timelineProperties.cellsYPosition - 20));
+                    svgHeight
+                    - timelineProperties.cellsYPosition
+                    - Timeline.TimelinePropertiesHeightOffset));
 
             width = Math.max(
                 timelineMargins.MinCellWidth,
@@ -509,7 +572,7 @@ module powerbi.extensibility.visual {
 
             this.settings = Timeline.parseSettings(dataView);
 
-            datePeriod = <TimelineDatePeriodBase>this.settings.general.datePeriod;
+            datePeriod = this.settings.general.datePeriod as TimelineDatePeriodBase;
 
             if (datePeriod.startDate && datePeriod.endDate) {
                 resetedStartDate = Utils.resetTime(datePeriod.startDate);
@@ -586,16 +649,17 @@ module powerbi.extensibility.visual {
                 || !options.dataViews[0]
                 || !options.dataViews[0].metadata
                 || !Timeline.isDataViewCategoricalValid(options.dataViews[0].categorical)) {
+
                 return false;
             }
 
             let dataView: DataView = options.dataViews[0],
-                columnExp: ISQExpr,
+                columnExp: ISQExpr = dataView.categorical.categories[0].source.expr,
                 valueType: string;
 
-            columnExp = <ISQExpr>dataView.categorical.categories[0].source.expr;
-
-            valueType = columnExp ? columnExp["level"] : null;
+            valueType = columnExp
+                ? columnExp["level"]
+                : null;
 
             if (!(dataView.categorical.categories[0].source.type.dateTime
                 || (dataView.categorical.categories[0].source.type.numeric
@@ -617,8 +681,6 @@ module powerbi.extensibility.visual {
         }
 
         public update(options: VisualUpdateOptions): void {
-            let datePeriod: TimelineDatePeriodBase;
-
             if (!Timeline.areVisualUpdateOptionsValid(options)) {
                 this.clearData();
 
@@ -632,7 +694,7 @@ module powerbi.extensibility.visual {
 
             this.createTimelineData(this.dataView);
 
-            datePeriod = <TimelineDatePeriodBase>this.settings.general.datePeriod;
+            const datePeriod: TimelineDatePeriodBase = this.settings.general.datePeriod as TimelineDatePeriodBase;
 
             this.updateCalendar(this.settings);
 
@@ -641,7 +703,11 @@ module powerbi.extensibility.visual {
             if (datePeriod.startDate && datePeriod.endDate) {
                 this.applySelection(options, datePeriod);
             } else {
-                this.render(this.timelineData, this.settings, this.timelineProperties, options);
+                this.render(
+                    this.timelineData,
+                    this.settings,
+                    this.timelineProperties,
+                    options);
             }
 
             this.renderGranularitySlicerRect(this.settings.granularity.granularity);
@@ -654,7 +720,7 @@ module powerbi.extensibility.visual {
         }
 
         private applyThePreviousFilter(options: VisualUpdateOptions, datePeriod: TimelineDatePeriodBase): void {
-            let columnIdentity: SQColumnRefExpr = this.timelineData.columnIdentity;
+            let columnIdentity: ISQExpr = this.timelineData.columnIdentity;
 
             if (!datePeriod.startDate || !datePeriod.endDate) {
                 this.clearSelection(columnIdentity);
@@ -698,7 +764,11 @@ module powerbi.extensibility.visual {
 
             this.updateCalendar(this.settings);
 
-            this.render(this.timelineData, this.settings, this.timelineProperties, this.options);
+            this.render(
+                this.timelineData,
+                this.settings,
+                this.timelineProperties,
+                this.options);
         }
 
         private updateCalendar(timelineFormat: VisualSettings): void {
@@ -754,21 +824,22 @@ module powerbi.extensibility.visual {
 
             if (!initialized) {
                 timelineData.cursorDataPoints.push({
-                    x: 0,
-                    y: 0,
-                    selectionIndex: 0,
+                    x: Timeline.DefaultCursorDatapointX,
+                    y: Timeline.DefaultCursorDatapointY,
+                    selectionIndex: Timeline.DefaultSelectionStartIndex,
                     cursorIndex: 0
                 });
 
                 timelineData.cursorDataPoints.push({
-                    x: 0,
-                    y: 0,
-                    selectionIndex: 0,
+                    x: Timeline.DefaultCursorDatapointX,
+                    y: Timeline.DefaultCursorDatapointY,
+                    selectionIndex: Timeline.DefaultSelectionStartIndex,
                     cursorIndex: 1
                 });
             }
 
-            isCalendarChanged = previousCalendar && previousCalendar.isChanged(timelineSettings.calendar, timelineSettings.weekDay);
+            isCalendarChanged = previousCalendar
+                && previousCalendar.isChanged(timelineSettings.calendar, timelineSettings.weekDay);
 
             if (timelineData && timelineData.currentGranularity) {
                 startDate = Utils.getStartSelectionDate(timelineData);
@@ -780,7 +851,8 @@ module powerbi.extensibility.visual {
 
                 timelineGranularityData.createGranularities(calendar);
                 timelineGranularityData.createLabels();
-                timelineData.currentGranularity = timelineGranularityData.getGranularity(timelineSettings.granularity.granularity);
+                timelineData.currentGranularity = timelineGranularityData.getGranularity(
+                    timelineSettings.granularity.granularity);
             } else {
                 calendar = previousCalendar;
 
@@ -790,7 +862,7 @@ module powerbi.extensibility.visual {
                 timelineData.selectionEndIndex = timelineData.currentGranularity.getDatePeriods().length - 1;
             }
 
-            timelineData.columnIdentity = <SQColumnRefExpr>dataView.categorical.categories[0].identityFields[0];
+            timelineData.columnIdentity = dataView.categorical.categories[0].identityFields[0];
 
             if (dataView.categorical.categories[0].source.type.numeric) {
                 (<any>timelineData.columnIdentity).ref = "Date";
@@ -805,7 +877,7 @@ module powerbi.extensibility.visual {
             timelineData.timelineDatapoints = [];
 
             for (let currentTimePeriod of timelineElements) {
-                let datapoint: TimelineDatapoint = {
+                const datapoint: TimelineDatapoint = {
                     index: currentTimePeriod.index,
                     datePeriod: currentTimePeriod
                 };
@@ -840,12 +912,12 @@ module powerbi.extensibility.visual {
             options: VisualUpdateOptions): void {
 
             let timelineDatapointsCount = this.timelineData.timelineDatapoints
-                .filter((x) => {
-                    return x.index % 1 === 0;
+                .filter((dataPoint: TimelineDatapoint) => {
+                    return dataPoint.index % 1 === 0;
                 })
                 .length;
 
-            this.svgWidth = 1
+            this.svgWidth = Timeline.SvgWidthOffset
                 + this.timelineProperties.cellHeight
                 + timelineProperties.cellWidth * timelineDatapointsCount;
 
@@ -859,8 +931,8 @@ module powerbi.extensibility.visual {
                     "drag-resize-disabled": true
                 })
                 .style({
-                    "overflow-x": "auto",
-                    "overflow-y": "auto"
+                    "overflow-x": Timeline.DefaultOverflow,
+                    "overflow-y": Timeline.DefaultOverflow
                 });
 
             this.mainSvgSelection.attr({
@@ -877,7 +949,7 @@ module powerbi.extensibility.visual {
                 timelineProperties.topMargin);
 
             let translateString: string = translate(
-                timelineProperties.cellHeight / 2,
+                timelineProperties.cellHeight / Timeline.CellHeightDivider,
                 timelineProperties.topMargin);
 
             this.mainGroupSelection.attr("transform", translateString);
@@ -888,25 +960,45 @@ module powerbi.extensibility.visual {
                 granularityType = this.timelineData.currentGranularity.getType();
 
             let yPos: number = 0,
-                yDiff: number = 1.50;
+                yDiff: number = Timeline.DefaultYDiff;
 
-            this.renderLabels(extendedLabels.yearLabels, this.yearLabelsSelection, yPos, granularityType === 0);
-
-            yPos += yDiff;
-
-            this.renderLabels(extendedLabels.quarterLabels, this.quarterLabelsSelection, yPos, granularityType === 1);
-
-            yPos += yDiff;
-
-            this.renderLabels(extendedLabels.monthLabels, this.monthLabelsSelection, yPos, granularityType === 2);
+            this.renderLabels(
+                extendedLabels.yearLabels,
+                this.yearLabelsSelection,
+                yPos,
+                granularityType === 0);
 
             yPos += yDiff;
 
-            this.renderLabels(extendedLabels.weekLabels, this.weekLabelsSelection, yPos, granularityType === 3);
+            this.renderLabels(
+                extendedLabels.quarterLabels,
+                this.quarterLabelsSelection,
+                yPos,
+                granularityType === 1);
 
             yPos += yDiff;
 
-            this.renderLabels(extendedLabels.dayLabels, this.dayLabelsSelection, yPos, granularityType === 4);
+            this.renderLabels(
+                extendedLabels.monthLabels,
+                this.monthLabelsSelection,
+                yPos,
+                granularityType === 2);
+
+            yPos += yDiff;
+
+            this.renderLabels(
+                extendedLabels.weekLabels,
+                this.weekLabelsSelection,
+                yPos,
+                granularityType === 3);
+
+            yPos += yDiff;
+
+            this.renderLabels(
+                extendedLabels.dayLabels,
+                this.dayLabelsSelection,
+                yPos,
+                granularityType === 4);
 
             this.renderCells(timelineData, timelineProperties);
 
@@ -940,35 +1032,41 @@ module powerbi.extensibility.visual {
                 .classed(Timeline.TimelineSelectors.textLabel.class, true);
 
             labelsGroupSelection
-                .text((x: TimelineLabel, id: number) => {
+                .text((label: TimelineLabel, id: number) => {
                     if (!isLast && id === 0 && labels.length > 1) {
-                        let fontSize = convertToPt(this.settings.labels.textSize);
+                        const fontSize: string = convertToPt(this.settings.labels.textSize);
 
                         let textProperties: TextProperties = {
                             text: labels[0].text,
-                            fontFamily: "arial",
+                            fontFamily: Timeline.DefaultFontFamily,
                             fontSize: fontSize
                         };
 
-                        let halfFirstTextWidth = textMeasurementService.measureSvgTextWidth(textProperties) / 2;
+                        let halfFirstTextWidth = textMeasurementService.measureSvgTextWidth(textProperties)
+                            / Timeline.TextWidthMiddleDivider;
 
                         textProperties = {
                             text: labels[1].text,
-                            fontFamily: "arial",
+                            fontFamily: Timeline.DefaultFontFamily,
                             fontSize: fontSize
                         };
 
-                        let halfSecondTextWidth = textMeasurementService.measureSvgTextWidth(textProperties) / 2,
-                            diff = this.timelineProperties.cellWidth * (labels[1].id - labels[0].id);
+                        const halfSecondTextWidth = textMeasurementService.measureSvgTextWidth(textProperties)
+                            / Timeline.TextWidthMiddleDivider;
+
+                        const diff: number = this.timelineProperties.cellWidth
+                            * (labels[1].id - labels[0].id);
 
                         if (diff < halfFirstTextWidth + halfSecondTextWidth) {
                             return "";
                         }
                     }
 
-                    let labelFormattedTextOptions: LabelFormattedTextOptions = {
-                        label: x.text,
-                        maxWidth: this.timelineProperties.cellWidth * (isLast ? 0.90 : 3),
+                    const labelFormattedTextOptions: LabelFormattedTextOptions = {
+                        label: label.text,
+                        maxWidth: this.timelineProperties.cellWidth * (isLast
+                            ? Timeline.CellWidthLastFactor
+                            : Timeline.CellWidthNotLastFactor),
                         fontSize: this.settings.labels.textSize
                     };
 
@@ -976,13 +1074,15 @@ module powerbi.extensibility.visual {
                 })
                 .style("font-size", convertToPt(this.settings.labels.textSize))
                 .attr({
-                    x: (x: TimelineLabel) => (x.id + 0.5) * this.timelineProperties.cellWidth,
+                    x: (label: TimelineLabel) => {
+                        return (label.id + Timeline.LabelIdOffset) * this.timelineProperties.cellWidth;
+                    },
                     y: this.timelineProperties.textYPosition
                     + (1 + index) * fromPointToPixel(this.settings.labels.textSize),
                     fill: this.settings.labels.fontColor
                 })
                 .append("title")
-                .text((x: TimelineLabel) => x.title);
+                .text((label: TimelineLabel) => label.title);
 
             labelsGroupSelection
                 .exit()
@@ -1010,10 +1110,6 @@ module powerbi.extensibility.visual {
                 .attr("width", 0)
                 .selectAll(Timeline.TimelineSelectors.TimelineSlicer.selector)
                 .remove();
-
-            this.mainGroupSelection
-                .selectAll(Timeline.TimelineSelectors.textLabel.selector)
-                .remove();
         }
 
         private static updateCursors(timelineData: TimelineData, cellWidth: number): void {
@@ -1021,7 +1117,7 @@ module powerbi.extensibility.visual {
                 endDate: TimelineDatePeriod = timelineData.timelineDatapoints[timelineData.selectionEndIndex].datePeriod;
 
             timelineData.cursorDataPoints[0].selectionIndex = startDate.index;
-            timelineData.cursorDataPoints[1].selectionIndex = (endDate.index + endDate.fraction);
+            timelineData.cursorDataPoints[1].selectionIndex = endDate.index + endDate.fraction;
         }
 
         private static parseSettings(dataView: DataView): VisualSettings {
@@ -1038,7 +1134,7 @@ module powerbi.extensibility.visual {
          * Public for testability.
          */
         public static setValidCalendarSettings(calendarSettings: CalendarSettings): void {
-            let defaultSettings: VisualSettings = VisualSettings.getDefault() as VisualSettings,
+            const defaultSettings: VisualSettings = VisualSettings.getDefault() as VisualSettings,
                 theLatestDayOfMonth: number = Utils.getTheLatestDayOfMonth(calendarSettings.month);
 
             calendarSettings.day = Math.max(
@@ -1047,8 +1143,8 @@ module powerbi.extensibility.visual {
         }
 
         public fillCells(cellsSettings: CellsSettings): void {
-            let dataPoints = this.timelineData.timelineDatapoints,
-                cellSelection = this.mainGroupSelection
+            const dataPoints: TimelineDatapoint[] = this.timelineData.timelineDatapoints,
+                cellSelection: UpdateSelection<TimelineDatapoint> = this.mainGroupSelection
                     .selectAll(Timeline.TimelineSelectors.CellRect.selector)
                     .data(dataPoints);
 
@@ -1103,7 +1199,11 @@ module powerbi.extensibility.visual {
                 .remove();
         }
 
-        private onCellClickHandler(dataPoint: TimelineDatapoint, index: number, isMultiSelection: boolean): void {
+        private onCellClickHandler(
+            dataPoint: TimelineDatapoint,
+            index: number,
+            isMultiSelection: boolean): void {
+
             let timelineData: TimelineData = this.timelineData,
                 cursorDataPoints: CursorDatapoint[] = timelineData.cursorDataPoints,
                 timelineProperties: TimelineProperties = this.timelineProperties;
@@ -1220,7 +1320,7 @@ module powerbi.extensibility.visual {
             cellHeight: number,
             cellsYPosition: number): UpdateSelection<any> {
 
-            let cursorSelection = this.cursorGroupSelection
+            const cursorSelection: UpdateSelection<CursorDatapoint> = this.cursorGroupSelection
                 .selectAll(Timeline.TimelineSelectors.SelectionCursor.selector)
                 .data(timelineData.cursorDataPoints);
 
@@ -1235,14 +1335,14 @@ module powerbi.extensibility.visual {
                         dy: number;
 
                     dx = cursorDataPoint.selectionIndex * this.timelineProperties.cellWidth;
-                    dy = cellHeight / 2 + cellsYPosition;
+                    dy = cellHeight / Timeline.CellHeightDivider + cellsYPosition;
 
                     return translate(dx, dy);
                 })
                 .attr({
                     d: d3.svg.arc<CursorDatapoint>()
                         .innerRadius(0)
-                        .outerRadius(cellHeight / 2)
+                        .outerRadius(cellHeight / Timeline.CellHeightDivider)
                         .startAngle((cursorDataPoint: CursorDatapoint) => {
                             return cursorDataPoint.cursorIndex * Math.PI + Math.PI;
                         })
@@ -1260,29 +1360,31 @@ module powerbi.extensibility.visual {
         }
 
         public renderTimeRangeText(timelineData: TimelineData, rangeHeaderSettings: LabelsSettings): void {
-            let leftMargin: number = (GranularityNames.length + 2) * this.timelineProperties.elementWidth,
-                maxWidth: number = this.svgWidth
-                    - leftMargin
-                    - this.timelineProperties.leftMargin
-                    - rangeHeaderSettings.textSize;
+            const leftMargin: number = (GranularityNames.length + Timeline.GranularityNamesLength)
+                * this.timelineProperties.elementWidth;
+
+            const maxWidth: number = this.svgWidth
+                - leftMargin
+                - this.timelineProperties.leftMargin
+                - rangeHeaderSettings.textSize;
 
             if (rangeHeaderSettings.show && maxWidth > 0) {
-                let timeRangeText: string = Utils.timeRangeText(timelineData);
+                const timeRangeText: string = Utils.timeRangeText(timelineData);
 
-                let labelFormattedTextOptions: LabelFormattedTextOptions = {
+                const labelFormattedTextOptions: LabelFormattedTextOptions = {
                     label: timeRangeText,
                     maxWidth: maxWidth,
                     fontSize: rangeHeaderSettings.textSize
                 };
 
-                let actualText: string = getLabelFormattedText(labelFormattedTextOptions);
+                const actualText: string = getLabelFormattedText(labelFormattedTextOptions);
 
                 this.rangeTextSelection
                     .classed(Timeline.TimelineSelectors.SelectionRangeContainer.class, true)
                     .attr({
                         x: GranularityNames.length
                         * (this.timelineProperties.elementWidth + this.timelineProperties.leftMargin),
-                        y: 40,
+                        y: Timeline.DefaultRangeTextSelectionY,
                         fill: rangeHeaderSettings.fontColor
                     })
                     .style({
@@ -1310,7 +1412,7 @@ module powerbi.extensibility.visual {
                 timelineData.columnIdentity);
         }
 
-        public applyDatePeriod(startDate: Date, endDate: Date, columnIdentity: SQColumnRefExpr): void {
+        public applyDatePeriod(startDate: Date, endDate: Date, columnIdentity: ISQExpr): void {
             let /*lower: SQConstantExpr,
                 upper: SQConstantExpr,
                 filterExpr: SQBetweenExpr,*/
@@ -1329,14 +1431,14 @@ module powerbi.extensibility.visual {
             this.applyFilter(filter, datePeriod);
         }
 
-        public clearSelection(columnIdentity: SQColumnRefExpr): void {
+        public clearSelection(columnIdentity: ISQExpr): void {
             this.applyFilter(
                 /*SemanticFilter.getAnyValueFilter(columnIdentity)*/undefined,
                 TimelineDatePeriodBase.createEmpty());
         }
 
         private applyFilter(filter: ISemanticFilter, datePeriod: TimelineDatePeriodBase): void {
-            let instance: VisualObjectInstance = {
+            const instance: VisualObjectInstance = {
                 objectName: "general",
                 selector: undefined,
                 properties: {

@@ -29,18 +29,29 @@ module powerbi.extensibility.visual.granularity {
     import Utils = utils.Utils;
 
     export class TimelineGranularityData {
+        private static DayOffset: number = 1;
+
         private dates: Date[];
         private granularities: Granularity[];
         private endingDate: Date;
+
+        constructor(startDate: Date, endDate: Date) {
+            this.granularities = [];
+            this.setDatesRange(startDate, endDate);
+
+            const lastDate: Date = this.dates[this.dates.length - 1];
+
+            this.endingDate = TimelineGranularityData.nextDay(lastDate);
+        }
 
         /**
          * Returns the date of the previos day 
          * @param date The following date
          */
         public static previousDay(date: Date): Date {
-            let prevDay: Date = Utils.resetTime(date);
+            const prevDay: Date = Utils.resetTime(date);
 
-            prevDay.setDate(prevDay.getDate() - 1);
+            prevDay.setDate(prevDay.getDate() - TimelineGranularityData.DayOffset);
 
             return prevDay;
         }
@@ -50,9 +61,9 @@ module powerbi.extensibility.visual.granularity {
          * @param date The previous date
          */
         public static nextDay(date: Date): Date {
-            let nextDay: Date = Utils.resetTime(date);
+            const nextDay: Date = Utils.resetTime(date);
 
-            nextDay.setDate(nextDay.getDate() + 1);
+            nextDay.setDate(nextDay.getDate() + TimelineGranularityData.DayOffset);
 
             return nextDay;
         }
@@ -69,15 +80,6 @@ module powerbi.extensibility.visual.granularity {
                 this.dates.push(date);
                 date = TimelineGranularityData.nextDay(date);
             }
-        }
-
-        constructor(startDate: Date, endDate: Date) {
-            this.granularities = [];
-            this.setDatesRange(startDate, endDate);
-
-            let lastDate: Date = this.dates[this.dates.length - 1];
-
-            this.endingDate = TimelineGranularityData.nextDay(lastDate);
         }
 
         /**
@@ -116,22 +118,22 @@ module powerbi.extensibility.visual.granularity {
         }
 
         public createLabels(): void {
-            this.granularities.forEach((x) => {
-                x.setExtendedLabel({
-                    dayLabels: x.getType() >= GranularityType.day
-                        ? x.createLabels(this.granularities[GranularityType.day])
+            this.granularities.forEach((granularity: Granularity) => {
+                granularity.setExtendedLabel({
+                    dayLabels: granularity.getType() >= GranularityType.day
+                        ? granularity.createLabels(this.granularities[GranularityType.day])
                         : [],
-                    weekLabels: x.getType() >= GranularityType.week
-                        ? x.createLabels(this.granularities[GranularityType.week])
+                    weekLabels: granularity.getType() >= GranularityType.week
+                        ? granularity.createLabels(this.granularities[GranularityType.week])
                         : [],
-                    monthLabels: x.getType() >= GranularityType.month
-                        ? x.createLabels(this.granularities[GranularityType.month])
+                    monthLabels: granularity.getType() >= GranularityType.month
+                        ? granularity.createLabels(this.granularities[GranularityType.month])
                         : [],
-                    quarterLabels: x.getType() >= GranularityType.quarter
-                        ? x.createLabels(this.granularities[GranularityType.quarter])
+                    quarterLabels: granularity.getType() >= GranularityType.quarter
+                        ? granularity.createLabels(this.granularities[GranularityType.quarter])
                         : [],
-                    yearLabels: x.getType() >= GranularityType.year
-                        ? x.createLabels(this.granularities[GranularityType.year])
+                    yearLabels: granularity.getType() >= GranularityType.year
+                        ? granularity.createLabels(this.granularities[GranularityType.year])
                         : [],
                 });
             });

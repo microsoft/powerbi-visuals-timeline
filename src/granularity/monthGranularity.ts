@@ -34,7 +34,10 @@ module powerbi.extensibility.visual.granularity {
         }
 
         public splitDate(date: Date): (string | number)[] {
-            return [this.shortMonthName(date), this.determineYear(date)];
+            return [
+                this.shortMonthName(date),
+                this.determineYear(date)
+            ];
         }
 
         public sameLabel(firstDatePeriod: TimelineDatePeriod, secondDatePeriod: TimelineDatePeriod): boolean {
@@ -43,7 +46,7 @@ module powerbi.extensibility.visual.granularity {
         }
 
         public generateLabel(datePeriod: TimelineDatePeriod): TimelineLabel {
-            let shortMonthName = this.shortMonthName(datePeriod.startDate);
+            const shortMonthName: string = this.shortMonthName(datePeriod.startDate);
 
             return {
                 title: shortMonthName,

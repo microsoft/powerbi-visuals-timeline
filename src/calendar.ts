@@ -37,6 +37,8 @@ module powerbi.extensibility.visual {
     }
 
     export class Calendar {
+        private static QuarterFirstMonths: number[] = [0, 3, 6, 9];
+
         private firstDayOfWeek: number;
         private firstMonthOfYear: number;
         private firstDayOfYear: number;
@@ -62,6 +64,7 @@ module powerbi.extensibility.visual {
         public isChanged(
             calendarSettings: CalendarSettings,
             weekDaySettings: WeekDaySettings): boolean {
+
             return this.firstMonthOfYear !== calendarSettings.month
                 || this.firstDayOfYear !== calendarSettings.day
                 || this.firstDayOfWeek !== weekDaySettings.day;
@@ -77,8 +80,8 @@ module powerbi.extensibility.visual {
 
             this.dateOfFirstWeek = {};
 
-            this.quarterFirstMonths = [0, 3, 6, 9].map((x: number) => {
-                return x + this.firstMonthOfYear;
+            this.quarterFirstMonths = Calendar.QuarterFirstMonths.map((monthIndex: number) => {
+                return monthIndex + this.firstMonthOfYear;
             });
         }
 

@@ -32,6 +32,11 @@ module powerbi.extensibility.visual.granularity {
     import Utils = utils.Utils;
 
     export class TimelineGranularityBase implements Granularity {
+        private static MonthNameSeparator: string = " ";
+        private static DefaultFraction: number = 1;
+        private static EmptyYearOffset: number = 0;
+        private static YearOffset: number = 1;
+
         protected calendar: Calendar;
 
         private datePeriods: TimelineDatePeriod[] = [];
@@ -49,14 +54,14 @@ module powerbi.extensibility.visual.granularity {
         * Returns the short month name of the given date (e.g. Jan, Feb, Mar)
         */
         public shortMonthName(date: Date): string {
-            return date.toString().split(" ")[1];
+            return date.toString().split(TimelineGranularityBase.MonthNameSeparator)[1];
         }
 
         public resetDatePeriods(): void {
             this.datePeriods = [];
         }
 
-        public getDatePeriods() {
+        public getDatePeriods(): TimelineDatePeriod[] {
             return this.datePeriods;
         }
 
@@ -72,10 +77,10 @@ module powerbi.extensibility.visual.granularity {
             let labels: TimelineLabel[] = [],
                 lastDatePeriod: TimelineDatePeriod;
 
-            this.datePeriods.forEach((x) => {
-                if (_.isEmpty(labels) || !granularity.sameLabel(x, lastDatePeriod)) {
-                    lastDatePeriod = x;
-                    labels.push(granularity.generateLabel(x));
+            this.datePeriods.forEach((datePeriod: TimelineDatePeriod) => {
+                if (_.isEmpty(labels) || !granularity.sameLabel(datePeriod, lastDatePeriod)) {
+                    lastDatePeriod = datePeriod;
+                    labels.push(granularity.generateLabel(datePeriod));
                 }
             });
 
@@ -94,7 +99,9 @@ module powerbi.extensibility.visual.granularity {
                 lastDatePeriod: TimelineDatePeriod = datePeriods[datePeriods.length - 1],
                 identifierArray: (string | number)[] = this.splitDate(date);
 
-            if (datePeriods.length === 0 || !_.isEqual(lastDatePeriod.identifierArray, identifierArray)) {
+            if (datePeriods.length === 0
+                || !_.isEqual(lastDatePeriod.identifierArray, identifierArray)) {
+
                 if (datePeriods.length > 0) {
                     lastDatePeriod.endDate = date;
                 }
@@ -105,7 +112,7 @@ module powerbi.extensibility.visual.granularity {
                     endDate: date,
                     week: this.determineWeek(date),
                     year: this.determineYear(date),
-                    fraction: 1,
+                    fraction: TimelineGranularityBase.DefaultFraction,
                     index: datePeriods.length
                 });
             }
@@ -152,24 +159,27 @@ module powerbi.extensibility.visual.granularity {
                 year--;
             }
 
-            let dateOfFirstWeek: Date = this.calendar.getDateOfFirstWeek(year),
+            const dateOfFirstWeek: Date = this.calendar.getDateOfFirstWeek(year),
                 weeks: number = Utils.getAmountOfWeeksBetweenDates(dateOfFirstWeek, date);
 
             return [weeks, year];
         }
 
         private inPreviousYear(date: Date): boolean {
-            let dateOfFirstWeek: Date = this.calendar.getDateOfFirstWeek(this.determineYear(date));
+            const dateOfFirstWeek: Date = this.calendar.getDateOfFirstWeek(this.determineYear(date));
+
             return date < dateOfFirstWeek;
         }
 
         public determineYear(date: Date): number {
-            let firstDay: Date = new Date(
+            const firstDay: Date = new Date(
                 date.getFullYear(),
                 this.calendar.getFirstMonthOfYear(),
                 this.calendar.getFirstDayOfYear());
 
-            return date.getFullYear() - ((firstDay <= date) ? 0 : 1);
+            return date.getFullYear() - ((firstDay <= date)
+                ? TimelineGranularityBase.EmptyYearOffset
+                : TimelineGranularityBase.YearOffset);
         }
     }
 }
