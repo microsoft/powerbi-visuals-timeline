@@ -1,0 +1,287 @@
+{
+    "dataRoles": [
+        {
+            "name": "Time",
+            "kind": "Grouping",
+            "displayName": "Time"
+        }
+    ],
+    "dataViewMappings": [
+        {
+            "conditions": [
+                {
+                    "Time": {
+                        "max": 1
+                    }
+                }
+            ],
+            "categorical": {
+                "categories": {
+                    "for": {
+                        "in": "Time"
+                    },
+                    "dataReductionAlgorithm": {
+                        "sample": {}
+                    }
+                }
+            }
+        }
+    ],
+    "objects": {
+        "general": {
+            "displayName": "General",
+            "properties": {
+                "selected": {
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "datePeriod": {
+                    "type": {
+                        "text": true
+                    }
+                }
+            }
+        },
+        "calendar": {
+            "displayName": "Fiscal Year Start",
+            "properties": {
+                "month": {
+                    "displayName": "Month",
+                    "type": {
+                        "enumeration": [
+                            {
+                                "value": "0",
+                                "displayName": "January"
+                            },
+                            {
+                                "value": "1",
+                                "displayName": "February"
+                            },
+                            {
+                                "value": "2",
+                                "displayName": "March"
+                            },
+                            {
+                                "value": "3",
+                                "displayName": "April"
+                            },
+                            {
+                                "value": "4",
+                                "displayName": "May"
+                            },
+                            {
+                                "value": "5",
+                                "displayName": "June"
+                            },
+                            {
+                                "value": "6",
+                                "displayName": "July"
+                            },
+                            {
+                                "value": "7",
+                                "displayName": "August"
+                            },
+                            {
+                                "value": "8",
+                                "displayName": "September"
+                            },
+                            {
+                                "value": "9",
+                                "displayName": "October"
+                            },
+                            {
+                                "value": "10",
+                                "displayName": "November"
+                            },
+                            {
+                                "value": "11",
+                                "displayName": "December"
+                            }
+                        ]
+                    }
+                },
+                "day": {
+                    "displayName": "Day",
+                    "type": {
+                        "numeric": true
+                    }
+                }
+            }
+        },
+        "weekDay": {
+            "displayName": "First Day of Week",
+            "properties": {
+                "day": {
+                    "displayName": "Day",
+                    "type": {
+                        "enumeration": [
+                            {
+                                "value": "0",
+                                "displayName": "Sunday"
+                            },
+                            {
+                                "value": "1",
+                                "displayName": "Monday"
+                            },
+                            {
+                                "value": "2",
+                                "displayName": "Tuesday"
+                            },
+                            {
+                                "value": "3",
+                                "displayName": "Wednesday"
+                            },
+                            {
+                                "value": "4",
+                                "displayName": "Thursday"
+                            },
+                            {
+                                "value": "5",
+                                "displayName": "Friday"
+                            },
+                            {
+                                "value": "6",
+                                "displayName": "Saturday"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        "rangeHeader": {
+            "displayName": "Range Header",
+            "properties": {
+                "show": {
+                    "displayName": "Show",
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "fontColor": {
+                    "displayName": "Font color",
+                    "type": {
+                        "fill": {
+                            "solid": {
+                                "color": true
+                            }
+                        }
+                    }
+                },
+                "textSize": {
+                    "displayName": "Text Size",
+                    "type": {
+                        "numeric": true
+                    }
+                }
+            }
+        },
+        "cells": {
+            "displayName": "Cells",
+            "properties": {
+                "fillSelected": {
+                    "displayName": "Selected cell color",
+                    "type": {
+                        "fill": {
+                            "solid": {
+                                "color": true
+                            }
+                        }
+                    }
+                },
+                "fillUnselected": {
+                    "displayName": "Unselected cell color",
+                    "type": {
+                        "fill": {
+                            "solid": {
+                                "color": {
+                                    "nullable": true
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "granularity": {
+            "displayName": "Granularity",
+            "properties": {
+                "scaleColor": {
+                    "displayName": "Scale color",
+                    "type": {
+                        "fill": {
+                            "solid": {
+                                "color": true
+                            }
+                        }
+                    }
+                },
+                "sliderColor": {
+                    "displayName": "Slider color",
+                    "type": {
+                        "fill": {
+                            "solid": {
+                                "color": true
+                            }
+                        }
+                    }
+                },
+                "granularity": {
+                    "displayName": "Granularity",
+                    "type": {
+                        "enumeration": [
+                            {
+                                "value": "0",
+                                "displayName": "Year"
+                            },
+                            {
+                                "value": "1",
+                                "displayName": "Quarter"
+                            },
+                            {
+                                "value": "2",
+                                "displayName": "Month"
+                            },
+                            {
+                                "value": "3",
+                                "displayName": "Week"
+                            },
+                            {
+                                "value": "4",
+                                "displayName": "Day"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        "labels": {
+            "displayName": "Labels",
+            "properties": {
+                "show": {
+                    "displayName": "Show",
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "fontColor": {
+                    "displayName": "Font color",
+                    "type": {
+                        "fill": {
+                            "solid": {
+                                "color": true
+                            }
+                        }
+                    }
+                },
+                "textSize": {
+                    "displayName": "Text Size",
+                    "type": {
+                        "numeric": true
+                    }
+                }
+            }
+        }
+    },
+    "supportsHighlight": true
+}
