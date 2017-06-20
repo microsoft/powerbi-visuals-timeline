@@ -40,6 +40,11 @@
                     "type": {
                         "text": true
                     }
+                },
+                "filter": {
+                    "type": {
+                        "filter": true
+                    }
                 }
             }
         },

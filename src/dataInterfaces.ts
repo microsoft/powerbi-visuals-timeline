@@ -115,7 +115,7 @@ module powerbi.extensibility.visual {
     }
 
     export interface TimelineData {
-        columnIdentity?: ISQExpr;
+        filterColumnTarget?: IFilterColumnTarget;
         timelineDatapoints?: TimelineDatapoint[];
         selectionStartIndex?: number;
         selectionEndIndex?: number;

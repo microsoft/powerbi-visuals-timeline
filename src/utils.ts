@@ -23,11 +23,7 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
  */
-
 module powerbi.extensibility.visual.utils {
-    // powerbi.data
-    import ISemanticFilter = powerbi.data.ISemanticFilter;
-
     // datePeriod
     import TimelineDatePeriod = datePeriod.TimelineDatePeriod;
     import ITimelineDatePeriod = datePeriod.ITimelineDatePeriod;
@@ -199,15 +195,6 @@ module powerbi.extensibility.visual.utils {
             const date: Date = new Date(2008, monthId + 1, 0); // leap year, so the latest day of February is 29.
 
             return date.getDate();
-        }
-
-        public static isSemanticFilterAvailableInTheDataView(filter: ISemanticFilter): boolean {
-            if (!filter /*|| SemanticFilter.isAnyFilter(filter)*/) {
-
-                return false;
-            }
-
-            return true;
         }
 
         public static isValueEmpty(value: any): boolean {

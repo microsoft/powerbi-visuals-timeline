@@ -33,7 +33,7 @@ module powerbi.extensibility.visual.granularity {
 
         /**
          * Returns the date's quarter name (e.g. Q1, Q2, Q3, Q4)
-         * @param date A date 
+         * @param date A date
          */
         private quarterText(date: Date): string {
             let quarter: number = QuarterGranularity.DefaultQuarter,

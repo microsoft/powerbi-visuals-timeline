@@ -55,7 +55,7 @@ module powerbi.extensibility.visual.test.mocks {
 
         public getDatePeriods(): TimelineDatePeriod[] {
             return this.datePeriod;
-        };
+        }
 
         public resetDatePeriods(): void { }
 

@@ -45,7 +45,7 @@ module powerbi.extensibility.visual.granularity {
         }
 
         /**
-         * Returns the date of the previos day 
+         * Returns the date of the previos day
          * @param date The following date
          */
         public static previousDay(date: Date): Date {
@@ -57,7 +57,7 @@ module powerbi.extensibility.visual.granularity {
         }
 
         /**
-         * Returns the date of the next day 
+         * Returns the date of the next day
          * @param date The previous date
          */
         public static nextDay(date: Date): Date {
