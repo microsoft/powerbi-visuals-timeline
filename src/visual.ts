@@ -160,8 +160,8 @@ module powerbi.extensibility.visual {
             propertyName: "filter"
         };
 
-        private static MIN_DATE: Date = new Date(-8640000000000000);
-        private static MAX_DATE: Date = new Date(8640000000000000);
+        private static MIN_DATE: Date = new Date(-8639999956800000);
+        private static MAX_DATE: Date = new Date(8639999956800000);
 
         private static TimelineSelectors: TimelineSelectors = {
             TimelineVisual: createClassAndSelector("timeline"),
@@ -691,7 +691,6 @@ module powerbi.extensibility.visual {
                 return;
             }
             this.options = options;
-            const existingDataView = this.dataView;
             this.dataView = options.dataViews[0];
             this.datePeriod = this.createDatePeriod(options.dataViews[0]);
             this.createTimelineData(this.dataView);
@@ -709,66 +708,6 @@ module powerbi.extensibility.visual {
                     options);
             }
             this.renderGranularitySlicerRect(this.settings.granularity.granularity);
-        }
-
-        private static hasSameCategoryIdentity(dataView1: DataView, dataView2: DataView): boolean {
-            if (!dataView1 ||
-                !dataView2 ||
-                !dataView1.categorical ||
-                !dataView2.categorical) {
-                return false;
-            }
-
-            let dv1Categories: DataViewCategoricalColumn[] = dataView1.categorical.categories;
-            let dv2Categories: DataViewCategoricalColumn[] = dataView2.categorical.categories;
-
-            if (!dv1Categories ||
-                !dv2Categories ||
-                dv1Categories.length !== dv2Categories.length) {
-                return false;
-            }
-
-            for (let i: number = 0, len: number = dv1Categories.length; i < len; i++) {
-                let dv1Identity: DataViewScopeIdentity[] = (<DataViewCategoryColumn>dv1Categories[i]).identity;
-                let dv2Identity: DataViewScopeIdentity[] = (<DataViewCategoryColumn>dv2Categories[i]).identity;
-
-                let dv1Length: number = this.getLengthOptional(dv1Identity);
-                if ((dv1Length < 1) || dv1Length !== this.getLengthOptional(dv2Identity)) {
-                    return false;
-                }
-
-                for (let j: number = 0; j < dv1Length; j++) {
-                    if (dv1Identity[j] && dv2Identity[j] && !_.isEqual(dv1Identity[j].key, dv2Identity[j].key)) {
-                        return false;
-                    }
-                }
-            }
-
-            return true;
-        }
-
-        private static getLengthOptional(identity: DataViewScopeIdentity[]): number {
-            if (identity) {
-                return identity.length;
-            }
-            return 0;
-        }
-
-        private applyThePreviousFilter(options: VisualUpdateOptions, datePeriod: TimelineDatePeriodBase): void {
-            let columnIdentity: IFilterColumnTarget = this.timelineData.filterColumnTarget;
-
-            if (!datePeriod.startDate || !datePeriod.endDate) {
-                this.clearSelection(columnIdentity);
-
-                return;
-            }
-
-            this.applyDatePeriod(
-                datePeriod.startDate,
-                datePeriod.endDate,
-                columnIdentity);
-
-            this.applySelection(options, datePeriod);
         }
 
         private applySelection(options: VisualUpdateOptions, datePeriod: TimelineDatePeriodBase): void {
@@ -897,7 +836,7 @@ module powerbi.extensibility.visual {
                 timelineData.selectionEndIndex = timelineData.currentGranularity.getDatePeriods().length - 1;
             }
 
-            const category = dataView.categorical.categories[0];
+            const category: DataViewCategoryColumn = dataView.categorical.categories[0];
             timelineData.filterColumnTarget = {
                 table: category.source.queryName.substr(0, category.source.queryName.indexOf(".")),
                 column: category.source.displayName
@@ -1467,7 +1406,7 @@ module powerbi.extensibility.visual {
             });
         }
         public applyDatePeriod(startDate: Date, endDate: Date, target: IFilterColumnTarget): void {
-            const datePeriod = TimelineDatePeriodBase.create(startDate, endDate);
+            const datePeriod: TimelineDatePeriodBase = TimelineDatePeriodBase.create(startDate, endDate);
             const filter: IAdvancedFilter = new window["powerbi-models"].AdvancedFilter(
                 target,
                 "And",
@@ -1484,20 +1423,7 @@ module powerbi.extensibility.visual {
         }
 
         public clearSelection(target: IFilterColumnTarget): void {
-            const datePeriod = TimelineDatePeriodBase.create(Timeline.MIN_DATE, Timeline.MAX_DATE);
-            let filter: IAdvancedFilter = new window["powerbi-models"].AdvancedFilter(
-                target,
-                "And",
-                {
-                    operator: "GreaterThanOrEqual",
-                    value: Timeline.MIN_DATE.toJSON()
-                },
-                {
-                    operator: "LessThanOrEqual",
-                    value: Timeline.MAX_DATE.toJSON()
-                });
-            this.applyFilter(filter, datePeriod);
-            this.host.applyJsonFilter(filter, Timeline.filterObjectProperty.objectName, Timeline.filterObjectProperty.propertyName);
+            this.applyDatePeriod(Timeline.MIN_DATE, Timeline.MAX_DATE, target);
         }
 
         /**

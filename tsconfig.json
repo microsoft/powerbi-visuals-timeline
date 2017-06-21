@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
     "allowJs": false,
-    "module": "system",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "target": "ES5",
