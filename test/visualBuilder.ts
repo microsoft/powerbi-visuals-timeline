@@ -38,8 +38,10 @@ module powerbi.extensibility.visual.test {
     import TimelineDatePeriodBase = SandboxedVisualNameSpace.datePeriod.TimelineDatePeriodBase;
 
     export class TimelineBuilder extends VisualBuilderBase<VisualClass> {
+
         constructor(width: number, height: number) {
             super(width, height, VisualPlugin.name);
+            this.visualHost.applyJsonFilter = () => {};
         }
 
         protected build(options: VisualConstructorOptions): VisualClass {
@@ -89,8 +91,6 @@ module powerbi.extensibility.visual.test {
                 .find(".cellRect")
                 .last()
                 .d3Click(0, 0);
-
-            // setSettings(dataView).general.filter = SemanticFilter.getDefaultValueFilter(SQExprBuilder.defaultValue());
         }
 
         public static setDatePeriod(
@@ -100,8 +100,6 @@ module powerbi.extensibility.visual.test {
             (dataView.metadata.objects as any).general = {
                 datePeriod: datePeriod.toString()
             };
-
-            // setSettings(dataView).general.datePeriod = datePeriod.toString();
         }
     }
 }

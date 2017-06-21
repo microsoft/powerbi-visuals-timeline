@@ -26,7 +26,11 @@
 
 'use strict';
 
-const recursivePathToTests = 'test/**/*.ts';
+const recursivePathToTests = 'test/**/*.ts'
+    , srcRecursivePath = '.tmp/drop/visual.js'
+    , srcCssRecursivePath = '.tmp/drop/visual.css'
+    , srcOriginalRecursivePath = 'src/**/*.ts'
+    , coverageFolder = 'coverage';
 
 module.exports = (config) => {
     const browsers = [];
@@ -47,17 +51,28 @@ module.exports = (config) => {
         },
         colors: true,
         frameworks: ['jasmine'],
-        reporters: ['progress'],
+        reporters: [
+            'progress',
+            'coverage',
+            'karma-remap-istanbul'
+        ],
         singleRun: true,
         files: [
-            '.tmp/drop/visual.css',
-            '.tmp/drop/visual.js',
-            'node_modules/jasmine-jquery/lib/jasmine-jquery.js',
+            srcCssRecursivePath,
+            srcRecursivePath,
+            'node_modules/jquery/dist/jquery.min.js',
             'node_modules/powerbi-visuals-utils-testutils/lib/index.js',
-            recursivePathToTests
+            'node_modules/jasmine-jquery/lib/jasmine-jquery.js',
+            recursivePathToTests,
+            {
+                pattern: srcOriginalRecursivePath,
+                included: false,
+                served: true
+            }
         ],
         preprocessors: {
-            [recursivePathToTests]: ['typescript']
+            [recursivePathToTests]: ['typescript'],
+            [srcRecursivePath]: ['sourcemap']
         },
         typescriptPreprocessor: {
             options: {
@@ -65,6 +80,20 @@ module.exports = (config) => {
                 target: 'ES5',
                 removeComments: false,
                 concatenateOutput: false
+            }
+        },
+        coverageReporter: {
+            dir: coverageFolder,
+            reporters: [
+                { type: 'html' },
+                { type: 'lcov' }
+            ]
+        },
+        remapIstanbulReporter: {
+            reports: {
+                lcovonly: coverageFolder + '/lcov.info',
+                html: coverageFolder,
+                'text-summary': null
             }
         }
     });

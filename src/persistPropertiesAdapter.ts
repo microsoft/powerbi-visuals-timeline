@@ -47,7 +47,7 @@ module powerbi.extensibility.visual.persistPropertiesAdapter {
         private host: IVisualHost;
         public get visualHost(): IVisualHost {
             return this.host;
-        };
+        }
 
         constructor(host: IVisualHost) {
             this.host = host;

@@ -78,7 +78,7 @@ module powerbi.extensibility.visual.granularity {
                 lastDatePeriod: TimelineDatePeriod;
 
             this.datePeriods.forEach((datePeriod: TimelineDatePeriod) => {
-                if (_.isEmpty(labels) || !granularity.sameLabel(datePeriod, lastDatePeriod)) {
+                if (!labels.length || !granularity.sameLabel(datePeriod, lastDatePeriod)) {
                     lastDatePeriod = datePeriod;
                     labels.push(granularity.generateLabel(datePeriod));
                 }
@@ -122,7 +122,7 @@ module powerbi.extensibility.visual.granularity {
         }
 
         public setNewEndDate(date: Date): void {
-            _.last(this.datePeriods).endDate = date;
+            this.datePeriods[this.datePeriods.length - 1].endDate = date;
         }
 
         /**

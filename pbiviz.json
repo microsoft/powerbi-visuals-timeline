@@ -9,7 +9,7 @@
     "supportUrl": "http://community.powerbi.com",
     "gitHubUrl": "https://github.com/Microsoft/powerbi-visuals-timeline"
   },
-  "apiVersion": "1.4.0",
+  "apiVersion": "1.7.0",
   "author": {
     "name": "Microsoft",
     "email": "pbicvsupport@microsoft.com"
@@ -18,7 +18,7 @@
     "icon": "assets/icon.png"
   },
   "externalJS": [
-    "node_modules/jquery/dist/jquery.min.js",
+    "node_modules/powerbi-models/dist/models.min.js",
     "node_modules/d3/d3.min.js",
     "node_modules/lodash/lodash.min.js",
     "node_modules/globalize/lib/globalize.js",
