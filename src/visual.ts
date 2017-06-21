@@ -160,9 +160,6 @@ module powerbi.extensibility.visual {
             propertyName: "filter"
         };
 
-        private static MIN_DATE: Date = new Date(-8639999956800000);
-        private static MAX_DATE: Date = new Date(8639999956800000);
-
         private static TimelineSelectors: TimelineSelectors = {
             TimelineVisual: createClassAndSelector("timeline"),
             SelectionRangeContainer: createClassAndSelector("selectionRangeContainer"),
@@ -640,7 +637,6 @@ module powerbi.extensibility.visual {
                 this.timelineGranularityData = new TimelineGranularityData(
                     startDate,
                     endDate);
-
                 this.timelineData = {
                     timelineDatapoints: [],
                     cursorDataPoints: []
@@ -795,21 +791,19 @@ module powerbi.extensibility.visual {
                 endDate: Date,
                 timelineElements: TimelineDatePeriod[],
                 countFullCells: number;
-
             if (!initialized) {
-                timelineData.cursorDataPoints.push({
+                timelineData.cursorDataPoints = [{
                     x: Timeline.DefaultCursorDatapointX,
                     y: Timeline.DefaultCursorDatapointY,
                     selectionIndex: Timeline.DefaultSelectionStartIndex,
                     cursorIndex: 0
-                });
-
-                timelineData.cursorDataPoints.push({
+                },
+                {
                     x: Timeline.DefaultCursorDatapointX,
                     y: Timeline.DefaultCursorDatapointY,
                     selectionIndex: Timeline.DefaultSelectionStartIndex,
                     cursorIndex: 1
-                });
+                }];
             }
 
             isCalendarChanged = previousCalendar
@@ -1423,7 +1417,9 @@ module powerbi.extensibility.visual {
         }
 
         public clearSelection(target: IFilterColumnTarget): void {
-            this.applyDatePeriod(Timeline.MIN_DATE, Timeline.MAX_DATE, target);
+            const endDate = this.timelineData.timelineDatapoints[this.timelineData.selectionEndIndex].datePeriod.endDate;
+            const startDate = this.timelineData.timelineDatapoints[this.timelineData.selectionStartIndex].datePeriod.startDate;
+            this.applyDatePeriod(startDate, endDate, target);
         }
 
         /**
