@@ -71,7 +71,8 @@ module powerbi.extensibility.visual.utils {
         }
 
         public static getAmountOfDaysBetweenDates(startDate: Date, endDate: Date): number {
-            const totalMilliseconds: number = endDate.getTime() - startDate.getTime();
+            const offset: number = Utils.getDaylightSavingTimeOffset(startDate, endDate);
+            const totalMilliseconds: number = endDate.getTime() - startDate.getTime() - offset;
 
             return Utils.convertToDaysFromMilliseconds(Math.abs(totalMilliseconds));
         }
@@ -95,6 +96,13 @@ module powerbi.extensibility.visual.utils {
 
         public static getDateWithoutTimezone(date: Date): Date {
             return new Date(Utils.getMillisecondsWithoutTimezone(date));
+        }
+
+        public static getDaylightSavingTimeOffset(startDate: Date, endDate: Date): number {
+            const startDateTzOffset: number = startDate.getTimezoneOffset();
+            const endDateTzOffset: number = endDate.getTimezoneOffset();
+
+            return (endDateTzOffset - startDateTzOffset) * 60 * 1000;
         }
 
         public static toStringDateWithoutTimezone(date: Date): string {
