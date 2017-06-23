@@ -100,7 +100,7 @@ module powerbi.extensibility.visual.granularity {
                 identifierArray: (string | number)[] = this.splitDate(date);
 
             if (datePeriods.length === 0
-                || !_.isEqual(lastDatePeriod.identifierArray, identifierArray)) {
+                || !Utils.arraysEqual(lastDatePeriod.identifierArray, identifierArray)) {
 
                 if (datePeriods.length > 0) {
                     lastDatePeriod.endDate = date;
