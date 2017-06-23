@@ -179,7 +179,7 @@ module powerbi.extensibility.visual.utils {
                 date = new Date(value);
             }
 
-            if (date && _.isDate(date) && date.toString() !== "Invalid Date") {
+            if (date && date instanceof Date && date.toString() !== "Invalid Date") {
                 return Utils.resetTime(date);
             }
 
@@ -258,7 +258,7 @@ module powerbi.extensibility.visual.utils {
          * @param granularityName The name of the granularity
          */
         public static getGranularityType(granularityName: string): GranularityType {
-            const index: number = _.findIndex(GranularityNames, (granularity: GranularityName) => {
+            const index: number = Utils.findIndex(GranularityNames, (granularity: GranularityName) => {
                 return granularity.name === granularityName;
             });
 
@@ -270,7 +270,7 @@ module powerbi.extensibility.visual.utils {
          * @param granularity The type of granularity
          */
         public static getGranularityName(granularityType: GranularityType): string {
-            const index: number = _.findIndex(GranularityNames, (granularity: GranularityName) => {
+            const index: number = Utils.findIndex(GranularityNames, (granularity: GranularityName) => {
                 return granularity.granularityType === granularityType;
             });
 
@@ -286,8 +286,8 @@ module powerbi.extensibility.visual.utils {
          */
         public static separateSelection(timelineData: TimelineData, startDate: Date, endDate: Date): void {
             let datePeriods: TimelineDatePeriod[] = timelineData.currentGranularity.getDatePeriods(),
-                startDateIndex: number = _.findIndex(datePeriods, x => startDate < x.endDate),
-                endDateIndex: number = _.findIndex(datePeriods, x => endDate <= x.endDate);
+                startDateIndex: number = Utils.findIndex(datePeriods, x => startDate < x.endDate),
+                endDateIndex: number = Utils.findIndex(datePeriods, x => endDate <= x.endDate);
 
             startDateIndex = startDateIndex >= 0
                 ? startDateIndex
@@ -361,7 +361,7 @@ module powerbi.extensibility.visual.utils {
          * @param datePeriods The list of date periods
          */
         public static unseparateSelection(datePeriods: TimelineDatePeriod[]): void {
-            const separationIndex: number = _.findIndex(
+            const separationIndex: number = Utils.findIndex(
                 datePeriods,
                 (datePeriod: TimelineDatePeriod) => {
                     return datePeriod.fraction < Utils.MinFraction;
@@ -409,6 +409,30 @@ module powerbi.extensibility.visual.utils {
             }
 
             return 0;
+        }
+
+        public static arraysEqual(a: any[], b: any[]): boolean {
+            if (a === b) return true;
+            if (a === null || b === null) return false;
+            if (a.length !== b.length) return false;
+
+            // If you don't care about the order of the elements inside
+            // the array, you should sort both arrays here.
+
+            for (let i = 0; i < a.length; ++i) {
+                if (a[i] !== b[i]) return false;
+            }
+            return true;
+        }
+        public static findIndex(array: any[], predicate: Function): number {
+            let value: any;
+            for (let i = 0; i < array.length; i++) {
+                value = array[i];
+                if (predicate(value, i, array)) {
+                    return i;
+                }
+            }
+            return -1;
         }
     }
 }

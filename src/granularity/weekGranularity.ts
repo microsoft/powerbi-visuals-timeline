@@ -27,6 +27,8 @@
 module powerbi.extensibility.visual.granularity {
     // datePeriod
     import TimelineDatePeriod = datePeriod.TimelineDatePeriod;
+    // utils
+    import Utils = utils.Utils;
 
     export class WeekGranularity extends TimelineGranularityBase {
         public getType(): GranularityType {
@@ -38,7 +40,7 @@ module powerbi.extensibility.visual.granularity {
         }
 
         public sameLabel(firstDatePeriod: TimelineDatePeriod, secondDatePeriod: TimelineDatePeriod): boolean {
-            return _.isEqual(firstDatePeriod.week, secondDatePeriod.week);
+            return Utils.arraysEqual(firstDatePeriod.week, secondDatePeriod.week);
         }
 
         public generateLabel(datePeriod: TimelineDatePeriod): TimelineLabel {
