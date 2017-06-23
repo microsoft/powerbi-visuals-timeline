@@ -425,10 +425,8 @@ module powerbi.extensibility.visual.utils {
             return true;
         }
         public static findIndex(array: any[], predicate: Function): number {
-            debugger;
-            const length = array.length >>> 0;
             let value: any;
-            for (let i = 0; i < length; i++) {
+            for (let i = 0; i < array.length; i++) {
                 value = array[i];
                 if (predicate(value, i, array)) {
                     return i;
