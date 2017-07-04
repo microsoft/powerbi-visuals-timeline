@@ -30,6 +30,7 @@
     "objects": {
         "general": {
             "displayName": "General",
+            "displayNameKey": "Visual_General",
             "properties": {
                 "selected": {
                     "type": {
@@ -50,64 +51,79 @@
         },
         "calendar": {
             "displayName": "Fiscal Year Start",
+            "displayNameKey": "Visual_FiscalYearStart",
             "properties": {
                 "month": {
                     "displayName": "Month",
+                    "displayNameKey": "Visual_Month",
                     "type": {
                         "enumeration": [
                             {
                                 "value": "0",
-                                "displayName": "January"
+                                "displayName": "January",
+                                "displayNameKey": "Visual_Month_January"
                             },
                             {
                                 "value": "1",
-                                "displayName": "February"
+                                "displayName": "February",
+                                "displayNameKey": "Visual_Month_February"
                             },
                             {
                                 "value": "2",
-                                "displayName": "March"
+                                "displayName": "March",
+                                "displayNameKey": "Visual_Month_March"
                             },
                             {
                                 "value": "3",
-                                "displayName": "April"
+                                "displayName": "April",
+                                "displayNameKey": "Visual_Month_April"
                             },
                             {
                                 "value": "4",
-                                "displayName": "May"
+                                "displayName": "May",
+                                "displayNameKey": "Visual_Month_May"
                             },
                             {
                                 "value": "5",
-                                "displayName": "June"
+                                "displayName": "June",
+                                "displayNameKey": "Visual_Month_June"
                             },
                             {
                                 "value": "6",
-                                "displayName": "July"
+                                "displayName": "July",
+                                "displayNameKey": "Visual_Month_July"
                             },
                             {
                                 "value": "7",
-                                "displayName": "August"
+                                "displayName": "August",
+                                "displayNameKey": "Visual_Month_August"
                             },
                             {
                                 "value": "8",
-                                "displayName": "September"
+                                "displayName": "September",
+                                "displayNameKey": "Visual_Month_September"
                             },
                             {
                                 "value": "9",
-                                "displayName": "October"
+                                "displayName": "October",
+                                "displayNameKey": "Visual_Month_October"
                             },
                             {
                                 "value": "10",
-                                "displayName": "November"
+                                "displayName": "November",
+                                "displayNameKey": "Visual_Month_November"
                             },
                             {
                                 "value": "11",
-                                "displayName": "December"
+                                "displayName": "December",
+                                "displayNameKey": "Visual_Month_December"
                             }
                         ]
                     }
                 },
                 "day": {
                     "displayName": "Day",
+                    "displayNameKey": "Visual_Day",
                     "type": {
                         "numeric": true
                     }
@@ -116,38 +132,47 @@
         },
         "weekDay": {
             "displayName": "First Day of Week",
+            "displayNameKey": "Visual_FirstDayOfWeek",
             "properties": {
                 "day": {
                     "displayName": "Day",
+                    "displayNameKey": "Visual_Day",
                     "type": {
                         "enumeration": [
                             {
                                 "value": "0",
-                                "displayName": "Sunday"
+                                "displayName": "Sunday",
+                                "displayNameKey": "Visual_Day_Sunday"
                             },
                             {
                                 "value": "1",
-                                "displayName": "Monday"
+                                "displayName": "Monday",
+                                "displayNameKey": "Visual_Day_Monday"
                             },
                             {
                                 "value": "2",
-                                "displayName": "Tuesday"
+                                "displayName": "Tuesday",
+                                "displayNameKey": "Visual_Day_Tuesday"
                             },
                             {
                                 "value": "3",
-                                "displayName": "Wednesday"
+                                "displayName": "Wednesday",
+                                "displayNameKey": "Visual_Day_Wednesday"
                             },
                             {
                                 "value": "4",
-                                "displayName": "Thursday"
+                                "displayName": "Thursday",
+                                "displayNameKey": "Visual_Day_Thursday"
                             },
                             {
                                 "value": "5",
-                                "displayName": "Friday"
+                                "displayName": "Friday",
+                                "displayNameKey": "Visual_Day_Friday"
                             },
                             {
                                 "value": "6",
-                                "displayName": "Saturday"
+                                "displayName": "Saturday",
+                                "displayNameKey": "Visual_Day_Saturday"
                             }
                         ]
                     }
@@ -156,15 +181,18 @@
         },
         "rangeHeader": {
             "displayName": "Range Header",
+            "displayNameKey": "Visual_RangeHeader",
             "properties": {
                 "show": {
                     "displayName": "Show",
+                    "displayNameKey": "Visual_Show",
                     "type": {
                         "bool": true
                     }
                 },
                 "fontColor": {
                     "displayName": "Font color",
+                    "displayNameKey": "Visual_FontColor",
                     "type": {
                         "fill": {
                             "solid": {
@@ -175,6 +203,7 @@
                 },
                 "textSize": {
                     "displayName": "Text Size",
+                    "displayNameKey": "Visual_TextSize",
                     "type": {
                         "numeric": true
                     }
@@ -183,9 +212,11 @@
         },
         "cells": {
             "displayName": "Cells",
+            "displayNameKey": "Visual_Cells",
             "properties": {
                 "fillSelected": {
                     "displayName": "Selected cell color",
+                    "displayNameKey": "Visual_Cell_SelectedColor",
                     "type": {
                         "fill": {
                             "solid": {
@@ -196,6 +227,7 @@
                 },
                 "fillUnselected": {
                     "displayName": "Unselected cell color",
+                    "displayNameKey": "Visual_Cell_UnselectedColor",
                     "type": {
                         "fill": {
                             "solid": {
@@ -210,9 +242,11 @@
         },
         "granularity": {
             "displayName": "Granularity",
+            "displayNameKey": "Visual_Granularity",
             "properties": {
                 "scaleColor": {
                     "displayName": "Scale color",
+                    "displayNameKey": "Visual_ScaleColor",
                     "type": {
                         "fill": {
                             "solid": {
@@ -223,6 +257,7 @@
                 },
                 "sliderColor": {
                     "displayName": "Slider color",
+                    "displayNameKey": "Visual_SliderColor",
                     "type": {
                         "fill": {
                             "solid": {
@@ -233,27 +268,33 @@
                 },
                 "granularity": {
                     "displayName": "Granularity",
+                    "displayNameKey": "Visual_Granularity",
                     "type": {
                         "enumeration": [
                             {
                                 "value": "0",
-                                "displayName": "Year"
+                                "displayName": "Year",
+                                "displayNameKey": "Visual_Granularity_Year"
                             },
                             {
                                 "value": "1",
-                                "displayName": "Quarter"
+                                "displayName": "Quarter",
+                                "displayNameKey": "Visual_Granularity_Quarter"
                             },
                             {
                                 "value": "2",
-                                "displayName": "Month"
+                                "displayName": "Month",
+                                "displayNameKey": "Visual_Granularity_Month"
                             },
                             {
                                 "value": "3",
-                                "displayName": "Week"
+                                "displayName": "Week",
+                                "displayNameKey": "Visual_Granularity_Week"
                             },
                             {
                                 "value": "4",
-                                "displayName": "Day"
+                                "displayName": "Day",
+                                "displayNameKey": "Visual_Granularity_Day"
                             }
                         ]
                     }
@@ -262,15 +303,18 @@
         },
         "labels": {
             "displayName": "Labels",
+            "displayNameKey": "Visual_Labels",
             "properties": {
                 "show": {
                     "displayName": "Show",
+                    "displayNameKey": "Visual_Show",
                     "type": {
                         "bool": true
                     }
                 },
                 "fontColor": {
                     "displayName": "Font color",
+                    "displayNameKey": "Visual_FontColor",
                     "type": {
                         "fill": {
                             "solid": {
@@ -281,6 +325,7 @@
                 },
                 "textSize": {
                     "displayName": "Text Size",
+                    "displayNameKey": "Visual_TextSize",
                     "type": {
                         "numeric": true
                     }
