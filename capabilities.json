@@ -3,7 +3,8 @@
         {
             "name": "Time",
             "kind": "Grouping",
-            "displayName": "Time"
+            "displayName": "Time",
+            "displayNameKey": "Role_Time"
         }
     ],
     "dataViewMappings": [
