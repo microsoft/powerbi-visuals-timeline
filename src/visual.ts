@@ -1409,7 +1409,7 @@ module powerbi.extensibility.visual {
                     value: startDate.toJSON()
                 },
                 {
-                    operator: "LessThanOrEqual",
+                    operator: "LessThan",
                     value: endDate.toJSON()
                 });
             this.applyFilter(filter, datePeriod);
