@@ -31,7 +31,6 @@ module powerbi.extensibility.visual.test {
     import VisualBuilderBase = powerbi.extensibility.utils.test.VisualBuilderBase;
 
     // Timeline1447991079100
-    import VisualPlugin = powerbi.visuals.plugins.Timeline1447991079100;
     import SandboxedVisualNameSpace = powerbi.extensibility.visual.Timeline1447991079100;
     import VisualClass = SandboxedVisualNameSpace.Timeline;
     import VisualSettings = SandboxedVisualNameSpace.settings.VisualSettings;
@@ -40,7 +39,7 @@ module powerbi.extensibility.visual.test {
     export class TimelineBuilder extends VisualBuilderBase<VisualClass> {
 
         constructor(width: number, height: number) {
-            super(width, height, VisualPlugin.name);
+            super(width, height, "Timeline1447991079100");
             this.visualHost.applyJsonFilter = () => {};
         }
 
