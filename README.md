@@ -1,4 +1,5 @@
 # Timeline Slicer
+[![Build Status](https://travis-ci.org/Microsoft/powerbi-visuals-timeline.svg?branch=master)](https://travis-ci.org/Microsoft/powerbi-visuals-timeline)
 
 > Graphical date range selector to use for filtering dates
 
