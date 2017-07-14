@@ -15,7 +15,7 @@
     "start": "pbiviz start",
     "package": "pbiviz package",
     "lint": "tslint -r \"node_modules/tslint-microsoft-contrib\" \"+(src|test)/**/*.ts\"",
-    "pretest": "pbiviz package --resources --no-minify --no-pbiviz",
+    "pretest": "pbiviz package --resources --no-minify --no-pbiviz --no-plugin",
     "test": "karma start"
   },
   "author": {
@@ -33,6 +33,7 @@
     "@types/jasmine-jquery": "1.5.31",
     "@types/jquery": "2.0.46",
     "@types/lodash": "4.14.55",
+    "coveralls": "2.13.1",
     "d3": "3.5.5",
     "jasmine": "2.6.0",
     "jasmine-jquery": "2.1.1",
