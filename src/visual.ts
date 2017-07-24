@@ -704,6 +704,29 @@ module powerbi.extensibility.visual {
                     options);
             }
             this.renderGranularitySlicerRect(this.settings.granularity.granularity);
+
+            if (!this.isThePreviousFilterApplied) {
+                this.applyThePreviousFilter(options, datePeriod);
+
+                this.isThePreviousFilterApplied = true;
+            }
+        }
+
+        private applyThePreviousFilter(options: VisualUpdateOptions, datePeriod: TimelineDatePeriodBase): void {
+            let target: IFilterColumnTarget = this.timelineData.filterColumnTarget;
+
+            if (!datePeriod.startDate || !datePeriod.endDate) {
+                this.clearSelection(target);
+
+                return;
+            }
+
+            this.applyDatePeriod(
+                datePeriod.startDate,
+                datePeriod.endDate,
+                target);
+
+            this.applySelection(options, datePeriod);
         }
 
         private applySelection(options: VisualUpdateOptions, datePeriod: TimelineDatePeriodBase): void {
@@ -1384,7 +1407,7 @@ module powerbi.extensibility.visual {
                 timelineData.filterColumnTarget);
         }
 
-        private applyFilter(filter: IAdvancedFilter, datePeriod: TimelineDatePeriodBase): void {
+        private applyFilter(datePeriod: TimelineDatePeriodBase): void {
             const instance: VisualObjectInstance = {
                 objectName: "general",
                 selector: undefined,
@@ -1400,26 +1423,34 @@ module powerbi.extensibility.visual {
             });
         }
         public applyDatePeriod(startDate: Date, endDate: Date, target: IFilterColumnTarget): void {
-            const datePeriod: TimelineDatePeriodBase = TimelineDatePeriodBase.create(startDate, endDate);
+            const datePeriod: TimelineDatePeriodBase =
+                startDate && endDate
+                    ? TimelineDatePeriodBase.create(startDate, endDate)
+                    : TimelineDatePeriodBase.createEmpty();
+
+            this.applyFilter(datePeriod);
+
             const filter: IAdvancedFilter = new window["powerbi-models"].AdvancedFilter(
                 target,
                 "And",
                 {
                     operator: "GreaterThanOrEqual",
-                    value: startDate.toJSON()
+                    value: startDate
+                        ? startDate.toJSON()
+                        : this.datePeriod.startDate
                 },
                 {
                     operator: "LessThan",
-                    value: endDate.toJSON()
+                    value: endDate
+                        ? endDate.toJSON()
+                        : this.datePeriod.endDate
                 });
-            this.applyFilter(filter, datePeriod);
+
             this.host.applyJsonFilter(filter, Timeline.filterObjectProperty.objectName, Timeline.filterObjectProperty.propertyName);
         }
 
         public clearSelection(target: IFilterColumnTarget): void {
-            const endDate = this.timelineData.timelineDatapoints[this.timelineData.selectionEndIndex].datePeriod.endDate;
-            const startDate = this.timelineData.timelineDatapoints[this.timelineData.selectionStartIndex].datePeriod.startDate;
-            this.applyDatePeriod(startDate, endDate, target);
+            this.applyDatePeriod(null, null, target);
         }
 
         /**
