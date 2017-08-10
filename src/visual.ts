@@ -1028,16 +1028,11 @@ module powerbi.extensibility.visual {
 
             if (!this.settings.labels.show) {
                 labelTextSelection.remove();
-
                 return;
             }
 
             let labelsGroupSelection: UpdateSelection<TimelineLabel> = labelTextSelection.data(labels);
             const fontSize: string = convertToPt(this.settings.labels.textSize);
-
-            labelsElement.attr({
-                height: fontSize
-            });
 
             labelsGroupSelection
                 .enter()
