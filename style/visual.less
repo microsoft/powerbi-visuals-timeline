@@ -60,32 +60,6 @@
         }
     }
 
-    .timelineSlicer {
-        fill: #000000;
-
-        .periodSlicer {
-            &Rect {
-                stroke: #aaa;
-                stroke-width: 2px;
-                fill: transparent;
-            }
-
-            &Granularities,
-            &Selection {
-                font-size: 10px;
-                text-anchor: middle;
-            }
-
-            &SelectionRect {
-                fill: transparent;
-            }
-        }
-
-        .periodSlicerRect {
-            pointer-events: none;
-        }
-    }
-
     .periodSlicerSelectionRect,
     .timelineVertLine,
     .cellRect {
@@ -95,4 +69,34 @@
     .selectionCursor {
         cursor: ew-resize;
     }
+}
+
+.timelineSlicer {
+    fill: #000000;
+    .periodSlicer {
+        &Rect {
+            stroke: #aaa;
+            stroke-width: 2px;
+            fill: transparent;
+        }
+
+        &Granularities,
+        &Selection {
+            font-size: 10px;
+            text-anchor: middle;
+        }
+
+        &SelectionRect {
+            fill: transparent;
+        }
+    }
+
+    .periodSlicerRect {
+        pointer-events: none;
+    }
+}
+
+.timelineWrapper {
+    width: 100%;
+    overflow: auto;
 }

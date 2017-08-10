@@ -53,8 +53,13 @@ module powerbi.extensibility.visual.test {
 
         public get mainElement(): JQuery {
             return this.element
+                .find("svg.timeline");
+        }
+
+        public get headerElement(): JQuery {
+            return this.element
                 .children("div")
-                .children("svg.timeline");
+                .children("svg");
         }
 
         public get cellRects(): JQuery {
@@ -75,13 +80,13 @@ module powerbi.extensibility.visual.test {
         }
 
         public get rangeHeaderText() {
-            return this.mainElement
+            return this.headerElement
                 .children("g.rangeTextArea")
                 .children("text.selectionRangeContainer");
         }
 
         public get timelineSlicer() {
-            return this.mainElement
+            return this.headerElement
                 .children("g.timelineSlicer");
         }
 

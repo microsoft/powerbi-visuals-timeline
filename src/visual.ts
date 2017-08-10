@@ -142,7 +142,7 @@ module powerbi.extensibility.visual {
         private static TimelineMargins: TimelineMargins = {
             LeftMargin: 15,
             RightMargin: 15,
-            TopMargin: 15,
+            TopMargin: 0,
             BottomMargin: 10,
             CellWidth: 40,
             CellHeight: 25,
@@ -152,7 +152,8 @@ module powerbi.extensibility.visual {
             MinCellWidth: 30,
             MaxCellHeight: 60,
             PeriodSlicerRectWidth: 15,
-            PeriodSlicerRectHeight: 23
+            PeriodSlicerRectHeight: 23,
+            LegendHeight: 60
         };
 
         private static filterObjectProperty: { objectName: string, propertyName: string } = {
@@ -162,6 +163,7 @@ module powerbi.extensibility.visual {
 
         private static TimelineSelectors: TimelineSelectors = {
             TimelineVisual: createClassAndSelector("timeline"),
+            TimelineWrapper: createClassAndSelector("timelineWrapper"),
             SelectionRangeContainer: createClassAndSelector("selectionRangeContainer"),
             textLabel: createClassAndSelector("label"),
             LowerTextCell: createClassAndSelector("lowerTextCell"),
@@ -195,6 +197,7 @@ module powerbi.extensibility.visual {
         private timelineGranularityData: TimelineGranularityData;
 
         private rootSelection: Selection<any>;
+        private headerSelection: Selection<any>;
         private mainSvgSelection: Selection<any>;
 
         private rangeTextSelection: Selection<any>;
@@ -278,7 +281,16 @@ module powerbi.extensibility.visual {
             this.rootSelection = d3.select(element)
                 .append("div");
 
+            this.headerSelection = this.rootSelection
+                .append("svg")
+                .attr({
+                    width: "100%",
+                    height: Timeline.TimelineMargins.LegendHeight
+                });
+
             this.mainSvgSelection = this.rootSelection
+                .append("div")
+                .classed(Timeline.TimelineSelectors.TimelineWrapper.className, true)
                 .append("svg")
                 .classed(Timeline.TimelineSelectors.TimelineVisual.className, true);
 
@@ -292,7 +304,8 @@ module powerbi.extensibility.visual {
                 .on("click", () => this.clear())
                 .on("touchstart", () => this.clear());
 
-            this.rangeTextSelection = this.mainSvgSelection.append("g")
+            this.rangeTextSelection = this.headerSelection
+                .append("g")
                 .classed(Timeline.TimelineSelectors.RangeTextArea.className, true)
                 .append("text");
 
@@ -356,7 +369,7 @@ module powerbi.extensibility.visual {
                 elementWidth: number = timelineProperties.elementWidth,
                 selectorPeriods: string[] = this.granularitySelectors;
 
-            this.selectorSelection = this.mainSvgSelection
+            this.selectorSelection = this.headerSelection
                 .append("g")
                 .classed(Timeline.TimelineSelectors.TimelineSlicer.className, true);
 
@@ -1015,22 +1028,19 @@ module powerbi.extensibility.visual {
 
             if (!this.settings.labels.show) {
                 labelTextSelection.remove();
-
                 return;
             }
 
             let labelsGroupSelection: UpdateSelection<TimelineLabel> = labelTextSelection.data(labels);
+            const fontSize: string = convertToPt(this.settings.labels.textSize);
 
             labelsGroupSelection
                 .enter()
                 .append("text")
                 .classed(Timeline.TimelineSelectors.textLabel.className, true);
-
             labelsGroupSelection
                 .text((label: TimelineLabel, id: number) => {
                     if (!isLast && id === 0 && labels.length > 1) {
-                        const fontSize: string = convertToPt(this.settings.labels.textSize);
-
                         let textProperties: TextProperties = {
                             text: labels[0].text,
                             fontFamily: Timeline.DefaultFontFamily,

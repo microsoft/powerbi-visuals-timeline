@@ -51,10 +51,12 @@ module powerbi.extensibility.visual {
         MaxCellHeight: number;
         PeriodSlicerRectWidth: number;
         PeriodSlicerRectHeight: number;
+        LegendHeight: number;
     }
 
     export interface TimelineSelectors {
         TimelineVisual: ClassAndSelector;
+        TimelineWrapper: ClassAndSelector;
         SelectionRangeContainer: ClassAndSelector;
         textLabel: ClassAndSelector;
         LowerTextCell: ClassAndSelector;
