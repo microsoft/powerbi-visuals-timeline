@@ -67,6 +67,7 @@ module powerbi.extensibility.visual {
     import LabelsSettings = settings.LabelsSettings;
     import CalendarSettings = settings.CalendarSettings;
     import GranularitySettings = settings.GranularitySettings;
+    import ScaleSizeAdjustment = settings.ScaleSizeAdjustment;
 
     // granularity
     import GranularityType = granularity.GranularityType;
@@ -538,7 +539,8 @@ module powerbi.extensibility.visual {
             datePeriodsCount: number,
             viewport: IViewport,
             timelineProperties: TimelineProperties,
-            timelineMargins: TimelineMargins): void {
+            timelineMargins: TimelineMargins,
+            scaleSizeAdjustment: ScaleSizeAdjustment): void {
 
             timelineProperties.cellsYPosition = timelineProperties.textYPosition;
 
@@ -560,14 +562,18 @@ module powerbi.extensibility.visual {
 
             maxHeight = viewport.width - timelineMargins.RightMargin - timelineMargins.MinCellWidth * datePeriodsCount;
 
-            height = Math.max(
-                timelineMargins.MinCellWidth,
-                Math.min(
-                    timelineMargins.MaxCellHeight,
-                    maxHeight,
-                    svgHeight
-                    - timelineProperties.cellsYPosition
-                    - Timeline.TimelinePropertiesHeightOffset));
+            if (scaleSizeAdjustment.show) {
+                height = Math.max(
+                    timelineMargins.MinCellWidth,
+                    Math.min(
+                        timelineMargins.MaxCellHeight,
+                        maxHeight,
+                        svgHeight
+                        - timelineProperties.cellsYPosition
+                        - Timeline.TimelinePropertiesHeightOffset));
+            } else {
+                height = timelineMargins.MinCellWidth;
+            }
 
             width = Math.max(
                 timelineMargins.MinCellWidth,
@@ -906,7 +912,9 @@ module powerbi.extensibility.visual {
                 countFullCells,
                 viewport,
                 timelineProperties,
-                Timeline.TimelineMargins);
+                Timeline.TimelineMargins,
+                timelineSettings.scaleSizeAdjustment
+            );
 
             Timeline.updateCursors(timelineData, timelineProperties.cellWidth);
 
