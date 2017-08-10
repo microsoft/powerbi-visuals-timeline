@@ -68,6 +68,10 @@ module powerbi.extensibility.visual.settings {
         public granularity: GranularityType = GranularityType.month;
     }
 
+    export class ScaleSizeAdjustment {
+        show: boolean = false;
+    }
+
     export class VisualSettings extends DataViewObjectsParser {
         public general: GeneralSettings = new GeneralSettings();
         public calendar: CalendarSettings = new CalendarSettings();
@@ -76,5 +80,6 @@ module powerbi.extensibility.visual.settings {
         public cells: CellsSettings = new CellsSettings();
         public granularity: GranularitySettings = new GranularitySettings();
         public labels: LabelsSettings = new LabelsSettings();
+        public scaleSizeAdjustment: ScaleSizeAdjustment = new ScaleSizeAdjustment();
     }
 }

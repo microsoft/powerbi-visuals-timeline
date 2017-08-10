@@ -1,3 +1,6 @@
+## 1.4.4
+* Scale auto sizing is possible to enable/disable via option parameter (disabled by default)
+
 ## 1.4.3
 * Added fixed top legend
 
