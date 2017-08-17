@@ -29,12 +29,12 @@
   "Visual_FontColor": "Font Color",
   "Visual_TextSize": "Text size",
   "Visual_Cells": "Cells",
-  "Visual_Cell_SelectedColor": "Selected Color"
+  "Visual_Cell_SelectedColor": "Selected Color",
   "Visual_Cell_UnselectedColor": "Unselected Color",
   "Visual_Granularity": "Granularity",
   "Visual_ScaleColor": "Scale Color",
   "Visual_SliderColor": "Slider Color",
-  "Visual_Granularity_Year": "Year"
+  "Visual_Granularity_Year": "Year",
   "Visual_Granularity_Quarter": "Quarter",
   "Visual_Granularity_Month": "Month",
   "Visual_Granularity_Week": "Week",
