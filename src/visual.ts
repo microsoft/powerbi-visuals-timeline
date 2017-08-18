@@ -154,7 +154,8 @@ module powerbi.extensibility.visual {
             MaxCellHeight: 60,
             PeriodSlicerRectWidth: 15,
             PeriodSlicerRectHeight: 23,
-            LegendHeight: 60
+            LegendHeight: 60,
+            LegendHeightOffset: 25
         };
 
         private static filterObjectProperty: { objectName: string, propertyName: string } = {
@@ -954,7 +955,7 @@ module powerbi.extensibility.visual {
             this.mainSvgSelection.attr({
                 height: convertToPx(Math.max(
                     Timeline.MinSizeOfViewport,
-                    options.viewport.height - Timeline.TimelineMargins.TopMargin)),
+                    options.viewport.height - Timeline.TimelineMargins.TopMargin - Timeline.TimelineMargins.LegendHeight - Timeline.TimelineMargins.LegendHeightOffset)),
                 width: convertToPx(Math.max(
                     Timeline.MinSizeOfViewport,
                     this.svgWidth))
@@ -966,7 +967,7 @@ module powerbi.extensibility.visual {
 
             let translateString: string = translate(
                 timelineProperties.cellHeight / Timeline.CellHeightDivider,
-                timelineProperties.topMargin);
+                timelineProperties.topMargin - (Timeline.TimelineMargins.LegendHeight - Timeline.TimelineMargins.LegendHeightOffset));
 
             this.mainGroupSelection.attr("transform", translateString);
             this.selectorSelection.attr("transform", fixedTranslateString);
