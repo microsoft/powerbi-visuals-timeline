@@ -52,6 +52,7 @@ module powerbi.extensibility.visual {
         PeriodSlicerRectWidth: number;
         PeriodSlicerRectHeight: number;
         LegendHeight: number;
+        LegendHeightOffset: number;
     }
 
     export interface TimelineSelectors {
