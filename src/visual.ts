@@ -154,8 +154,8 @@ module powerbi.extensibility.visual {
             MaxCellHeight: 60,
             PeriodSlicerRectWidth: 15,
             PeriodSlicerRectHeight: 23,
-            LegendHeight: 60,
-            LegendHeightOffset: 25
+            LegendHeight: 50,
+            LegendHeightOffset: 5
         };
 
         private static filterObjectProperty: { objectName: string, propertyName: string } = {
