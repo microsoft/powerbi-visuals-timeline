@@ -1,3 +1,6 @@
+## 1.4.6
+* FIX. Layout offsets was corrected
+
 ## 1.4.5
 * Layout fixes that repair horizontal scrolling and vertical space between legend and scale
 
