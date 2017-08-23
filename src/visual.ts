@@ -155,7 +155,8 @@ module powerbi.extensibility.visual {
             PeriodSlicerRectWidth: 15,
             PeriodSlicerRectHeight: 23,
             LegendHeight: 50,
-            LegendHeightOffset: 5
+            LegendHeightOffset: 5,
+            HeightOffset: 75
         };
 
         private static filterObjectProperty: { objectName: string, propertyName: string } = {
@@ -955,7 +956,7 @@ module powerbi.extensibility.visual {
             this.mainSvgSelection.attr({
                 height: convertToPx(Math.max(
                     Timeline.MinSizeOfViewport,
-                    options.viewport.height - Timeline.TimelineMargins.TopMargin - Timeline.TimelineMargins.LegendHeight - Timeline.TimelineMargins.LegendHeightOffset)),
+                    options.viewport.height - Timeline.TimelineMargins.TopMargin - Timeline.TimelineMargins.HeightOffset)),
                 width: convertToPx(Math.max(
                     Timeline.MinSizeOfViewport,
                     this.svgWidth))
