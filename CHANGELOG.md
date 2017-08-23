@@ -1,3 +1,6 @@
+## 1.4.7
+* FIX. Horizontal scrolling was repaired
+
 ## 1.4.6
 * FIX. Layout offsets was corrected
 
