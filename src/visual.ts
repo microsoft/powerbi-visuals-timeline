@@ -875,8 +875,11 @@ module powerbi.extensibility.visual {
             }
 
             const category: DataViewCategoryColumn = dataView.categorical.categories[0];
+            let categoryExpr: any = category.source && category.source.expr ? category.source.expr as any : null;
+
+            // category.source.queryName contains wrong table name if table was renamed! category.source.expr.source.entity contains correct table name.
             timelineData.filterColumnTarget = {
-                table: category.source.queryName.substr(0, category.source.queryName.indexOf(".")),
+                table: categoryExpr && categoryExpr.source && categoryExpr.source.entity ? categoryExpr.source.entity : category.source.queryName.substr(0, category.source.queryName.indexOf(".")),
                 column: category.source.displayName
             };
 
