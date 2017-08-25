@@ -1,3 +1,6 @@
+## 1.4.8
+* FIX. Cross filtering didn't work if data source was renamed after the visual was added
+
 ## 1.4.7
 * FIX. Horizontal scrolling was repaired
 
