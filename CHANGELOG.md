@@ -1,3 +1,6 @@
+## 1.4.9
+* FIX. Max date issue when date range is not specified (all dates)
+
 ## 1.4.8
 * FIX. Cross filtering didn't work if data source was renamed after the visual was added
 
