@@ -1453,8 +1453,11 @@ module powerbi.extensibility.visual {
 
             this.applyFilter(datePeriod);
 
-            let adaptedEndDate: Date = new Date(this.datePeriod.endDate);
-            adaptedEndDate.setDate(adaptedEndDate.getDate() + 1);
+            let adaptedEndDate: any = null;
+            if (this.datePeriod && this.datePeriod.endDate) {
+                adaptedEndDate = new Date(this.datePeriod.endDate);
+                adaptedEndDate.setDate(adaptedEndDate.getDate() + 1);
+            }
 
             // If startDate and EndDate is null then ClearSelection is triggered
             const filter: IAdvancedFilter = new window["powerbi-models"].AdvancedFilter(
