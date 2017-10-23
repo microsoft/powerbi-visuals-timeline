@@ -313,6 +313,13 @@
                         "bool": true
                     }
                 },
+                "displayAll": {
+                    "displayName": "Display all",
+                    "displayNameKey": "Visual_DisplayAll",
+                    "type": {
+                        "bool": true
+                    }
+                },
                 "fontColor": {
                     "displayName": "Font color",
                     "displayNameKey": "Visual_FontColor",
