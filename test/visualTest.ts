@@ -620,7 +620,8 @@ module powerbi.extensibility.visual.test {
                 beforeEach(() => {
                     dataView.metadata.objects = {
                         labels: {
-                            show: true
+                            show: true,
+                            displayAll: true
                         }
                     };
                 });
@@ -634,6 +635,16 @@ module powerbi.extensibility.visual.test {
                     visualBuilder.updateFlushAllD3Transitions(dataView);
 
                     expect(visualBuilder.allLabels).not.toBeInDOM();
+                });
+
+                it("shows only selected granularity label if displayAll is set to false", () => {
+                    visualBuilder.updateFlushAllD3Transitions(dataView);
+                    // All labels should be visible
+                    expect(visualBuilder.allLabels.children().length).toBeGreaterThan(1);
+                    (dataView.metadata.objects as any).labels.displayAll = false;
+                    visualBuilder.updateFlushAllD3Transitions(dataView);
+                    // Only one label should be visible
+                    expect(visualBuilder.allLabels.children().length).toBe(1);
                 });
 
                 it("font color", () => {

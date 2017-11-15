@@ -41,5 +41,6 @@
 	"Visual_Granularity_Day": "Day",
 	"Visual_Labels": "Labels",
 	"Visual_ScaleSizeAdjustment": "Scale size auto adjustment",
-	"Visual_FirstDayOfWeek": "First Day of Week"
+	"Visual_FirstDayOfWeek": "First Day of Week",
+	"Visual_DisplayAll": "Display all"
 }

@@ -555,9 +555,10 @@ module powerbi.extensibility.visual {
             labelSize = fromPointToPixel(labelsSettings.textSize);
 
             if (labelsSettings.show) {
+                let granularityOffset: number = labelsSettings.displayAll ? granularityType + 1 : 1;
                 timelineProperties.cellsYPosition += labelSize
                     * Timeline.LabelSizeFactor
-                    * (granularityType + 1);
+                    * granularityOffset;
             }
 
             svgHeight = Math.max(0, viewport.height - timelineMargins.TopMargin);
@@ -983,43 +984,55 @@ module powerbi.extensibility.visual {
             let yPos: number = 0,
                 yDiff: number = Timeline.DefaultYDiff;
 
-            this.renderLabels(
-                extendedLabels.yearLabels,
-                this.yearLabelsSelection,
-                yPos,
-                granularityType === 0);
+            // Removing currently displayed labels
+            this.mainGroupSelection
+                .selectAll(Timeline.TimelineSelectors.textLabel.selectorName)
+                .remove();
 
-            yPos += yDiff;
+            if (timelineSettings.labels.displayAll || granularityType === GranularityType.year) {
+                this.renderLabels(
+                    extendedLabels.yearLabels,
+                    this.yearLabelsSelection,
+                    yPos,
+                    granularityType === 0);
+                    yPos += yDiff;
+            }
 
-            this.renderLabels(
-                extendedLabels.quarterLabels,
-                this.quarterLabelsSelection,
-                yPos,
-                granularityType === 1);
+            if (timelineSettings.labels.displayAll || granularityType === GranularityType.quarter) {
+                this.renderLabels(
+                    extendedLabels.quarterLabels,
+                    this.quarterLabelsSelection,
+                    yPos,
+                    granularityType === 1);
+                    yPos += yDiff;
+            }
 
-            yPos += yDiff;
+            if (timelineSettings.labels.displayAll || granularityType === GranularityType.month) {
+                this.renderLabels(
+                    extendedLabels.monthLabels,
+                    this.monthLabelsSelection,
+                    yPos,
+                    granularityType === 2);
+                    yPos += yDiff;
+            }
 
-            this.renderLabels(
-                extendedLabels.monthLabels,
-                this.monthLabelsSelection,
-                yPos,
-                granularityType === 2);
+            if (timelineSettings.labels.displayAll || granularityType === GranularityType.week) {
+                this.renderLabels(
+                    extendedLabels.weekLabels,
+                    this.weekLabelsSelection,
+                    yPos,
+                    granularityType === 3);
+                    yPos += yDiff;
+            }
 
-            yPos += yDiff;
-
-            this.renderLabels(
-                extendedLabels.weekLabels,
-                this.weekLabelsSelection,
-                yPos,
-                granularityType === 3);
-
-            yPos += yDiff;
-
-            this.renderLabels(
-                extendedLabels.dayLabels,
-                this.dayLabelsSelection,
-                yPos,
-                granularityType === 4);
+            if (timelineSettings.labels.displayAll || granularityType === GranularityType.day) {
+                this.renderLabels(
+                    extendedLabels.dayLabels,
+                    this.dayLabelsSelection,
+                    yPos,
+                    granularityType === 4);
+                    yPos += yDiff;
+            }
 
             this.renderCells(timelineData, timelineProperties);
 

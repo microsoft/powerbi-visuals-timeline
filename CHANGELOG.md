@@ -1,3 +1,6 @@
+## 1.5.0
+* Added setting to toggle between displaying all labels, or only for selected granularity
+
 ## 1.4.9
 * FIX. Max date issue when date range is not specified (all dates)
 

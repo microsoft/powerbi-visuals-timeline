@@ -53,6 +53,7 @@ module powerbi.extensibility.visual.settings {
 
     export class LabelsSettings {
         show: boolean = true;
+        displayAll: boolean = true;
         fontColor: string = "#777777";
         textSize: number = 9;
     }
