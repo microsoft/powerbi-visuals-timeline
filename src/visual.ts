@@ -877,11 +877,12 @@ module powerbi.extensibility.visual {
 
             const category: DataViewCategoryColumn = dataView.categorical.categories[0];
             let categoryExpr: any = category.source && category.source.expr ? category.source.expr as any : null;
-
-            // category.source.queryName contains wrong table name if table was renamed! category.source.expr.source.entity contains correct table name.
+            let filteringColumn: string = categoryExpr && categoryExpr.arg && categoryExpr.arg.arg && categoryExpr.arg.arg.property ? categoryExpr.arg.arg.property : category.source.displayName;
+            // category.source.queryName contains wrong table name in case when table was renamed! category.source.expr.source.entity contains correct table name.
+            // category.source.displayName contains wrong column name in case when Hierarchy mode of showing date was chosen
             timelineData.filterColumnTarget = {
                 table: categoryExpr && categoryExpr.source && categoryExpr.source.entity ? categoryExpr.source.entity : category.source.queryName.substr(0, category.source.queryName.indexOf(".")),
-                column: category.source.displayName
+                column: filteringColumn
             };
 
             if (category.source.type.numeric) {
