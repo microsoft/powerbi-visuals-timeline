@@ -1,3 +1,6 @@
+## 1.5.1
+* FIX. Filtering doesn't work when Hierarchy mode of showing date field was chosen
+
 ## 1.5.0
 * Added setting to toggle between displaying all labels, or only for selected granularity
 
