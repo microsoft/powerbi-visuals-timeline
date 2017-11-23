@@ -725,7 +725,7 @@ module powerbi.extensibility.visual {
             }
             // End date from data is always less than date from slicer filter.
             // This means that we need to correct it before check.
-            let adaptedDataEndDate : Date = null;
+            let adaptedDataEndDate: Date = null;
             if (this.datePeriod.endDate) {
                 adaptedDataEndDate = new Date(this.datePeriod.endDate);
                 adaptedDataEndDate.setDate(adaptedDataEndDate.getDate() + 1);
