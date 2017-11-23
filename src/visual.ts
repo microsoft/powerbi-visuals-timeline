@@ -231,8 +231,6 @@ module powerbi.extensibility.visual {
 
         private datePeriod: ITimelineDatePeriod;
 
-        private isThePreviousFilterApplied: boolean = false;
-
         private initialized: boolean;
 
         private calendar: Calendar;
@@ -597,8 +595,6 @@ module powerbi.extensibility.visual {
                 resetedStartDate: Date,
                 resetedEndDate: Date;
 
-            this.settings = Timeline.parseSettings(dataView);
-
             datePeriod = this.settings.general.datePeriod as TimelineDatePeriodBase;
 
             if (datePeriod.startDate && datePeriod.endDate) {
@@ -710,14 +706,41 @@ module powerbi.extensibility.visual {
             }
             this.options = options;
             this.dataView = options.dataViews[0];
+
+            // it contains dates from data view.
             this.datePeriod = this.createDatePeriod(options.dataViews[0]);
+
+            // Setting parsing was moved here from createTimelineData because settings values may be modified before the function is called.
+            this.settings = Timeline.parseSettings(options.dataViews[0]);
+
+            // It contains date boundaties that was taken from current slicer filter (filter range).
+            // If nothing is selected in slicer the boundaries will be null.
+            const filterDatePeriod: TimelineDatePeriodBase = this.settings.general.datePeriod as TimelineDatePeriodBase;
+
+            // There may be the case when date boundaries that taken from data view are less than slicer filter dates.
+            // The case may happen if there is another timeline slicer that works with the same data and already applied a filter.
+            // In that case we need to correct slice filter dates.
+            if (filterDatePeriod.startDate && this.datePeriod.startDate && filterDatePeriod.startDate.getTime() < this.datePeriod.startDate.getTime()) {
+                filterDatePeriod.startDate = null;
+            }
+            // End date from data is always less than date from slicer filter.
+            // This means that we need to correct it before check.
+            let adaptedDataEndDate = null;
+            if (this.datePeriod.endDate) {
+                adaptedDataEndDate = new Date(this.datePeriod.endDate);
+                adaptedDataEndDate.setDate(adaptedDataEndDate.getDate() + 1);
+            }
+            if (filterDatePeriod.endDate && adaptedDataEndDate && filterDatePeriod.endDate.getTime() > adaptedDataEndDate.getTime()) {
+                filterDatePeriod.endDate = null;
+            }
+
             this.createTimelineData(this.dataView);
-            const datePeriod: TimelineDatePeriodBase = this.settings.general.datePeriod as TimelineDatePeriodBase;
+
             this.updateCalendar(this.settings);
             this.initialized = true;
 
-            if (datePeriod.startDate && datePeriod.endDate) {
-                this.applySelection(options, datePeriod);
+            if (filterDatePeriod.startDate && filterDatePeriod.endDate) {
+                this.applySelection(options, filterDatePeriod);
             } else {
                 this.render(
                     this.timelineData,
@@ -726,29 +749,6 @@ module powerbi.extensibility.visual {
                     options);
             }
             this.renderGranularitySlicerRect(this.settings.granularity.granularity);
-
-            if (!this.isThePreviousFilterApplied) {
-                this.applyThePreviousFilter(options, datePeriod);
-
-                this.isThePreviousFilterApplied = true;
-            }
-        }
-
-        private applyThePreviousFilter(options: VisualUpdateOptions, datePeriod: TimelineDatePeriodBase): void {
-            let target: IFilterColumnTarget = this.timelineData.filterColumnTarget;
-
-            if (!datePeriod.startDate || !datePeriod.endDate) {
-                this.clearSelection(target);
-
-                return;
-            }
-
-            this.applyDatePeriod(
-                datePeriod.startDate,
-                datePeriod.endDate,
-                target);
-
-            this.applySelection(options, datePeriod);
         }
 
         private applySelection(options: VisualUpdateOptions, datePeriod: TimelineDatePeriodBase): void {
@@ -1467,12 +1467,6 @@ module powerbi.extensibility.visual {
 
             this.applyFilter(datePeriod);
 
-            let adaptedEndDate: any = null;
-            if (this.datePeriod && this.datePeriod.endDate) {
-                adaptedEndDate = new Date(this.datePeriod.endDate);
-                adaptedEndDate.setDate(adaptedEndDate.getDate() + 1);
-            }
-
             // If startDate and EndDate is null then ClearSelection is triggered
             const filter: IAdvancedFilter = new window["powerbi-models"].AdvancedFilter(
                 target,
@@ -1481,16 +1475,16 @@ module powerbi.extensibility.visual {
                     operator: "GreaterThanOrEqual",
                     value: startDate
                         ? startDate.toJSON()
-                        : this.datePeriod.startDate
+                        : null
                 },
                 {
                     operator: "LessThan",
                     value: endDate
                         ? endDate.toJSON()
-                        : adaptedEndDate
+                        : null
                 });
 
-            this.host.applyJsonFilter(filter, Timeline.filterObjectProperty.objectName, Timeline.filterObjectProperty.propertyName);
+            this.host.applyJsonFilter(filter, Timeline.filterObjectProperty.objectName, Timeline.filterObjectProperty.propertyName, (startDate && endDate ? FilterAction.merge : FilterAction.remove));
         }
 
         public clearSelection(target: IFilterColumnTarget): void {

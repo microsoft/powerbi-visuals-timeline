@@ -1,3 +1,7 @@
+## 1.5.2
+* UPD: API was updated to version 1.9
+* FIX: Mutual selection (when two timeline slicers apply filters to each other) was corrected and can be clear for now.
+
 ## 1.5.1
 * FIX. Filtering doesn't work when Hierarchy mode of showing date field was chosen
 
