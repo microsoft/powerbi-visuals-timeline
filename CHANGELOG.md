@@ -1,3 +1,6 @@
+## 1.5.3
+* NEW: Added force selection setting for current period
+
 ## 1.5.2
 * UPD: API was updated to version 1.9
 * FIX: Mutual selection (when two timeline slicers apply filters to each other) was corrected and can be clear for now.
