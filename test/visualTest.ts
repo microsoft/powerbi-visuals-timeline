@@ -616,6 +616,49 @@ module powerbi.extensibility.visual.test {
                 });
             });
 
+            describe("Force selection", () => {
+                beforeEach(() => {
+                    const currentDate = new Date();
+
+                    defaultDataViewBuilder.valuesCategory[0] = new Date(currentDate.getFullYear(), 0, 1);
+                    defaultDataViewBuilder.valuesCategory[1] = new Date(currentDate.getFullYear() + 1, 0, 1);
+
+                    dataView = defaultDataViewBuilder.getDataView();
+
+                    dataView.metadata.objects = {
+                        forceSelection: {
+                            currentPeriod: true
+                        },
+                        granularity: {}
+                    };
+                });
+
+                function checkSelectedElement(granularity: GranularityType): void {
+                    dataView.metadata.objects.granularity.granularity = granularity;
+                    visualBuilder.updateFlushAllD3Transitions(dataView);
+
+                    let selectedElements: Element[] = [];
+                    visualBuilder.cellRects
+                        .toArray()
+                        .forEach((element: Element) => {
+                            const fill: string = $(element).css("fill");
+                            if (fill !== "rgba(0, 0, 0, 0)") {
+                                selectedElements.push(element);
+                            }
+                        });
+
+                    expect(selectedElements.length).toEqual(1);
+                }
+
+                for (let granularity in GranularityType) {
+                    if (isNaN(+granularity)) {
+                        it(`current period for '${granularity}' granularity`, () => {
+                            checkSelectedElement(GranularityType[granularity]);
+                        });
+                    }
+                }
+            });
+
             describe("Labels", () => {
                 beforeEach(() => {
                     dataView.metadata.objects = {
