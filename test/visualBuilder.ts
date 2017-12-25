@@ -102,7 +102,8 @@ module powerbi.extensibility.visual.test {
             datePeriod: TimelineDatePeriodBase): void {
 
             (dataView.metadata.objects as any).general = {
-                datePeriod: datePeriod.toString()
+                datePeriod: datePeriod.toString(),
+                isUserSelection: true
             };
         }
     }
