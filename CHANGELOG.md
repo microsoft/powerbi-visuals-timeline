@@ -1,5 +1,6 @@
 ## 1.5.3
 * NEW: Added force selection setting for current period
+* FIX: Scroll bars don't display correctly
 
 ## 1.5.2
 * UPD: API was updated to version 1.9

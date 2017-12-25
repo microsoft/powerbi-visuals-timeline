@@ -202,6 +202,7 @@ module powerbi.extensibility.visual {
         private rootSelection: Selection<any>;
         private headerSelection: Selection<any>;
         private mainSvgSelection: Selection<any>;
+        private mainSvgWrapperSelection: Selection<any>;
 
         private rangeTextSelection: Selection<any>;
         private mainGroupSelection: Selection<any>;
@@ -291,9 +292,11 @@ module powerbi.extensibility.visual {
                     height: Timeline.TimelineMargins.LegendHeight
                 });
 
-            this.mainSvgSelection = this.rootSelection
+            this.mainSvgWrapperSelection = this.rootSelection
                 .append("div")
-                .classed(Timeline.TimelineSelectors.TimelineWrapper.className, true)
+                .classed(Timeline.TimelineSelectors.TimelineWrapper.className, true);
+
+            this.mainSvgSelection = this.mainSvgWrapperSelection
                 .append("svg")
                 .classed(Timeline.TimelineSelectors.TimelineVisual.className, true);
 
@@ -1002,22 +1005,35 @@ module powerbi.extensibility.visual {
 
             this.rootSelection
                 .attr({
-                    height: convertToPx(options.viewport.height),
-                    width: convertToPx(options.viewport.width),
                     "drag-resize-disabled": true
                 })
                 .style({
                     "overflow-x": Timeline.DefaultOverflow,
-                    "overflow-y": Timeline.DefaultOverflow
+                    "overflow-y": Timeline.DefaultOverflow,
+                    height: convertToPx(options.viewport.height),
+                    width: convertToPx(options.viewport.width),
                 });
 
-            this.mainSvgSelection.attr({
+            const legendFullHeight: number = Timeline.TimelineMargins.LegendHeight + Timeline.TimelineMargins.LegendHeightOffset;
+            this.mainSvgWrapperSelection.style({
                 height: convertToPx(Math.max(
                     Timeline.MinSizeOfViewport,
-                    options.viewport.height - Timeline.TimelineMargins.TopMargin - Timeline.TimelineMargins.HeightOffset)),
-                width: convertToPx(Math.max(
-                    Timeline.MinSizeOfViewport,
-                    this.svgWidth))
+                    options.viewport.height - legendFullHeight - Timeline.TimelineMargins.TopMargin))
+            });
+
+            const mainAreaHeight: number = timelineProperties.cellsYPosition - Timeline.TimelineMargins.LegendHeight
+                + timelineProperties.cellHeight;
+            const mainSvgHeight: number = Timeline.TimelineMargins.TopMargin + Timeline.TimelineMargins.LegendHeightOffset
+                + mainAreaHeight;
+            this.mainSvgSelection.attr({
+                height: convertToPx(Math.max(
+                    Timeline.MinSizeOfViewport, mainSvgHeight
+                )),
+                width: this.svgWidth < options.viewport.width
+                    ? "100%"
+                    : convertToPx(Math.max(
+                        Timeline.MinSizeOfViewport,
+                        this.svgWidth))
             });
 
             let fixedTranslateString: string = translate(
