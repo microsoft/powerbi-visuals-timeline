@@ -43,9 +43,27 @@
                         "text": true
                     }
                 },
+                "isUserSelection": {
+                    "type": {
+                        "bool": true
+                    }
+                },
                 "filter": {
                     "type": {
                         "filter": true
+                    }
+                }
+            }
+        },
+        "forceSelection" : {
+            "displayName": "Force selection",
+            "displayNameKey": "Visual_ForceSelection",
+            "properties": {
+                "currentPeriod": {
+                    "displayName": "Current period",
+                    "displayNameKey": "Visual_CurrentPeriod",
+                    "type": {
+                        "bool": true
                     }
                 }
             }
