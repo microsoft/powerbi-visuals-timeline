@@ -667,6 +667,7 @@ module powerbi.extensibility.visual {
         }
 
         public static selectCurrentPeriod(
+            datePeriod: ITimelineDatePeriod,
             granularity: GranularityType,
             calendar) {
             let currentDate: Date = Utils.resetTime(new Date());
@@ -689,6 +690,19 @@ module powerbi.extensibility.visual {
                 case GranularityType.year:
                     ({startDate, endDate} = calendar.getYearPeriod(currentDate));
                     break;
+            }
+
+            const checkDatesForNoneDayGranularity: boolean =
+                datePeriod.startDate <= startDate || startDate <= datePeriod.endDate ||
+                datePeriod.startDate <= endDate || endDate <= datePeriod.endDate;
+
+            const checkDatesForDayGranularity: boolean =
+                datePeriod.startDate <= startDate && endDate <= datePeriod.endDate;
+
+            if (!(checkDatesForNoneDayGranularity && granularity !== GranularityType.day ||
+                checkDatesForDayGranularity && granularity === GranularityType.day)) {
+                startDate = null;
+                endDate = null;
             }
 
             return {startDate, endDate};
@@ -777,21 +791,21 @@ module powerbi.extensibility.visual {
             const target: IFilterColumnTarget = this.timelineData.filterColumnTarget;
 
             if (!isUserSelection) {
-                if (currentForceSelection &&
-                    datePeriod.startDate < currentDate && datePeriod.endDate > currentDate) {
+                if (currentForceSelection) {
                     ({startDate: filterDatePeriod.startDate,
-                        endDate: filterDatePeriod.endDate} = Timeline.selectCurrentPeriod(granularity, this.calendar));
+                        endDate: filterDatePeriod.endDate} = Timeline.selectCurrentPeriod(datePeriod, granularity, this.calendar));
                 } else {
                     filterDatePeriod.startDate = null;
                     filterDatePeriod.endDate = null;
                 }
             }
 
-            if ((!isUserSelection &&
-                String(this.prevFilteredStartDate) !== String(filterDatePeriod.startDate) &&
-                String(this.prevFilteredEndDate) !== String(filterDatePeriod.endDate)) ||
-                (!this.initialized && !currentForceSelection)) {
+            const filterWasChanged: boolean =
+                String(this.prevFilteredStartDate) !== String(filterDatePeriod.startDate) ||
+                String(this.prevFilteredEndDate) !== String(filterDatePeriod.endDate);
 
+            if ((!isUserSelection && filterWasChanged) ||
+                (!this.initialized && !currentForceSelection)) {
                 this.applyDatePeriod(filterDatePeriod.startDate, filterDatePeriod.endDate, target, isUserSelection);
             }
 
