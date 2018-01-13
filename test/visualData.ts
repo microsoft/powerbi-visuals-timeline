@@ -44,6 +44,10 @@ module powerbi.extensibility.visual.test {
             new Date(2016, 0, 10),
             1000 * 24 * 3600);
 
+        public setDateRange(startDate: Date, endDate: Date) {
+            this.valuesCategory = getDateRange(startDate, endDate, 1000 * 24 * 3600);
+        }
+
         public getDataView(columnNames?: string[]): powerbi.DataView {
             return this.createCategoricalDataViewBuilder([
                 {

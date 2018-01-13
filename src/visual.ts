@@ -782,11 +782,11 @@ module powerbi.extensibility.visual {
                 filterDatePeriod.endDate = null;
             }
 
-            const currentDate: Date = new Date();
             const datePeriod: ITimelineDatePeriod = this.datePeriod;
 
             const granularity = this.settings.granularity.granularity;
             const currentForceSelection: boolean = this.settings.forceSelection.currentPeriod;
+            const latestAvailableDate: boolean = this.settings.forceSelection.latestAvailableDate;
             const isUserSelection: boolean = this.settings.general.isUserSelection;
             const target: IFilterColumnTarget = this.timelineData.filterColumnTarget;
 
@@ -798,6 +798,10 @@ module powerbi.extensibility.visual {
                     filterDatePeriod.startDate = null;
                     filterDatePeriod.endDate = null;
                 }
+            } else {
+                if (latestAvailableDate) {
+                    filterDatePeriod.endDate = adaptedDataEndDate;
+                }
             }
 
             const filterWasChanged: boolean =
@@ -805,6 +809,7 @@ module powerbi.extensibility.visual {
                 String(this.prevFilteredEndDate) !== String(filterDatePeriod.endDate);
 
             if ((!isUserSelection && filterWasChanged) ||
+                (isUserSelection && filterWasChanged && latestAvailableDate) ||
                 (!this.initialized && !currentForceSelection)) {
                 this.applyDatePeriod(filterDatePeriod.startDate, filterDatePeriod.endDate, target, isUserSelection);
             }
@@ -1413,8 +1418,24 @@ module powerbi.extensibility.visual {
             };
         }
 
-        public cursorDragended(): void {
+        public cursorDragended(currentCursor: CursorDatapoint): void {
             this.setSelection(this.timelineData);
+
+            if (currentCursor.cursorIndex === 1 && this.settings.forceSelection.latestAvailableDate) {
+                const instanceOfForceSelection: VisualObjectInstance = {
+                    objectName: "forceSelection",
+                    selector: undefined,
+                    properties: {
+                        latestAvailableDate: false
+                    }
+                };
+
+                this.host.persistProperties({
+                    merge: [
+                        instanceOfForceSelection
+                    ]
+                });
+            }
         }
 
         private cursorDragBehavior: Drag<CursorDatapoint> = d3.behavior.drag()
@@ -1426,8 +1447,8 @@ module powerbi.extensibility.visual {
             .on("drag", (cursorDataPoint: CursorDatapoint) => {
                 this.cursorDrag(cursorDataPoint);
             })
-            .on("dragend", () => {
-                this.cursorDragended();
+            .on("dragend", (cursorDataPoint: CursorDatapoint) => {
+                this.cursorDragended(cursorDataPoint);
             });
 
         public renderCursors(
@@ -1530,7 +1551,7 @@ module powerbi.extensibility.visual {
         }
 
         private applyFilter(datePeriod: TimelineDatePeriodBase, isUserSelection: boolean): void {
-            const instance: VisualObjectInstance = {
+            const instanceOfGeneral: VisualObjectInstance = {
                 objectName: "general",
                 selector: undefined,
                 properties: {
@@ -1541,7 +1562,7 @@ module powerbi.extensibility.visual {
 
             this.host.persistProperties({
                 merge: [
-                    instance
+                    instanceOfGeneral
                 ]
             });
 

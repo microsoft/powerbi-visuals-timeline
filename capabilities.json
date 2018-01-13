@@ -65,6 +65,13 @@
                     "type": {
                         "bool": true
                     }
+                },
+                "latestAvailableDate": {
+                    "displayName": "Latest available date",
+                    "displayNameKey": "Visual_LatestAvailableDate",
+                    "type": {
+                        "bool": true
+                    }
                 }
             }
         },

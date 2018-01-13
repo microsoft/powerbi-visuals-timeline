@@ -45,6 +45,7 @@ module powerbi.extensibility.visual.settings {
 
     export class ForceSelectionSettings {
         public currentPeriod: boolean = false;
+        public latestAvailableDate: boolean = false;
     }
 
     export class CalendarSettings {
