@@ -87,7 +87,7 @@ module powerbi.extensibility.visual {
         }
 
         public getQuarterIndex(date: Date): number {
-            return Math.ceil(date.getMonth() / 3) - 1;
+            return Math.floor(date.getMonth() / 3);
         }
 
         public getQuarterStartDate(year: number, quarterIndex: number): Date {
