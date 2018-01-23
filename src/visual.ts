@@ -697,7 +697,8 @@ module powerbi.extensibility.visual {
                 datePeriod.startDate <= endDate || endDate <= datePeriod.endDate;
 
             const checkDatesForDayGranularity: boolean =
-                datePeriod.startDate <= startDate && endDate <= datePeriod.endDate;
+                datePeriod.startDate <= startDate && endDate <= datePeriod.endDate ||
+                startDate.toString() === datePeriod.endDate.toString();
 
             if (!(checkDatesForNoneDayGranularity && granularity !== GranularityType.day ||
                 checkDatesForDayGranularity && granularity === GranularityType.day)) {
