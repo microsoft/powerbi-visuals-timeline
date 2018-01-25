@@ -36,6 +36,11 @@ module powerbi.extensibility.visual {
         [year: number]: Date;
     }
 
+    export interface PeriodDates {
+        startDate: Date;
+        endDate: Date;
+    }
+
     export class Calendar {
         private static QuarterFirstMonths: number[] = [0, 3, 6, 9];
 
@@ -57,8 +62,68 @@ module powerbi.extensibility.visual {
             return this.firstDayOfYear;
         }
 
+        public getNextDate(date: Date): Date {
+            return TimelineGranularityData.nextDay(date);
+        }
+
+        public getWeekPeriod(date: Date): PeriodDates {
+            const year: number = date.getFullYear();
+            const month: number = date.getMonth();
+
+            let dayOfWeek: number = date.getDay();
+            let deltaDays: number = 0;
+            if (this.firstDayOfWeek !== dayOfWeek) {
+                deltaDays = dayOfWeek - this.firstDayOfWeek;
+            }
+
+            if (deltaDays < 0) {
+                deltaDays = 7 + deltaDays;
+            }
+
+            let startDate = new Date(year, month, date.getDate() - deltaDays);
+            let endDate = new Date(year, month, startDate.getDate() + 7);
+
+            return {startDate, endDate};
+        }
+
+        public getQuarterIndex(date: Date): number {
+            return Math.floor(date.getMonth() / 3);
+        }
+
         public getQuarterStartDate(year: number, quarterIndex: number): Date {
             return new Date(year, this.quarterFirstMonths[quarterIndex], this.firstDayOfYear);
+        }
+
+        public getQuarterEndDate(date: Date): Date {
+            return new Date(date.getFullYear(), date.getMonth() + 3, this.firstDayOfYear);
+        }
+
+        public getQuarterPeriod(date: Date): PeriodDates {
+            const quarterIndex = this.getQuarterIndex(date);
+
+            let startDate: Date = this.getQuarterStartDate(date.getFullYear(), quarterIndex);
+            let endDate: Date = this.getQuarterEndDate(startDate);
+
+            return {startDate, endDate};
+        }
+
+        public getMonthPeriod(date: Date): PeriodDates {
+            const year: number = date.getFullYear();
+            const month: number = date.getMonth();
+
+            let startDate: Date = new Date(year, month, this.firstDayOfYear);
+            let endDate: Date = new Date(year, month + 1, this.firstDayOfYear);
+
+            return {startDate, endDate};
+        }
+
+        public getYearPeriod(date: Date): PeriodDates {
+            const year: number = date.getFullYear();
+
+            let startDate: Date = new Date(year, this.firstMonthOfYear, this.firstDayOfYear);
+            let endDate: Date = new Date(year + 1, this.firstMonthOfYear, this.firstDayOfYear);
+
+            return {startDate, endDate};
         }
 
         public isChanged(

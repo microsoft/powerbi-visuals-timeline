@@ -42,5 +42,8 @@
 	"Visual_Labels": "Labels",
 	"Visual_ScaleSizeAdjustment": "Scale size auto adjustment",
 	"Visual_FirstDayOfWeek": "First Day of Week",
-	"Visual_DisplayAll": "Display all"
+	"Visual_DisplayAll": "Display all",
+	"Visual_ForceSelection": "Force selection",
+	"Visual_CurrentPeriod": "Current period",
+	"Visual_LatestAvailableDate": "Latest available date"
 }

@@ -616,6 +616,109 @@ module powerbi.extensibility.visual.test {
                 });
             });
 
+
+            describe("Force selection", () => {
+                function checkSelectedElement(granularity: GranularityType,
+                                              expectedElementsAmount: number): void {
+                    dataView.metadata.objects.granularity.granularity = granularity;
+
+                    visualBuilder.updateFlushAllD3Transitions(dataView);
+
+                    let selectedElements: Element[] = [];
+                    visualBuilder.cellRects
+                        .toArray()
+                        .forEach((element: Element) => {
+                            const fill: string = $(element).attr("fill");
+                            if (fill !== "rgba(0, 0, 0, 0)" && fill !== "transparent") {
+                                selectedElements.push(element);
+                            }
+                        });
+
+                    expect(selectedElements.length).toEqual(expectedElementsAmount);
+                }
+
+                for (let granularity in GranularityType) {
+                    if (isNaN(+granularity)) {
+                        it(`current period for '${granularity}' granularity`, () => {
+                            const currentDate: Date = new Date();
+                            const startDateRange: Date = new Date(currentDate.getFullYear(), 0, 1);
+                            const endDateRange: Date = new Date(currentDate.getFullYear() + 1, 11, 31);
+
+                            defaultDataViewBuilder.setDateRange(startDateRange, endDateRange);
+
+                            dataView = defaultDataViewBuilder.getDataView();
+                            dataView.metadata.objects = {
+                                forceSelection: {
+                                    currentPeriod: true
+                                },
+                                granularity: {}
+                            };
+
+                            checkSelectedElement(GranularityType[granularity], 1);
+                        });
+
+                        it(`latest available date for '${granularity}' granularity`, () => {
+                            const startDateRange: Date = new Date(2018, 0, 1);
+                            const endDateRange: Date = new Date(2018, 11, 31);
+
+                            const amountOfDaysFromStart: number = 10;
+
+                            defaultDataViewBuilder.setDateRange(startDateRange, endDateRange);
+
+                            dataView = defaultDataViewBuilder.getDataView();
+                            dataView.metadata.objects = {
+                                forceSelection: {
+                                    latestAvailableDate: true
+                                },
+                                granularity:  {}
+                            };
+
+                            const startDateSelection: Date =
+                                    defaultDataViewBuilder.valuesCategory[amountOfDaysFromStart];
+                            const endDateSelection: Date =
+                                    defaultDataViewBuilder.valuesCategory[amountOfDaysFromStart + 1];
+
+                            TimelineBuilder.setDatePeriod(
+                                dataView,
+                                TimelineDatePeriodBase.create(startDateSelection, endDateSelection)
+                            );
+
+                            const yearOfEndDate: number = endDateSelection.getFullYear();
+                            const yearOfStartDateSelection: number = startDateSelection.getFullYear();
+                            const monthOfEndDate: number = endDateRange.getMonth();
+                            const monthOfStartDateSelection: number = startDateSelection.getMonth();
+
+                            const amountOfMonthsInYearsDiff: number = Math.ceil((yearOfEndDate - yearOfStartDateSelection) * 12);
+                            const amountOfMonthsThisYear: number = monthOfEndDate - monthOfStartDateSelection + 1;
+
+                            const amountOfMonths: number = amountOfMonthsInYearsDiff + amountOfMonthsThisYear;
+                            const amountOfDays: number = defaultDataViewBuilder.valuesCategory.length;
+
+                            let expectedElementsAmount: number;
+                            switch (granularity) {
+                                case "year":
+                                    expectedElementsAmount = (amountOfDays - amountOfDaysFromStart) / 365;
+                                    break;
+                                case "quarter":
+                                    expectedElementsAmount = amountOfMonths / 3;
+                                    break;
+                                case "month":
+                                    expectedElementsAmount = amountOfMonths;
+                                    break;
+                                case "week":
+                                    expectedElementsAmount = Math.ceil((amountOfDays - amountOfDaysFromStart) / 7) + 1;
+                                    break;
+                                case "day":
+                                    expectedElementsAmount = amountOfDays - amountOfDaysFromStart;
+                                    break;
+                            }
+
+                            checkSelectedElement(GranularityType[granularity], Math.round(expectedElementsAmount));
+                        });
+                    }
+                }
+            });
+
             describe("Labels", () => {
                 beforeEach(() => {
                     dataView.metadata.objects = {
