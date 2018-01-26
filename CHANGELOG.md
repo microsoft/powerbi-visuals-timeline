@@ -1,3 +1,6 @@
+## 1.6.1
+* FIX: Issue with incompatibility of selection with previous version
+
 ## 1.6.0
 * NEW: Added force selection setting for latest available date
 * NEW: Added force selection setting for current period
