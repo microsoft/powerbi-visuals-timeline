@@ -795,9 +795,6 @@ module powerbi.extensibility.visual {
                 if (currentForceSelection) {
                     ({startDate: filterDatePeriod.startDate,
                         endDate: filterDatePeriod.endDate} = Timeline.selectCurrentPeriod(datePeriod, granularity, this.calendar));
-                } else {
-                    filterDatePeriod.startDate = null;
-                    filterDatePeriod.endDate = null;
                 }
             } else {
                 if (latestAvailableDate) {
