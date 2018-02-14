@@ -15,7 +15,7 @@
 	"Visual_Month_October": "listopada",
 	"Visual_Month_November": "studenog",
 	"Visual_Month_December": "prosinca",
-	"Visual_Day": "Day",
+	"Visual_Day": "Dan",
 	"Visual_Day_FirstDayOfWeek": "Prvi dan u tjednu",
 	"Visual_Day_Sunday": "nedjelja",
 	"Visual_Day_Monday": "ponedjeljak",
@@ -38,7 +38,7 @@
 	"Visual_Granularity_Quarter": "Tromjesečje",
 	"Visual_Granularity_Month": "Mjesec",
 	"Visual_Granularity_Week": "Tjedan",
-	"Visual_Granularity_Day": "Day",
+	"Visual_Granularity_Day": "Dan",
 	"Visual_Labels": "Oznake",
 	"Visual_ScaleSizeAdjustment": "Automatska prilagodba veličine skale",
 	"Visual_FirstDayOfWeek": "Prvi dan u tjednu"

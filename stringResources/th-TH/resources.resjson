@@ -15,7 +15,7 @@
 	"Visual_Month_October": "ตุลาคม",
 	"Visual_Month_November": "พฤศจิกายน",
 	"Visual_Month_December": "ธันวาคม",
-	"Visual_Day": "Day",
+	"Visual_Day": "วัน",
 	"Visual_Day_FirstDayOfWeek": "วันแรกของสัปดาห์",
 	"Visual_Day_Sunday": "วันอาทิตย์",
 	"Visual_Day_Monday": "วันจันทร์",
@@ -38,7 +38,7 @@
 	"Visual_Granularity_Quarter": "ไตรมาส",
 	"Visual_Granularity_Month": "เดือน",
 	"Visual_Granularity_Week": "สัปดาห์",
-	"Visual_Granularity_Day": "Day",
+	"Visual_Granularity_Day": "วัน",
 	"Visual_Labels": "ป้ายชื่อ",
 	"Visual_ScaleSizeAdjustment": "การปรับขนาดมาตราส่วนอัตโนมัติ",
 	"Visual_FirstDayOfWeek": "วันแรกของสัปดาห์"
