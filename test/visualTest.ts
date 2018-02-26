@@ -63,6 +63,28 @@ module powerbi.extensibility.visual.test {
     import DefaultWaitForRender = powerbi.extensibility.utils.test.DefaultWaitForRender;
     import assertColorsMatch = powerbi.extensibility.utils.test.helpers.color.assertColorsMatch;
 
+    function createFakeFilter(startDate: Date, endDate: Date): any {
+        let filterSample: string =
+            `{"fromValue":{"items":{"m":{"entity":"MSFT"}}},` +
+            `"whereItems":[{"condition":{"_kind":8,"left":{"_kind":13,"comparison":2,` +
+            `"left":{"_kind":2,"source":{"_kind":0,"entity":"MSFT","variable":"m"},"ref":"Date"},` +
+            `"right":{"_kind":18,"unit":5,"arg":{"_kind":17,"type":{"underlyingType":519,"category":null,` +
+            `"temporalType":{"underlyingType":519}},` +
+            `"value":"${startDate.toString()}","typeEncodedValue":"datetime'${startDate.toString()}'"}}},` +
+            `"right":{"_kind":13,"comparison":3,` +
+            `"left":{"_kind":2,"source":{"_kind":0,"entity":"MSFT","variable":"m"},"ref":"Date"},` +
+            `"right":{"_kind":18,"unit":5,"arg":{"_kind":17,"type":{"underlyingType":519,"category":null,` +
+            `"temporalType":{"underlyingType":519}},` +
+            `"value":"${endDate.toString()}","typeEncodedValue":"datetime'${endDate.toString()}'"}}}}}]}`;
+
+        // simulate filter string
+        let fakeFilter = JSON.parse(filterSample);
+        fakeFilter.whereItems[0].condition.left.right.arg.value = startDate;
+        fakeFilter.whereItems[0].condition.right.right.arg.value = startDate;
+
+        return fakeFilter;
+    }
+
     describe("Timeline", () => {
         let visualBuilder: TimelineBuilder,
             defaultDataViewBuilder: TimelineData,
@@ -296,24 +318,7 @@ module powerbi.extensibility.visual.test {
         });
 
         describe("selection", () => {
-            // TODO: Turn this test on as soon as API supports SemanticFilter
-            xit("selection should be persistent after updating", (done) => {
-                checkSelectionState(dataView, visualBuilder, done);
-            });
-
-            // TODO: Turn this test on as soon as API supports SemanticFilter
-            xit("selection should be persistent after updating settings of calendar using the format panel", (done) => {
-                checkSelectionState(dataView, visualBuilder, done, (dataView: DataView) => {
-                    dataView.metadata.objects = {
-                        calendar: {
-                            month: 5,
-                            day: 1
-                        }
-                    };
-                });
-            });
-
-            xit("selection should be recovered from the dataView after starting", (done) => {
+            it("selection should be recovered from the dataView after starting", (done) => {
                 const startDate: Date = defaultDataViewBuilder.valuesCategory[0],
                     endDate: Date = defaultDataViewBuilder.valuesCategory[1],
                     datePeriod: TimelineDatePeriodBase = TimelineDatePeriodBase.create(startDate, endDate);
@@ -325,6 +330,8 @@ module powerbi.extensibility.visual.test {
                 };
 
                 TimelineBuilder.setDatePeriod(dataView, datePeriod);
+                // simulate filter restoring
+                dataView.metadata.objects.general.filter = createFakeFilter(startDate, endDate);
 
                 visualBuilder.updateFlushAllD3Transitions(dataView);
 
@@ -659,7 +666,7 @@ module powerbi.extensibility.visual.test {
                             checkSelectedElement(GranularityType[granularity], 1);
                         });
 
-                        xit(`latest available date for '${granularity}' granularity`, () => {
+                        it(`latest available date for '${granularity}' granularity`, () => {
                             const startDateRange: Date = new Date(2018, 0, 1);
                             const endDateRange: Date = new Date(2018, 11, 31);
 
@@ -684,6 +691,8 @@ module powerbi.extensibility.visual.test {
                                 dataView,
                                 TimelineDatePeriodBase.create(startDateSelection, endDateSelection)
                             );
+                            // simulate filter restoring
+                            dataView.metadata.objects.general.filter = createFakeFilter(startDateSelection, endDateSelection);
 
                             const yearOfEndDate: number = endDateSelection.getFullYear();
                             const yearOfStartDateSelection: number = startDateSelection.getFullYear();
