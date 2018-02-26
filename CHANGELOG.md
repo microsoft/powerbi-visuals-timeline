@@ -1,3 +1,6 @@
+## 1.6.2
+* Added Power BI Bookmarks support
+
 ## 1.6.1
 * FIX: Issue with incompatibility of selection with previous version
 
