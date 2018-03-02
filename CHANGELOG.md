@@ -1,3 +1,7 @@
+## 1.6.3
+* Fix bug with incorrect weeks numbers
+* Fix bug with incorrect force selection of current period with week granularity
+
 ## 1.6.2
 * Added Power BI Bookmarks support
 

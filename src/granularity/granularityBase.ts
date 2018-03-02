@@ -155,20 +155,15 @@ module powerbi.extensibility.visual.granularity {
         public determineWeek(date: Date): number[] {
             let year: number = this.determineYear(date);
 
-            if (this.inPreviousYear(date)) {
-                year--;
+            const dateOfFirstWeek: Date = this.calendar.getDateOfFirstWeek(year);
+            const dateOfFirstFullWeek: Date = this.calendar.getDateOfFirstFullWeek(year);
+            const weeks: number = Utils.getAmountOfWeeksBetweenDates(dateOfFirstFullWeek, date);
+
+            if (date >= dateOfFirstFullWeek && dateOfFirstWeek < dateOfFirstFullWeek) {
+                return [weeks + 1, year];
             }
 
-            const dateOfFirstWeek: Date = this.calendar.getDateOfFirstWeek(year),
-                weeks: number = Utils.getAmountOfWeeksBetweenDates(dateOfFirstWeek, date);
-
             return [weeks, year];
-        }
-
-        private inPreviousYear(date: Date): boolean {
-            const dateOfFirstWeek: Date = this.calendar.getDateOfFirstWeek(this.determineYear(date));
-
-            return date < dateOfFirstWeek;
         }
 
         public determineYear(date: Date): number {

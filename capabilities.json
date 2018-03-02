@@ -67,7 +67,7 @@
                     }
                 },
                 "latestAvailableDate": {
-                    "displayName": "Latest available date",
+                    "displayName": "Latest available period",
                     "displayNameKey": "Visual_LatestAvailableDate",
                     "type": {
                         "bool": true

@@ -48,6 +48,7 @@ module powerbi.extensibility.visual {
         private firstMonthOfYear: number;
         private firstDayOfYear: number;
         private dateOfFirstWeek: DateDictionary;
+        private dateOfFirstFullWeek: DateDictionary;
         private quarterFirstMonths: number[];
 
         public getFirstDayOfWeek(): number {
@@ -69,8 +70,8 @@ module powerbi.extensibility.visual {
         public getWeekPeriod(date: Date): PeriodDates {
             const year: number = date.getFullYear();
             const month: number = date.getMonth();
+            const dayOfWeek: number = date.getDay();
 
-            let dayOfWeek: number = date.getDay();
             let deltaDays: number = 0;
             if (this.firstDayOfWeek !== dayOfWeek) {
                 deltaDays = dayOfWeek - this.firstDayOfWeek;
@@ -80,8 +81,10 @@ module powerbi.extensibility.visual {
                 deltaDays = 7 + deltaDays;
             }
 
-            let startDate = new Date(year, month, date.getDate() - deltaDays);
-            let endDate = new Date(year, month, startDate.getDate() + 7);
+            const daysToWeekEnd = (7 - deltaDays);
+
+            const startDate = new Date(year, month, date.getDate() - deltaDays);
+            const endDate = new Date(year, month, date.getDate() + daysToWeekEnd);
 
             return {startDate, endDate};
         }
@@ -144,13 +147,14 @@ module powerbi.extensibility.visual {
             this.firstDayOfYear = calendarFormat.day;
 
             this.dateOfFirstWeek = {};
+            this.dateOfFirstFullWeek = {};
 
             this.quarterFirstMonths = Calendar.QuarterFirstMonths.map((monthIndex: number) => {
                 return monthIndex + this.firstMonthOfYear;
             });
         }
 
-        private calculateDateOfFirstWeek(year: number): Date {
+        private calculateDateOfFirstFullWeek(year: number): Date {
             let date: Date = new Date(year, this.firstMonthOfYear, this.firstDayOfYear);
 
             while (date.getDay() !== this.firstDayOfWeek) {
@@ -162,10 +166,18 @@ module powerbi.extensibility.visual {
 
         public getDateOfFirstWeek(year: number): Date {
             if (!this.dateOfFirstWeek[year]) {
-                this.dateOfFirstWeek[year] = this.calculateDateOfFirstWeek(year);
+                this.dateOfFirstWeek[year] = new Date(year, this.firstMonthOfYear, this.firstDayOfYear);
             }
 
             return this.dateOfFirstWeek[year];
+        }
+
+        public getDateOfFirstFullWeek(year: number): Date {
+            if (!this.dateOfFirstFullWeek[year]) {
+                this.dateOfFirstFullWeek[year] = this.calculateDateOfFirstFullWeek(year);
+            }
+
+            return this.dateOfFirstFullWeek[year];
         }
     }
 }

@@ -666,11 +666,101 @@ module powerbi.extensibility.visual.test {
                             checkSelectedElement(GranularityType[granularity], 1);
                         });
 
-                        it(`latest available date for '${granularity}' granularity`, () => {
-                            const startDateRange: Date = new Date(2018, 0, 1);
-                            const endDateRange: Date = new Date(2018, 11, 31);
+                        it(`current period out of data set for '${granularity}' granularity`, () => {
+                            const currentDate: Date = new Date();
+                            const startDateRange: Date = new Date(2010, 0, 1);
+                            const endDateRange: Date = new Date(2011, 11, 31);
 
-                            const amountOfDaysFromStart: number = 10;
+                            const amountOfDaysFromStart: number = 0;
+
+                            defaultDataViewBuilder.setDateRange(startDateRange, endDateRange);
+
+                            dataView = defaultDataViewBuilder.getDataView();
+                            dataView.metadata.objects = {
+                                forceSelection: {
+                                    currentPeriod: true
+                                },
+                                granularity: { 
+                                    granularity
+                                }
+                            };
+
+                            const startDateSelection: Date =
+                                defaultDataViewBuilder.valuesCategory[amountOfDaysFromStart];
+                            const endDateSelection: Date =
+                                defaultDataViewBuilder.valuesCategory[amountOfDaysFromStart + 1];
+
+                            const yearOfEndDate: number = endDateSelection.getFullYear();
+                            const yearOfStartDateSelection: number = startDateSelection.getFullYear();
+                            const monthOfEndDate: number = endDateRange.getMonth();
+                            const monthOfStartDateSelection: number = startDateSelection.getMonth();
+
+                            const amountOfDays: number = defaultDataViewBuilder.valuesCategory.length;
+                            const amountOfYears = (amountOfDays - amountOfDaysFromStart) / 365;
+
+                            const amountOfMonthsInYearsDiff: number = Math.ceil((amountOfYears - 1) * 12);
+                            const amountOfMonthsThisYear: number = monthOfEndDate - monthOfStartDateSelection + 1;
+
+                            const amountOfMonths: number = amountOfMonthsInYearsDiff + amountOfMonthsThisYear;
+
+                            let expectedElementsAmount: number;
+                            switch (granularity) {
+                                case "year":
+                                    expectedElementsAmount = amountOfYears;
+                                    break;
+                                case "quarter":
+                                    expectedElementsAmount = amountOfMonths / 3;
+                                    break;
+                                case "month":
+                                    expectedElementsAmount = amountOfMonths;
+                                    break;
+                                case "week":
+                                    expectedElementsAmount = Math.ceil((amountOfDays - amountOfDaysFromStart) / 7) + 1;
+                                    break;
+                                case "day":
+                                    expectedElementsAmount = amountOfDays - amountOfDaysFromStart;
+                                    break;
+                            }
+
+                            checkSelectedElement(GranularityType[granularity], Math.ceil(expectedElementsAmount));
+                        });
+
+                        // it(`latest available period for '${granularity}' granularity with user selection`, () => {
+                        //     const startDateRange: Date = new Date(2018, 1, 1);
+                        //     const endDateRange: Date = new Date(2018, 11, 30);
+
+                        //     const amountOfDaysFromStart: number = 15;
+
+                        //     defaultDataViewBuilder.setDateRange(startDateRange, endDateRange);
+
+                        //     dataView = defaultDataViewBuilder.getDataView();
+                        //     dataView.metadata.objects = {
+                        //         forceSelection: {
+                        //             latestAvailableDate: true
+                        //         },
+                        //         granularity: {}
+                        //     };
+
+                        //     const startDateSelection: Date =
+                        //         defaultDataViewBuilder.valuesCategory[amountOfDaysFromStart];
+                        //     const endDateSelection: Date =
+                        //         defaultDataViewBuilder.valuesCategory[amountOfDaysFromStart + 1];
+
+                        //     dataView.metadata.objects.general.filter = createFakeFilter(startDateSelection, endDateSelection);
+                        //     TimelineBuilder.setDatePeriod(
+                        //         dataView,
+                        //         TimelineDatePeriodBase.create(startDateSelection, endDateSelection)
+                        //     );
+                        //     // simulate filter restoring
+
+                        //     checkSelectedElement(GranularityType[granularity], 1);
+                        // });
+
+                        it(`latest available period for '${granularity}' granularity`, () => {
+                            const startDateRange: Date = new Date(2018, 0, 1);
+                            const endDateRange: Date = new Date(2019, 11, 31);
+
+                            const amountOfDaysFromStart: number = 0;
 
                             defaultDataViewBuilder.setDateRange(startDateRange, endDateRange);
 
@@ -687,28 +777,23 @@ module powerbi.extensibility.visual.test {
                             const endDateSelection: Date =
                                 defaultDataViewBuilder.valuesCategory[amountOfDaysFromStart + 1];
 
-                            TimelineBuilder.setDatePeriod(
-                                dataView,
-                                TimelineDatePeriodBase.create(startDateSelection, endDateSelection)
-                            );
-                            // simulate filter restoring
-                            dataView.metadata.objects.general.filter = createFakeFilter(startDateSelection, endDateSelection);
-
                             const yearOfEndDate: number = endDateSelection.getFullYear();
                             const yearOfStartDateSelection: number = startDateSelection.getFullYear();
                             const monthOfEndDate: number = endDateRange.getMonth();
                             const monthOfStartDateSelection: number = startDateSelection.getMonth();
 
-                            const amountOfMonthsInYearsDiff: number = Math.ceil((yearOfEndDate - yearOfStartDateSelection) * 12);
+                            const amountOfDays: number = defaultDataViewBuilder.valuesCategory.length;
+                            const amountOfYears = (amountOfDays - amountOfDaysFromStart) / 365;
+
+                            const amountOfMonthsInYearsDiff: number = Math.ceil((amountOfYears - 1) * 12);
                             const amountOfMonthsThisYear: number = monthOfEndDate - monthOfStartDateSelection + 1;
 
                             const amountOfMonths: number = amountOfMonthsInYearsDiff + amountOfMonthsThisYear;
-                            const amountOfDays: number = defaultDataViewBuilder.valuesCategory.length;
 
                             let expectedElementsAmount: number;
                             switch (granularity) {
                                 case "year":
-                                    expectedElementsAmount = (amountOfDays - amountOfDaysFromStart) / 365;
+                                    expectedElementsAmount = amountOfYears;
                                     break;
                                 case "quarter":
                                     expectedElementsAmount = amountOfMonths / 3;
@@ -817,6 +902,18 @@ module powerbi.extensibility.visual.test {
 
                     expect(actualResult[actualResult.length - 1]).toBe(2014);
                 });
+            });
+        });
+
+        describe("first week", () => {
+            const year2010 = 2010;
+
+            it("should return a first day of year", () => {
+                const date = calendar.getDateOfFirstWeek(year2010);
+                const firstDayOfWeek = date.getDate();
+                const firstDayOfYear = calendar.getFirstDayOfYear();
+
+                expect(firstDayOfWeek).toEqual(firstDayOfYear);
             });
         });
     });
