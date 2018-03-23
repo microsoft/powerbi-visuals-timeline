@@ -41,5 +41,9 @@
 	"Visual_Granularity_Day": "Diena",
 	"Visual_Labels": "Etiķetes",
 	"Visual_ScaleSizeAdjustment": "Skalas lieluma automātiskā pielāgošana",
-	"Visual_FirstDayOfWeek": "Pirmā nedēļas diena"
+	"Visual_FirstDayOfWeek": "Pirmā nedēļas diena",
+	"Visual_DisplayAll": "Parādīt visu",
+	"Visual_ForceSelection": "Piespiedu atlase",
+	"Visual_CurrentPeriod": "Pašreizējais periods",
+	"Visual_LatestAvailableDate": "Pēdējais pieejamais datums"
 }

@@ -41,5 +41,9 @@
 	"Visual_Granularity_Day": "День",
 	"Visual_Labels": "Підписи",
 	"Visual_ScaleSizeAdjustment": "Авторегулювання розміру шкали",
-	"Visual_FirstDayOfWeek": "Перший день тижня"
+	"Visual_FirstDayOfWeek": "Перший день тижня",
+	"Visual_DisplayAll": "Відобразити все",
+	"Visual_ForceSelection": "Примусово застосувати виділення",
+	"Visual_CurrentPeriod": "Поточний період",
+	"Visual_LatestAvailableDate": "Дата найновішої доступної версії"
 }

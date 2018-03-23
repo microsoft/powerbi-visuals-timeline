@@ -41,5 +41,9 @@
 	"Visual_Granularity_Day": "Dag",
 	"Visual_Labels": "Labels",
 	"Visual_ScaleSizeAdjustment": "Automatische aanpassing van schaal",
-	"Visual_FirstDayOfWeek": "Eerste dag van de week"
+	"Visual_FirstDayOfWeek": "Eerste dag van de week",
+	"Visual_DisplayAll": "Alles weergeven",
+	"Visual_ForceSelection": "Selectie forceren",
+	"Visual_CurrentPeriod": "Huidige periode",
+	"Visual_LatestAvailableDate": "Laatste beschikbare datum"
 }

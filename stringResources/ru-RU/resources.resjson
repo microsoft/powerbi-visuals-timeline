@@ -41,5 +41,9 @@
 	"Visual_Granularity_Day": "День",
 	"Visual_Labels": "Метки",
 	"Visual_ScaleSizeAdjustment": "Автоматическая настройка масштаба",
-	"Visual_FirstDayOfWeek": "Первый день недели"
+	"Visual_FirstDayOfWeek": "Первый день недели",
+	"Visual_DisplayAll": "Показать все",
+	"Visual_ForceSelection": "Принудительный выбор",
+	"Visual_CurrentPeriod": "Текущий период",
+	"Visual_LatestAvailableDate": "Последняя доступная дата"
 }

@@ -41,5 +41,9 @@
 	"Visual_Granularity_Day": "Күн",
 	"Visual_Labels": "Белгілер",
 	"Visual_ScaleSizeAdjustment": "Масштаб өлшемін автоматты түрде реттеу",
-	"Visual_FirstDayOfWeek": "Аптаның бірінші күні"
+	"Visual_FirstDayOfWeek": "Аптаның бірінші күні",
+	"Visual_DisplayAll": "Барлығын көрсету",
+	"Visual_ForceSelection": "Мәжбүрлі таңдау",
+	"Visual_CurrentPeriod": "Ағымдағы кезең",
+	"Visual_LatestAvailableDate": "Ең соңғы қолжетімді күн"
 }

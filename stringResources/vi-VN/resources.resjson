@@ -41,5 +41,9 @@
 	"Visual_Granularity_Day": "Ngày",
 	"Visual_Labels": "Nhãn",
 	"Visual_ScaleSizeAdjustment": "Tự động điều chỉnh kích cỡ thước tỷ lệ",
-	"Visual_FirstDayOfWeek": "Ngày đầu tuần"
+	"Visual_FirstDayOfWeek": "Ngày đầu tuần",
+	"Visual_DisplayAll": "Hiển thị tất cả",
+	"Visual_ForceSelection": "Buộc chọn",
+	"Visual_CurrentPeriod": "Giai đoạn hiện nay",
+	"Visual_LatestAvailableDate": "Ngày rảnh gần đây nhất"
 }

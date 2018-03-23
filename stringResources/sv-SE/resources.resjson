@@ -41,5 +41,9 @@
 	"Visual_Granularity_Day": "Dag",
 	"Visual_Labels": "Etiketter",
 	"Visual_ScaleSizeAdjustment": "Automatisk justering av skalningsstorlek",
-	"Visual_FirstDayOfWeek": "Första dagen i veckan"
+	"Visual_FirstDayOfWeek": "Första dagen i veckan",
+	"Visual_DisplayAll": "Visa alla",
+	"Visual_ForceSelection": "Framtvinga markering",
+	"Visual_CurrentPeriod": "Aktuell period",
+	"Visual_LatestAvailableDate": "Datum senast tillgänglig"
 }

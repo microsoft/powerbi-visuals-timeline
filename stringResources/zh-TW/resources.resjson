@@ -41,5 +41,9 @@
 	"Visual_Granularity_Day": "日",
 	"Visual_Labels": "標籤",
 	"Visual_ScaleSizeAdjustment": "刻度大小自動調整",
-	"Visual_FirstDayOfWeek": "每週的第一天"
+	"Visual_FirstDayOfWeek": "每週的第一天",
+	"Visual_DisplayAll": "全部顯示",
+	"Visual_ForceSelection": "強制選取",
+	"Visual_CurrentPeriod": "目前週期",
+	"Visual_LatestAvailableDate": "最新的可用日期"
 }

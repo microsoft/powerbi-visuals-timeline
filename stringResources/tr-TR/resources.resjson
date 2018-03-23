@@ -41,5 +41,9 @@
 	"Visual_Granularity_Day": "Gün",
 	"Visual_Labels": "Etiketler",
 	"Visual_ScaleSizeAdjustment": "Ölçek boyutunu otomatik ayarlama",
-	"Visual_FirstDayOfWeek": "Haftanın İlk Günü"
+	"Visual_FirstDayOfWeek": "Haftanın İlk Günü",
+	"Visual_DisplayAll": "Tümünü göster",
+	"Visual_ForceSelection": "Seçimi zorla",
+	"Visual_CurrentPeriod": "Geçerli dönem",
+	"Visual_LatestAvailableDate": "Kullanılabilir en geç tarih"
 }

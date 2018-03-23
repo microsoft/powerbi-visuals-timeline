@@ -41,5 +41,9 @@
 	"Visual_Granularity_Day": "दिन",
 	"Visual_Labels": "लेबल",
 	"Visual_ScaleSizeAdjustment": "स्केल आकार स्वत: समायोजन",
-	"Visual_FirstDayOfWeek": "सप्ताह का पहला दिन"
+	"Visual_FirstDayOfWeek": "सप्ताह का पहला दिन",
+	"Visual_DisplayAll": "सभी प्रदर्शित करें",
+	"Visual_ForceSelection": "बाध्य चयन",
+	"Visual_CurrentPeriod": "वर्तमान अवधि",
+	"Visual_LatestAvailableDate": "नवीनतम उपलब्ध दिनांक"
 }

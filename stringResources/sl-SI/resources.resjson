@@ -41,5 +41,9 @@
 	"Visual_Granularity_Day": "Dan",
 	"Visual_Labels": "Oznake",
 	"Visual_ScaleSizeAdjustment": "Lestvica velikosti avto obračun",
-	"Visual_FirstDayOfWeek": "Prvi dan v tednu"
+	"Visual_FirstDayOfWeek": "Prvi dan v tednu",
+	"Visual_DisplayAll": "Prikaži vse",
+	"Visual_ForceSelection": "Vsili izbor",
+	"Visual_CurrentPeriod": "Trenutno obdobje",
+	"Visual_LatestAvailableDate": "Datum najpoznejše razpoložljivosti"
 }

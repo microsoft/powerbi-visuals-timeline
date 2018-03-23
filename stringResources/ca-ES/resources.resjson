@@ -41,5 +41,9 @@
 	"Visual_Granularity_Day": "Dia",
 	"Visual_Labels": "Etiquetes",
 	"Visual_ScaleSizeAdjustment": "Ajust automàtic de la mida de l'escala",
-	"Visual_FirstDayOfWeek": "Primer dia de la setmana"
+	"Visual_FirstDayOfWeek": "Primer dia de la setmana",
+	"Visual_DisplayAll": "Mostra-ho tot",
+	"Visual_ForceSelection": "Força la selecció",
+	"Visual_CurrentPeriod": "Període actual",
+	"Visual_LatestAvailableDate": "Última data disponible"
 }

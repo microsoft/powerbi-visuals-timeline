@@ -41,5 +41,9 @@
 	"Visual_Granularity_Day": "Den",
 	"Visual_Labels": "Popisky",
 	"Visual_ScaleSizeAdjustment": "Automatická úprava měřítka velikosti",
-	"Visual_FirstDayOfWeek": "První den v týdnu"
+	"Visual_FirstDayOfWeek": "První den v týdnu",
+	"Visual_DisplayAll": "Zobrazit vše",
+	"Visual_ForceSelection": "Vynutit výběr",
+	"Visual_CurrentPeriod": "Aktuální období",
+	"Visual_LatestAvailableDate": "Datum nejpozději k dispozici"
 }

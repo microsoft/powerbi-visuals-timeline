@@ -41,5 +41,9 @@
 	"Visual_Granularity_Day": "יום",
 	"Visual_Labels": "תוויות",
 	"Visual_ScaleSizeAdjustment": "התאמה אוטומטית של גודל קנה מידה",
-	"Visual_FirstDayOfWeek": "היום הראשון בשבוע"
+	"Visual_FirstDayOfWeek": "היום הראשון בשבוע",
+	"Visual_DisplayAll": "הצג הכול",
+	"Visual_ForceSelection": "כפה בחירה",
+	"Visual_CurrentPeriod": "התקופה הנוכחית",
+	"Visual_LatestAvailableDate": "התאריך הזמין העדכני ביותר"
 }

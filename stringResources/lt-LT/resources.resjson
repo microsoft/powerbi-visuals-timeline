@@ -41,5 +41,9 @@
 	"Visual_Granularity_Day": "Diena",
 	"Visual_Labels": "Žymos",
 	"Visual_ScaleSizeAdjustment": "Automatinis mastelio dydžio koregavimas",
-	"Visual_FirstDayOfWeek": "Pirma savaitės diena"
+	"Visual_FirstDayOfWeek": "Pirma savaitės diena",
+	"Visual_DisplayAll": "Rodyti viską",
+	"Visual_ForceSelection": "Jėgos pasirinkimas",
+	"Visual_CurrentPeriod": "Dabartinis laikotarpis",
+	"Visual_LatestAvailableDate": "Vėliausia galima data"
 }

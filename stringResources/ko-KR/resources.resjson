@@ -41,5 +41,9 @@
 	"Visual_Granularity_Day": "일",
 	"Visual_Labels": "레이블",
 	"Visual_ScaleSizeAdjustment": "눈금 크기 자동 조정",
-	"Visual_FirstDayOfWeek": "시작 요일"
+	"Visual_FirstDayOfWeek": "시작 요일",
+	"Visual_DisplayAll": "모두 표시",
+	"Visual_ForceSelection": "강제로 선택",
+	"Visual_CurrentPeriod": "현재 기간",
+	"Visual_LatestAvailableDate": "사용 가능한 가장 늦은 날짜"
 }

@@ -41,5 +41,9 @@
 	"Visual_Granularity_Day": "Dag",
 	"Visual_Labels": "Merkelapper",
 	"Visual_ScaleSizeAdjustment": "Automatisk justering av størrelsesskalering",
-	"Visual_FirstDayOfWeek": "Første dag i uken"
+	"Visual_FirstDayOfWeek": "Første dag i uken",
+	"Visual_DisplayAll": "Vis alle",
+	"Visual_ForceSelection": "Tving valg",
+	"Visual_CurrentPeriod": "Inneværende periode",
+	"Visual_LatestAvailableDate": "Siste tilgjengelige dato"
 }

@@ -41,5 +41,9 @@
 	"Visual_Granularity_Day": "Eguna",
 	"Visual_Labels": "Etiketak",
 	"Visual_ScaleSizeAdjustment": "Doitu automatikoki eskala-tamaina",
-	"Visual_FirstDayOfWeek": "Asteko lehen eguna"
+	"Visual_FirstDayOfWeek": "Asteko lehen eguna",
+	"Visual_DisplayAll": "Bistaratu guztiak",
+	"Visual_ForceSelection": "Behartu hautapena",
+	"Visual_CurrentPeriod": "Uneko aldia",
+	"Visual_LatestAvailableDate": "Erabilgarri dagoen azken data"
 }

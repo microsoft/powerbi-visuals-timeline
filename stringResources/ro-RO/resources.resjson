@@ -41,5 +41,9 @@
 	"Visual_Granularity_Day": "Zi",
 	"Visual_Labels": "Etichete",
 	"Visual_ScaleSizeAdjustment": "Ajustare automată dimensiune scară",
-	"Visual_FirstDayOfWeek": "Prima zi a săptămânii"
+	"Visual_FirstDayOfWeek": "Prima zi a săptămânii",
+	"Visual_DisplayAll": "Afișare totală",
+	"Visual_ForceSelection": "Forțați selecția",
+	"Visual_CurrentPeriod": "Perioada curentă",
+	"Visual_LatestAvailableDate": "Cea mai recentă dată disponibilă"
 }

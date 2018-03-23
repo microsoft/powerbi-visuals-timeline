@@ -41,5 +41,9 @@
 	"Visual_Granularity_Day": "Día",
 	"Visual_Labels": "Etiquetas",
 	"Visual_ScaleSizeAdjustment": "Axuste automático do tamaño da escala",
-	"Visual_FirstDayOfWeek": "Primeiro día da semana"
+	"Visual_FirstDayOfWeek": "Primeiro día da semana",
+	"Visual_DisplayAll": "Mostrar todo",
+	"Visual_ForceSelection": "Forzar selección",
+	"Visual_CurrentPeriod": "Período actual",
+	"Visual_LatestAvailableDate": "Última data na que estivo dispoñible"
 }

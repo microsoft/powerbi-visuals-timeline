@@ -41,5 +41,9 @@
 	"Visual_Granularity_Day": "Дан",
 	"Visual_Labels": "Ознаке",
 	"Visual_ScaleSizeAdjustment": "Аутоматско прилагођавање величине скале",
-	"Visual_FirstDayOfWeek": "Први дан у седмици"
+	"Visual_FirstDayOfWeek": "Први дан у седмици",
+	"Visual_DisplayAll": "Прикажи све",
+	"Visual_ForceSelection": "Наметни избор",
+	"Visual_CurrentPeriod": "Тренутни период",
+	"Visual_LatestAvailableDate": "Последњи доступни датум"
 }

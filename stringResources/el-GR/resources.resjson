@@ -41,5 +41,9 @@
 	"Visual_Granularity_Day": "Ημέρα",
 	"Visual_Labels": "Ετικέτες",
 	"Visual_ScaleSizeAdjustment": "Αυτόματη προσαρμογή μεγέθους κλίμακας",
-	"Visual_FirstDayOfWeek": "Πρώτη ημέρα της εβδομάδας"
+	"Visual_FirstDayOfWeek": "Πρώτη ημέρα της εβδομάδας",
+	"Visual_DisplayAll": "Εμφάνιση όλων",
+	"Visual_ForceSelection": "Επιβολή επιλογής",
+	"Visual_CurrentPeriod": "Τρέχουσα περίοδος",
+	"Visual_LatestAvailableDate": "Τελευταία διαθέσιμη ημερομηνία"
 }

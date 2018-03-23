@@ -41,5 +41,9 @@
 	"Visual_Granularity_Day": "Hari",
 	"Visual_Labels": "Label",
 	"Visual_ScaleSizeAdjustment": "Penyesuaian otomatis ukuran skala",
-	"Visual_FirstDayOfWeek": "Hari Pertama Dalam Seminggu"
+	"Visual_FirstDayOfWeek": "Hari Pertama Dalam Seminggu",
+	"Visual_DisplayAll": "Tampilkan semua",
+	"Visual_ForceSelection": "Pilih paksa",
+	"Visual_CurrentPeriod": "Periode saat ini",
+	"Visual_LatestAvailableDate": "Tanggal terbaru yang tersedia"
 }

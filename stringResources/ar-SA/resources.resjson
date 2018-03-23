@@ -41,5 +41,9 @@
 	"Visual_Granularity_Day": "اليوم",
 	"Visual_Labels": "تسميات",
 	"Visual_ScaleSizeAdjustment": "ضبط حجم المقياس تلقائيًا",
-	"Visual_FirstDayOfWeek": "أول يوم في الأسبوع"
+	"Visual_FirstDayOfWeek": "أول يوم في الأسبوع",
+	"Visual_DisplayAll": "عرض الكل",
+	"Visual_ForceSelection": "فرض التحديد",
+	"Visual_CurrentPeriod": "الفترة الحالية",
+	"Visual_LatestAvailableDate": "آخر تاريخ متاح"
 }

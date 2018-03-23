@@ -41,5 +41,9 @@
 	"Visual_Granularity_Day": "Deň",
 	"Visual_Labels": "Označenia",
 	"Visual_ScaleSizeAdjustment": "Automatické prispôsobenie veľkosti mierky",
-	"Visual_FirstDayOfWeek": "Prvý deň v týždni"
+	"Visual_FirstDayOfWeek": "Prvý deň v týždni",
+	"Visual_DisplayAll": "Zobraziť všetko",
+	"Visual_ForceSelection": "Vynútiť výber",
+	"Visual_CurrentPeriod": "Aktuálne obdobie",
+	"Visual_LatestAvailableDate": "Dátum poslednej dostupnosti"
 }

@@ -41,5 +41,9 @@
 	"Visual_Granularity_Day": "Päev",
 	"Visual_Labels": "Sildid",
 	"Visual_ScaleSizeAdjustment": "Skaala suuruse automaatne korrigeerimine",
-	"Visual_FirstDayOfWeek": "Nädala esimene päev"
+	"Visual_FirstDayOfWeek": "Nädala esimene päev",
+	"Visual_DisplayAll": "Kuva kõik",
+	"Visual_ForceSelection": "Jõusta valik",
+	"Visual_CurrentPeriod": "Praegune periood",
+	"Visual_LatestAvailableDate": "Viimane saadaolev kuupäev"
 }

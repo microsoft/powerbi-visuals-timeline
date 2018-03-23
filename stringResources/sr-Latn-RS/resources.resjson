@@ -41,5 +41,9 @@
 	"Visual_Granularity_Day": "Dan",
 	"Visual_Labels": "Oznake",
 	"Visual_ScaleSizeAdjustment": "Automatsko prilagođavanje veličine skale",
-	"Visual_FirstDayOfWeek": "Prvi dan u sedmici"
+	"Visual_FirstDayOfWeek": "Prvi dan u sedmici",
+	"Visual_DisplayAll": "Prikaži sve",
+	"Visual_ForceSelection": "Nametni izbor",
+	"Visual_CurrentPeriod": "Trenutni period",
+	"Visual_LatestAvailableDate": "Poslednji dostupni datum"
 }

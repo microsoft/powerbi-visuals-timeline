@@ -41,5 +41,9 @@
 	"Visual_Granularity_Day": "Päivä",
 	"Visual_Labels": "Otsikot",
 	"Visual_ScaleSizeAdjustment": "Koon skaalaamisen automaattinen säätö",
-	"Visual_FirstDayOfWeek": "Viikon ensimmäinen päivä"
+	"Visual_FirstDayOfWeek": "Viikon ensimmäinen päivä",
+	"Visual_DisplayAll": "Näytä kaikki",
+	"Visual_ForceSelection": "Pakota valinta",
+	"Visual_CurrentPeriod": "Nykyinen jakso",
+	"Visual_LatestAvailableDate": "Viimeisimmän käytettävyyden päivämäärä"
 }

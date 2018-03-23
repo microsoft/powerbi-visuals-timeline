@@ -41,5 +41,9 @@
 	"Visual_Granularity_Day": "日",
 	"Visual_Labels": "ラベル",
 	"Visual_ScaleSizeAdjustment": "スケール サイズの自動調整",
-	"Visual_FirstDayOfWeek": "週の最初の曜日"
+	"Visual_FirstDayOfWeek": "週の最初の曜日",
+	"Visual_DisplayAll": "すべて表示",
+	"Visual_ForceSelection": "選択を必須にする",
+	"Visual_CurrentPeriod": "現在の期間",
+	"Visual_LatestAvailableDate": "利用可能になった最新の日付"
 }

@@ -41,5 +41,9 @@
 	"Visual_Granularity_Day": "Dag",
 	"Visual_Labels": "Etiketter",
 	"Visual_ScaleSizeAdjustment": "Automatisk justering af skalastørrelse",
-	"Visual_FirstDayOfWeek": "Første dag i ugen"
+	"Visual_FirstDayOfWeek": "Første dag i ugen",
+	"Visual_DisplayAll": "Vis alle",
+	"Visual_ForceSelection": "Gennemtving valg",
+	"Visual_CurrentPeriod": "Aktuel periode",
+	"Visual_LatestAvailableDate": "Senest tilgængelige dato"
 }
