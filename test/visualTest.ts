@@ -275,6 +275,7 @@ module powerbi.extensibility.visual.test {
                     visualBuilder.update(dataView);
 
                     spyOn(visualBuilder.visualObject, "renderGranularitySlicerRect");
+                    spyOn(visualBuilder.visualObject, "selectPeriod");
 
                     renderTimeout(() => {
                         periodSlicerSelectionRectElements = visualBuilder
@@ -288,14 +289,14 @@ module powerbi.extensibility.visual.test {
                 it("mousedown - event", () => {
                     $(periodSlicerSelectionRectElements[0]).d3MouseDown(0, 0);
 
-                    expectToCallRenderGranularitySlicerRect(GranularityType.year);
+                    expectToCallSelectPeriod(GranularityType.year);
                 });
 
                 it("drag - event", () => {
                     $(periodSlicerSelectionRectElements[0]).d3MouseDown(0, 0);
                     $(periodSlicerSelectionRectElements[0]).d3MouseMove(70, 0);
 
-                    expectToCallRenderGranularitySlicerRect(GranularityType.quarter);
+                    expectToCallSelectPeriod(GranularityType.quarter);
                 });
 
                 it("settings - event", () => {
@@ -312,6 +313,11 @@ module powerbi.extensibility.visual.test {
 
                 function expectToCallRenderGranularitySlicerRect(granularity: GranularityType): void {
                     expect(visualBuilder.visualObject.renderGranularitySlicerRect)
+                        .toHaveBeenCalledWith(granularity);
+                }
+
+                function expectToCallSelectPeriod(granularity: GranularityType): void {
+                    expect(visualBuilder.visualObject.selectPeriod)
                         .toHaveBeenCalledWith(granularity);
                 }
             });
@@ -680,7 +686,7 @@ module powerbi.extensibility.visual.test {
                                 forceSelection: {
                                     currentPeriod: true
                                 },
-                                granularity: { 
+                                granularity: {
                                     granularity
                                 }
                             };
@@ -724,37 +730,6 @@ module powerbi.extensibility.visual.test {
 
                             checkSelectedElement(GranularityType[granularity], Math.ceil(expectedElementsAmount));
                         });
-
-                        // it(`latest available period for '${granularity}' granularity with user selection`, () => {
-                        //     const startDateRange: Date = new Date(2018, 1, 1);
-                        //     const endDateRange: Date = new Date(2018, 11, 30);
-
-                        //     const amountOfDaysFromStart: number = 15;
-
-                        //     defaultDataViewBuilder.setDateRange(startDateRange, endDateRange);
-
-                        //     dataView = defaultDataViewBuilder.getDataView();
-                        //     dataView.metadata.objects = {
-                        //         forceSelection: {
-                        //             latestAvailableDate: true
-                        //         },
-                        //         granularity: {}
-                        //     };
-
-                        //     const startDateSelection: Date =
-                        //         defaultDataViewBuilder.valuesCategory[amountOfDaysFromStart];
-                        //     const endDateSelection: Date =
-                        //         defaultDataViewBuilder.valuesCategory[amountOfDaysFromStart + 1];
-
-                        //     dataView.metadata.objects.general.filter = createFakeFilter(startDateSelection, endDateSelection);
-                        //     TimelineBuilder.setDatePeriod(
-                        //         dataView,
-                        //         TimelineDatePeriodBase.create(startDateSelection, endDateSelection)
-                        //     );
-                        //     // simulate filter restoring
-
-                        //     checkSelectedElement(GranularityType[granularity], 1);
-                        // });
 
                         it(`latest available period for '${granularity}' granularity`, () => {
                             const startDateRange: Date = new Date(2018, 0, 1);

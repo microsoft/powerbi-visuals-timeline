@@ -50,6 +50,10 @@ module powerbi.extensibility.visual.granularity {
             return [];
         }
 
+        public splitDateForTitle(date: Date): (string | number)[] {
+            return this.splitDate(date);
+        }
+
         /**
         * Returns the short month name of the given date (e.g. Jan, Feb, Mar)
         */

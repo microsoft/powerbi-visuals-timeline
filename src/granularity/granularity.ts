@@ -41,5 +41,6 @@ module powerbi.extensibility.visual.granularity {
         addDate(date: Date);
         setNewEndDate(date: Date): void;
         splitPeriod(index: number, newFraction: number, newDate: Date): void;
+        splitDateForTitle(date: Date): (string | number)[];
     }
 }

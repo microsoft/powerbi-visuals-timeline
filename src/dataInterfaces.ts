@@ -48,6 +48,7 @@ module powerbi.extensibility.visual {
         StartYpoint: number;
         ElementWidth: number;
         MinCellWidth: number;
+        MinCellHeight: number;
         MaxCellHeight: number;
         PeriodSlicerRectWidth: number;
         PeriodSlicerRectHeight: number;

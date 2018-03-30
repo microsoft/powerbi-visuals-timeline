@@ -149,7 +149,8 @@ module powerbi.extensibility.visual {
             StartXpoint: 10,
             StartYpoint: 20,
             ElementWidth: 30,
-            MinCellWidth: 30,
+            MinCellWidth: 45,
+            MinCellHeight: 30,
             MaxCellHeight: 60,
             PeriodSlicerRectWidth: 15,
             PeriodSlicerRectHeight: 23,
@@ -519,7 +520,8 @@ module powerbi.extensibility.visual {
             viewport: IViewport,
             timelineProperties: TimelineProperties,
             timelineMargins: TimelineMargins,
-            scaleSizeAdjustment: ScaleSizeAdjustment): void {
+            scaleSizeAdjustment: ScaleSizeAdjustment,
+            labelFontSize: number = 9): void {
 
             timelineProperties.cellsYPosition = timelineProperties.textYPosition;
 
@@ -544,7 +546,7 @@ module powerbi.extensibility.visual {
 
             if (scaleSizeAdjustment.show) {
                 height = Math.max(
-                    timelineMargins.MinCellWidth,
+                    timelineMargins.MinCellHeight,
                     Math.min(
                         timelineMargins.MaxCellHeight,
                         maxHeight,
@@ -552,7 +554,7 @@ module powerbi.extensibility.visual {
                         - timelineProperties.cellsYPosition
                         - Timeline.TimelinePropertiesHeightOffset));
             } else {
-                height = timelineMargins.MinCellWidth;
+                height = timelineMargins.MinCellHeight;
             }
 
             width = Math.max(
@@ -771,7 +773,7 @@ module powerbi.extensibility.visual {
                     ({
                         startDate: filterDatePeriod.startDate,
                         endDate: filterDatePeriod.endDate
-                    } = Timeline.selectPeriod(datePeriod, granularity, this.calendar, new Date(this.datePeriod.endDate)));
+                    } = Timeline.selectPeriod(datePeriod, granularity, this.calendar, this.datePeriod.endDate));
                 }
             } else if (this.prevGranularity !== granularity && currentForceSelection) {
                 ({
@@ -787,10 +789,10 @@ module powerbi.extensibility.visual {
             if ((!isUserSelection && filterWasChanged) ||
                 (isUserSelection && filterWasChanged && latestAvailableDate) ||
                 (!this.initialized && !currentForceSelection)) {
-                this.applyDatePeriod(filterDatePeriod.startDate, filterDatePeriod.endDate, target, isUserSelection);
+                 this.applyDatePeriod(filterDatePeriod.startDate, filterDatePeriod.endDate, target, isUserSelection);
             }
 
-            if (this.prevGranularity && this.prevGranularity !== granularity) {
+            if (this.prevGranularity && this.prevGranularity !== granularity && latestAvailableDate) {
                 filterDatePeriod.endDate = adaptedDataEndDate;
             }
 
@@ -818,7 +820,7 @@ module powerbi.extensibility.visual {
                 options);
         }
 
-        private selectPeriod(granularityType: GranularityType): void {
+        public selectPeriod(granularityType: GranularityType): void {
             if (this.timelineData.currentGranularity.getType() !== granularityType) {
                 this.host.persistProperties({
                     merge: [{
@@ -829,6 +831,7 @@ module powerbi.extensibility.visual {
                 });
 
                 this.settings.granularity.granularity = granularityType;
+                return;
             }
 
             this.redrawPeriod(granularityType);
@@ -851,7 +854,8 @@ module powerbi.extensibility.visual {
                 this.initialized,
                 timelineFormat,
                 this.options.viewport,
-                this.calendar);
+                this.calendar,
+                this.settings);
         }
 
         private static isDataViewValid(dataView): boolean {
@@ -880,7 +884,8 @@ module powerbi.extensibility.visual {
             initialized: boolean,
             timelineSettings: VisualSettings,
             viewport: IViewport,
-            previousCalendar: Calendar): Calendar {
+            previousCalendar: Calendar,
+            setting: VisualSettings): Calendar {
 
             if (this.isDataViewValid(dataView)) {
                 return null;
@@ -946,6 +951,7 @@ module powerbi.extensibility.visual {
             }
 
             if (isCalendarChanged && startDate && endDate) {
+                Utils.unseparateSelection(timelineData.currentGranularity.getDatePeriods());
                 Utils.separateSelection(timelineData, startDate, endDate);
             }
 
@@ -976,7 +982,8 @@ module powerbi.extensibility.visual {
                 viewport,
                 timelineProperties,
                 Timeline.TimelineMargins,
-                timelineSettings.scaleSizeAdjustment
+                timelineSettings.scaleSizeAdjustment,
+                setting.labels.textSize
             );
 
             Timeline.updateCursors(timelineData, timelineProperties.cellWidth);
