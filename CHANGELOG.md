@@ -1,3 +1,12 @@
+## 1.6.4
+* Fix issue with incorrect selection after granularity change 
+* Increased minimum width of cells for weeks, months, quarters and years
+* Changed title of week granularity
+
+## 1.6.3
+* Fixed bug with incorrect week numbers
+* Fixed bug with incorrect force selection of current period with week granularity
+
 ## 1.6.2
 * Added Power BI Bookmarks support
 

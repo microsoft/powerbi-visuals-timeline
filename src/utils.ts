@@ -343,10 +343,10 @@ module powerbi.extensibility.visual.utils {
         */
         public static timeRangeText(timelineData: TimelineData): string {
             let startSelectionDateArray: (string | number)[] = timelineData.currentGranularity
-                .splitDate(Utils.getStartSelectionDate(timelineData));
+                .splitDateForTitle(Utils.getStartSelectionDate(timelineData));
 
             let endSelectionDateArray: (string | number)[] = timelineData.currentGranularity
-                .splitDate(Utils.getEndSelectionPeriod(timelineData).startDate);
+                .splitDateForTitle(Utils.getEndSelectionPeriod(timelineData).startDate);
 
             return `${startSelectionDateArray.join(Utils.DateArrayJoiner)}${Utils.DateSplitter}${endSelectionDateArray.join(Utils.DateArrayJoiner)}`;
         }

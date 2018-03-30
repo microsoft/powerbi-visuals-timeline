@@ -39,6 +39,15 @@ module powerbi.extensibility.visual.granularity {
             return this.determineWeek(date);
         }
 
+        public splitDateForTitle(date: Date): (string | number)[] {
+            const weekData = this.determineWeek(date);
+
+            return [
+                `W${weekData[0]}`,
+                weekData[1]
+            ];
+        }
+
         public sameLabel(firstDatePeriod: TimelineDatePeriod, secondDatePeriod: TimelineDatePeriod): boolean {
             return Utils.arraysEqual(firstDatePeriod.week, secondDatePeriod.week);
         }
