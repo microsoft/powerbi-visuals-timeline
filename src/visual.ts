@@ -241,6 +241,9 @@ module powerbi.extensibility.visual {
 
         private host: IVisualHost;
 
+        private locale: string;
+        private localizationManager: ILocalizationManager;
+
         /**
          * Changes the current granularity depending on the given granularity type
          * Separates the new granularity's date periods which contain the start/end selection
@@ -264,8 +267,10 @@ module powerbi.extensibility.visual {
             this.host = options.host;
 
             this.initialized = false;
+            this.locale = this.host.locale;
 
             this.selectionManager = this.host.createSelectionManager();
+            this.localizationManager = this.host.createLocalizationManager();
 
             this.timelineProperties = {
                 textYPosition: Timeline.DefaultTextYPosition,
@@ -409,8 +414,9 @@ module powerbi.extensibility.visual {
                 .append("text")
                 .classed(Timeline.TimelineSelectors.PeriodSlicerSelection.className, true);
 
+            const selectedText = this.localizationManager.getDisplayName(Utils.getGranularityNameKey(granularityType));
             this.selectedTextSelection
-                .text(Utils.getGranularityName(granularityType))
+                .text(selectedText)
                 .attr({
                     x: convertToPx(startXpoint + Timeline.SelectedTextSelectionFactor * elementWidth),
                     y: convertToPx(startYpoint + Timeline.SelectedTextSelectionYOffset),
@@ -484,8 +490,8 @@ module powerbi.extensibility.visual {
                         + granularity
                         * this.timelineProperties.elementWidth)
                 });
-
-            this.selectedTextSelection.text(Utils.getGranularityName(granularity));
+            const selectedText = this.localizationManager.getDisplayName(Utils.getGranularityNameKey(granularity));
+            this.selectedTextSelection.text(selectedText);
         }
 
         public fillColorGranularity(granularitySettings: GranularitySettings): void {
@@ -855,7 +861,9 @@ module powerbi.extensibility.visual {
                 timelineFormat,
                 this.options.viewport,
                 this.calendar,
-                this.settings);
+                this.settings,
+                this.locale,
+                this.host.createLocalizationManager());
         }
 
         private static isDataViewValid(dataView): boolean {
@@ -885,7 +893,9 @@ module powerbi.extensibility.visual {
             timelineSettings: VisualSettings,
             viewport: IViewport,
             previousCalendar: Calendar,
-            setting: VisualSettings): Calendar {
+            setting: VisualSettings,
+            locale: string,
+            localizationManager: ILocalizationManager): Calendar {
 
             if (this.isDataViewValid(dataView)) {
                 return null;
@@ -923,7 +933,7 @@ module powerbi.extensibility.visual {
             if (!initialized || isCalendarChanged) {
                 calendar = new Calendar(timelineSettings.calendar, timelineSettings.weekDay);
 
-                timelineGranularityData.createGranularities(calendar);
+                timelineGranularityData.createGranularities(calendar, locale, localizationManager);
                 timelineGranularityData.createLabels();
                 timelineData.currentGranularity = timelineGranularityData.getGranularity(
                     timelineSettings.granularity.granularity);

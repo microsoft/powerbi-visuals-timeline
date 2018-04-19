@@ -28,19 +28,24 @@ module powerbi.extensibility.visual.granularity {
     export const GranularityNames: GranularityName[] = [
         {
             granularityType: GranularityType.year,
-            name: "year"
+            name: "year",
+            nameKey: "Visual_Granularity_Year"
         }, {
             granularityType: GranularityType.quarter,
-            name: "quarter"
+            name: "quarter",
+            nameKey: "Visual_Granularity_Quarter"
         }, {
             granularityType: GranularityType.month,
-            name: "month"
+            name: "month",
+            nameKey: "Visual_Granularity_Month"
         }, {
             granularityType: GranularityType.week,
-            name: "week"
+            name: "week",
+            nameKey: "Visual_Granularity_Week"
         }, {
             granularityType: GranularityType.day,
-            name: "day"
+            name: "day",
+            nameKey: "Visual_Granularity_Day"
         }
     ];
 }

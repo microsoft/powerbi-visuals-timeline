@@ -28,5 +28,6 @@ module powerbi.extensibility.visual.granularity {
     export interface GranularityName {
         granularityType: GranularityType;
         name: string;
+        nameKey: string;
     }
 }
