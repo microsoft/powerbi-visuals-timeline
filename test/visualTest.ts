@@ -99,7 +99,6 @@ module powerbi.extensibility.visual.test {
 
         describe("DOM tests", () => {
             it("svg element created", () => expect(visualBuilder.mainElement[0]).toBeInDOM());
-
             it("basic update", (done) => {
                 dataView.metadata.objects = {
                     granularity: {
@@ -858,13 +857,15 @@ module powerbi.extensibility.visual.test {
 
         beforeEach(() => {
             calendar = createCalendar();
+            const localizationManager = powerbi.extensibility.utils.test.mocks.createLocalizationManager();
+            const locale = "en-US";
 
             granularities = [
-                new YearGranularity(calendar),
-                new QuarterGranularity(calendar),
-                new WeekGranularity(calendar),
-                new MonthGranularity(calendar),
-                new DayGranularity(calendar)
+                new YearGranularity(calendar, locale, localizationManager),
+                new QuarterGranularity(calendar, locale),
+                new WeekGranularity(calendar, locale, localizationManager),
+                new MonthGranularity(calendar, locale),
+                new DayGranularity(calendar, locale)
             ];
         });
 

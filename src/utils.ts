@@ -35,7 +35,6 @@ module powerbi.extensibility.visual.utils {
     import GranularityType = granularity.GranularityType;
     import GranularityName = granularity.GranularityName;
     import GranularityNames = granularity.GranularityNames;
-    import TimelineGranularityData = granularity.TimelineGranularityData;
 
     export class Utils {
         private static DateSplitter: string = " - ";
@@ -269,12 +268,12 @@ module powerbi.extensibility.visual.utils {
          * Returns the name of the granularity type
          * @param granularity The type of granularity
          */
-        public static getGranularityName(granularityType: GranularityType): string {
+        public static getGranularityNameKey(granularityType: GranularityType): string {
             const index: number = Utils.findIndex(GranularityNames, (granularity: GranularityName) => {
                 return granularity.granularityType === granularityType;
             });
 
-            return GranularityNames[index].name;
+            return GranularityNames[index].nameKey;
         }
 
         /**
@@ -352,7 +351,7 @@ module powerbi.extensibility.visual.utils {
         }
 
         public static dateRangeText(datePeriod: TimelineDatePeriod): string {
-            return `${datePeriod.startDate.toDateString()}${Utils.DateSplitter}${TimelineGranularityData.previousDay(datePeriod.endDate).toDateString()}`;
+            return `${datePeriod.startDate.toDateString()}${Utils.DateSplitter}${this.previousDay(datePeriod.endDate).toDateString()}`;
         }
 
         /**
@@ -433,6 +432,14 @@ module powerbi.extensibility.visual.utils {
                 }
             }
             return -1;
+        }
+
+        private static previousDay(date: Date): Date {
+            const prevDay: Date = Utils.resetTime(date);
+
+            prevDay.setDate(prevDay.getDate() - 1);
+
+            return prevDay;
         }
     }
 }

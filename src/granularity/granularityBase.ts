@@ -27,6 +27,7 @@
 module powerbi.extensibility.visual.granularity {
     // datePeriod
     import TimelineDatePeriod = datePeriod.TimelineDatePeriod;
+    import valueFormatter = powerbi.extensibility.utils.formatting.valueFormatter;
 
     // utils
     import Utils = utils.Utils;
@@ -41,9 +42,11 @@ module powerbi.extensibility.visual.granularity {
 
         private datePeriods: TimelineDatePeriod[] = [];
         private extendedLabel: ExtendedLabel;
+        private shortMonthFormatter: powerbi.extensibility.utils.formatting.IValueFormatter;
 
-        constructor(calendar: Calendar) {
+        constructor(calendar: Calendar, private locale: string) {
             this.calendar = calendar;
+            this.shortMonthFormatter = valueFormatter.create({ format: "MMM", cultureSelector: this.locale});
         }
 
         public splitDate(date: Date): (string | number)[] {
@@ -58,7 +61,7 @@ module powerbi.extensibility.visual.granularity {
         * Returns the short month name of the given date (e.g. Jan, Feb, Mar)
         */
         public shortMonthName(date: Date): string {
-            return date.toString().split(TimelineGranularityBase.MonthNameSeparator)[1];
+            return this.shortMonthFormatter.format(date);
         }
 
         public resetDatePeriods(): void {
