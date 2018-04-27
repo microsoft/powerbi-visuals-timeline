@@ -160,6 +160,13 @@
             "displayName": "First Day of Week",
             "displayNameKey": "Visual_FirstDayOfWeek",
             "properties": {
+                "daySelection": {
+                    "displayName": "Day Selection",
+                    "displayNameKey": "Visual_Day_Selection",
+                    "type": {
+                        "bool": true
+                    }
+                },
                 "day": {
                     "displayName": "Day",
                     "displayNameKey": "Visual_Day",

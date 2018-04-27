@@ -671,8 +671,8 @@ module powerbi.extensibility.visual {
                     endDate = null;
                 }
             } else {
-                const endDateAvailable = (datePeriod.startDate <= startDate && startDate <= datePeriod.endDate);
-                const startDateAvailable = (datePeriod.startDate <= endDate && endDate <= datePeriod.endDate);
+                const startDateAvailable = (datePeriod.startDate <= startDate && startDate <= datePeriod.endDate);
+                const endDateAvailable = (datePeriod.startDate <= endDate && endDate <= datePeriod.endDate);
 
                 if (!startDateAvailable && !endDateAvailable) {
                     startDate = null;
@@ -765,27 +765,26 @@ module powerbi.extensibility.visual {
             const latestAvailableDate: boolean = this.settings.forceSelection.latestAvailableDate;
             const isUserSelection: boolean = this.settings.general.isUserSelection;
             const target: IFilterColumnTarget = this.timelineData.filterColumnTarget;
-            if (!isUserSelection) {
+
+            if (!isUserSelection || this.prevGranularity !== granularity) {
+                let currentForceSelectionResult =  { startDate: null, endDate: null };
                 if (currentForceSelection) {
-                    ({
+                    currentForceSelectionResult  = ({
                         startDate: filterDatePeriod.startDate,
                         endDate: filterDatePeriod.endDate
                     } = Timeline.selectCurrentPeriod(datePeriod, granularity, this.calendar));
-                } else if (latestAvailableDate) {
-                    filterDatePeriod.endDate = adaptedDataEndDate;
                 }
-
-                if (currentForceSelection && latestAvailableDate && (!filterDatePeriod.startDate || !filterDatePeriod.endDate)) {
+                if (latestAvailableDate && ( !currentForceSelection ||
+                    (currentForceSelection && !currentForceSelectionResult.startDate && !currentForceSelectionResult.endDate))) {
+                    filterDatePeriod.endDate = adaptedDataEndDate;
                     ({
                         startDate: filterDatePeriod.startDate,
                         endDate: filterDatePeriod.endDate
                     } = Timeline.selectPeriod(datePeriod, granularity, this.calendar, this.datePeriod.endDate));
                 }
-            } else if (this.prevGranularity !== granularity && currentForceSelection) {
-                ({
-                    startDate: filterDatePeriod.startDate,
-                    endDate: filterDatePeriod.endDate
-                } = Timeline.selectCurrentPeriod(datePeriod, granularity, this.calendar));
+
+                if (this.prevGranularity !== granularity)
+                    this.applyFilter(false);
             }
 
             const filterWasChanged: boolean =
@@ -793,13 +792,8 @@ module powerbi.extensibility.visual {
                 String(this.prevFilteredEndDate) !== String(filterDatePeriod.endDate);
 
             if ((!isUserSelection && filterWasChanged) ||
-                (isUserSelection && filterWasChanged && latestAvailableDate) ||
                 (!this.initialized && !currentForceSelection)) {
                  this.applyDatePeriod(filterDatePeriod.startDate, filterDatePeriod.endDate, target, isUserSelection);
-            }
-
-            if (this.prevGranularity && this.prevGranularity !== granularity && latestAvailableDate) {
-                filterDatePeriod.endDate = adaptedDataEndDate;
             }
 
             this.prevFilteredStartDate = filterDatePeriod.startDate;
@@ -1241,6 +1235,13 @@ module powerbi.extensibility.visual {
         private static parseSettings(dataView: DataView): VisualSettings {
             const settings: VisualSettings = VisualSettings.parse<VisualSettings>(dataView);
 
+            if (!settings.weekDay.daySelection) {
+                const dateValues = dataView.categorical.categories[0].values,
+                    minDate = new Date(Math.min.apply(null, dateValues));
+
+                settings.weekDay.day = new Date(minDate.getFullYear(), settings.calendar.month, settings.calendar.day).getDay();
+            }
+
             Timeline.setValidCalendarSettings(settings.calendar);
 
             const filter: IAdvancedFilter = FilterManager.restoreFilter(
@@ -1633,9 +1634,20 @@ module powerbi.extensibility.visual {
             const settings: VisualSettings = this.settings
                 || VisualSettings.getDefault() as VisualSettings;
 
-            return VisualSettings.enumerateObjectInstances(
+            let instancesEnumerator: VisualObjectInstanceEnumeration = VisualSettings.enumerateObjectInstances(
                 settings,
-                options);
+                options),
+                instances = instancesEnumerator["instances"] ? instancesEnumerator["instances"] : instancesEnumerator;
+
+            if (options.objectName === "weekDay"
+                && !settings.weekDay.daySelection
+                && instances
+                && instances[0]
+                && instances[0].properties) {
+                delete instances[0].properties["day"];
+            }
+
+            return instances;
         }
     }
 }

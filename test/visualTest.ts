@@ -498,6 +498,48 @@ module powerbi.extensibility.visual.test {
         });
 
         describe("Format settings test", () => {
+            function checkSelectedElement(
+                granularity: string,
+                expectedElementsAmount: number
+            ): void {
+                dataView.metadata.objects.granularity.granularity = granularity;
+
+                visualBuilder.updateFlushAllD3Transitions(dataView);
+
+                let selectedElements: Element[] = [];
+                visualBuilder.cellRects
+                    .toArray()
+                    .forEach((element: Element) => {
+                        const fill: string = $(element).attr("fill");
+                        if (fill !== "rgba(0, 0, 0, 0)" && fill !== "transparent") {
+                            selectedElements.push(element);
+                        }
+                    });
+                expect(selectedElements.length).toEqual(expectedElementsAmount);
+            }
+
+            function checkSelectedElementIsLatestAvailable(
+                granularity: string
+            ): void {
+                dataView.metadata.objects.granularity.granularity = granularity;
+
+                visualBuilder.updateFlushAllD3Transitions(dataView);
+
+                let selectedElements: Element[] = [],
+                    lastElement = visualBuilder.cellRects.last();
+                visualBuilder.cellRects
+                    .toArray()
+                    .forEach((element: Element) => {
+                        const fill: string = $(element).attr("fill");
+                        if (fill !== "rgba(0, 0, 0, 0)" && fill !== "transparent") {
+                            selectedElements.push(element);
+                        }
+                    });
+
+                expect(selectedElements.length).toEqual(1);
+                expect(selectedElements[0]).toEqual(lastElement[0]);
+            }
+
             describe("Range header", () => {
                 beforeEach(() => {
                     dataView.metadata.objects = {
@@ -628,29 +670,68 @@ module powerbi.extensibility.visual.test {
                 });
             });
 
+            describe("First day of week option", () => {
+                const daySelection: boolean = true,
+                    startDateRange: Date = new Date(2015, 0, 1),
+                    weekFromStartRange: Date = new Date(2015, 0, 7);
+                let calendar: Calendar,
+                    granularity: string = "week",
+                    selectedWeekCount: number = 0;
+
+                beforeEach(() => {
+                    visualBuilder = new TimelineBuilder(1000, 500);
+                    defaultDataViewBuilder = new TimelineData();
+                    defaultDataViewBuilder.setDateRange(startDateRange, weekFromStartRange);
+
+                    dataView = defaultDataViewBuilder.getDataView();
+                });
+
+                it("check calendar with default day of week - Sunday", () => {
+                    const dayOfWeekSundayNumber = 0;
+                    selectedWeekCount = 2;
+
+                    dataView.metadata.objects = {
+                        weekDay: {
+                            day: dayOfWeekSundayNumber,
+                            daySelection: daySelection
+                        },
+                        granularity: {}
+                    };
+
+                    checkSelectedElement(GranularityType[granularity], selectedWeekCount);
+                });
+
+                it("check calendar with setted day of week - Tuesday", () => {
+                    const dayOfWeekThursdayNumber = 2;
+                    selectedWeekCount = 2;
+
+                    dataView.metadata.objects = {
+                        weekDay: {
+                            day: dayOfWeekThursdayNumber,
+                            daySelection: daySelection
+                           },
+                        granularity: {}
+                    };
+
+                    checkSelectedElement(GranularityType[granularity], selectedWeekCount);
+                });
+
+                it("check calendar with day of week option off", () => {
+                    // January,1 must be first day of week by default
+                    selectedWeekCount = 1;
+
+                    dataView.metadata.objects = {
+                        weekDay: {
+                            daySelection: !daySelection
+                        },
+                        granularity: {}
+                    };
+
+                    checkSelectedElement(GranularityType[granularity], selectedWeekCount);
+                });
+            });
 
             describe("Force selection", () => {
-                function checkSelectedElement(
-                    granularity: string,
-                    expectedElementsAmount: number
-                ): void {
-                    dataView.metadata.objects.granularity.granularity = granularity;
-
-                    visualBuilder.updateFlushAllD3Transitions(dataView);
-
-                    let selectedElements: Element[] = [];
-                    visualBuilder.cellRects
-                        .toArray()
-                        .forEach((element: Element) => {
-                            const fill: string = $(element).attr("fill");
-                            if (fill !== "rgba(0, 0, 0, 0)" && fill !== "transparent") {
-                                selectedElements.push(element);
-                            }
-                        });
-
-                    expect(selectedElements.length).toEqual(expectedElementsAmount);
-                }
-
                 for (let granularity in GranularityType) {
                     if (isNaN(+granularity)) {
                         it(`current period for '${granularity}' granularity`, () => {
@@ -734,8 +815,6 @@ module powerbi.extensibility.visual.test {
                             const startDateRange: Date = new Date(2018, 0, 1);
                             const endDateRange: Date = new Date(2019, 11, 31);
 
-                            const amountOfDaysFromStart: number = 0;
-
                             defaultDataViewBuilder.setDateRange(startDateRange, endDateRange);
 
                             dataView = defaultDataViewBuilder.getDataView();
@@ -746,44 +825,26 @@ module powerbi.extensibility.visual.test {
                                 granularity: {}
                             };
 
-                            const startDateSelection: Date =
-                                defaultDataViewBuilder.valuesCategory[amountOfDaysFromStart];
-                            const endDateSelection: Date =
-                                defaultDataViewBuilder.valuesCategory[amountOfDaysFromStart + 1];
+                            checkSelectedElementIsLatestAvailable(GranularityType[granularity]);
+                        });
 
-                            const yearOfEndDate: number = endDateSelection.getFullYear();
-                            const yearOfStartDateSelection: number = startDateSelection.getFullYear();
-                            const monthOfEndDate: number = endDateRange.getMonth();
-                            const monthOfStartDateSelection: number = startDateSelection.getMonth();
+                        it(`latest available period and current period for '${granularity}' granularity both for out of date range`, () => {
+                            // can not find current date, so will be found last available date
+                            const startDateRange: Date = new Date(2011, 0, 1);
+                            const endDateRange: Date = new Date(2012, 11, 31);
 
-                            const amountOfDays: number = defaultDataViewBuilder.valuesCategory.length;
-                            const amountOfYears = (amountOfDays - amountOfDaysFromStart) / 365;
+                            defaultDataViewBuilder.setDateRange(startDateRange, endDateRange);
 
-                            const amountOfMonthsInYearsDiff: number = Math.ceil((amountOfYears - 1) * 12);
-                            const amountOfMonthsThisYear: number = monthOfEndDate - monthOfStartDateSelection + 1;
+                            dataView = defaultDataViewBuilder.getDataView();
+                            dataView.metadata.objects = {
+                                forceSelection: {
+                                    currentPeriod: true,
+                                    latestAvailableDate: true
+                                },
+                                granularity: {}
+                            };
 
-                            const amountOfMonths: number = amountOfMonthsInYearsDiff + amountOfMonthsThisYear;
-
-                            let expectedElementsAmount: number;
-                            switch (granularity) {
-                                case "year":
-                                    expectedElementsAmount = amountOfYears;
-                                    break;
-                                case "quarter":
-                                    expectedElementsAmount = amountOfMonths / 3;
-                                    break;
-                                case "month":
-                                    expectedElementsAmount = amountOfMonths;
-                                    break;
-                                case "week":
-                                    expectedElementsAmount = Math.ceil((amountOfDays - amountOfDaysFromStart) / 7) + 1;
-                                    break;
-                                case "day":
-                                    expectedElementsAmount = amountOfDays - amountOfDaysFromStart;
-                                    break;
-                            }
-
-                            checkSelectedElement(GranularityType[granularity], Math.round(expectedElementsAmount));
+                            checkSelectedElementIsLatestAvailable(GranularityType[granularity]);
                         });
                     }
                 }
@@ -1296,7 +1357,8 @@ module powerbi.extensibility.visual.test {
     function createCalendar(
         month: number = 1,
         day: number = 1,
-        week: number = 1): Calendar {
+        week: number = 1,
+        dayOfWeekSelectionOn: boolean = false): Calendar {
 
         let calendarSettings: CalendarSettings,
             weekDaySettings: WeekDaySettings;
@@ -1307,7 +1369,8 @@ module powerbi.extensibility.visual.test {
         };
 
         weekDaySettings = {
-            day: week
+            day: week,
+            daySelection: dayOfWeekSelectionOn
         };
 
         return new Calendar(calendarSettings, weekDaySettings);
