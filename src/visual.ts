@@ -1235,13 +1235,6 @@ module powerbi.extensibility.visual {
         private static parseSettings(dataView: DataView): VisualSettings {
             const settings: VisualSettings = VisualSettings.parse<VisualSettings>(dataView);
 
-            if (!settings.weekDay.daySelection) {
-                const dateValues = dataView.categorical.categories[0].values,
-                    minDate = new Date(Math.min.apply(null, dateValues));
-
-                settings.weekDay.day = new Date(minDate.getFullYear(), settings.calendar.month, settings.calendar.day).getDay();
-            }
-
             Timeline.setValidCalendarSettings(settings.calendar);
 
             const filter: IAdvancedFilter = FilterManager.restoreFilter(

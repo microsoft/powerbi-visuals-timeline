@@ -709,17 +709,14 @@ module powerbi.extensibility.visual.test {
                         weekDay: {
                             day: dayOfWeekThursdayNumber,
                             daySelection: daySelection
-                           },
+                        },
                         granularity: {}
                     };
 
                     checkSelectedElement(GranularityType[granularity], selectedWeekCount);
                 });
 
-                it("check calendar with day of week option off", () => {
-                    // January,1 must be first day of week by default
-                    selectedWeekCount = 1;
-
+                it("check calendar getWeekperiod function with day of week option off", () => {
                     dataView.metadata.objects = {
                         weekDay: {
                             daySelection: !daySelection
@@ -727,7 +724,52 @@ module powerbi.extensibility.visual.test {
                         granularity: {}
                     };
 
-                    checkSelectedElement(GranularityType[granularity], selectedWeekCount);
+                    visualBuilder.updateFlushAllD3Transitions(dataView);
+
+                    let visualCalendar: Calendar = visualBuilder.visualObject["calendar"];
+                    let dates: any = visualCalendar.getWeekPeriod(new Date(2014, 0, 1));
+                    expect(dates.startDate as Date).toEqual(new Date(2014, 0, 1));
+                    expect(dates.endDate as Date).toEqual(new Date(2014, 0, 8));
+                    dates = visualCalendar.getWeekPeriod(new Date(2015, 0, 1));
+                    expect(dates.startDate as Date).toEqual(new Date(2015, 0, 1));
+                    expect(dates.endDate as Date).toEqual(new Date(2015, 0, 8));
+                    dates = visualCalendar.getWeekPeriod(new Date(2016, 0, 1));
+                    expect(dates.startDate as Date).toEqual(new Date(2016, 0, 1));
+                    expect(dates.endDate as Date).toEqual(new Date(2016, 0, 8));
+                    dates = visualCalendar.getWeekPeriod(new Date(2017, 0, 1));
+                    expect(dates.startDate as Date).toEqual(new Date(2017, 0, 1));
+                    expect(dates.endDate as Date).toEqual(new Date(2017, 0, 8));
+                    dates = visualCalendar.getWeekPeriod(new Date(2018, 0, 1));
+                    expect(dates.startDate as Date).toEqual(new Date(2018, 0, 1));
+                    expect(dates.endDate as Date).toEqual(new Date(2018, 0, 8));
+                });
+
+                it("check calendar with day of week option off", () => {
+                    // January,1 must be first day of week by default for every year in period
+                    selectedWeekCount = 1;
+
+                    visualBuilder = new TimelineBuilder(1000, 500);
+                    defaultDataViewBuilder = new TimelineData();
+                    defaultDataViewBuilder.setDateRange(new Date(2015, 0, 1), new Date(2016, 0, 12));
+                    dataView = defaultDataViewBuilder.getDataView();
+
+                    dataView.metadata.objects = {
+                        weekDay: {
+                            daySelection: !daySelection
+                        },
+                        granularity: {
+                            granularity: GranularityType[granularity]
+                        }
+                    };
+
+                    spyOn(visualBuilder.visualObject, "selectPeriod");
+
+                    visualBuilder.updateFlushAllD3Transitions(dataView);
+
+                    let periods: any[] = visualBuilder.visualObject.timelineData.currentGranularity.getDatePeriods();
+                    expect(periods.length).toEqual(55);
+                    expect(periods[0].startDate as Date).toEqual(new Date(2015, 0, 1));
+                    expect(periods[53].startDate as Date).toEqual(new Date(2016, 0, 1));
                 });
             });
 
