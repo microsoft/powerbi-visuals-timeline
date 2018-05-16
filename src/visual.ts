@@ -757,7 +757,6 @@ module powerbi.extensibility.visual {
             if (filterDatePeriod.endDate && adaptedDataEndDate && filterDatePeriod.endDate.getTime() > adaptedDataEndDate.getTime()) {
                 filterDatePeriod.endDate = null;
             }
-
             const datePeriod: ITimelineDatePeriod = this.datePeriod;
 
             const granularity = this.settings.granularity.granularity;
@@ -798,6 +797,7 @@ module powerbi.extensibility.visual {
 
             this.prevFilteredStartDate = filterDatePeriod.startDate;
             this.prevFilteredEndDate = filterDatePeriod.endDate;
+
             this.prevGranularity = granularity;
 
             if (!this.initialized) {
@@ -1560,7 +1560,7 @@ module powerbi.extensibility.visual {
             );
         }
 
-        private applyFilter(isUserSelection: boolean): void {
+        private applyFilter(isUserSelection: boolean, isClearPeriod?: boolean): void {
             const instanceOfGeneral: VisualObjectInstance = {
                 objectName: "general",
                 selector: undefined,
@@ -1568,6 +1568,10 @@ module powerbi.extensibility.visual {
                     isUserSelection: isUserSelection
                 }
             };
+
+            if (isClearPeriod) {
+                instanceOfGeneral.properties["datePeriod"] = null;
+            }
 
             this.host.persistProperties({
                 merge: [
@@ -1578,7 +1582,7 @@ module powerbi.extensibility.visual {
         }
 
         public applyDatePeriod(startDate: Date, endDate: Date, target: IFilterColumnTarget, isUserSelection: boolean): void {
-            this.applyFilter(isUserSelection);
+            this.applyFilter(isUserSelection, startDate === null && endDate === null ? true : false);
 
             // If startDate and EndDate is null then ClearSelection is triggered
             const filter: IAdvancedFilter = new window["powerbi-models"].AdvancedFilter(
