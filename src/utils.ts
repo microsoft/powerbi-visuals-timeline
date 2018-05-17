@@ -38,16 +38,12 @@ module powerbi.extensibility.visual.utils {
 
     export class Utils {
         private static DateSplitter: string = " - ";
-
         private static MinFraction: number = 1;
-
         private static TotalDaysInWeek: number = 7;
         private static WeekDayOffset: number = 1;
-
-        private static DefaultCellColor: string = "transparent";
-
         private static DateArrayJoiner: string = " ";
 
+        public static DefaultCellColor: string = "transparent";
         public static TotalMilliseconds: number = 1000;
         public static TotalSeconds: number = 60;
         public static TotalMinutes: number = 60;
@@ -60,10 +56,10 @@ module powerbi.extensibility.visual.utils {
         private static OffsetMilliseconds: number = 999;
 
         private static TotalMillisecondsInADay: number =
-        Utils.TotalMilliseconds
-        * Utils.TotalSeconds
-        * Utils.TotalMinutes
-        * Utils.TotalHours;
+            Utils.TotalMilliseconds
+            * Utils.TotalSeconds
+            * Utils.TotalMinutes
+            * Utils.TotalHours;
 
         public static convertToDaysFromMilliseconds(milliseconds: number): number {
             return milliseconds / (Utils.TotalMillisecondsInADay);
@@ -250,6 +246,11 @@ module powerbi.extensibility.visual.utils {
             return inSelectedPeriods
                 ? cellSettings.fillSelected
                 : (cellSettings.fillUnselected || Utils.DefaultCellColor);
+        }
+
+        public static isGranuleSelected(dataPoint: TimelineDatapoint, timelineData: TimelineData, cellSettings: CellsSettings): boolean {
+            return dataPoint.datePeriod.startDate >= Utils.getStartSelectionDate(timelineData)
+                && dataPoint.datePeriod.endDate <= Utils.getEndSelectionDate(timelineData);
         }
 
         /**

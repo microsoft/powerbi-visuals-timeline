@@ -67,6 +67,7 @@ module powerbi.extensibility.visual {
     import CalendarSettings = settings.CalendarSettings;
     import GranularitySettings = settings.GranularitySettings;
     import ScaleSizeAdjustment = settings.ScaleSizeAdjustment;
+    import ScrollAutoAdjustment = settings.ScrollAutoAdjustment;
 
     // granularity
     import GranularityType = granularity.GranularityType;
@@ -243,6 +244,7 @@ module powerbi.extensibility.visual {
 
         private locale: string;
         private localizationManager: ILocalizationManager;
+        private horizontalAutoScrollingPositionOffset: number = 200;
 
         /**
          * Changes the current granularity depending on the given granularity type
@@ -766,14 +768,14 @@ module powerbi.extensibility.visual {
             const target: IFilterColumnTarget = this.timelineData.filterColumnTarget;
 
             if (!isUserSelection || this.prevGranularity !== granularity) {
-                let currentForceSelectionResult =  { startDate: null, endDate: null };
+                let currentForceSelectionResult = { startDate: null, endDate: null };
                 if (currentForceSelection) {
-                    currentForceSelectionResult  = ({
+                    currentForceSelectionResult = ({
                         startDate: filterDatePeriod.startDate,
                         endDate: filterDatePeriod.endDate
                     } = Timeline.selectCurrentPeriod(datePeriod, granularity, this.calendar));
                 }
-                if (latestAvailableDate && ( !currentForceSelection ||
+                if (latestAvailableDate && (!currentForceSelection ||
                     (currentForceSelection && !currentForceSelectionResult.startDate && !currentForceSelectionResult.endDate))) {
                     filterDatePeriod.endDate = adaptedDataEndDate;
                     ({
@@ -792,7 +794,7 @@ module powerbi.extensibility.visual {
 
             if ((!isUserSelection && filterWasChanged) ||
                 (!this.initialized && !currentForceSelection)) {
-                 this.applyDatePeriod(filterDatePeriod.startDate, filterDatePeriod.endDate, target, isUserSelection);
+                this.applyDatePeriod(filterDatePeriod.startDate, filterDatePeriod.endDate, target, isUserSelection);
             }
 
             this.prevFilteredStartDate = filterDatePeriod.startDate;
@@ -1272,14 +1274,26 @@ module powerbi.extensibility.visual {
                 Math.min(theLatestDayOfMonth, calendarSettings.day));
         }
 
-        public fillCells(cellsSettings: CellsSettings): void {
+        public fillCells(visSettings: VisualSettings): void {
             const dataPoints: TimelineDatapoint[] = this.timelineData.timelineDatapoints,
                 cellSelection: UpdateSelection<TimelineDatapoint> = this.mainGroupSelection
                     .selectAll(Timeline.TimelineSelectors.CellRect.selectorName)
-                    .data(dataPoints);
+                    .data(dataPoints),
+                    cellsSettings: CellsSettings = visSettings.cells;
 
-            cellSelection.attr("fill", (dataPoint: TimelineDatapoint) => {
-                return Utils.getCellColor(dataPoint, this.timelineData, cellsSettings);
+            let singleCaseDone: boolean = false;
+            cellSelection.attr("fill", (dataPoint: TimelineDatapoint, index: number) => {
+                let isSelected: Boolean = Utils.isGranuleSelected(dataPoint, this.timelineData, cellsSettings);
+
+                if (visSettings.scrollAutoAdjustment.show && isSelected && !singleCaseDone) {
+                    const selectedGranulaPos: number = (cellSelection[0][index] as any).x.baseVal.value;
+                    (this.mainSvgWrapperSelection[0][0] as any).scrollTo(selectedGranulaPos - this.horizontalAutoScrollingPositionOffset, 0);
+                    singleCaseDone = true;
+                }
+
+                return isSelected
+                    ? cellsSettings.fillSelected
+                    : (cellsSettings.fillUnselected || Utils.DefaultCellColor);
             });
         }
 
@@ -1322,7 +1336,7 @@ module powerbi.extensibility.visual {
                 .on("click", clickHandler)
                 .on("touchstart", clickHandler);
 
-            this.fillCells(this.settings.cells);
+            this.fillCells(this.settings);
 
             cellsSelection
                 .exit()
@@ -1355,7 +1369,7 @@ module powerbi.extensibility.visual {
                 cursorDataPoints[1].selectionIndex = dataPoint.datePeriod.index + dataPoint.datePeriod.fraction;
             }
 
-            this.fillCells(this.settings.cells);
+            this.fillCells(this.settings);
 
             this.renderCursors(
                 timelineData,
@@ -1389,7 +1403,7 @@ module powerbi.extensibility.visual {
                     currentlyMouseOverElement.datePeriod.index + currentlyMouseOverElement.datePeriod.fraction;
             }
 
-            this.fillCells(this.settings.cells);
+            this.fillCells(this.settings);
 
             this.renderCursors(
                 this.timelineData,
