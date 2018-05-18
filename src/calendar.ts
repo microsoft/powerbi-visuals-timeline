@@ -50,6 +50,7 @@ module powerbi.extensibility.visual {
         private dateOfFirstWeek: DateDictionary;
         private dateOfFirstFullWeek: DateDictionary;
         private quarterFirstMonths: number[];
+        private isDaySelection: boolean;
 
         public getFirstDayOfWeek(): number {
             return this.firstDayOfWeek;
@@ -72,9 +73,13 @@ module powerbi.extensibility.visual {
             const month: number = date.getMonth();
             const dayOfWeek: number = date.getDay();
 
+            let weekDay = this.isDaySelection ?
+                this.firstDayOfWeek :
+                new Date(year, this.firstMonthOfYear, this.firstDayOfYear).getDay();
+
             let deltaDays: number = 0;
-            if (this.firstDayOfWeek !== dayOfWeek) {
-                deltaDays = dayOfWeek - this.firstDayOfWeek;
+            if (weekDay !== dayOfWeek) {
+                deltaDays = dayOfWeek - weekDay;
             }
 
             if (deltaDays < 0) {
@@ -82,11 +87,10 @@ module powerbi.extensibility.visual {
             }
 
             const daysToWeekEnd = (7 - deltaDays);
-
             const startDate = new Date(year, month, date.getDate() - deltaDays);
             const endDate = new Date(year, month, date.getDate() + daysToWeekEnd);
 
-            return {startDate, endDate};
+            return { startDate, endDate };
         }
 
         public getQuarterIndex(date: Date): number {
@@ -107,7 +111,7 @@ module powerbi.extensibility.visual {
             let startDate: Date = this.getQuarterStartDate(date.getFullYear(), quarterIndex);
             let endDate: Date = this.getQuarterEndDate(startDate);
 
-            return {startDate, endDate};
+            return { startDate, endDate };
         }
 
         public getMonthPeriod(date: Date): PeriodDates {
@@ -117,7 +121,7 @@ module powerbi.extensibility.visual {
             let startDate: Date = new Date(year, month, this.firstDayOfYear);
             let endDate: Date = new Date(year, month + 1, this.firstDayOfYear);
 
-            return {startDate, endDate};
+            return { startDate, endDate };
         }
 
         public getYearPeriod(date: Date): PeriodDates {
@@ -126,7 +130,7 @@ module powerbi.extensibility.visual {
             let startDate: Date = new Date(year, this.firstMonthOfYear, this.firstDayOfYear);
             let endDate: Date = new Date(year + 1, this.firstMonthOfYear, this.firstDayOfYear);
 
-            return {startDate, endDate};
+            return { startDate, endDate };
         }
 
         public isChanged(
@@ -142,6 +146,7 @@ module powerbi.extensibility.visual {
             calendarFormat: CalendarSettings,
             weekDaySettings: WeekDaySettings) {
 
+            this.isDaySelection = weekDaySettings.daySelection;
             this.firstDayOfWeek = weekDaySettings.day;
             this.firstMonthOfYear = calendarFormat.month;
             this.firstDayOfYear = calendarFormat.day;
@@ -157,7 +162,11 @@ module powerbi.extensibility.visual {
         private calculateDateOfFirstFullWeek(year: number): Date {
             let date: Date = new Date(year, this.firstMonthOfYear, this.firstDayOfYear);
 
-            while (date.getDay() !== this.firstDayOfWeek) {
+            let weekDay = this.isDaySelection ?
+                this.firstDayOfWeek :
+                new Date(year, this.firstMonthOfYear, this.firstDayOfYear).getDay();
+
+            while (date.getDay() !== weekDay) {
                 date = TimelineGranularityData.nextDay(date);
             }
 

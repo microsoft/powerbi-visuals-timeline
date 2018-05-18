@@ -498,6 +498,48 @@ module powerbi.extensibility.visual.test {
         });
 
         describe("Format settings test", () => {
+            function checkSelectedElement(
+                granularity: string,
+                expectedElementsAmount: number
+            ): void {
+                dataView.metadata.objects.granularity.granularity = granularity;
+
+                visualBuilder.updateFlushAllD3Transitions(dataView);
+
+                let selectedElements: Element[] = [];
+                visualBuilder.cellRects
+                    .toArray()
+                    .forEach((element: Element) => {
+                        const fill: string = $(element).attr("fill");
+                        if (fill !== "rgba(0, 0, 0, 0)" && fill !== "transparent") {
+                            selectedElements.push(element);
+                        }
+                    });
+                expect(selectedElements.length).toEqual(expectedElementsAmount);
+            }
+
+            function checkSelectedElementIsLatestAvailable(
+                granularity: string
+            ): void {
+                dataView.metadata.objects.granularity.granularity = granularity;
+
+                visualBuilder.updateFlushAllD3Transitions(dataView);
+
+                let selectedElements: Element[] = [],
+                    lastElement = visualBuilder.cellRects.last();
+                visualBuilder.cellRects
+                    .toArray()
+                    .forEach((element: Element) => {
+                        const fill: string = $(element).attr("fill");
+                        if (fill !== "rgba(0, 0, 0, 0)" && fill !== "transparent") {
+                            selectedElements.push(element);
+                        }
+                    });
+
+                expect(selectedElements.length).toEqual(1);
+                expect(selectedElements[0]).toEqual(lastElement[0]);
+            }
+
             describe("Range header", () => {
                 beforeEach(() => {
                     dataView.metadata.objects = {
@@ -628,31 +670,209 @@ module powerbi.extensibility.visual.test {
                 });
             });
 
+            describe("First day of week option", () => {
+                const daySelection: boolean = true,
+                    startDateRange: Date = new Date(2015, 0, 1),
+                    weekFromStartRange: Date = new Date(2015, 0, 7);
+                let calendar: Calendar,
+                    granularity: string = "week",
+                    selectedWeekCount: number = 0;
 
-            describe("Force selection", () => {
-                function checkSelectedElement(
-                    granularity: string,
-                    expectedElementsAmount: number
-                ): void {
-                    dataView.metadata.objects.granularity.granularity = granularity;
+                beforeEach(() => {
+                    visualBuilder = new TimelineBuilder(1000, 500);
+                    defaultDataViewBuilder = new TimelineData();
+                    defaultDataViewBuilder.setDateRange(startDateRange, weekFromStartRange);
+
+                    dataView = defaultDataViewBuilder.getDataView();
+                });
+
+                it("check calendar with default day of week - Sunday", () => {
+                    const dayOfWeekSundayNumber = 0;
+                    selectedWeekCount = 2;
+
+                    dataView.metadata.objects = {
+                        weekDay: {
+                            day: dayOfWeekSundayNumber,
+                            daySelection: daySelection
+                        },
+                        granularity: {}
+                    };
+
+                    checkSelectedElement(GranularityType[granularity], selectedWeekCount);
+                });
+
+                it("check calendar with setted day of week - Tuesday", () => {
+                    const dayOfWeekThursdayNumber = 2;
+                    selectedWeekCount = 2;
+
+                    dataView.metadata.objects = {
+                        weekDay: {
+                            day: dayOfWeekThursdayNumber,
+                            daySelection: daySelection
+                        },
+                        granularity: {}
+                    };
+
+                    checkSelectedElement(GranularityType[granularity], selectedWeekCount);
+                });
+
+                it("check calendar getWeekperiod function with day of week option off", () => {
+                    dataView.metadata.objects = {
+                        weekDay: {
+                            daySelection: !daySelection
+                        },
+                        granularity: {}
+                    };
 
                     visualBuilder.updateFlushAllD3Transitions(dataView);
 
-                    let selectedElements: Element[] = [];
-                    visualBuilder.cellRects
-                        .toArray()
-                        .forEach((element: Element) => {
-                            const fill: string = $(element).attr("fill");
-                            if (fill !== "rgba(0, 0, 0, 0)" && fill !== "transparent") {
-                                selectedElements.push(element);
-                            }
-                        });
+                    let visualCalendar: Calendar = visualBuilder.visualObject["calendar"];
+                    let dates: any = visualCalendar.getWeekPeriod(new Date(2014, 0, 1));
+                    expect(dates.startDate as Date).toEqual(new Date(2014, 0, 1));
+                    expect(dates.endDate as Date).toEqual(new Date(2014, 0, 8));
+                    dates = visualCalendar.getWeekPeriod(new Date(2015, 0, 1));
+                    expect(dates.startDate as Date).toEqual(new Date(2015, 0, 1));
+                    expect(dates.endDate as Date).toEqual(new Date(2015, 0, 8));
+                    dates = visualCalendar.getWeekPeriod(new Date(2016, 0, 1));
+                    expect(dates.startDate as Date).toEqual(new Date(2016, 0, 1));
+                    expect(dates.endDate as Date).toEqual(new Date(2016, 0, 8));
+                    dates = visualCalendar.getWeekPeriod(new Date(2017, 0, 1));
+                    expect(dates.startDate as Date).toEqual(new Date(2017, 0, 1));
+                    expect(dates.endDate as Date).toEqual(new Date(2017, 0, 8));
+                    dates = visualCalendar.getWeekPeriod(new Date(2018, 0, 1));
+                    expect(dates.startDate as Date).toEqual(new Date(2018, 0, 1));
+                    expect(dates.endDate as Date).toEqual(new Date(2018, 0, 8));
+                });
 
-                    expect(selectedElements.length).toEqual(expectedElementsAmount);
-                }
+                it("check calendar with day of week option off", () => {
+                    // January,1 must be first day of week by default for every year in period
+                    selectedWeekCount = 1;
 
+                    visualBuilder = new TimelineBuilder(1000, 500);
+                    defaultDataViewBuilder = new TimelineData();
+                    defaultDataViewBuilder.setDateRange(new Date(2015, 0, 1), new Date(2016, 0, 12));
+                    dataView = defaultDataViewBuilder.getDataView();
+
+                    dataView.metadata.objects = {
+                        weekDay: {
+                            daySelection: !daySelection
+                        },
+                        granularity: {
+                            granularity: GranularityType[granularity]
+                        }
+                    };
+
+                    visualBuilder.updateFlushAllD3Transitions(dataView);
+
+                    let periods: any[] = visualBuilder.visualObject.timelineData.currentGranularity.getDatePeriods();
+                    expect(periods.length).toEqual(55);
+                    expect(periods[0].startDate as Date).toEqual(new Date(2015, 0, 1));
+                    expect(periods[53].startDate as Date).toEqual(new Date(2016, 0, 1));
+                });
+            });
+
+            describe("Force selection", () => {
                 for (let granularity in GranularityType) {
                     if (isNaN(+granularity)) {
+                        it("disabled both -- possible to make user selection", () => {
+                            const currentDate: Date = new Date();
+                            const startDateRange: Date = new Date(currentDate.getFullYear() - 1, 0, 1);
+                            const endDateRange: Date = new Date(currentDate.getFullYear() + 1, 11, 31);
+                            const color: string = "#ABCDEF";
+                            const colorSel: string = "#AAAAAA";
+
+                            defaultDataViewBuilder.setDateRange(startDateRange, endDateRange);
+
+                            dataView = defaultDataViewBuilder.getDataView();
+                            dataView.metadata.objects = {
+                                cells: {
+                                    fillUnselected: getSolidColorStructuralObject(color),
+                                    fillSelected: getSolidColorStructuralObject(colorSel)
+                                },
+                                forceSelection: {
+                                    currentPeriod: false,
+                                    latestAvailableDate: false
+                                },
+                                granularity: {}
+                            };
+
+                            visualBuilder.updateFlushAllD3Transitions(dataView);
+
+                            const lastCell: JQuery = visualBuilder.cellRects.last();
+
+                            clickElement(lastCell);
+
+                            assertColorsMatch(
+                                lastCell.css("fill"),
+                                colorSel);
+                        });
+
+                        it("current enabled -- impossible to make user selection", () => {
+                            const currentDate: Date = new Date();
+                            const startDateRange: Date = new Date(currentDate.getFullYear() - 1, 0, 1);
+                            const endDateRange: Date = new Date(currentDate.getFullYear() + 1, 11, 31);
+                            const color: string = "#ABCDEF";
+                            const colorSel: string = "#AAAAAA";
+
+                            defaultDataViewBuilder.setDateRange(startDateRange, endDateRange);
+
+                            dataView = defaultDataViewBuilder.getDataView();
+                            dataView.metadata.objects = {
+                                cells: {
+                                    fillUnselected: getSolidColorStructuralObject(color),
+                                    fillSelected: getSolidColorStructuralObject(colorSel)
+                                },
+                                forceSelection: {
+                                    currentPeriod: true,
+                                    latestAvailableDate: false
+                                },
+                                granularity: {}
+                            };
+
+                            visualBuilder.updateFlushAllD3Transitions(dataView);
+
+                            const lastCell: JQuery = visualBuilder.cellRects.last();
+
+                            clickElement(lastCell);
+
+                            assertColorsMatch(
+                                lastCell.css("fill"),
+                                color);
+                        });
+
+                        it("latest enabled -- impossible to make user selection", () => {
+                            const currentDate: Date = new Date();
+                            const startDateRange: Date = new Date(currentDate.getFullYear() - 1, 0, 1);
+                            const endDateRange: Date = new Date(currentDate.getFullYear() + 1, 11, 31);
+                            const color: string = "#ABCDEF";
+                            const colorSel: string = "#AAAAAA";
+
+                            defaultDataViewBuilder.setDateRange(startDateRange, endDateRange);
+
+                            dataView = defaultDataViewBuilder.getDataView();
+                            dataView.metadata.objects = {
+                                cells: {
+                                    fillUnselected: getSolidColorStructuralObject(color),
+                                    fillSelected: getSolidColorStructuralObject(colorSel)
+                                },
+                                forceSelection: {
+                                    currentPeriod: false,
+                                    latestAvailableDate: true
+                                },
+                                granularity: {}
+                            };
+
+                            visualBuilder.updateFlushAllD3Transitions(dataView);
+
+                            const firstCell: JQuery = visualBuilder.cellRects.first();
+
+                            clickElement(firstCell);
+
+                            assertColorsMatch(
+                                firstCell.css("fill"),
+                                color);
+                        });
+
                         it(`current period for '${granularity}' granularity`, () => {
                             const currentDate: Date = new Date();
                             const startDateRange: Date = new Date(currentDate.getFullYear(), 0, 1);
@@ -734,8 +954,6 @@ module powerbi.extensibility.visual.test {
                             const startDateRange: Date = new Date(2018, 0, 1);
                             const endDateRange: Date = new Date(2019, 11, 31);
 
-                            const amountOfDaysFromStart: number = 0;
-
                             defaultDataViewBuilder.setDateRange(startDateRange, endDateRange);
 
                             dataView = defaultDataViewBuilder.getDataView();
@@ -746,44 +964,26 @@ module powerbi.extensibility.visual.test {
                                 granularity: {}
                             };
 
-                            const startDateSelection: Date =
-                                defaultDataViewBuilder.valuesCategory[amountOfDaysFromStart];
-                            const endDateSelection: Date =
-                                defaultDataViewBuilder.valuesCategory[amountOfDaysFromStart + 1];
+                            checkSelectedElementIsLatestAvailable(GranularityType[granularity]);
+                        });
 
-                            const yearOfEndDate: number = endDateSelection.getFullYear();
-                            const yearOfStartDateSelection: number = startDateSelection.getFullYear();
-                            const monthOfEndDate: number = endDateRange.getMonth();
-                            const monthOfStartDateSelection: number = startDateSelection.getMonth();
+                        it(`latest available period and current period for '${granularity}' granularity both for out of date range`, () => {
+                            // can not find current date, so will be found last available date
+                            const startDateRange: Date = new Date(2011, 0, 1);
+                            const endDateRange: Date = new Date(2012, 11, 31);
 
-                            const amountOfDays: number = defaultDataViewBuilder.valuesCategory.length;
-                            const amountOfYears = (amountOfDays - amountOfDaysFromStart) / 365;
+                            defaultDataViewBuilder.setDateRange(startDateRange, endDateRange);
 
-                            const amountOfMonthsInYearsDiff: number = Math.ceil((amountOfYears - 1) * 12);
-                            const amountOfMonthsThisYear: number = monthOfEndDate - monthOfStartDateSelection + 1;
+                            dataView = defaultDataViewBuilder.getDataView();
+                            dataView.metadata.objects = {
+                                forceSelection: {
+                                    currentPeriod: true,
+                                    latestAvailableDate: true
+                                },
+                                granularity: {}
+                            };
 
-                            const amountOfMonths: number = amountOfMonthsInYearsDiff + amountOfMonthsThisYear;
-
-                            let expectedElementsAmount: number;
-                            switch (granularity) {
-                                case "year":
-                                    expectedElementsAmount = amountOfYears;
-                                    break;
-                                case "quarter":
-                                    expectedElementsAmount = amountOfMonths / 3;
-                                    break;
-                                case "month":
-                                    expectedElementsAmount = amountOfMonths;
-                                    break;
-                                case "week":
-                                    expectedElementsAmount = Math.ceil((amountOfDays - amountOfDaysFromStart) / 7) + 1;
-                                    break;
-                                case "day":
-                                    expectedElementsAmount = amountOfDays - amountOfDaysFromStart;
-                                    break;
-                            }
-
-                            checkSelectedElement(GranularityType[granularity], Math.round(expectedElementsAmount));
+                            checkSelectedElementIsLatestAvailable(GranularityType[granularity]);
                         });
                     }
                 }
@@ -1296,7 +1496,8 @@ module powerbi.extensibility.visual.test {
     function createCalendar(
         month: number = 1,
         day: number = 1,
-        week: number = 1): Calendar {
+        week: number = 1,
+        dayOfWeekSelectionOn: boolean = false): Calendar {
 
         let calendarSettings: CalendarSettings,
             weekDaySettings: WeekDaySettings;
@@ -1307,7 +1508,8 @@ module powerbi.extensibility.visual.test {
         };
 
         weekDaySettings = {
-            day: week
+            day: week,
+            daySelection: dayOfWeekSelectionOn
         };
 
         return new Calendar(calendarSettings, weekDaySettings);

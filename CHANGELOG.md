@@ -1,3 +1,18 @@
+## 1.7.0
+* ADD: new option to enable auto scrolling focus for selected period
+* ADD: if force selection is activated user selection doesn't work
+* FIX: blinkig issue was resolved
+* FIX: behaviour of option to switch off first day of week was corrected
+* FIX: applying of force selection was corrected for granularity changing case
+
+## 1.6.6
+* Added option to switch off first day of a week
+* Fixed force selection of latest available period
+
+## 1.6.5
+* Added new localization strings
+* Increased API version to 1.11.0
+
 ## 1.6.4
 * Fix issue with incorrect selection after granularity change 
 * Increased minimum width of cells for weeks, months, quarters and years

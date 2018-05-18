@@ -67,6 +67,7 @@ module powerbi.extensibility.visual {
     import CalendarSettings = settings.CalendarSettings;
     import GranularitySettings = settings.GranularitySettings;
     import ScaleSizeAdjustment = settings.ScaleSizeAdjustment;
+    import ScrollAutoAdjustment = settings.ScrollAutoAdjustment;
 
     // granularity
     import GranularityType = granularity.GranularityType;
@@ -243,6 +244,7 @@ module powerbi.extensibility.visual {
 
         private locale: string;
         private localizationManager: ILocalizationManager;
+        private horizontalAutoScrollingPositionOffset: number = 200;
 
         /**
          * Changes the current granularity depending on the given granularity type
@@ -312,8 +314,16 @@ module powerbi.extensibility.visual {
             this.clearCatcherSelection = appendClearCatcher(this.mainSvgSelection);
 
             this.clearCatcherSelection
-                .on("click", () => this.clear())
-                .on("touchstart", () => this.clear());
+                .on("click", () => {
+                    if (!this.settings.forceSelection.currentPeriod && !this.settings.forceSelection.latestAvailableDate) {
+                        this.clear();
+                    }
+                })
+                .on("touchstart", () => {
+                    if (!this.settings.forceSelection.currentPeriod && !this.settings.forceSelection.latestAvailableDate) {
+                        this.clear();
+                    }
+                });
 
             this.rangeTextSelection = this.headerSelection
                 .append("g")
@@ -429,7 +439,7 @@ module powerbi.extensibility.visual {
                 .append("rect")
                 .classed(Timeline.TimelineSelectors.PeriodSlicerSelectionRect.className, true);
 
-            const clickHandler = (d: any, index: number) => {
+            const granularityTypeClickHandler = (d: any, index: number) => {
                 this.selectPeriod(index);
             };
 
@@ -442,8 +452,8 @@ module powerbi.extensibility.visual {
                     width: convertToPx(elementWidth),
                     height: convertToPx(Timeline.DefaultSelectorPeriodsHeight)
                 })
-                .on("mousedown", clickHandler)
-                .on("touchstart", clickHandler);
+                .on("mousedown", granularityTypeClickHandler)
+                .on("touchstart", granularityTypeClickHandler);
 
             this.periodSlicerRectSelection = this.selectorSelection
                 .append("rect")
@@ -671,8 +681,8 @@ module powerbi.extensibility.visual {
                     endDate = null;
                 }
             } else {
-                const endDateAvailable = (datePeriod.startDate <= startDate && startDate <= datePeriod.endDate);
-                const startDateAvailable = (datePeriod.startDate <= endDate && endDate <= datePeriod.endDate);
+                const startDateAvailable = (datePeriod.startDate <= startDate && startDate <= datePeriod.endDate);
+                const endDateAvailable = (datePeriod.startDate <= endDate && endDate <= datePeriod.endDate);
 
                 if (!startDateAvailable && !endDateAvailable) {
                     startDate = null;
@@ -757,35 +767,32 @@ module powerbi.extensibility.visual {
             if (filterDatePeriod.endDate && adaptedDataEndDate && filterDatePeriod.endDate.getTime() > adaptedDataEndDate.getTime()) {
                 filterDatePeriod.endDate = null;
             }
-
             const datePeriod: ITimelineDatePeriod = this.datePeriod;
 
             const granularity = this.settings.granularity.granularity;
             const currentForceSelection: boolean = this.settings.forceSelection.currentPeriod;
             const latestAvailableDate: boolean = this.settings.forceSelection.latestAvailableDate;
-            const isUserSelection: boolean = this.settings.general.isUserSelection;
+            const isUserSelection: boolean = this.settings.general.isUserSelection && !currentForceSelection && !latestAvailableDate;
             const target: IFilterColumnTarget = this.timelineData.filterColumnTarget;
-            if (!isUserSelection) {
-                if (currentForceSelection) {
-                    ({
-                        startDate: filterDatePeriod.startDate,
-                        endDate: filterDatePeriod.endDate
-                    } = Timeline.selectCurrentPeriod(datePeriod, granularity, this.calendar));
-                } else if (latestAvailableDate) {
-                    filterDatePeriod.endDate = adaptedDataEndDate;
-                }
 
-                if (currentForceSelection && latestAvailableDate && (!filterDatePeriod.startDate || !filterDatePeriod.endDate)) {
-                    ({
-                        startDate: filterDatePeriod.startDate,
-                        endDate: filterDatePeriod.endDate
-                    } = Timeline.selectPeriod(datePeriod, granularity, this.calendar, this.datePeriod.endDate));
-                }
-            } else if (this.prevGranularity !== granularity && currentForceSelection) {
-                ({
+            let currentForceSelectionResult = { startDate: null, endDate: null };
+            if (currentForceSelection) {
+                currentForceSelectionResult = ({
                     startDate: filterDatePeriod.startDate,
                     endDate: filterDatePeriod.endDate
                 } = Timeline.selectCurrentPeriod(datePeriod, granularity, this.calendar));
+            }
+            if (latestAvailableDate && (!currentForceSelection ||
+                (currentForceSelection && !currentForceSelectionResult.startDate && !currentForceSelectionResult.endDate))) {
+                filterDatePeriod.endDate = adaptedDataEndDate;
+                ({
+                    startDate: filterDatePeriod.startDate,
+                    endDate: filterDatePeriod.endDate
+                } = Timeline.selectPeriod(datePeriod, granularity, this.calendar, this.datePeriod.endDate));
+            }
+
+            if (this.prevGranularity !== granularity) {
+                this.applyFilter(false);
             }
 
             const filterWasChanged: boolean =
@@ -793,17 +800,13 @@ module powerbi.extensibility.visual {
                 String(this.prevFilteredEndDate) !== String(filterDatePeriod.endDate);
 
             if ((!isUserSelection && filterWasChanged) ||
-                (isUserSelection && filterWasChanged && latestAvailableDate) ||
                 (!this.initialized && !currentForceSelection)) {
-                 this.applyDatePeriod(filterDatePeriod.startDate, filterDatePeriod.endDate, target, isUserSelection);
-            }
-
-            if (this.prevGranularity && this.prevGranularity !== granularity && latestAvailableDate) {
-                filterDatePeriod.endDate = adaptedDataEndDate;
+                this.applyDatePeriod(filterDatePeriod.startDate, filterDatePeriod.endDate, target, isUserSelection);
             }
 
             this.prevFilteredStartDate = filterDatePeriod.startDate;
             this.prevFilteredEndDate = filterDatePeriod.endDate;
+
             this.prevGranularity = granularity;
 
             if (!this.initialized) {
@@ -1278,14 +1281,26 @@ module powerbi.extensibility.visual {
                 Math.min(theLatestDayOfMonth, calendarSettings.day));
         }
 
-        public fillCells(cellsSettings: CellsSettings): void {
+        public fillCells(visSettings: VisualSettings): void {
             const dataPoints: TimelineDatapoint[] = this.timelineData.timelineDatapoints,
                 cellSelection: UpdateSelection<TimelineDatapoint> = this.mainGroupSelection
                     .selectAll(Timeline.TimelineSelectors.CellRect.selectorName)
-                    .data(dataPoints);
+                    .data(dataPoints),
+                cellsSettings: CellsSettings = visSettings.cells;
 
-            cellSelection.attr("fill", (dataPoint: TimelineDatapoint) => {
-                return Utils.getCellColor(dataPoint, this.timelineData, cellsSettings);
+            let singleCaseDone: boolean = false;
+            cellSelection.attr("fill", (dataPoint: TimelineDatapoint, index: number) => {
+                let isSelected: Boolean = Utils.isGranuleSelected(dataPoint, this.timelineData, cellsSettings);
+
+                if (visSettings.scrollAutoAdjustment.show && isSelected && !singleCaseDone) {
+                    const selectedGranulaPos: number = (cellSelection[0][index] as any).x.baseVal.value;
+                    (this.mainSvgWrapperSelection[0][0] as any).scrollTo(selectedGranulaPos - this.horizontalAutoScrollingPositionOffset, 0);
+                    singleCaseDone = true;
+                }
+
+                return isSelected
+                    ? cellsSettings.fillSelected
+                    : (cellsSettings.fillUnselected || Utils.DefaultCellColor);
             });
         }
 
@@ -1319,6 +1334,11 @@ module powerbi.extensibility.visual {
                 });
 
             let clickHandler = (dataPoint: TimelineDatapoint, index: number) => {
+                // If something from Force Selection settings group is enabled, any user filters has no sense
+                if (this.settings.forceSelection.currentPeriod || this.settings.forceSelection.latestAvailableDate) {
+                    return;
+                }
+
                 const event: MouseEvent = d3.event as MouseEvent;
 
                 this.onCellClickHandler(dataPoint, index, event.altKey || event.shiftKey);
@@ -1328,7 +1348,7 @@ module powerbi.extensibility.visual {
                 .on("click", clickHandler)
                 .on("touchstart", clickHandler);
 
-            this.fillCells(this.settings.cells);
+            this.fillCells(this.settings);
 
             cellsSelection
                 .exit()
@@ -1361,7 +1381,7 @@ module powerbi.extensibility.visual {
                 cursorDataPoints[1].selectionIndex = dataPoint.datePeriod.index + dataPoint.datePeriod.fraction;
             }
 
-            this.fillCells(this.settings.cells);
+            this.fillCells(this.settings);
 
             this.renderCursors(
                 timelineData,
@@ -1395,7 +1415,7 @@ module powerbi.extensibility.visual {
                     currentlyMouseOverElement.datePeriod.index + currentlyMouseOverElement.datePeriod.fraction;
             }
 
-            this.fillCells(this.settings.cells);
+            this.fillCells(this.settings);
 
             this.renderCursors(
                 this.timelineData,
@@ -1436,22 +1456,6 @@ module powerbi.extensibility.visual {
 
         public cursorDragended(currentCursor: CursorDatapoint): void {
             this.setSelection(this.timelineData);
-
-            if (currentCursor.cursorIndex === 1 && this.settings.forceSelection.latestAvailableDate) {
-                const instanceOfForceSelection: VisualObjectInstance = {
-                    objectName: "forceSelection",
-                    selector: undefined,
-                    properties: {
-                        latestAvailableDate: false
-                    }
-                };
-
-                this.host.persistProperties({
-                    merge: [
-                        instanceOfForceSelection
-                    ]
-                });
-            }
         }
 
         private cursorDragBehavior: Drag<CursorDatapoint> = d3.behavior.drag<CursorDatapoint>()
@@ -1461,9 +1465,17 @@ module powerbi.extensibility.visual {
                 return cursorDataPoint;
             })
             .on("drag", (cursorDataPoint: CursorDatapoint) => {
+                if (this.settings.forceSelection.currentPeriod || this.settings.forceSelection.latestAvailableDate) {
+                    return;
+                }
+
                 this.cursorDrag(cursorDataPoint);
             })
             .on("dragend", (cursorDataPoint: CursorDatapoint) => {
+                if (this.settings.forceSelection.currentPeriod || this.settings.forceSelection.latestAvailableDate) {
+                    return;
+                }
+
                 this.cursorDragended(cursorDataPoint);
             });
 
@@ -1566,7 +1578,7 @@ module powerbi.extensibility.visual {
             );
         }
 
-        private applyFilter(isUserSelection: boolean): void {
+        private applyFilter(isUserSelection: boolean, isClearPeriod?: boolean): void {
             const instanceOfGeneral: VisualObjectInstance = {
                 objectName: "general",
                 selector: undefined,
@@ -1574,6 +1586,10 @@ module powerbi.extensibility.visual {
                     isUserSelection: isUserSelection
                 }
             };
+
+            if (isClearPeriod) {
+                instanceOfGeneral.properties["datePeriod"] = null;
+            }
 
             this.host.persistProperties({
                 merge: [
@@ -1584,7 +1600,7 @@ module powerbi.extensibility.visual {
         }
 
         public applyDatePeriod(startDate: Date, endDate: Date, target: IFilterColumnTarget, isUserSelection: boolean): void {
-            this.applyFilter(isUserSelection);
+            this.applyFilter(isUserSelection, startDate === null && endDate === null ? true : false);
 
             // If startDate and EndDate is null then ClearSelection is triggered
             const filter: IAdvancedFilter = new window["powerbi-models"].AdvancedFilter(
@@ -1633,9 +1649,20 @@ module powerbi.extensibility.visual {
             const settings: VisualSettings = this.settings
                 || VisualSettings.getDefault() as VisualSettings;
 
-            return VisualSettings.enumerateObjectInstances(
+            let instancesEnumerator: VisualObjectInstanceEnumeration = VisualSettings.enumerateObjectInstances(
                 settings,
-                options);
+                options),
+                instances = instancesEnumerator["instances"] ? instancesEnumerator["instances"] : instancesEnumerator;
+
+            if (options.objectName === "weekDay"
+                && !settings.weekDay.daySelection
+                && instances
+                && instances[0]
+                && instances[0].properties) {
+                delete instances[0].properties["day"];
+            }
+
+            return instances;
         }
     }
 }

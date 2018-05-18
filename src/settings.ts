@@ -54,6 +54,7 @@ module powerbi.extensibility.visual.settings {
     }
 
     export class WeekDaySettings {
+        public daySelection: boolean = true;
         public day: number = 0;
     }
 
@@ -79,6 +80,10 @@ module powerbi.extensibility.visual.settings {
         show: boolean = false;
     }
 
+    export class ScrollAutoAdjustment {
+        show: boolean = false;
+    }
+
     export class VisualSettings extends DataViewObjectsParser {
         public general: GeneralSettings = new GeneralSettings();
         public calendar: CalendarSettings = new CalendarSettings();
@@ -89,5 +94,6 @@ module powerbi.extensibility.visual.settings {
         public granularity: GranularitySettings = new GranularitySettings();
         public labels: LabelsSettings = new LabelsSettings();
         public scaleSizeAdjustment: ScaleSizeAdjustment = new ScaleSizeAdjustment();
+        public scrollAutoAdjustment: ScrollAutoAdjustment = new ScrollAutoAdjustment();
     }
 }
