@@ -1,3 +1,11 @@
+## 1.6.6
+* Added option to switch off first day of a week
+* Fixed force selection of latest available period
+
+## 1.6.5
+* Added new localization strings
+* Increased API version to 1.11.0
+
 ## 1.6.4
 * Fix issue with incorrect selection after granularity change 
 * Increased minimum width of cells for weeks, months, quarters and years

@@ -54,6 +54,7 @@ module powerbi.extensibility.visual.settings {
     }
 
     export class WeekDaySettings {
+        public daySelection: boolean = true;
         public day: number = 0;
     }
 
