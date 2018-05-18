@@ -63,6 +63,28 @@ module powerbi.extensibility.visual.test {
     import DefaultWaitForRender = powerbi.extensibility.utils.test.DefaultWaitForRender;
     import assertColorsMatch = powerbi.extensibility.utils.test.helpers.color.assertColorsMatch;
 
+    function createFakeFilter(startDate: Date, endDate: Date): any {
+        let filterSample: string =
+            `{"fromValue":{"items":{"m":{"entity":"MSFT"}}},` +
+            `"whereItems":[{"condition":{"_kind":8,"left":{"_kind":13,"comparison":2,` +
+            `"left":{"_kind":2,"source":{"_kind":0,"entity":"MSFT","variable":"m"},"ref":"Date"},` +
+            `"right":{"_kind":18,"unit":5,"arg":{"_kind":17,"type":{"underlyingType":519,"category":null,` +
+            `"temporalType":{"underlyingType":519}},` +
+            `"value":"${startDate.toString()}","typeEncodedValue":"datetime'${startDate.toString()}'"}}},` +
+            `"right":{"_kind":13,"comparison":3,` +
+            `"left":{"_kind":2,"source":{"_kind":0,"entity":"MSFT","variable":"m"},"ref":"Date"},` +
+            `"right":{"_kind":18,"unit":5,"arg":{"_kind":17,"type":{"underlyingType":519,"category":null,` +
+            `"temporalType":{"underlyingType":519}},` +
+            `"value":"${endDate.toString()}","typeEncodedValue":"datetime'${endDate.toString()}'"}}}}}]}`;
+
+        // simulate filter string
+        let fakeFilter = JSON.parse(filterSample);
+        fakeFilter.whereItems[0].condition.left.right.arg.value = startDate;
+        fakeFilter.whereItems[0].condition.right.right.arg.value = startDate;
+
+        return fakeFilter;
+    }
+
     describe("Timeline", () => {
         let visualBuilder: TimelineBuilder,
             defaultDataViewBuilder: TimelineData,
@@ -77,7 +99,6 @@ module powerbi.extensibility.visual.test {
 
         describe("DOM tests", () => {
             it("svg element created", () => expect(visualBuilder.mainElement[0]).toBeInDOM());
-
             it("basic update", (done) => {
                 dataView.metadata.objects = {
                     granularity: {
@@ -253,6 +274,7 @@ module powerbi.extensibility.visual.test {
                     visualBuilder.update(dataView);
 
                     spyOn(visualBuilder.visualObject, "renderGranularitySlicerRect");
+                    spyOn(visualBuilder.visualObject, "selectPeriod");
 
                     renderTimeout(() => {
                         periodSlicerSelectionRectElements = visualBuilder
@@ -266,14 +288,14 @@ module powerbi.extensibility.visual.test {
                 it("mousedown - event", () => {
                     $(periodSlicerSelectionRectElements[0]).d3MouseDown(0, 0);
 
-                    expectToCallRenderGranularitySlicerRect(GranularityType.year);
+                    expectToCallSelectPeriod(GranularityType.year);
                 });
 
                 it("drag - event", () => {
                     $(periodSlicerSelectionRectElements[0]).d3MouseDown(0, 0);
                     $(periodSlicerSelectionRectElements[0]).d3MouseMove(70, 0);
 
-                    expectToCallRenderGranularitySlicerRect(GranularityType.quarter);
+                    expectToCallSelectPeriod(GranularityType.quarter);
                 });
 
                 it("settings - event", () => {
@@ -292,27 +314,15 @@ module powerbi.extensibility.visual.test {
                     expect(visualBuilder.visualObject.renderGranularitySlicerRect)
                         .toHaveBeenCalledWith(granularity);
                 }
+
+                function expectToCallSelectPeriod(granularity: GranularityType): void {
+                    expect(visualBuilder.visualObject.selectPeriod)
+                        .toHaveBeenCalledWith(granularity);
+                }
             });
         });
 
         describe("selection", () => {
-            // TODO: Turn this test on as soon as API supports SemanticFilter
-            xit("selection should be persistent after updating", (done) => {
-                checkSelectionState(dataView, visualBuilder, done);
-            });
-
-            // TODO: Turn this test on as soon as API supports SemanticFilter
-            xit("selection should be persistent after updating settings of calendar using the format panel", (done) => {
-                checkSelectionState(dataView, visualBuilder, done, (dataView: DataView) => {
-                    dataView.metadata.objects = {
-                        calendar: {
-                            month: 5,
-                            day: 1
-                        }
-                    };
-                });
-            });
-
             it("selection should be recovered from the dataView after starting", (done) => {
                 const startDate: Date = defaultDataViewBuilder.valuesCategory[0],
                     endDate: Date = defaultDataViewBuilder.valuesCategory[1],
@@ -325,6 +335,8 @@ module powerbi.extensibility.visual.test {
                 };
 
                 TimelineBuilder.setDatePeriod(dataView, datePeriod);
+                // simulate filter restoring
+                dataView.metadata.objects.general.filter = createFakeFilter(startDate, endDate);
 
                 visualBuilder.updateFlushAllD3Transitions(dataView);
 
@@ -616,11 +628,173 @@ module powerbi.extensibility.visual.test {
                 });
             });
 
+
+            describe("Force selection", () => {
+                function checkSelectedElement(
+                    granularity: string,
+                    expectedElementsAmount: number
+                ): void {
+                    dataView.metadata.objects.granularity.granularity = granularity;
+
+                    visualBuilder.updateFlushAllD3Transitions(dataView);
+
+                    let selectedElements: Element[] = [];
+                    visualBuilder.cellRects
+                        .toArray()
+                        .forEach((element: Element) => {
+                            const fill: string = $(element).attr("fill");
+                            if (fill !== "rgba(0, 0, 0, 0)" && fill !== "transparent") {
+                                selectedElements.push(element);
+                            }
+                        });
+
+                    expect(selectedElements.length).toEqual(expectedElementsAmount);
+                }
+
+                for (let granularity in GranularityType) {
+                    if (isNaN(+granularity)) {
+                        it(`current period for '${granularity}' granularity`, () => {
+                            const currentDate: Date = new Date();
+                            const startDateRange: Date = new Date(currentDate.getFullYear(), 0, 1);
+                            const endDateRange: Date = new Date(currentDate.getFullYear() + 1, 11, 31);
+
+                            defaultDataViewBuilder.setDateRange(startDateRange, endDateRange);
+
+                            dataView = defaultDataViewBuilder.getDataView();
+                            dataView.metadata.objects = {
+                                forceSelection: {
+                                    currentPeriod: true
+                                },
+                                granularity: {}
+                            };
+
+                            checkSelectedElement(GranularityType[granularity], 1);
+                        });
+
+                        it(`current period out of data set for '${granularity}' granularity`, () => {
+                            const currentDate: Date = new Date();
+                            const startDateRange: Date = new Date(2010, 0, 1);
+                            const endDateRange: Date = new Date(2011, 11, 31);
+
+                            const amountOfDaysFromStart: number = 0;
+
+                            defaultDataViewBuilder.setDateRange(startDateRange, endDateRange);
+
+                            dataView = defaultDataViewBuilder.getDataView();
+                            dataView.metadata.objects = {
+                                forceSelection: {
+                                    currentPeriod: true
+                                },
+                                granularity: {
+                                    granularity
+                                }
+                            };
+
+                            const startDateSelection: Date =
+                                defaultDataViewBuilder.valuesCategory[amountOfDaysFromStart];
+                            const endDateSelection: Date =
+                                defaultDataViewBuilder.valuesCategory[amountOfDaysFromStart + 1];
+
+                            const yearOfEndDate: number = endDateSelection.getFullYear();
+                            const yearOfStartDateSelection: number = startDateSelection.getFullYear();
+                            const monthOfEndDate: number = endDateRange.getMonth();
+                            const monthOfStartDateSelection: number = startDateSelection.getMonth();
+
+                            const amountOfDays: number = defaultDataViewBuilder.valuesCategory.length;
+                            const amountOfYears = (amountOfDays - amountOfDaysFromStart) / 365;
+
+                            const amountOfMonthsInYearsDiff: number = Math.ceil((amountOfYears - 1) * 12);
+                            const amountOfMonthsThisYear: number = monthOfEndDate - monthOfStartDateSelection + 1;
+
+                            const amountOfMonths: number = amountOfMonthsInYearsDiff + amountOfMonthsThisYear;
+
+                            let expectedElementsAmount: number;
+                            switch (granularity) {
+                                case "year":
+                                    expectedElementsAmount = amountOfYears;
+                                    break;
+                                case "quarter":
+                                    expectedElementsAmount = amountOfMonths / 3;
+                                    break;
+                                case "month":
+                                    expectedElementsAmount = amountOfMonths;
+                                    break;
+                                case "week":
+                                    expectedElementsAmount = Math.ceil((amountOfDays - amountOfDaysFromStart) / 7) + 1;
+                                    break;
+                                case "day":
+                                    expectedElementsAmount = amountOfDays - amountOfDaysFromStart;
+                                    break;
+                            }
+
+                            checkSelectedElement(GranularityType[granularity], Math.ceil(expectedElementsAmount));
+                        });
+
+                        it(`latest available period for '${granularity}' granularity`, () => {
+                            const startDateRange: Date = new Date(2018, 0, 1);
+                            const endDateRange: Date = new Date(2019, 11, 31);
+
+                            const amountOfDaysFromStart: number = 0;
+
+                            defaultDataViewBuilder.setDateRange(startDateRange, endDateRange);
+
+                            dataView = defaultDataViewBuilder.getDataView();
+                            dataView.metadata.objects = {
+                                forceSelection: {
+                                    latestAvailableDate: true
+                                },
+                                granularity: {}
+                            };
+
+                            const startDateSelection: Date =
+                                defaultDataViewBuilder.valuesCategory[amountOfDaysFromStart];
+                            const endDateSelection: Date =
+                                defaultDataViewBuilder.valuesCategory[amountOfDaysFromStart + 1];
+
+                            const yearOfEndDate: number = endDateSelection.getFullYear();
+                            const yearOfStartDateSelection: number = startDateSelection.getFullYear();
+                            const monthOfEndDate: number = endDateRange.getMonth();
+                            const monthOfStartDateSelection: number = startDateSelection.getMonth();
+
+                            const amountOfDays: number = defaultDataViewBuilder.valuesCategory.length;
+                            const amountOfYears = (amountOfDays - amountOfDaysFromStart) / 365;
+
+                            const amountOfMonthsInYearsDiff: number = Math.ceil((amountOfYears - 1) * 12);
+                            const amountOfMonthsThisYear: number = monthOfEndDate - monthOfStartDateSelection + 1;
+
+                            const amountOfMonths: number = amountOfMonthsInYearsDiff + amountOfMonthsThisYear;
+
+                            let expectedElementsAmount: number;
+                            switch (granularity) {
+                                case "year":
+                                    expectedElementsAmount = amountOfYears;
+                                    break;
+                                case "quarter":
+                                    expectedElementsAmount = amountOfMonths / 3;
+                                    break;
+                                case "month":
+                                    expectedElementsAmount = amountOfMonths;
+                                    break;
+                                case "week":
+                                    expectedElementsAmount = Math.ceil((amountOfDays - amountOfDaysFromStart) / 7) + 1;
+                                    break;
+                                case "day":
+                                    expectedElementsAmount = amountOfDays - amountOfDaysFromStart;
+                                    break;
+                            }
+
+                            checkSelectedElement(GranularityType[granularity], Math.round(expectedElementsAmount));
+                        });
+                    }
+                }
+            });
+
             describe("Labels", () => {
                 beforeEach(() => {
                     dataView.metadata.objects = {
                         labels: {
-                            show: true
+                            show: true,
+                            displayAll: true
                         }
                     };
                 });
@@ -634,6 +808,16 @@ module powerbi.extensibility.visual.test {
                     visualBuilder.updateFlushAllD3Transitions(dataView);
 
                     expect(visualBuilder.allLabels).not.toBeInDOM();
+                });
+
+                it("shows only selected granularity label if displayAll is set to false", () => {
+                    visualBuilder.updateFlushAllD3Transitions(dataView);
+                    // All labels should be visible
+                    expect(visualBuilder.allLabels.children().length).toBeGreaterThan(1);
+                    (dataView.metadata.objects as any).labels.displayAll = false;
+                    visualBuilder.updateFlushAllD3Transitions(dataView);
+                    // Only one label should be visible
+                    expect(visualBuilder.allLabels.children().length).toBe(1);
                 });
 
                 it("font color", () => {
@@ -673,13 +857,15 @@ module powerbi.extensibility.visual.test {
 
         beforeEach(() => {
             calendar = createCalendar();
+            const localizationManager = powerbi.extensibility.utils.test.mocks.createLocalizationManager();
+            const locale = "en-US";
 
             granularities = [
-                new YearGranularity(calendar),
-                new QuarterGranularity(calendar),
-                new WeekGranularity(calendar),
-                new MonthGranularity(calendar),
-                new DayGranularity(calendar)
+                new YearGranularity(calendar, locale, localizationManager),
+                new QuarterGranularity(calendar, locale),
+                new WeekGranularity(calendar, locale, localizationManager),
+                new MonthGranularity(calendar, locale),
+                new DayGranularity(calendar, locale)
             ];
         });
 
@@ -692,6 +878,18 @@ module powerbi.extensibility.visual.test {
 
                     expect(actualResult[actualResult.length - 1]).toBe(2014);
                 });
+            });
+        });
+
+        describe("first week", () => {
+            const year2010 = 2010;
+
+            it("should return a first day of year", () => {
+                const date = calendar.getDateOfFirstWeek(year2010);
+                const firstDayOfWeek = date.getDate();
+                const firstDayOfYear = calendar.getFirstDayOfYear();
+
+                expect(firstDayOfWeek).toEqual(firstDayOfYear);
             });
         });
     });
@@ -1038,6 +1236,30 @@ module powerbi.extensibility.visual.test {
 
                 expect(getTime(actualValue)).toBe(getTime(expectedValue));
             }
+        });
+
+        describe("Capabilities tests", () => {
+            it("all items having displayName should have displayNameKey property", () => {
+                jasmine.getJSONFixtures().fixturesPath = "base";
+
+                let jsonData = getJSONFixture("capabilities.json");
+
+                let objectsChecker: Function = (obj) => {
+                    for (let property in obj) {
+                        let value: any = obj[property];
+
+                        if (value.displayName) {
+                            expect(value.displayNameKey).toBeDefined();
+                        }
+
+                        if (typeof value === "object") {
+                            objectsChecker(value);
+                        }
+                    }
+                };
+
+                objectsChecker(jsonData);
+            });
         });
 
         function getTime(date: Date): number | Date {

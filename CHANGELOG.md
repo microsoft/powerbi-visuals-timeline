@@ -1,3 +1,33 @@
+## 1.6.4
+* Fix issue with incorrect selection after granularity change 
+* Increased minimum width of cells for weeks, months, quarters and years
+* Changed title of week granularity
+
+## 1.6.3
+* Fixed bug with incorrect week numbers
+* Fixed bug with incorrect force selection of current period with week granularity
+
+## 1.6.2
+* Added Power BI Bookmarks support
+
+## 1.6.1
+* FIX: Issue with incompatibility of selection with previous version
+
+## 1.6.0
+* NEW: Added force selection setting for latest available date
+* NEW: Added force selection setting for current period
+* FIX: Scroll bars don't display correctly
+
+## 1.5.2
+* UPD: API was updated to version 1.9
+* FIX: Mutual selection (when two timeline slicers apply filters to each other) was corrected and can be clear for now.
+
+## 1.5.1
+* FIX. Filtering doesn't work when Hierarchy mode of showing date field was chosen
+
+## 1.5.0
+* Added setting to toggle between displaying all labels, or only for selected granularity
+
 ## 1.4.9
 * FIX. Max date issue when date range is not specified (all dates)
 

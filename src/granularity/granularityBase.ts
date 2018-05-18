@@ -27,6 +27,7 @@
 module powerbi.extensibility.visual.granularity {
     // datePeriod
     import TimelineDatePeriod = datePeriod.TimelineDatePeriod;
+    import valueFormatter = powerbi.extensibility.utils.formatting.valueFormatter;
 
     // utils
     import Utils = utils.Utils;
@@ -41,20 +42,26 @@ module powerbi.extensibility.visual.granularity {
 
         private datePeriods: TimelineDatePeriod[] = [];
         private extendedLabel: ExtendedLabel;
+        private shortMonthFormatter: powerbi.extensibility.utils.formatting.IValueFormatter;
 
-        constructor(calendar: Calendar) {
+        constructor(calendar: Calendar, private locale: string) {
             this.calendar = calendar;
+            this.shortMonthFormatter = valueFormatter.create({ format: "MMM", cultureSelector: this.locale});
         }
 
         public splitDate(date: Date): (string | number)[] {
             return [];
         }
 
+        public splitDateForTitle(date: Date): (string | number)[] {
+            return this.splitDate(date);
+        }
+
         /**
         * Returns the short month name of the given date (e.g. Jan, Feb, Mar)
         */
         public shortMonthName(date: Date): string {
-            return date.toString().split(TimelineGranularityBase.MonthNameSeparator)[1];
+            return this.shortMonthFormatter.format(date);
         }
 
         public resetDatePeriods(): void {
@@ -155,20 +162,15 @@ module powerbi.extensibility.visual.granularity {
         public determineWeek(date: Date): number[] {
             let year: number = this.determineYear(date);
 
-            if (this.inPreviousYear(date)) {
-                year--;
+            const dateOfFirstWeek: Date = this.calendar.getDateOfFirstWeek(year);
+            const dateOfFirstFullWeek: Date = this.calendar.getDateOfFirstFullWeek(year);
+            const weeks: number = Utils.getAmountOfWeeksBetweenDates(dateOfFirstFullWeek, date);
+
+            if (date >= dateOfFirstFullWeek && dateOfFirstWeek < dateOfFirstFullWeek) {
+                return [weeks + 1, year];
             }
 
-            const dateOfFirstWeek: Date = this.calendar.getDateOfFirstWeek(year),
-                weeks: number = Utils.getAmountOfWeeksBetweenDates(dateOfFirstWeek, date);
-
             return [weeks, year];
-        }
-
-        private inPreviousYear(date: Date): boolean {
-            const dateOfFirstWeek: Date = this.calendar.getDateOfFirstWeek(this.determineYear(date));
-
-            return date < dateOfFirstWeek;
         }
 
         public determineYear(date: Date): number {

@@ -50,7 +50,7 @@ module powerbi.extensibility.visual.granularity {
 
             return {
                 title,
-                text: datePeriod.startDate.getDate().toString(),
+                text: datePeriod.startDate.getDate().toLocaleString(),
                 id: datePeriod.index
             };
         }

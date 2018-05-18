@@ -36,6 +36,11 @@ module powerbi.extensibility.visual {
         [year: number]: Date;
     }
 
+    export interface PeriodDates {
+        startDate: Date;
+        endDate: Date;
+    }
+
     export class Calendar {
         private static QuarterFirstMonths: number[] = [0, 3, 6, 9];
 
@@ -43,6 +48,7 @@ module powerbi.extensibility.visual {
         private firstMonthOfYear: number;
         private firstDayOfYear: number;
         private dateOfFirstWeek: DateDictionary;
+        private dateOfFirstFullWeek: DateDictionary;
         private quarterFirstMonths: number[];
 
         public getFirstDayOfWeek(): number {
@@ -57,8 +63,70 @@ module powerbi.extensibility.visual {
             return this.firstDayOfYear;
         }
 
+        public getNextDate(date: Date): Date {
+            return TimelineGranularityData.nextDay(date);
+        }
+
+        public getWeekPeriod(date: Date): PeriodDates {
+            const year: number = date.getFullYear();
+            const month: number = date.getMonth();
+            const dayOfWeek: number = date.getDay();
+
+            let deltaDays: number = 0;
+            if (this.firstDayOfWeek !== dayOfWeek) {
+                deltaDays = dayOfWeek - this.firstDayOfWeek;
+            }
+
+            if (deltaDays < 0) {
+                deltaDays = 7 + deltaDays;
+            }
+
+            const daysToWeekEnd = (7 - deltaDays);
+
+            const startDate = new Date(year, month, date.getDate() - deltaDays);
+            const endDate = new Date(year, month, date.getDate() + daysToWeekEnd);
+
+            return {startDate, endDate};
+        }
+
+        public getQuarterIndex(date: Date): number {
+            return Math.floor(date.getMonth() / 3);
+        }
+
         public getQuarterStartDate(year: number, quarterIndex: number): Date {
             return new Date(year, this.quarterFirstMonths[quarterIndex], this.firstDayOfYear);
+        }
+
+        public getQuarterEndDate(date: Date): Date {
+            return new Date(date.getFullYear(), date.getMonth() + 3, this.firstDayOfYear);
+        }
+
+        public getQuarterPeriod(date: Date): PeriodDates {
+            const quarterIndex = this.getQuarterIndex(date);
+
+            let startDate: Date = this.getQuarterStartDate(date.getFullYear(), quarterIndex);
+            let endDate: Date = this.getQuarterEndDate(startDate);
+
+            return {startDate, endDate};
+        }
+
+        public getMonthPeriod(date: Date): PeriodDates {
+            const year: number = date.getFullYear();
+            const month: number = date.getMonth();
+
+            let startDate: Date = new Date(year, month, this.firstDayOfYear);
+            let endDate: Date = new Date(year, month + 1, this.firstDayOfYear);
+
+            return {startDate, endDate};
+        }
+
+        public getYearPeriod(date: Date): PeriodDates {
+            const year: number = date.getFullYear();
+
+            let startDate: Date = new Date(year, this.firstMonthOfYear, this.firstDayOfYear);
+            let endDate: Date = new Date(year + 1, this.firstMonthOfYear, this.firstDayOfYear);
+
+            return {startDate, endDate};
         }
 
         public isChanged(
@@ -79,13 +147,14 @@ module powerbi.extensibility.visual {
             this.firstDayOfYear = calendarFormat.day;
 
             this.dateOfFirstWeek = {};
+            this.dateOfFirstFullWeek = {};
 
             this.quarterFirstMonths = Calendar.QuarterFirstMonths.map((monthIndex: number) => {
                 return monthIndex + this.firstMonthOfYear;
             });
         }
 
-        private calculateDateOfFirstWeek(year: number): Date {
+        private calculateDateOfFirstFullWeek(year: number): Date {
             let date: Date = new Date(year, this.firstMonthOfYear, this.firstDayOfYear);
 
             while (date.getDay() !== this.firstDayOfWeek) {
@@ -97,10 +166,18 @@ module powerbi.extensibility.visual {
 
         public getDateOfFirstWeek(year: number): Date {
             if (!this.dateOfFirstWeek[year]) {
-                this.dateOfFirstWeek[year] = this.calculateDateOfFirstWeek(year);
+                this.dateOfFirstWeek[year] = new Date(year, this.firstMonthOfYear, this.firstDayOfYear);
             }
 
             return this.dateOfFirstWeek[year];
+        }
+
+        public getDateOfFirstFullWeek(year: number): Date {
+            if (!this.dateOfFirstFullWeek[year]) {
+                this.dateOfFirstFullWeek[year] = this.calculateDateOfFirstFullWeek(year);
+            }
+
+            return this.dateOfFirstFullWeek[year];
         }
     }
 }

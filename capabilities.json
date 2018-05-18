@@ -43,9 +43,34 @@
                         "text": true
                     }
                 },
+                "isUserSelection": {
+                    "type": {
+                        "bool": true
+                    }
+                },
                 "filter": {
                     "type": {
                         "filter": true
+                    }
+                }
+            }
+        },
+        "forceSelection" : {
+            "displayName": "Force selection",
+            "displayNameKey": "Visual_ForceSelection",
+            "properties": {
+                "currentPeriod": {
+                    "displayName": "Current period",
+                    "displayNameKey": "Visual_CurrentPeriod",
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "latestAvailableDate": {
+                    "displayName": "Latest available period",
+                    "displayNameKey": "Visual_LatestAvailableDate",
+                    "type": {
+                        "bool": true
                     }
                 }
             }
@@ -309,6 +334,13 @@
                 "show": {
                     "displayName": "Show",
                     "displayNameKey": "Visual_Show",
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "displayAll": {
+                    "displayName": "Display all",
+                    "displayNameKey": "Visual_DisplayAll",
                     "type": {
                         "bool": true
                     }

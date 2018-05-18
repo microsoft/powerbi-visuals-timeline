@@ -39,7 +39,13 @@ module powerbi.extensibility.visual.settings {
 
     export class GeneralSettings {
         public datePeriod: TimelineDatePeriodBase | string = TimelineDatePeriodBase.createEmpty();
+        public isUserSelection: boolean = false;
         public filter: ISemanticFilter = null;
+    }
+
+    export class ForceSelectionSettings {
+        public currentPeriod: boolean = false;
+        public latestAvailableDate: boolean = false;
     }
 
     export class CalendarSettings {
@@ -53,6 +59,7 @@ module powerbi.extensibility.visual.settings {
 
     export class LabelsSettings {
         show: boolean = true;
+        displayAll: boolean = true;
         fontColor: string = "#777777";
         textSize: number = 9;
     }
@@ -75,6 +82,7 @@ module powerbi.extensibility.visual.settings {
     export class VisualSettings extends DataViewObjectsParser {
         public general: GeneralSettings = new GeneralSettings();
         public calendar: CalendarSettings = new CalendarSettings();
+        public forceSelection: ForceSelectionSettings = new ForceSelectionSettings();
         public weekDay: WeekDaySettings = new WeekDaySettings();
         public rangeHeader: LabelsSettings = new LabelsSettings();
         public cells: CellsSettings = new CellsSettings();

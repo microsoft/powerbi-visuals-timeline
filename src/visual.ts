@@ -49,13 +49,12 @@ module powerbi.extensibility.visual {
 
     // powerbi.extensibility.utils.interactivity
     import appendClearCatcher = powerbi.extensibility.utils.interactivity.appendClearCatcher;
+    import AppliedFilter = powerbi.extensibility.utils.filter.AppliedFilter;
+    import FilterManager = powerbi.extensibility.utils.filter.FilterManager;
 
     // powerbi.extensibility.utils.chart
     import getLabelFormattedText = powerbi.extensibility.utils.chart.dataLabel.utils.getLabelFormattedText;
     import LabelFormattedTextOptions = powerbi.extensibility.utils.chart.dataLabel.LabelFormattedTextOptions;
-
-    // persistPropertiesAdapter
-    import PersistPropertiesAdapter = persistPropertiesAdapter.PersistPropertiesAdapter;
 
     // scaleUtils
     import getScale = scaleUtils.getScale;
@@ -150,7 +149,8 @@ module powerbi.extensibility.visual {
             StartXpoint: 10,
             StartYpoint: 20,
             ElementWidth: 30,
-            MinCellWidth: 30,
+            MinCellWidth: 45,
+            MinCellHeight: 30,
             MaxCellHeight: 60,
             PeriodSlicerRectWidth: 15,
             PeriodSlicerRectHeight: 23,
@@ -202,6 +202,7 @@ module powerbi.extensibility.visual {
         private rootSelection: Selection<any>;
         private headerSelection: Selection<any>;
         private mainSvgSelection: Selection<any>;
+        private mainSvgWrapperSelection: Selection<any>;
 
         private rangeTextSelection: Selection<any>;
         private mainGroupSelection: Selection<any>;
@@ -230,15 +231,18 @@ module powerbi.extensibility.visual {
         private svgWidth: number;
 
         private datePeriod: ITimelineDatePeriod;
-
-        private isThePreviousFilterApplied: boolean = false;
+        private prevFilteredStartDate: Date | null = null;
+        private prevFilteredEndDate: Date | null = null;
+        private prevGranularity: GranularityType | null = null;
 
         private initialized: boolean;
 
         private calendar: Calendar;
 
-        private persistPropertiesAdapter: PersistPropertiesAdapter;
         private host: IVisualHost;
+
+        private locale: string;
+        private localizationManager: ILocalizationManager;
 
         /**
          * Changes the current granularity depending on the given granularity type
@@ -258,18 +262,20 @@ module powerbi.extensibility.visual {
         }
 
         public init(options: VisualConstructorOptions): void {
-            let element: HTMLElement = options.element,
-                host: IVisualHost = this.host = options.host;
-            this.persistPropertiesAdapter = PersistPropertiesAdapter.create(host);
+            let element: HTMLElement = options.element;
+
+            this.host = options.host;
 
             this.initialized = false;
+            this.locale = this.host.locale;
 
-            this.selectionManager = host.createSelectionManager();
+            this.selectionManager = this.host.createSelectionManager();
+            this.localizationManager = this.host.createLocalizationManager();
 
             this.timelineProperties = {
                 textYPosition: Timeline.DefaultTextYPosition,
                 cellsYPosition: Timeline.TimelineMargins.TopMargin
-                * Timeline.CellsYPositionFactor + Timeline.CellsYPositionOffset,
+                    * Timeline.CellsYPositionFactor + Timeline.CellsYPositionOffset,
                 topMargin: Timeline.TimelineMargins.TopMargin,
                 bottomMargin: Timeline.TimelineMargins.BottomMargin,
                 leftMargin: Timeline.TimelineMargins.LeftMargin,
@@ -291,9 +297,11 @@ module powerbi.extensibility.visual {
                     height: Timeline.TimelineMargins.LegendHeight
                 });
 
-            this.mainSvgSelection = this.rootSelection
+            this.mainSvgWrapperSelection = this.rootSelection
                 .append("div")
-                .classed(Timeline.TimelineSelectors.TimelineWrapper.className, true)
+                .classed(Timeline.TimelineSelectors.TimelineWrapper.className, true);
+
+            this.mainSvgSelection = this.mainSvgWrapperSelection
                 .append("svg")
                 .classed(Timeline.TimelineSelectors.TimelineVisual.className, true);
 
@@ -336,31 +344,6 @@ module powerbi.extensibility.visual {
                 this.selectionManager.clear();
 
                 if (this.timelineData) {
-                    this.timelineData.selectionStartIndex = Timeline.DefaultSelectionStartIndex;
-
-                    this.timelineData.selectionEndIndex =
-                        this.timelineData.currentGranularity.getDatePeriods().length - 1;
-
-                    const hasIrregularDataPoint: boolean = this.timelineData.timelineDatapoints
-                        .some((dataPoint: TimelineDatapoint) => dataPoint.index % 1 !== 0);
-
-                    if (hasIrregularDataPoint) {
-                        this.selectPeriod(this.timelineData.currentGranularity.getType());
-                    }
-                    else {
-                        Timeline.updateCursors(this.timelineData, this.timelineProperties.cellWidth);
-
-                        this.fillCells(this.settings.cells);
-
-                        this.renderCursors(
-                            this.timelineData,
-                            this.timelineProperties.cellHeight,
-                            this.timelineProperties.cellsYPosition);
-
-                        this.renderTimeRangeText(this.timelineData, this.settings.rangeHeader);
-                        this.fillColorGranularity(this.settings.granularity);
-                    }
-
                     this.clearSelection(this.timelineData.filterColumnTarget);
                 }
             }
@@ -431,8 +414,9 @@ module powerbi.extensibility.visual {
                 .append("text")
                 .classed(Timeline.TimelineSelectors.PeriodSlicerSelection.className, true);
 
+            const selectedText = this.localizationManager.getDisplayName(Utils.getGranularityNameKey(granularityType));
             this.selectedTextSelection
-                .text(Utils.getGranularityName(granularityType))
+                .text(selectedText)
                 .attr({
                     x: convertToPx(startXpoint + Timeline.SelectedTextSelectionFactor * elementWidth),
                     y: convertToPx(startYpoint + Timeline.SelectedTextSelectionYOffset),
@@ -506,8 +490,8 @@ module powerbi.extensibility.visual {
                         + granularity
                         * this.timelineProperties.elementWidth)
                 });
-
-            this.selectedTextSelection.text(Utils.getGranularityName(granularity));
+            const selectedText = this.localizationManager.getDisplayName(Utils.getGranularityNameKey(granularity));
+            this.selectedTextSelection.text(selectedText);
         }
 
         public fillColorGranularity(granularitySettings: GranularitySettings): void {
@@ -542,7 +526,8 @@ module powerbi.extensibility.visual {
             viewport: IViewport,
             timelineProperties: TimelineProperties,
             timelineMargins: TimelineMargins,
-            scaleSizeAdjustment: ScaleSizeAdjustment): void {
+            scaleSizeAdjustment: ScaleSizeAdjustment,
+            labelFontSize: number = 9): void {
 
             timelineProperties.cellsYPosition = timelineProperties.textYPosition;
 
@@ -555,9 +540,10 @@ module powerbi.extensibility.visual {
             labelSize = fromPointToPixel(labelsSettings.textSize);
 
             if (labelsSettings.show) {
+                let granularityOffset: number = labelsSettings.displayAll ? granularityType + 1 : 1;
                 timelineProperties.cellsYPosition += labelSize
                     * Timeline.LabelSizeFactor
-                    * (granularityType + 1);
+                    * granularityOffset;
             }
 
             svgHeight = Math.max(0, viewport.height - timelineMargins.TopMargin);
@@ -566,7 +552,7 @@ module powerbi.extensibility.visual {
 
             if (scaleSizeAdjustment.show) {
                 height = Math.max(
-                    timelineMargins.MinCellWidth,
+                    timelineMargins.MinCellHeight,
                     Math.min(
                         timelineMargins.MaxCellHeight,
                         maxHeight,
@@ -574,7 +560,7 @@ module powerbi.extensibility.visual {
                         - timelineProperties.cellsYPosition
                         - Timeline.TimelinePropertiesHeightOffset));
             } else {
-                height = timelineMargins.MinCellWidth;
+                height = timelineMargins.MinCellHeight;
             }
 
             width = Math.max(
@@ -590,31 +576,8 @@ module powerbi.extensibility.visual {
         }
 
         private createTimelineData(dataView: DataView) {
-            let startDate: Date,
-                endDate: Date,
-                datePeriod: TimelineDatePeriodBase,
-                resetedStartDate: Date,
-                resetedEndDate: Date;
-
-            this.settings = Timeline.parseSettings(dataView);
-
-            datePeriod = this.settings.general.datePeriod as TimelineDatePeriodBase;
-
-            if (datePeriod.startDate && datePeriod.endDate) {
-                resetedStartDate = Utils.resetTime(datePeriod.startDate);
-                resetedEndDate = Utils.resetTime(Utils.getEndOfThePreviousDate(datePeriod.endDate));
-
-                startDate = this.datePeriod.startDate < resetedStartDate
-                    ? this.datePeriod.startDate
-                    : resetedStartDate;
-
-                endDate = this.datePeriod.endDate > resetedEndDate
-                    ? this.datePeriod.endDate
-                    : resetedEndDate;
-            } else {
-                startDate = this.datePeriod.startDate;
-                endDate = this.datePeriod.endDate;
-            }
+            let startDate = this.datePeriod.startDate;
+            let endDate = this.datePeriod.endDate;
 
             if (!this.initialized) {
                 this.drawGranular(this.timelineProperties, this.settings.granularity.granularity);
@@ -626,8 +589,7 @@ module powerbi.extensibility.visual {
                     daysPeriods: TimelineDatePeriod[],
                     prevStartDate: Date,
                     prevEndDate: Date,
-                    changedSelection: boolean,
-                    isSemanticFilterAvailableInTheDataView: boolean;
+                    changedSelection: boolean;
 
                 actualEndDate = TimelineGranularityData.nextDay(endDate);
 
@@ -663,6 +625,62 @@ module powerbi.extensibility.visual {
                     cursorDataPoints: []
                 };
             }
+        }
+
+        public static selectCurrentPeriod(
+            datePeriod: ITimelineDatePeriod,
+            granularity: GranularityType,
+            calendar
+        ) {
+            return this.selectPeriod(datePeriod, granularity, calendar, Utils.resetTime(new Date()));
+        }
+
+        public static selectPeriod(
+            datePeriod: ITimelineDatePeriod,
+            granularity: GranularityType,
+            calendar,
+            periodDate: Date
+        ) {
+            let startDate: Date = periodDate,
+                endDate: Date;
+            switch (granularity) {
+                case GranularityType.day:
+                    endDate = calendar.getNextDate(periodDate);
+                    break;
+                case GranularityType.week:
+                    ({ startDate, endDate } = calendar.getWeekPeriod(periodDate));
+                    break;
+                case GranularityType.month:
+                    ({ startDate, endDate } = calendar.getMonthPeriod(periodDate));
+                    break;
+                case GranularityType.quarter:
+                    ({ startDate, endDate } = calendar.getQuarterPeriod(periodDate));
+                    break;
+                case GranularityType.year:
+                    ({ startDate, endDate } = calendar.getYearPeriod(periodDate));
+                    break;
+            }
+
+            if (granularity === GranularityType.day) {
+                const checkDatesForDayGranularity: boolean =
+                    datePeriod.startDate <= startDate && endDate <= datePeriod.endDate ||
+                    startDate.toString() === datePeriod.endDate.toString();
+
+                if (!checkDatesForDayGranularity) {
+                    startDate = null;
+                    endDate = null;
+                }
+            } else {
+                const endDateAvailable = (datePeriod.startDate <= startDate && startDate <= datePeriod.endDate);
+                const startDateAvailable = (datePeriod.startDate <= endDate && endDate <= datePeriod.endDate);
+
+                if (!startDateAvailable && !endDateAvailable) {
+                    startDate = null;
+                    endDate = null;
+                }
+            }
+
+            return { startDate, endDate };
         }
 
         public static areVisualUpdateOptionsValid(options: VisualUpdateOptions): boolean {
@@ -707,71 +725,119 @@ module powerbi.extensibility.visual {
                 this.clearData();
                 return;
             }
+
             this.options = options;
             this.dataView = options.dataViews[0];
+
+            // it contains dates from data view.
             this.datePeriod = this.createDatePeriod(options.dataViews[0]);
+
+            // Setting parsing was moved here from createTimelineData because settings values may be modified before the function is called.
+            this.settings = Timeline.parseSettings(options.dataViews[0]);
             this.createTimelineData(this.dataView);
-            const datePeriod: TimelineDatePeriodBase = this.settings.general.datePeriod as TimelineDatePeriodBase;
-            this.updateCalendar(this.settings);
-            this.initialized = true;
-
-            if (datePeriod.startDate && datePeriod.endDate) {
-                this.applySelection(options, datePeriod);
-            } else {
-                this.render(
-                    this.timelineData,
-                    this.settings,
-                    this.timelineProperties,
-                    options);
-            }
-            this.renderGranularitySlicerRect(this.settings.granularity.granularity);
-
-            if (!this.isThePreviousFilterApplied) {
-                this.applyThePreviousFilter(options, datePeriod);
-
-                this.isThePreviousFilterApplied = true;
-            }
-        }
-
-        private applyThePreviousFilter(options: VisualUpdateOptions, datePeriod: TimelineDatePeriodBase): void {
-            let target: IFilterColumnTarget = this.timelineData.filterColumnTarget;
-
-            if (!datePeriod.startDate || !datePeriod.endDate) {
-                this.clearSelection(target);
-
-                return;
-            }
-
-            this.applyDatePeriod(
-                datePeriod.startDate,
-                datePeriod.endDate,
-                target);
-
-            this.applySelection(options, datePeriod);
-        }
-
-        private applySelection(options: VisualUpdateOptions, datePeriod: TimelineDatePeriodBase): void {
-            this.changeGranularity(
-                this.settings.granularity.granularity,
-                datePeriod.startDate,
-                datePeriod.endDate);
-
             this.updateCalendar(this.settings);
 
-            this.render(this.timelineData, this.settings, this.timelineProperties, options);
+            // It contains date boundaties that was taken from current slicer filter (filter range).
+            // If nothing is selected in slicer the boundaries will be null.
+            const filterDatePeriod: TimelineDatePeriodBase = this.settings.general.datePeriod as TimelineDatePeriodBase;
+
+            // There may be the case when date boundaries that taken from data view are less than slicer filter dates.
+            // The case may happen if there is another timeline slicer that works with the same data and already applied a filter.
+            // In that case we need to correct slice filter dates.
+            if (filterDatePeriod.startDate && this.datePeriod.startDate && filterDatePeriod.startDate.getTime() < this.datePeriod.startDate.getTime()) {
+                filterDatePeriod.startDate = null;
+            }
+            // End date from data is always less than date from slicer filter.
+            // This means that we need to correct it before check.
+            let adaptedDataEndDate: Date = null;
+            if (this.datePeriod.endDate) {
+                adaptedDataEndDate = new Date(this.datePeriod.endDate as any);
+                adaptedDataEndDate.setDate(adaptedDataEndDate.getDate() + 1);
+            }
+            if (filterDatePeriod.endDate && adaptedDataEndDate && filterDatePeriod.endDate.getTime() > adaptedDataEndDate.getTime()) {
+                filterDatePeriod.endDate = null;
+            }
+
+            const datePeriod: ITimelineDatePeriod = this.datePeriod;
+
+            const granularity = this.settings.granularity.granularity;
+            const currentForceSelection: boolean = this.settings.forceSelection.currentPeriod;
+            const latestAvailableDate: boolean = this.settings.forceSelection.latestAvailableDate;
+            const isUserSelection: boolean = this.settings.general.isUserSelection;
+            const target: IFilterColumnTarget = this.timelineData.filterColumnTarget;
+            if (!isUserSelection) {
+                if (currentForceSelection) {
+                    ({
+                        startDate: filterDatePeriod.startDate,
+                        endDate: filterDatePeriod.endDate
+                    } = Timeline.selectCurrentPeriod(datePeriod, granularity, this.calendar));
+                } else if (latestAvailableDate) {
+                    filterDatePeriod.endDate = adaptedDataEndDate;
+                }
+
+                if (currentForceSelection && latestAvailableDate && (!filterDatePeriod.startDate || !filterDatePeriod.endDate)) {
+                    ({
+                        startDate: filterDatePeriod.startDate,
+                        endDate: filterDatePeriod.endDate
+                    } = Timeline.selectPeriod(datePeriod, granularity, this.calendar, this.datePeriod.endDate));
+                }
+            } else if (this.prevGranularity !== granularity && currentForceSelection) {
+                ({
+                    startDate: filterDatePeriod.startDate,
+                    endDate: filterDatePeriod.endDate
+                } = Timeline.selectCurrentPeriod(datePeriod, granularity, this.calendar));
+            }
+
+            const filterWasChanged: boolean =
+                String(this.prevFilteredStartDate) !== String(filterDatePeriod.startDate) ||
+                String(this.prevFilteredEndDate) !== String(filterDatePeriod.endDate);
+
+            if ((!isUserSelection && filterWasChanged) ||
+                (isUserSelection && filterWasChanged && latestAvailableDate) ||
+                (!this.initialized && !currentForceSelection)) {
+                 this.applyDatePeriod(filterDatePeriod.startDate, filterDatePeriod.endDate, target, isUserSelection);
+            }
+
+            if (this.prevGranularity && this.prevGranularity !== granularity && latestAvailableDate) {
+                filterDatePeriod.endDate = adaptedDataEndDate;
+            }
+
+            this.prevFilteredStartDate = filterDatePeriod.startDate;
+            this.prevFilteredEndDate = filterDatePeriod.endDate;
+            this.prevGranularity = granularity;
+
+            if (!this.initialized) {
+                this.initialized = true;
+            }
+
+            if (filterDatePeriod.startDate && filterDatePeriod.endDate) {
+                this.changeGranularity(
+                    this.settings.granularity.granularity,
+                    filterDatePeriod.startDate,
+                    filterDatePeriod.endDate);
+                this.updateCalendar(this.settings);
+            }
+
+            this.renderGranularitySlicerRect(granularity);
+            this.render(
+                this.timelineData,
+                this.settings,
+                this.timelineProperties,
+                options);
         }
 
-        private selectPeriod(granularityType: GranularityType): void {
+        public selectPeriod(granularityType: GranularityType): void {
             if (this.timelineData.currentGranularity.getType() !== granularityType) {
-                this.persistPropertiesAdapter.persistProperties({
-                    objectInstance: {
+                this.host.persistProperties({
+                    merge: [{
                         objectName: "granularity",
                         selector: null,
                         properties: { granularity: granularityType }
-                    }
+                    }]
                 });
 
                 this.settings.granularity.granularity = granularityType;
+                return;
             }
 
             this.redrawPeriod(granularityType);
@@ -794,7 +860,10 @@ module powerbi.extensibility.visual {
                 this.initialized,
                 timelineFormat,
                 this.options.viewport,
-                this.calendar);
+                this.calendar,
+                this.settings,
+                this.locale,
+                this.host.createLocalizationManager());
         }
 
         private static isDataViewValid(dataView): boolean {
@@ -823,7 +892,10 @@ module powerbi.extensibility.visual {
             initialized: boolean,
             timelineSettings: VisualSettings,
             viewport: IViewport,
-            previousCalendar: Calendar): Calendar {
+            previousCalendar: Calendar,
+            setting: VisualSettings,
+            locale: string,
+            localizationManager: ILocalizationManager): Calendar {
 
             if (this.isDataViewValid(dataView)) {
                 return null;
@@ -861,7 +933,7 @@ module powerbi.extensibility.visual {
             if (!initialized || isCalendarChanged) {
                 calendar = new Calendar(timelineSettings.calendar, timelineSettings.weekDay);
 
-                timelineGranularityData.createGranularities(calendar);
+                timelineGranularityData.createGranularities(calendar, locale, localizationManager);
                 timelineGranularityData.createLabels();
                 timelineData.currentGranularity = timelineGranularityData.getGranularity(
                     timelineSettings.granularity.granularity);
@@ -876,11 +948,12 @@ module powerbi.extensibility.visual {
 
             const category: DataViewCategoryColumn = dataView.categorical.categories[0];
             let categoryExpr: any = category.source && category.source.expr ? category.source.expr as any : null;
-
-            // category.source.queryName contains wrong table name if table was renamed! category.source.expr.source.entity contains correct table name.
+            let filteringColumn: string = categoryExpr && categoryExpr.arg && categoryExpr.arg.arg && categoryExpr.arg.arg.property ? categoryExpr.arg.arg.property : category.source.displayName;
+            // category.source.queryName contains wrong table name in case when table was renamed! category.source.expr.source.entity contains correct table name.
+            // category.source.displayName contains wrong column name in case when Hierarchy mode of showing date was chosen
             timelineData.filterColumnTarget = {
                 table: categoryExpr && categoryExpr.source && categoryExpr.source.entity ? categoryExpr.source.entity : category.source.queryName.substr(0, category.source.queryName.indexOf(".")),
-                column: category.source.displayName
+                column: filteringColumn
             };
 
             if (category.source.type.numeric) {
@@ -888,6 +961,7 @@ module powerbi.extensibility.visual {
             }
 
             if (isCalendarChanged && startDate && endDate) {
+                Utils.unseparateSelection(timelineData.currentGranularity.getDatePeriods());
                 Utils.separateSelection(timelineData, startDate, endDate);
             }
 
@@ -918,7 +992,8 @@ module powerbi.extensibility.visual {
                 viewport,
                 timelineProperties,
                 Timeline.TimelineMargins,
-                timelineSettings.scaleSizeAdjustment
+                timelineSettings.scaleSizeAdjustment,
+                setting.labels.textSize
             );
 
             Timeline.updateCursors(timelineData, timelineProperties.cellWidth);
@@ -947,22 +1022,35 @@ module powerbi.extensibility.visual {
 
             this.rootSelection
                 .attr({
-                    height: convertToPx(options.viewport.height),
-                    width: convertToPx(options.viewport.width),
                     "drag-resize-disabled": true
                 })
                 .style({
                     "overflow-x": Timeline.DefaultOverflow,
-                    "overflow-y": Timeline.DefaultOverflow
+                    "overflow-y": Timeline.DefaultOverflow,
+                    height: convertToPx(options.viewport.height),
+                    width: convertToPx(options.viewport.width),
                 });
 
-            this.mainSvgSelection.attr({
+            const legendFullHeight: number = Timeline.TimelineMargins.LegendHeight + Timeline.TimelineMargins.LegendHeightOffset;
+            this.mainSvgWrapperSelection.style({
                 height: convertToPx(Math.max(
                     Timeline.MinSizeOfViewport,
-                    options.viewport.height - Timeline.TimelineMargins.TopMargin - Timeline.TimelineMargins.HeightOffset)),
-                width: convertToPx(Math.max(
-                    Timeline.MinSizeOfViewport,
-                    this.svgWidth))
+                    options.viewport.height - legendFullHeight - Timeline.TimelineMargins.TopMargin))
+            });
+
+            const mainAreaHeight: number = timelineProperties.cellsYPosition - Timeline.TimelineMargins.LegendHeight
+                + timelineProperties.cellHeight;
+            const mainSvgHeight: number = Timeline.TimelineMargins.TopMargin + Timeline.TimelineMargins.LegendHeightOffset
+                + mainAreaHeight;
+            this.mainSvgSelection.attr({
+                height: convertToPx(Math.max(
+                    Timeline.MinSizeOfViewport, mainSvgHeight
+                )),
+                width: this.svgWidth < options.viewport.width
+                    ? "100%"
+                    : convertToPx(Math.max(
+                        Timeline.MinSizeOfViewport,
+                        this.svgWidth))
             });
 
             let fixedTranslateString: string = translate(
@@ -983,43 +1071,55 @@ module powerbi.extensibility.visual {
             let yPos: number = 0,
                 yDiff: number = Timeline.DefaultYDiff;
 
-            this.renderLabels(
-                extendedLabels.yearLabels,
-                this.yearLabelsSelection,
-                yPos,
-                granularityType === 0);
+            // Removing currently displayed labels
+            this.mainGroupSelection
+                .selectAll(Timeline.TimelineSelectors.textLabel.selectorName)
+                .remove();
 
-            yPos += yDiff;
+            if (timelineSettings.labels.displayAll || granularityType === GranularityType.year) {
+                this.renderLabels(
+                    extendedLabels.yearLabels,
+                    this.yearLabelsSelection,
+                    yPos,
+                    granularityType === 0);
+                yPos += yDiff;
+            }
 
-            this.renderLabels(
-                extendedLabels.quarterLabels,
-                this.quarterLabelsSelection,
-                yPos,
-                granularityType === 1);
+            if (timelineSettings.labels.displayAll || granularityType === GranularityType.quarter) {
+                this.renderLabels(
+                    extendedLabels.quarterLabels,
+                    this.quarterLabelsSelection,
+                    yPos,
+                    granularityType === 1);
+                yPos += yDiff;
+            }
 
-            yPos += yDiff;
+            if (timelineSettings.labels.displayAll || granularityType === GranularityType.month) {
+                this.renderLabels(
+                    extendedLabels.monthLabels,
+                    this.monthLabelsSelection,
+                    yPos,
+                    granularityType === 2);
+                yPos += yDiff;
+            }
 
-            this.renderLabels(
-                extendedLabels.monthLabels,
-                this.monthLabelsSelection,
-                yPos,
-                granularityType === 2);
+            if (timelineSettings.labels.displayAll || granularityType === GranularityType.week) {
+                this.renderLabels(
+                    extendedLabels.weekLabels,
+                    this.weekLabelsSelection,
+                    yPos,
+                    granularityType === 3);
+                yPos += yDiff;
+            }
 
-            yPos += yDiff;
-
-            this.renderLabels(
-                extendedLabels.weekLabels,
-                this.weekLabelsSelection,
-                yPos,
-                granularityType === 3);
-
-            yPos += yDiff;
-
-            this.renderLabels(
-                extendedLabels.dayLabels,
-                this.dayLabelsSelection,
-                yPos,
-                granularityType === 4);
+            if (timelineSettings.labels.displayAll || granularityType === GranularityType.day) {
+                this.renderLabels(
+                    extendedLabels.dayLabels,
+                    this.dayLabelsSelection,
+                    yPos,
+                    granularityType === 4);
+                yPos += yDiff;
+            }
 
             this.renderCells(timelineData, timelineProperties);
 
@@ -1096,7 +1196,7 @@ module powerbi.extensibility.visual {
                         return (label.id + Timeline.LabelIdOffset) * this.timelineProperties.cellWidth;
                     },
                     y: this.timelineProperties.textYPosition
-                    + (1 + index) * fromPointToPixel(this.settings.labels.textSize),
+                        + (1 + index) * fromPointToPixel(this.settings.labels.textSize),
                     fill: this.settings.labels.fontColor
                 })
                 .append("title")
@@ -1143,7 +1243,25 @@ module powerbi.extensibility.visual {
 
             Timeline.setValidCalendarSettings(settings.calendar);
 
-            settings.general.datePeriod = TimelineDatePeriodBase.parse(settings.general.datePeriod as string);
+            const filter: IAdvancedFilter = FilterManager.restoreFilter(
+                dataView.metadata
+                && dataView.metadata.objects
+                && dataView.metadata.objects["general"]
+                && dataView.metadata.objects["general"]["filter"] as any
+            ) as IAdvancedFilter;
+
+            if (filter
+                && filter.conditions
+                && filter.conditions[0]
+                && filter.conditions[1]
+            ) {
+                const startDate: Date = filter.conditions[0].value as any;
+                const endDate: Date = filter.conditions[1].value as any;
+
+                settings.general.datePeriod = TimelineDatePeriodBase.create(startDate, endDate);
+            } else {
+                settings.general.datePeriod = TimelineDatePeriodBase.createEmpty();
+            }
 
             return settings;
         }
@@ -1316,11 +1434,27 @@ module powerbi.extensibility.visual {
             };
         }
 
-        public cursorDragended(): void {
+        public cursorDragended(currentCursor: CursorDatapoint): void {
             this.setSelection(this.timelineData);
+
+            if (currentCursor.cursorIndex === 1 && this.settings.forceSelection.latestAvailableDate) {
+                const instanceOfForceSelection: VisualObjectInstance = {
+                    objectName: "forceSelection",
+                    selector: undefined,
+                    properties: {
+                        latestAvailableDate: false
+                    }
+                };
+
+                this.host.persistProperties({
+                    merge: [
+                        instanceOfForceSelection
+                    ]
+                });
+            }
         }
 
-        private cursorDragBehavior: Drag<CursorDatapoint> = d3.behavior.drag()
+        private cursorDragBehavior: Drag<CursorDatapoint> = d3.behavior.drag<CursorDatapoint>()
             .origin((cursorDataPoint: CursorDatapoint) => {
                 cursorDataPoint.x = cursorDataPoint.selectionIndex * this.timelineProperties.cellWidth;
 
@@ -1329,8 +1463,8 @@ module powerbi.extensibility.visual {
             .on("drag", (cursorDataPoint: CursorDatapoint) => {
                 this.cursorDrag(cursorDataPoint);
             })
-            .on("dragend", () => {
-                this.cursorDragended();
+            .on("dragend", (cursorDataPoint: CursorDatapoint) => {
+                this.cursorDragended(cursorDataPoint);
             });
 
         public renderCursors(
@@ -1401,7 +1535,7 @@ module powerbi.extensibility.visual {
                     .classed(Timeline.TimelineSelectors.SelectionRangeContainer.className, true)
                     .attr({
                         x: GranularityNames.length
-                        * (this.timelineProperties.elementWidth + this.timelineProperties.leftMargin),
+                            * (this.timelineProperties.elementWidth + this.timelineProperties.leftMargin),
                         y: Timeline.DefaultRangeTextSelectionY,
                         fill: rangeHeaderSettings.fontColor
                     })
@@ -1427,37 +1561,30 @@ module powerbi.extensibility.visual {
             this.applyDatePeriod(
                 Utils.getStartSelectionDate(timelineData),
                 Utils.getEndSelectionDate(timelineData),
-                timelineData.filterColumnTarget);
+                timelineData.filterColumnTarget,
+                true
+            );
         }
 
-        private applyFilter(datePeriod: TimelineDatePeriodBase): void {
-            const instance: VisualObjectInstance = {
+        private applyFilter(isUserSelection: boolean): void {
+            const instanceOfGeneral: VisualObjectInstance = {
                 objectName: "general",
                 selector: undefined,
                 properties: {
-                    datePeriod: datePeriod.toString()
+                    isUserSelection: isUserSelection
                 }
             };
 
             this.host.persistProperties({
                 merge: [
-                    instance
+                    instanceOfGeneral
                 ]
             });
+
         }
-        public applyDatePeriod(startDate: Date, endDate: Date, target: IFilterColumnTarget): void {
-            const datePeriod: TimelineDatePeriodBase =
-                startDate && endDate
-                    ? TimelineDatePeriodBase.create(startDate, endDate)
-                    : TimelineDatePeriodBase.createEmpty();
 
-            this.applyFilter(datePeriod);
-
-            let adaptedEndDate: any = null;
-            if (this.datePeriod && this.datePeriod.endDate) {
-                adaptedEndDate = new Date(this.datePeriod.endDate);
-                adaptedEndDate.setDate(adaptedEndDate.getDate() + 1);
-            }
+        public applyDatePeriod(startDate: Date, endDate: Date, target: IFilterColumnTarget, isUserSelection: boolean): void {
+            this.applyFilter(isUserSelection);
 
             // If startDate and EndDate is null then ClearSelection is triggered
             const filter: IAdvancedFilter = new window["powerbi-models"].AdvancedFilter(
@@ -1467,20 +1594,30 @@ module powerbi.extensibility.visual {
                     operator: "GreaterThanOrEqual",
                     value: startDate
                         ? startDate.toJSON()
-                        : this.datePeriod.startDate
+                        : null
                 },
                 {
                     operator: "LessThan",
                     value: endDate
                         ? endDate.toJSON()
-                        : adaptedEndDate
+                        : null
                 });
 
-            this.host.applyJsonFilter(filter, Timeline.filterObjectProperty.objectName, Timeline.filterObjectProperty.propertyName);
+            this.host.applyJsonFilter(
+                filter,
+                Timeline.filterObjectProperty.objectName,
+                Timeline.filterObjectProperty.propertyName,
+                (startDate && endDate)
+                    ? FilterAction.merge
+                    : FilterAction.remove
+            );
         }
 
         public clearSelection(target: IFilterColumnTarget): void {
-            this.applyDatePeriod(null, null, target);
+            this.prevFilteredStartDate = null;
+            this.prevFilteredEndDate = null;
+
+            this.applyDatePeriod(null, null, target, false);
         }
 
         /**

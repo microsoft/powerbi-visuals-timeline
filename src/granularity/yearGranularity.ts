@@ -29,6 +29,10 @@ module powerbi.extensibility.visual.granularity {
     import TimelineDatePeriod = datePeriod.TimelineDatePeriod;
 
     export class YearGranularity extends TimelineGranularityBase {
+        constructor(calendar: Calendar, locale: string, protected localizationManager: ILocalizationManager) {
+            super(calendar, locale);
+        }
+
         public getType(): GranularityType {
             return GranularityType.year;
         }
@@ -42,9 +46,10 @@ module powerbi.extensibility.visual.granularity {
         }
 
         public generateLabel(datePeriod: TimelineDatePeriod): TimelineLabel {
+            const localYear = this.localizationManager.getDisplayName("Visual_Granularity_Year");
             return {
-                title: `Year ${datePeriod.year}`,
-                text: datePeriod.year.toString(),
+                title: `${localYear} ${datePeriod.year}`,
+                text: datePeriod.year.toLocaleString(),
                 id: datePeriod.index
             };
         }

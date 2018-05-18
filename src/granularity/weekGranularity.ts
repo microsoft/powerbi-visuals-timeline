@@ -31,6 +31,10 @@ module powerbi.extensibility.visual.granularity {
     import Utils = utils.Utils;
 
     export class WeekGranularity extends TimelineGranularityBase {
+        constructor(calendar: Calendar, locale: string, protected localizationManager: ILocalizationManager) {
+            super(calendar, locale);
+        }
+
         public getType(): GranularityType {
             return GranularityType.week;
         }
@@ -39,13 +43,23 @@ module powerbi.extensibility.visual.granularity {
             return this.determineWeek(date);
         }
 
+        public splitDateForTitle(date: Date): (string | number)[] {
+            const weekData = this.determineWeek(date);
+
+            return [
+                `W${weekData[0]}`,
+                weekData[1]
+            ];
+        }
+
         public sameLabel(firstDatePeriod: TimelineDatePeriod, secondDatePeriod: TimelineDatePeriod): boolean {
             return Utils.arraysEqual(firstDatePeriod.week, secondDatePeriod.week);
         }
 
         public generateLabel(datePeriod: TimelineDatePeriod): TimelineLabel {
+            const localWeek = this.localizationManager.getDisplayName("Visual_Granularity_Week");
             return {
-                title: `Week ${datePeriod.week[0]} - ${datePeriod.week[1]}`,
+                title: `${localWeek} ${datePeriod.week[0]} - ${datePeriod.week[1]}`,
                 text: `W${datePeriod.week[0]}`,
                 id: datePeriod.index
             };

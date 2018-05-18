@@ -107,14 +107,14 @@ module powerbi.extensibility.visual.granularity {
             return this.granularities[index];
         }
 
-        public createGranularities(calendar: Calendar): void {
+        public createGranularities(calendar: Calendar, locale: string, localizationManager: ILocalizationManager): void {
             this.granularities = [];
 
-            this.addGranularity(new YearGranularity(calendar));
-            this.addGranularity(new QuarterGranularity(calendar));
-            this.addGranularity(new MonthGranularity(calendar));
-            this.addGranularity(new WeekGranularity(calendar));
-            this.addGranularity(new DayGranularity(calendar));
+            this.addGranularity(new YearGranularity(calendar, locale, localizationManager));
+            this.addGranularity(new QuarterGranularity(calendar, locale));
+            this.addGranularity(new MonthGranularity(calendar, locale));
+            this.addGranularity(new WeekGranularity(calendar, locale, localizationManager));
+            this.addGranularity(new DayGranularity(calendar, locale));
         }
 
         public createLabels(): void {
