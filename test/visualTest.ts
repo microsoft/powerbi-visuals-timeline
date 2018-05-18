@@ -762,8 +762,6 @@ module powerbi.extensibility.visual.test {
                         }
                     };
 
-                    spyOn(visualBuilder.visualObject, "selectPeriod");
-
                     visualBuilder.updateFlushAllD3Transitions(dataView);
 
                     let periods: any[] = visualBuilder.visualObject.timelineData.currentGranularity.getDatePeriods();
@@ -776,6 +774,105 @@ module powerbi.extensibility.visual.test {
             describe("Force selection", () => {
                 for (let granularity in GranularityType) {
                     if (isNaN(+granularity)) {
+                        it("disabled both -- possible to make user selection", () => {
+                            const currentDate: Date = new Date();
+                            const startDateRange: Date = new Date(currentDate.getFullYear() - 1, 0, 1);
+                            const endDateRange: Date = new Date(currentDate.getFullYear() + 1, 11, 31);
+                            const color: string = "#ABCDEF";
+                            const colorSel: string = "#AAAAAA";
+
+                            defaultDataViewBuilder.setDateRange(startDateRange, endDateRange);
+
+                            dataView = defaultDataViewBuilder.getDataView();
+                            dataView.metadata.objects = {
+                                cells: {
+                                    fillUnselected: getSolidColorStructuralObject(color),
+                                    fillSelected: getSolidColorStructuralObject(colorSel)
+                                },
+                                forceSelection: {
+                                    currentPeriod: false,
+                                    latestAvailableDate: false
+                                },
+                                granularity: {}
+                            };
+
+                            visualBuilder.updateFlushAllD3Transitions(dataView);
+
+                            const lastCell: JQuery = visualBuilder.cellRects.last();
+
+                            clickElement(lastCell);
+
+                            assertColorsMatch(
+                                lastCell.css("fill"),
+                                colorSel);
+                        });
+
+                        it("current enabled -- impossible to make user selection", () => {
+                            const currentDate: Date = new Date();
+                            const startDateRange: Date = new Date(currentDate.getFullYear() - 1, 0, 1);
+                            const endDateRange: Date = new Date(currentDate.getFullYear() + 1, 11, 31);
+                            const color: string = "#ABCDEF";
+                            const colorSel: string = "#AAAAAA";
+
+                            defaultDataViewBuilder.setDateRange(startDateRange, endDateRange);
+
+                            dataView = defaultDataViewBuilder.getDataView();
+                            dataView.metadata.objects = {
+                                cells: {
+                                    fillUnselected: getSolidColorStructuralObject(color),
+                                    fillSelected: getSolidColorStructuralObject(colorSel)
+                                },
+                                forceSelection: {
+                                    currentPeriod: true,
+                                    latestAvailableDate: false
+                                },
+                                granularity: {}
+                            };
+
+                            visualBuilder.updateFlushAllD3Transitions(dataView);
+
+                            const lastCell: JQuery = visualBuilder.cellRects.last();
+
+                            clickElement(lastCell);
+
+                            assertColorsMatch(
+                                lastCell.css("fill"),
+                                color);
+                        });
+
+                        it("latest enabled -- impossible to make user selection", () => {
+                            const currentDate: Date = new Date();
+                            const startDateRange: Date = new Date(currentDate.getFullYear() - 1, 0, 1);
+                            const endDateRange: Date = new Date(currentDate.getFullYear() + 1, 11, 31);
+                            const color: string = "#ABCDEF";
+                            const colorSel: string = "#AAAAAA";
+
+                            defaultDataViewBuilder.setDateRange(startDateRange, endDateRange);
+
+                            dataView = defaultDataViewBuilder.getDataView();
+                            dataView.metadata.objects = {
+                                cells: {
+                                    fillUnselected: getSolidColorStructuralObject(color),
+                                    fillSelected: getSolidColorStructuralObject(colorSel)
+                                },
+                                forceSelection: {
+                                    currentPeriod: false,
+                                    latestAvailableDate: true
+                                },
+                                granularity: {}
+                            };
+
+                            visualBuilder.updateFlushAllD3Transitions(dataView);
+
+                            const firstCell: JQuery = visualBuilder.cellRects.first();
+
+                            clickElement(firstCell);
+
+                            assertColorsMatch(
+                                firstCell.css("fill"),
+                                color);
+                        });
+
                         it(`current period for '${granularity}' granularity`, () => {
                             const currentDate: Date = new Date();
                             const startDateRange: Date = new Date(currentDate.getFullYear(), 0, 1);
