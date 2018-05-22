@@ -1,3 +1,6 @@
+## 1.8.0
+* Added localization for all supported languages
+
 ## 1.7.0
 * ADD: new option to enable auto scrolling focus for selected period
 * ADD: if force selection is activated user selection doesn't work
