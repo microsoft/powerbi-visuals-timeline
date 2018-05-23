@@ -246,6 +246,8 @@ module powerbi.extensibility.visual {
         private localizationManager: ILocalizationManager;
         private horizontalAutoScrollingPositionOffset: number = 200;
 
+        private scrollAutoFocusFunc: () => void;
+
         /**
          * Changes the current granularity depending on the given granularity type
          * Separates the new granularity's date periods which contain the start/end selection
@@ -1130,6 +1132,10 @@ module powerbi.extensibility.visual {
                 timelineData,
                 timelineProperties.cellHeight,
                 timelineProperties.cellsYPosition);
+
+            if (this.scrollAutoFocusFunc) {
+                this.scrollAutoFocusFunc();
+            }
         }
 
         private renderLabels(
@@ -1294,7 +1300,9 @@ module powerbi.extensibility.visual {
 
                 if (visSettings.scrollAutoAdjustment.show && isSelected && !singleCaseDone) {
                     const selectedGranulaPos: number = (cellSelection[0][index] as any).x.baseVal.value;
-                    (this.mainSvgWrapperSelection[0][0] as any).scrollTo(selectedGranulaPos - this.horizontalAutoScrollingPositionOffset, 0);
+                    this.scrollAutoFocusFunc = () => {
+                        (this.mainSvgWrapperSelection[0][0] as any).scrollLeft = selectedGranulaPos - this.horizontalAutoScrollingPositionOffset;
+                    };
                     singleCaseDone = true;
                 }
 
