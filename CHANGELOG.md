@@ -1,3 +1,6 @@
+## 1.8.1
+* FIX: auto scrolling focus for selected period didn't work in Edge and broke the layout
+
 ## 1.8.0
 * Added localization for all supported languages
 
