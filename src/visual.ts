@@ -246,7 +246,13 @@ module powerbi.extensibility.visual {
         private localizationManager: ILocalizationManager;
         private horizontalAutoScrollingPositionOffset: number = 200;
 
-        private scrollAutoFocusFunc: () => void;
+        private selectedGranulaPos: number = null;
+
+        private scrollAutoFocusFunc = (selectedGranulaPos: number) => {
+            if (selectedGranulaPos) {
+                (this.mainSvgWrapperSelection[0][0] as any).scrollLeft = selectedGranulaPos - this.horizontalAutoScrollingPositionOffset;
+            }
+        }
 
         /**
          * Changes the current granularity depending on the given granularity type
@@ -1133,9 +1139,7 @@ module powerbi.extensibility.visual {
                 timelineProperties.cellHeight,
                 timelineProperties.cellsYPosition);
 
-            if (this.scrollAutoFocusFunc) {
-                this.scrollAutoFocusFunc();
-            }
+            this.scrollAutoFocusFunc(this.selectedGranulaPos);
         }
 
         private renderLabels(
@@ -1300,9 +1304,7 @@ module powerbi.extensibility.visual {
 
                 if (visSettings.scrollAutoAdjustment.show && isSelected && !singleCaseDone) {
                     const selectedGranulaPos: number = (cellSelection[0][index] as any).x.baseVal.value;
-                    this.scrollAutoFocusFunc = () => {
-                        (this.mainSvgWrapperSelection[0][0] as any).scrollLeft = selectedGranulaPos - this.horizontalAutoScrollingPositionOffset;
-                    };
+                    this.selectedGranulaPos = selectedGranulaPos;
                     singleCaseDone = true;
                 }
 
