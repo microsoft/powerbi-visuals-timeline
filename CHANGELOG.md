@@ -1,3 +1,6 @@
+## 1.8.2
+* FIX: Year format was corrected
+
 ## 1.8.1
 * FIX: auto scrolling focus for selected period didn't work in Edge and broke the layout
 
