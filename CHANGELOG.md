@@ -1,3 +1,6 @@
+## 1.8.3
+* FIX: Year format correction was improved by using literals
+
 ## 1.8.2
 * FIX: Year format was corrected
 
