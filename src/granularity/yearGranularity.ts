@@ -49,7 +49,7 @@ module powerbi.extensibility.visual.granularity {
             const localYear = this.localizationManager.getDisplayName("Visual_Granularity_Year");
             return {
                 title: `${localYear} ${datePeriod.year}`,
-                text: datePeriod.year.toString(),
+                text: `${datePeriod.year}`,
                 id: datePeriod.index
             };
         }
