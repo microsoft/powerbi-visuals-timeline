@@ -27,6 +27,8 @@
 module powerbi.extensibility.visual.granularity {
     // datePeriod
     import TimelineDatePeriod = datePeriod.TimelineDatePeriod;
+    import Selection = d3.Selection;
+    import GranularitySettings = settings.GranularitySettings;
 
     export interface Granularity {
         getType?(): GranularityType;
@@ -42,5 +44,15 @@ module powerbi.extensibility.visual.granularity {
         setNewEndDate(date: Date): void;
         splitPeriod(index: number, newFraction: number, newDate: Date): void;
         splitDateForTitle(date: Date): (string | number)[];
+        render(
+            placeHolder: Selection<any>,
+            startYpoint: number,
+            sequenceNum: number,
+            elementWidth: number,
+            startXpoint: number,
+            granularSettings: GranularitySettings,
+            selectPeriodCallback: (granularityType: GranularityType) => void,
+            selectedType: GranularityType
+        ): boolean;
     }
 }

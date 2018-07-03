@@ -273,7 +273,7 @@ module powerbi.extensibility.visual.test {
 
                     visualBuilder.update(dataView);
 
-                    spyOn(visualBuilder.visualObject, "renderGranularitySlicerRect");
+                    spyOn(visualBuilder.visualObject, "changeGranularity");
                     spyOn(visualBuilder.visualObject, "selectPeriod");
 
                     renderTimeout(() => {
@@ -287,15 +287,7 @@ module powerbi.extensibility.visual.test {
 
                 it("mousedown - event", () => {
                     $(periodSlicerSelectionRectElements[0]).d3MouseDown(0, 0);
-
                     expectToCallSelectPeriod(GranularityType.year);
-                });
-
-                it("drag - event", () => {
-                    $(periodSlicerSelectionRectElements[0]).d3MouseDown(0, 0);
-                    $(periodSlicerSelectionRectElements[0]).d3MouseMove(70, 0);
-
-                    expectToCallSelectPeriod(GranularityType.quarter);
                 });
 
                 it("settings - event", () => {
@@ -306,13 +298,72 @@ module powerbi.extensibility.visual.test {
                     };
 
                     visualBuilder.update(dataView);
-
-                    expectToCallRenderGranularitySlicerRect(GranularityType.day);
+                    expectToCallChangeGranularity(GranularityType.day);
                 });
 
-                function expectToCallRenderGranularitySlicerRect(granularity: GranularityType): void {
-                    expect(visualBuilder.visualObject.renderGranularitySlicerRect)
-                        .toHaveBeenCalledWith(granularity);
+                it("mousedown - event - with disabled year", () => {
+                    dataView.metadata.objects = {
+                        granularity: {
+                            granularityYearVisibility: false
+                        }
+                    };
+
+                    visualBuilder.update(dataView);
+                    let periodSlicerSelectionRectElements = visualBuilder.element.find(".periodSlicerSelectionRect");
+                    $(periodSlicerSelectionRectElements[0]).d3MouseDown(0, 0);
+                    expect(periodSlicerSelectionRectElements.length).toEqual(4);
+                    expectToCallSelectPeriod(GranularityType.quarter);
+                });
+
+                it("mousedown - event - with disabled quarter", () => {
+                    dataView.metadata.objects = {
+                        granularity: {
+                            granularityQuarterVisibility: false
+                        }
+                    };
+
+                    visualBuilder.update(dataView);
+                    let periodSlicerSelectionRectElements = visualBuilder.element.find(".periodSlicerSelectionRect");
+                    $(periodSlicerSelectionRectElements[1]).d3MouseDown(0, 0);
+                    expect(periodSlicerSelectionRectElements.length).toEqual(4);
+                    expectToCallSelectPeriod(GranularityType.month);
+                });
+
+                it("mousedown - event - with disabled year, quarter and month", () => {
+                    dataView.metadata.objects = {
+                        granularity: {
+                            granularityYearVisibility: false,
+                            granularityQuarterVisibility: false,
+                            granularityMonthVisibility: false
+                        }
+                    };
+
+                    visualBuilder.update(dataView);
+                    let periodSlicerSelectionRectElements = visualBuilder.element.find(".periodSlicerSelectionRect");
+                    $(periodSlicerSelectionRectElements[1]).d3MouseDown(0, 0);
+                    expect(periodSlicerSelectionRectElements.length).toEqual(2);
+                    expectToCallSelectPeriod(GranularityType.day);
+                });
+
+                it("mousedown - impossible - all granularities are disabled", () => {
+                    dataView.metadata.objects = {
+                        granularity: {
+                            granularityYearVisibility: false,
+                            granularityQuarterVisibility: false,
+                            granularityMonthVisibility: false,
+                            granularityWeekVisibility: false,
+                            granularityDayVisibility: false
+                        }
+                    };
+
+                    visualBuilder.update(dataView);
+                    let periodSlicerSelectionRectElements = visualBuilder.element.find(".periodSlicerSelectionRect");
+                    expect(periodSlicerSelectionRectElements.length).toEqual(0);
+                });
+
+                function expectToCallChangeGranularity(granularity: GranularityType): void {
+                    expect(visualBuilder.visualObject.changeGranularity)
+                        .toHaveBeenCalledWith(granularity, jasmine.any(Date), jasmine.any(Date));
                 }
 
                 function expectToCallSelectPeriod(granularity: GranularityType): void {
@@ -663,7 +714,7 @@ module powerbi.extensibility.visual.test {
                     visualBuilder.updateFlushAllD3Transitions(dataView);
 
                     const strokeColor: string = visualBuilder.timelineSlicer
-                        .children("rect.periodSlicerRect")
+                        .find("rect.periodSlicerRect")
                         .css("stroke");
 
                     assertColorsMatch(strokeColor, color);

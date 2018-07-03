@@ -331,6 +331,41 @@
                             }
                         ]
                     }
+                },
+                "granularityYearVisibility": {
+                    "displayName": "Year visibility",
+                    "displayNameKey": "Visual_GranularityYearVisibility",
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "granularityQuarterVisibility": {
+                    "displayName": "Quarter visibility",
+                    "displayNameKey": "Visual_GranularityQuarterVisibility",
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "granularityMonthVisibility": {
+                    "displayName": "Month visibility",
+                    "displayNameKey": "Visual_GranularityMonthVisibility",
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "granularityWeekVisibility": {
+                    "displayName": "Week visibility",
+                    "displayNameKey": "Visual_GranularityWeekVisibility",
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "granularityDayVisibility": {
+                    "displayName": "Day visibility",
+                    "displayNameKey": "Visual_GranularityDayVisibility",
+                    "type": {
+                        "bool": true
+                    }
                 }
             }
         },

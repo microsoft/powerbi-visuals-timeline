@@ -265,6 +265,38 @@ module powerbi.extensibility.visual.utils {
             return GranularityNames[index].granularityType;
         }
 
+        public static getGranularityPropsByMarker(marker: string): GranularityName {
+            const index: number = Utils.findIndex(GranularityNames, (granularity: GranularityName) => {
+                return granularity.marker === marker;
+            });
+
+            return GranularityNames[index];
+        }
+
+        /**
+         * Returns the granularity type of the given granularity name
+         * @param granularityName The name of the granularity
+         */
+        public static getGranularityTypeByMarker(granularityMarker: string): GranularityType {
+            const index: number = Utils.findIndex(GranularityNames, (granularity: GranularityName) => {
+                return granularity.marker === granularityMarker;
+            });
+
+            return GranularityNames[index].granularityType;
+        }
+
+        /**
+         * Returns the marker of granularity by its type
+         * @param granularityType The type of granularity
+         */
+        public static getGranularityMarkerByType(granularityType: GranularityType): string {
+            const index: number = Utils.findIndex(GranularityNames, (granularity: GranularityName) => {
+                return granularity.granularityType === granularityType;
+            });
+
+            return GranularityNames[index].marker;
+        }
+
         /**
          * Returns the name of the granularity type
          * @param granularity The type of granularity
