@@ -665,23 +665,19 @@ module powerbi.extensibility.visual {
                 this.updateCalendar(this.settings);
             }
 
+            const startXpoint: number = this.timelineProperties.startXpoint,
+                elementWidth: number = this.timelineProperties.elementWidth;
+
             d3.selectAll("g." + Timeline.TimelineSelectors.TimelineSlicer.className).remove();
             this.selectorSelection = this.headerSelection
                     .append("g")
                     .classed(Timeline.TimelineSelectors.TimelineSlicer.className, true);
 
-            const startXpoint: number = this.timelineProperties.startXpoint,
-                startYpoint: number = this.timelineProperties.startYpoint,
-                elementWidth: number = this.timelineProperties.elementWidth;
-
-            this.timelineGranularityData.renderGranularities(
-                this.selectorSelection,
-                startYpoint,
-                elementWidth,
-                startXpoint,
-                this.settings.granularity,
-                (granularityType: GranularityType) => { this.selectPeriod(granularityType); },
-                this.settings.granularity.granularity);
+            this.timelineGranularityData.renderGranularities({
+                selection: this.selectorSelection,
+                granularSettings: this.settings.granularity,
+                selectPeriodCallback: (granularityType: GranularityType) => { this.selectPeriod(granularityType); }
+            });
 
             // create selected period text
             this.selectorSelection
@@ -691,7 +687,7 @@ module powerbi.extensibility.visual {
                 .text(this.localizationManager.getDisplayName(Utils.getGranularityNameKey(granularity)))
                 .attr({
                     x: convertToPx(startXpoint + Timeline.SelectedTextSelectionFactor * elementWidth),
-                    y: convertToPx(startYpoint + Timeline.SelectedTextSelectionYOffset),
+                    y: convertToPx(Timeline.SelectedTextSelectionYOffset),
                 });
 
             this.render(
@@ -927,7 +923,7 @@ module powerbi.extensibility.visual {
 
             let fixedTranslateString: string = translate(
                 timelineProperties.leftMargin,
-                timelineProperties.topMargin);
+                timelineProperties.topMargin + this.timelineProperties.startYpoint);
 
             let translateString: string = translate(
                 timelineProperties.cellHeight / Timeline.CellHeightDivider,

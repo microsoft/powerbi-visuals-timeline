@@ -27,6 +27,7 @@
     "src/granularity/dayGranularity.ts",
     "src/granularity/granularityData.ts",
     "src/granularity/granularityName.ts",
+    "src/granularity/granularityRenderProps.ts",
     "src/granularity/monthGranularity.ts",
     "src/granularity/quarterGranularity.ts",
     "src/granularity/weekGranularity.ts",

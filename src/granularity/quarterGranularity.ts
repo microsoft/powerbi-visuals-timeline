@@ -30,7 +30,6 @@ module powerbi.extensibility.visual.granularity {
     // utils
     import Utils = utils.Utils;
     import Selection = d3.Selection;
-    import GranularitySettings = settings.GranularitySettings;
 
     export class QuarterGranularity extends TimelineGranularityBase {
         private static DefaultQuarter: number = 3;
@@ -39,30 +38,12 @@ module powerbi.extensibility.visual.granularity {
             super(calendar, locale, Utils.getGranularityPropsByMarker("Q"));
         }
 
-        public render(
-            placeHolder: Selection<any>,
-            startYpoint: number,
-            sequenceNum: number,
-            elementWidth: number,
-            startXpoint: number,
-            granularSettings: GranularitySettings,
-            selectPeriodCallback: (granularityType: GranularityType) => void,
-            selectedType: GranularityType
-        ): boolean {
-
-            if (!granularSettings.granularityQuarterVisibility) {
-                return false;
+        public render(props: GranularityRenderProps, isFirst: boolean): Selection<any> {
+            if (!props.granularSettings.granularityQuarterVisibility) {
+                return null;
             }
 
-            return super.render(
-                placeHolder,
-                startYpoint,
-                sequenceNum,
-                elementWidth,
-                startXpoint,
-                granularSettings,
-                selectPeriodCallback,
-                selectedType);
+            return super.render(props, isFirst);
         }
 
         /**

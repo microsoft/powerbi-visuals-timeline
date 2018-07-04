@@ -47,20 +47,27 @@ module powerbi.extensibility.visual.granularity {
         private static EmptyYearOffset: number = 0;
         private static YearOffset: number = 1;
 
-        private static DefaultVertLineSelectionWidth: number = 2;
-        private static DefaultVertLineSelectionHeight: number = 3;
-        private static DefaultHorizLineSelectionHeight: number = 1;
-        private static HorizLineSelectionYOffset: number = 2;
-        private static TextLabelsSelectionOffset: number = 3;
-        private static TextLabelsSelectionDx: string = "0.5em";
-        private static SelectorPeriodsFactor: number = 2;
-        private static DefaultSelectorPeriodsY: number = 3;
-        private static DefaultSelectorPeriodsHeight: number = 23;
-        private static PeriodSlicerRectSelectionYOffset: number = 16;
-        private static DefaultPeriodSlicerRectSelectionRx: number = 4;
-        private static DefaultPeriodSlicerRectSelectionWidth: number = 15;
-        private static DefaultPeriodSlicerRectSelectionHeight: number = 23;
-        private static PeriodSlicerRectSelectionXOffset: number = 6;
+        private clickableRectHeight: number = 23;
+        private clickableRectFactor: number = 2;
+        private clickableRectWidth: number = 30;
+
+        private hLineYOffset: number = 2;
+        private hLineHeight: number = 1;
+        private hLineWidth: number = 30;
+        private hLineXOffset: number = 30;
+
+        private sliderXOffset: number = 6;
+        private sliderYOffset: number = 16;
+        private sliderRx: number = 4;
+        private sliderWidth: number = 15;
+        private sliderHeight: number = 23;
+
+        private vLineWidth: number = 2;
+        private vLineHeight: number = 3;
+
+        private textLabelXOffset: number = 3;
+        private textLabelYOffset: number = 3;
+        private textLabelDx: string = "0.5em";
 
         protected calendar: Calendar;
 
@@ -75,38 +82,29 @@ module powerbi.extensibility.visual.granularity {
             this.granularityProps = granularityProps;
         }
 
-        public render(
-            placeHolder: Selection<any>,
-            startYpoint: number,
-            sequenceNum: number,
-            elementWidth: number,
-            startXpoint: number,
-            granularSettings: GranularitySettings,
-            selectPeriodCallback: (granularityType: GranularityType) => void,
-            selectedType: GranularityType
-        ): boolean {
-            let granularitySelection = placeHolder.append("g")
-                .attr("transform", translate(startXpoint + sequenceNum * elementWidth, 0));
+        public render(props: GranularityRenderProps, isFirst: boolean): Selection<any> {
+            let granularitySelection = props.selection.append("g")
+                .attr("transform", translate(0, 0));
 
             // render vetical line
             granularitySelection.append("rect")
                 .classed("timelineVertLine", true)
                 .attr({
                     x: 0,
-                    y: convertToPx(startYpoint),
-                    width: convertToPx(TimelineGranularityBase.DefaultVertLineSelectionWidth),
-                    height: convertToPx(TimelineGranularityBase.DefaultVertLineSelectionHeight)
+                    y: 0,
+                    width: convertToPx(this.vLineWidth),
+                    height: convertToPx(this.vLineHeight)
                 });
 
             // render horizontal line
-            if (sequenceNum > 0) {
+            if (!isFirst) {
                 granularitySelection.append("rect")
                     .classed("timelineHorzLine", true)
                     .attr({
-                        x: convertToPx(0 - elementWidth),
-                        y: convertToPx(startYpoint + TimelineGranularityBase.HorizLineSelectionYOffset),
-                        height: convertToPx(TimelineGranularityBase.DefaultHorizLineSelectionHeight),
-                        width: convertToPx(elementWidth)
+                        x: convertToPx(0 - this.hLineXOffset),
+                        y: convertToPx(this.hLineYOffset),
+                        height: convertToPx(this.hLineHeight),
+                        width: convertToPx(this.hLineWidth)
                     });
             }
 
@@ -115,23 +113,21 @@ module powerbi.extensibility.visual.granularity {
                 .classed("periodSlicerGranularities", true)
                 .text(this.granularityProps.marker)
                 .attr({
-                    x: convertToPx(0 - TimelineGranularityBase.TextLabelsSelectionOffset),
-                    y: convertToPx(startYpoint - TimelineGranularityBase.TextLabelsSelectionOffset),
-                    dx: TimelineGranularityBase.TextLabelsSelectionDx
+                    x: convertToPx(0 - this.textLabelXOffset),
+                    y: convertToPx(0 - this.textLabelYOffset),
+                    dx: this.textLabelDx
                 });
 
             // render slider
-            if (selectedType === this.granularityProps.granularityType) {
+            if (props.granularSettings.granularity === this.granularityProps.granularityType) {
                 this.renderSlider(
                     granularitySelection,
-                    granularSettings.sliderColor,
-                    selectedType,
-                    startYpoint
+                    props.granularSettings
                 );
             }
 
             const granularityTypeClickHandler = (d: any, index: number) => {
-                selectPeriodCallback(this.granularityProps.granularityType);
+                props.selectPeriodCallback(this.granularityProps.granularityType);
 
                 let sliderSelection = d3.selectAll("rect.periodSlicerRect");
                 if (sliderSelection) {
@@ -140,9 +136,7 @@ module powerbi.extensibility.visual.granularity {
 
                 this.renderSlider(
                     granularitySelection,
-                    granularSettings.sliderColor,
-                    selectedType,
-                    startYpoint
+                    props.granularSettings
                 );
             };
 
@@ -151,36 +145,34 @@ module powerbi.extensibility.visual.granularity {
                 .append("rect")
                 .classed("periodSlicerSelectionRect", true)
                 .attr({
-                    x: convertToPx(0 - elementWidth / TimelineGranularityBase.SelectorPeriodsFactor),
-                    y: convertToPx(TimelineGranularityBase.DefaultSelectorPeriodsY),
-                    width: convertToPx(elementWidth),
-                    height: convertToPx(TimelineGranularityBase.DefaultSelectorPeriodsHeight)
+                    x: convertToPx(0 - this.clickableRectWidth / this.clickableRectFactor),
+                    y: convertToPx(0 - this.clickableRectWidth / this.clickableRectFactor),
+                    width: convertToPx(this.clickableRectWidth),
+                    height: convertToPx(this.clickableRectHeight)
                 })
                 .on("mousedown", granularityTypeClickHandler)
                 .on("touchstart", granularityTypeClickHandler);
 
-            granularitySelection.attr("fill", granularSettings.scaleColor);
+            granularitySelection.attr("fill", props.granularSettings.scaleColor);
 
-            return true;
+            return granularitySelection;
         }
 
         private renderSlider(
-            placeHolder: Selection<any>,
-            sliderColor: string,
-            selectedType: GranularityType,
-            startYpoint: number
+            selection: Selection<any>,
+            granularSettings: GranularitySettings
         ): void {
-            placeHolder
+            selection
                 .append("rect")
                 .classed("periodSlicerRect", true)
-                .style("stroke", sliderColor)
+                .style("stroke", granularSettings.sliderColor)
                 .attr({
-                    x: convertToPx(0 - TimelineGranularityBase.PeriodSlicerRectSelectionXOffset),
-                    y: convertToPx(startYpoint - TimelineGranularityBase.PeriodSlicerRectSelectionYOffset),
-                    rx: convertToPx(TimelineGranularityBase.DefaultPeriodSlicerRectSelectionRx),
-                    width: convertToPx(TimelineGranularityBase.DefaultPeriodSlicerRectSelectionWidth),
-                    height: convertToPx(TimelineGranularityBase.DefaultPeriodSlicerRectSelectionHeight)
-                }).data([selectedType]);
+                    x: convertToPx(0 - this.sliderXOffset),
+                    y: convertToPx(0 - this.sliderYOffset),
+                    rx: convertToPx(this.sliderRx),
+                    width: convertToPx(this.sliderWidth),
+                    height: convertToPx(this.sliderHeight)
+                }).data([granularSettings.granularity]);
         }
 
         public splitDate(date: Date): (string | number)[] {
