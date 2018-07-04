@@ -47,5 +47,10 @@
 	"Visual_ForceSelection": "Force selection",
 	"Visual_CurrentPeriod": "Current period",
 	"Visual_LatestAvailableDate": "Latest available period",
-	"Visual_ScrollAutoAdjustment": "Scroll position auto adjustment"
+	"Visual_ScrollAutoAdjustment": "Scroll position auto adjustment",
+	"Visual_GranularityYearVisibility": "Year visibility",
+	"Visual_GranularityQuarterVisibility": "Quarter visibility",
+	"Visual_GranularityMonthVisibility": "Month visibility",
+	"Visual_GranularityWeekVisibility": "Week visibility",
+	"Visual_GranularityDayVisibility": "Day visibility"
 }

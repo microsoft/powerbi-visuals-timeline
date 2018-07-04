@@ -29,24 +29,158 @@ module powerbi.extensibility.visual.granularity {
     import TimelineDatePeriod = datePeriod.TimelineDatePeriod;
     import valueFormatter = powerbi.extensibility.utils.formatting.valueFormatter;
 
+    // powerbi.extensibility.utils.svg
+    import translate = powerbi.extensibility.utils.svg.translate;
+
+    // powerbi.extensibility.utils.type
+    import convertToPx = powerbi.extensibility.utils.type.PixelConverter.toString;
+
     // utils
     import Utils = utils.Utils;
 
+    import Selection = d3.Selection;
+
+    import GranularitySettings = settings.GranularitySettings;
+
     export class TimelineGranularityBase implements Granularity {
-        private static MonthNameSeparator: string = " ";
         private static DefaultFraction: number = 1;
         private static EmptyYearOffset: number = 0;
         private static YearOffset: number = 1;
+
+        private static DefaultVertLineSelectionWidth: number = 2;
+        private static DefaultVertLineSelectionHeight: number = 3;
+        private static DefaultHorizLineSelectionHeight: number = 1;
+        private static HorizLineSelectionYOffset: number = 2;
+        private static TextLabelsSelectionOffset: number = 3;
+        private static TextLabelsSelectionDx: string = "0.5em";
+        private static SelectorPeriodsFactor: number = 2;
+        private static DefaultSelectorPeriodsY: number = 3;
+        private static DefaultSelectorPeriodsHeight: number = 23;
+        private static PeriodSlicerRectSelectionYOffset: number = 16;
+        private static DefaultPeriodSlicerRectSelectionRx: number = 4;
+        private static DefaultPeriodSlicerRectSelectionWidth: number = 15;
+        private static DefaultPeriodSlicerRectSelectionHeight: number = 23;
+        private static PeriodSlicerRectSelectionXOffset: number = 6;
 
         protected calendar: Calendar;
 
         private datePeriods: TimelineDatePeriod[] = [];
         private extendedLabel: ExtendedLabel;
         private shortMonthFormatter: powerbi.extensibility.utils.formatting.IValueFormatter;
+        private granularityProps: GranularityName = null;
 
-        constructor(calendar: Calendar, private locale: string) {
+        constructor(calendar: Calendar, private locale: string, granularityProps: GranularityName) {
             this.calendar = calendar;
-            this.shortMonthFormatter = valueFormatter.create({ format: "MMM", cultureSelector: this.locale});
+            this.shortMonthFormatter = valueFormatter.create({ format: "MMM", cultureSelector: this.locale });
+            this.granularityProps = granularityProps;
+        }
+
+        public render(
+            placeHolder: Selection<any>,
+            startYpoint: number,
+            sequenceNum: number,
+            elementWidth: number,
+            startXpoint: number,
+            granularSettings: GranularitySettings,
+            selectPeriodCallback: (granularityType: GranularityType) => void,
+            selectedType: GranularityType
+        ): boolean {
+            let granularitySelection = placeHolder.append("g")
+                .attr("transform", translate(startXpoint + sequenceNum * elementWidth, 0));
+
+            // render vetical line
+            granularitySelection.append("rect")
+                .classed("timelineVertLine", true)
+                .attr({
+                    x: 0,
+                    y: convertToPx(startYpoint),
+                    width: convertToPx(TimelineGranularityBase.DefaultVertLineSelectionWidth),
+                    height: convertToPx(TimelineGranularityBase.DefaultVertLineSelectionHeight)
+                });
+
+            // render horizontal line
+            if (sequenceNum > 0) {
+                granularitySelection.append("rect")
+                    .classed("timelineHorzLine", true)
+                    .attr({
+                        x: convertToPx(0 - elementWidth),
+                        y: convertToPx(startYpoint + TimelineGranularityBase.HorizLineSelectionYOffset),
+                        height: convertToPx(TimelineGranularityBase.DefaultHorizLineSelectionHeight),
+                        width: convertToPx(elementWidth)
+                    });
+            }
+
+            // render marker
+            granularitySelection.append("text")
+                .classed("periodSlicerGranularities", true)
+                .text(this.granularityProps.marker)
+                .attr({
+                    x: convertToPx(0 - TimelineGranularityBase.TextLabelsSelectionOffset),
+                    y: convertToPx(startYpoint - TimelineGranularityBase.TextLabelsSelectionOffset),
+                    dx: TimelineGranularityBase.TextLabelsSelectionDx
+                });
+
+            // render slider
+            if (selectedType === this.granularityProps.granularityType) {
+                this.renderSlider(
+                    granularitySelection,
+                    granularSettings.sliderColor,
+                    selectedType,
+                    startYpoint
+                );
+            }
+
+            const granularityTypeClickHandler = (d: any, index: number) => {
+                selectPeriodCallback(this.granularityProps.granularityType);
+
+                let sliderSelection = d3.selectAll("rect.periodSlicerRect");
+                if (sliderSelection) {
+                    sliderSelection.remove();
+                }
+
+                this.renderSlider(
+                    granularitySelection,
+                    granularSettings.sliderColor,
+                    selectedType,
+                    startYpoint
+                );
+            };
+
+            // render selection rects
+            granularitySelection
+                .append("rect")
+                .classed("periodSlicerSelectionRect", true)
+                .attr({
+                    x: convertToPx(0 - elementWidth / TimelineGranularityBase.SelectorPeriodsFactor),
+                    y: convertToPx(TimelineGranularityBase.DefaultSelectorPeriodsY),
+                    width: convertToPx(elementWidth),
+                    height: convertToPx(TimelineGranularityBase.DefaultSelectorPeriodsHeight)
+                })
+                .on("mousedown", granularityTypeClickHandler)
+                .on("touchstart", granularityTypeClickHandler);
+
+            granularitySelection.attr("fill", granularSettings.scaleColor);
+
+            return true;
+        }
+
+        private renderSlider(
+            placeHolder: Selection<any>,
+            sliderColor: string,
+            selectedType: GranularityType,
+            startYpoint: number
+        ): void {
+            placeHolder
+                .append("rect")
+                .classed("periodSlicerRect", true)
+                .style("stroke", sliderColor)
+                .attr({
+                    x: convertToPx(0 - TimelineGranularityBase.PeriodSlicerRectSelectionXOffset),
+                    y: convertToPx(startYpoint - TimelineGranularityBase.PeriodSlicerRectSelectionYOffset),
+                    rx: convertToPx(TimelineGranularityBase.DefaultPeriodSlicerRectSelectionRx),
+                    width: convertToPx(TimelineGranularityBase.DefaultPeriodSlicerRectSelectionWidth),
+                    height: convertToPx(TimelineGranularityBase.DefaultPeriodSlicerRectSelectionHeight)
+                }).data([selectedType]);
         }
 
         public splitDate(date: Date): (string | number)[] {

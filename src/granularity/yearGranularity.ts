@@ -27,14 +27,44 @@
 module powerbi.extensibility.visual.granularity {
     // datePeriod
     import TimelineDatePeriod = datePeriod.TimelineDatePeriod;
+    // utils
+    import Utils = utils.Utils;
+    import Selection = d3.Selection;
+    import GranularitySettings = settings.GranularitySettings;
 
     export class YearGranularity extends TimelineGranularityBase {
         constructor(calendar: Calendar, locale: string, protected localizationManager: ILocalizationManager) {
-            super(calendar, locale);
+            super(calendar, locale, Utils.getGranularityPropsByMarker("Y"));
         }
 
         public getType(): GranularityType {
             return GranularityType.year;
+        }
+
+        public render(
+            placeHolder: Selection<any>,
+            startYpoint: number,
+            sequenceNum: number,
+            elementWidth: number,
+            startXpoint: number,
+            granularSettings: GranularitySettings,
+            selectPeriodCallback: (granularityType: GranularityType) => void,
+            selectedType: GranularityType
+        ): boolean {
+
+            if (!granularSettings.granularityYearVisibility) {
+                return false;
+            }
+
+            return super.render(
+                placeHolder,
+                startYpoint,
+                sequenceNum,
+                elementWidth,
+                startXpoint,
+                granularSettings,
+                selectPeriodCallback,
+                selectedType);
         }
 
         public splitDate(date: Date): (string | number)[] {

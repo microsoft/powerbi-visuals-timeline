@@ -74,6 +74,11 @@ module powerbi.extensibility.visual.settings {
         public scaleColor: string = "#000000";
         public sliderColor: string = "#AAAAAA";
         public granularity: GranularityType = GranularityType.month;
+        public granularityYearVisibility: boolean = true;
+        public granularityQuarterVisibility: boolean = true;
+        public granularityMonthVisibility: boolean = true;
+        public granularityWeekVisibility: boolean = true;
+        public granularityDayVisibility: boolean = true;
     }
 
     export class ScaleSizeAdjustment {

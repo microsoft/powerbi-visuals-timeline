@@ -27,9 +27,43 @@
 module powerbi.extensibility.visual.granularity {
     // datePeriod
     import TimelineDatePeriod = datePeriod.TimelineDatePeriod;
+    // utils
+    import Utils = utils.Utils;
+    import Selection = d3.Selection;
+    import GranularitySettings = settings.GranularitySettings;
 
     export class QuarterGranularity extends TimelineGranularityBase {
         private static DefaultQuarter: number = 3;
+
+        constructor(calendar: Calendar, locale: string) {
+            super(calendar, locale, Utils.getGranularityPropsByMarker("Q"));
+        }
+
+        public render(
+            placeHolder: Selection<any>,
+            startYpoint: number,
+            sequenceNum: number,
+            elementWidth: number,
+            startXpoint: number,
+            granularSettings: GranularitySettings,
+            selectPeriodCallback: (granularityType: GranularityType) => void,
+            selectedType: GranularityType
+        ): boolean {
+
+            if (!granularSettings.granularityQuarterVisibility) {
+                return false;
+            }
+
+            return super.render(
+                placeHolder,
+                startYpoint,
+                sequenceNum,
+                elementWidth,
+                startXpoint,
+                granularSettings,
+                selectPeriodCallback,
+                selectedType);
+        }
 
         /**
          * Returns the date's quarter name (e.g. Q1, Q2, Q3, Q4)

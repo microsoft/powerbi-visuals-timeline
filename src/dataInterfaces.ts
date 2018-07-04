@@ -73,7 +73,6 @@ module powerbi.extensibility.visual {
         SelectionCursor: ClassAndSelector;
         Cell: ClassAndSelector;
         CellRect: ClassAndSelector;
-        VertLine: ClassAndSelector;
         TimelineSlicer: ClassAndSelector;
         PeriodSlicerGranularities: ClassAndSelector;
         PeriodSlicerSelection: ClassAndSelector;

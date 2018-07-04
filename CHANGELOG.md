@@ -1,3 +1,6 @@
+## 1.9.0
+* ADD: possibility to disable certain granularities for user access (granularity section on format panel)
+
 ## 1.8.3
 * FIX: Year format correction was improved by using literals
 

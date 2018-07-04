@@ -265,6 +265,14 @@ module powerbi.extensibility.visual.utils {
             return GranularityNames[index].granularityType;
         }
 
+        public static getGranularityPropsByMarker(marker: string): GranularityName {
+            const index: number = Utils.findIndex(GranularityNames, (granularity: GranularityName) => {
+                return granularity.marker === marker;
+            });
+
+            return GranularityNames[index];
+        }
+
         /**
          * Returns the name of the granularity type
          * @param granularity The type of granularity

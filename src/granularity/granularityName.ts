@@ -29,5 +29,6 @@ module powerbi.extensibility.visual.granularity {
         granularityType: GranularityType;
         name: string;
         nameKey: string;
+        marker: string;
     }
 }

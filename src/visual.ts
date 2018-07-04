@@ -90,26 +90,8 @@ module powerbi.extensibility.visual {
         private static CellsYPositionFactor: number = 3;
         private static CellsYPositionOffset: number = 65;
 
-        private static HorizLineSelectionYOffset: number = 2;
-        private static DefaultHorizLineSelectionHeight: number = 1;
-
-        private static DefaultVertLineSelectionWidth: number = 2;
-        private static DefaultVertLineSelectionHeight: number = 3;
-
-        private static TextLabelsSelectionOffset: number = 3;
-
         private static SelectedTextSelectionFactor: number = 2;
         private static SelectedTextSelectionYOffset: number = 17;
-
-        private static SelectorPeriodsFactor: number = 2;
-        private static DefaultSelectorPeriodsY: number = 3;
-        private static DefaultSelectorPeriodsHeight: number = 23;
-
-        private static PeriodSlicerRectSelectionXOffset: number = 6;
-        private static PeriodSlicerRectSelectionYOffset: number = 16;
-        private static DefaultPeriodSlicerRectSelectionRx: number = 4;
-        private static DefaultPeriodSlicerRectSelectionWidth: number = 15;
-        private static DefaultPeriodSlicerRectSelectionHeight: number = 23;
 
         private static LabelSizeFactor: number = 1.5;
         private static TimelinePropertiesHeightOffset: number = 20;
@@ -129,8 +111,6 @@ module powerbi.extensibility.visual {
         private static DefaultYDiff: number = 1.5;
 
         private static DefaultOverflow: string = "auto";
-
-        private static TextLabelsSelectionDx: string = "0.5em";
 
         private static CellWidthLastFactor: number = 0.9;
         private static CellWidthNotLastFactor: number = 3;
@@ -181,7 +161,6 @@ module powerbi.extensibility.visual {
             SelectionCursor: createClassAndSelector("selectionCursor"),
             Cell: createClassAndSelector("cell"),
             CellRect: createClassAndSelector("cellRect"),
-            VertLine: createClassAndSelector("timelineVertLine"),
             TimelineSlicer: createClassAndSelector("timelineSlicer"),
             PeriodSlicerGranularities: createClassAndSelector("periodSlicerGranularities"),
             PeriodSlicerSelection: createClassAndSelector("periodSlicerSelection"),
@@ -215,14 +194,7 @@ module powerbi.extensibility.visual {
         private cellsSelection: Selection<any>;
         private cursorGroupSelection: Selection<any>;
         private selectorSelection: Selection<any>;
-        private periodSlicerRectSelection: Selection<any>;
-        private selectedTextSelection: Selection<any>;
-        private vertLineSelection: Selection<any>;
-        private horizLineSelection: Selection<any>;
-        private textLabelsSelection: Selection<any>;
         private clearCatcherSelection: Selection<any>;
-
-        private granularitySelectors: string[] = ["Y", "Q", "M", "W", "D"];
 
         private selectionManager: ISelectionManager;
 
@@ -367,168 +339,19 @@ module powerbi.extensibility.visual {
             }
         }
 
-        private drawGranular(timelineProperties: TimelineProperties, granularityType: GranularityType): void {
-            const startXpoint: number = timelineProperties.startXpoint,
-                startYpoint: number = timelineProperties.startYpoint,
-                elementWidth: number = timelineProperties.elementWidth,
-                selectorPeriods: string[] = this.granularitySelectors;
-
-            this.selectorSelection = this.headerSelection
-                .append("g")
-                .classed(Timeline.TimelineSelectors.TimelineSlicer.className, true);
-
-            const dragPeriodRect: Drag<any> = d3.behavior.drag()
-                .on("drag", () => {
-                    this.selectPeriod(this.getGranularityIndexByPosition((d3.event as MouseEvent).x));
-                });
-
-            this.selectorSelection.call(dragPeriodRect);
-
-            // create horiz. line
-            this.horizLineSelection = this.selectorSelection.append("rect");
-
-            this.horizLineSelection.attr({
-                x: convertToPx(startXpoint),
-                y: convertToPx(startYpoint + Timeline.HorizLineSelectionYOffset),
-                height: convertToPx(Timeline.DefaultHorizLineSelectionHeight),
-                width: convertToPx((selectorPeriods.length - 1) * elementWidth)
-            });
-
-            // create vert. lines
-            this.vertLineSelection = this.selectorSelection
-                .selectAll("vertLines")
-                .data(selectorPeriods)
-                .enter()
-                .append("rect");
-
-            this.vertLineSelection
-                .classed(Timeline.TimelineSelectors.VertLine.className, true)
-                .attr({
-                    x: (d, index) => convertToPx(startXpoint + index * elementWidth),
-                    y: convertToPx(startYpoint),
-                    width: convertToPx(Timeline.DefaultVertLineSelectionWidth),
-                    height: convertToPx(Timeline.DefaultVertLineSelectionHeight)
-                });
-
-            // create text lables
-            let text = this.selectorSelection
-                .selectAll(Timeline.TimelineSelectors.PeriodSlicerGranularities.selectorName)
-                .data(selectorPeriods)
-                .enter()
-                .append("text")
-                .classed(Timeline.TimelineSelectors.PeriodSlicerGranularities.className, true);
-
-            this.textLabelsSelection = text
-                .text((value: string) => value)
-                .attr({
-                    x: (d, index: number) => convertToPx(startXpoint
-                        - Timeline.TextLabelsSelectionOffset + index * elementWidth),
-                    y: convertToPx(startYpoint - Timeline.TextLabelsSelectionOffset),
-                    dx: Timeline.TextLabelsSelectionDx
-                });
-
-            // create selected period text
-            this.selectedTextSelection = this.selectorSelection
-                .append("text")
-                .classed(Timeline.TimelineSelectors.PeriodSlicerSelection.className, true);
-
-            const selectedText = this.localizationManager.getDisplayName(Utils.getGranularityNameKey(granularityType));
-            this.selectedTextSelection
-                .text(selectedText)
-                .attr({
-                    x: convertToPx(startXpoint + Timeline.SelectedTextSelectionFactor * elementWidth),
-                    y: convertToPx(startYpoint + Timeline.SelectedTextSelectionYOffset),
-                });
-
-            const selRects: Selection<string> = this.selectorSelection
-                .selectAll(Timeline.TimelineSelectors.PeriodSlicerSelectionRect.selectorName)
-                .data(selectorPeriods)
-                .enter()
-                .append("rect")
-                .classed(Timeline.TimelineSelectors.PeriodSlicerSelectionRect.className, true);
-
-            const granularityTypeClickHandler = (d: any, index: number) => {
-                this.selectPeriod(index);
-            };
-
-            selRects
-                .attr({
-                    x: (d, index: number) => convertToPx(startXpoint
-                        - elementWidth / Timeline.SelectorPeriodsFactor
-                        + index * elementWidth),
-                    y: convertToPx(Timeline.DefaultSelectorPeriodsY),
-                    width: convertToPx(elementWidth),
-                    height: convertToPx(Timeline.DefaultSelectorPeriodsHeight)
-                })
-                .on("mousedown", granularityTypeClickHandler)
-                .on("touchstart", granularityTypeClickHandler);
-
-            this.periodSlicerRectSelection = this.selectorSelection
-                .append("rect")
-                .classed(Timeline.TimelineSelectors.PeriodSlicerRect.className, true)
-                .attr({
-                    y: convertToPx(startYpoint - Timeline.PeriodSlicerRectSelectionYOffset),
-                    rx: convertToPx(Timeline.DefaultPeriodSlicerRectSelectionRx),
-                    width: convertToPx(Timeline.DefaultPeriodSlicerRectSelectionWidth),
-                    height: convertToPx(Timeline.DefaultPeriodSlicerRectSelectionHeight)
-                });
-
-            this.renderGranularitySlicerRect(granularityType);
-        }
-
-        public getGranularityIndexByPosition(position: number): number {
-            let selectorIndexes: number[],
-                scale: ElementScale = getScale(this.rootSelection.node() as HTMLElement),
-                scaledPosition: number = position / scale.x; // It takes account of scaling when we use "Fit to page" or "Fit to width".
-
-            selectorIndexes = this.granularitySelectors.map((selector: string, index: number) => {
-                return index;
-            });
-
-            return Utils.getIndexByPosition(
-                selectorIndexes,
-                this.timelineProperties.elementWidth,
-                scaledPosition,
-                this.timelineProperties.startXpoint);
-        }
-
         public doesPeriodSlicerRectPositionNeedToUpdate(granularity: GranularityType): boolean {
-            return !(this.periodSlicerRectSelection.datum() === granularity);
-        }
+            let sliderSelection = d3.select("rect.periodSlicerRect");
+            if (sliderSelection && sliderSelection.datum() === granularity) {
+                return false;
+            }
 
-        public renderGranularitySlicerRect(granularity: GranularityType): void {
-            this.periodSlicerRectSelection.data([granularity]);
-
-            this.periodSlicerRectSelection
-                .transition()
-                .attr({
-                    x: convertToPx(
-                        this.timelineProperties.startXpoint
-                        - Timeline.PeriodSlicerRectSelectionXOffset
-                        + granularity
-                        * this.timelineProperties.elementWidth)
-                });
-            const selectedText = this.localizationManager.getDisplayName(Utils.getGranularityNameKey(granularity));
-            this.selectedTextSelection.text(selectedText);
-        }
-
-        public fillColorGranularity(granularitySettings: GranularitySettings): void {
-            const sliderColor: string = granularitySettings.sliderColor,
-                scaleColor: string = granularitySettings.scaleColor;
-
-            this.periodSlicerRectSelection.style("stroke", sliderColor);
-            this.selectedTextSelection.attr("fill", scaleColor);
-            this.textLabelsSelection.attr("fill", scaleColor);
-            this.vertLineSelection.attr("fill", scaleColor);
-            this.horizLineSelection.attr("fill", scaleColor);
+            return true;
         }
 
         public redrawPeriod(granularity: GranularityType): void {
             if (this.doesPeriodSlicerRectPositionNeedToUpdate(granularity)) {
                 let startDate: Date,
                     endDate: Date;
-
-                this.renderGranularitySlicerRect(granularity);
 
                 startDate = Utils.getStartSelectionDate(this.timelineData);
                 endDate = Utils.getEndSelectionDate(this.timelineData);
@@ -593,13 +416,19 @@ module powerbi.extensibility.visual {
             return Utils.getDatePeriod(dataView.categorical.categories[0].values);
         }
 
-        private createTimelineData(dataView: DataView) {
-            let startDate = this.datePeriod.startDate;
-            let endDate = this.datePeriod.endDate;
+        private createTimelineData(
+            timelineSettings: VisualSettings,
+            startDate: Date,
+            endDate: Date,
+            timelineGranularityData: TimelineGranularityData,
+            locale: string,
+            localizationManager: ILocalizationManager
+        ) {
 
             if (!this.initialized) {
-                this.drawGranular(this.timelineProperties, this.settings.granularity.granularity);
-                this.fillColorGranularity(this.settings.granularity);
+                let calendar = new Calendar(timelineSettings.calendar, timelineSettings.weekDay);
+                timelineGranularityData.createGranularities(calendar, locale, localizationManager);
+                timelineGranularityData.createLabels();
             }
 
             if (this.initialized) {
@@ -632,16 +461,6 @@ module powerbi.extensibility.visual {
                 } else {
                     this.initialized = false;
                 }
-            }
-
-            if (!this.initialized) {
-                this.timelineGranularityData = new TimelineGranularityData(
-                    startDate,
-                    endDate);
-                this.timelineData = {
-                    timelineDatapoints: [],
-                    cursorDataPoints: []
-                };
             }
         }
 
@@ -752,7 +571,25 @@ module powerbi.extensibility.visual {
 
             // Setting parsing was moved here from createTimelineData because settings values may be modified before the function is called.
             this.settings = Timeline.parseSettings(options.dataViews[0]);
-            this.createTimelineData(this.dataView);
+
+            if (!this.initialized) {
+                this.timelineGranularityData = new TimelineGranularityData(
+                    this.datePeriod.startDate,
+                    this.datePeriod.endDate);
+                this.timelineData = {
+                    timelineDatapoints: [],
+                    cursorDataPoints: []
+                };
+            }
+
+            this.createTimelineData(
+                this.settings,
+                this.datePeriod.startDate,
+                this.datePeriod.endDate,
+                this.timelineGranularityData,
+                this.locale,
+                this.localizationManager);
+
             this.updateCalendar(this.settings);
 
             // It contains date boundaties that was taken from current slicer filter (filter range).
@@ -782,7 +619,6 @@ module powerbi.extensibility.visual {
             const latestAvailableDate: boolean = this.settings.forceSelection.latestAvailableDate;
             const isUserSelection: boolean = this.settings.general.isUserSelection && !currentForceSelection && !latestAvailableDate;
             const target: IFilterColumnTarget = this.timelineData.filterColumnTarget;
-
             let currentForceSelectionResult = { startDate: null, endDate: null };
             if (currentForceSelection) {
                 currentForceSelectionResult = ({
@@ -829,7 +665,35 @@ module powerbi.extensibility.visual {
                 this.updateCalendar(this.settings);
             }
 
-            this.renderGranularitySlicerRect(granularity);
+            d3.selectAll("g." + Timeline.TimelineSelectors.TimelineSlicer.className).remove();
+            this.selectorSelection = this.headerSelection
+                    .append("g")
+                    .classed(Timeline.TimelineSelectors.TimelineSlicer.className, true);
+
+            const startXpoint: number = this.timelineProperties.startXpoint,
+                startYpoint: number = this.timelineProperties.startYpoint,
+                elementWidth: number = this.timelineProperties.elementWidth;
+
+            this.timelineGranularityData.renderGranularities(
+                this.selectorSelection,
+                startYpoint,
+                elementWidth,
+                startXpoint,
+                this.settings.granularity,
+                (granularityType: GranularityType) => { this.selectPeriod(granularityType); },
+                this.settings.granularity.granularity);
+
+            // create selected period text
+            this.selectorSelection
+                .append("text")
+                .attr("fill", this.settings.granularity.scaleColor)
+                .classed(Timeline.TimelineSelectors.PeriodSlicerSelection.className, true)
+                .text(this.localizationManager.getDisplayName(Utils.getGranularityNameKey(granularity)))
+                .attr({
+                    x: convertToPx(startXpoint + Timeline.SelectedTextSelectionFactor * elementWidth),
+                    y: convertToPx(startYpoint + Timeline.SelectedTextSelectionYOffset),
+                });
+
             this.render(
                 this.timelineData,
                 this.settings,
@@ -848,6 +712,7 @@ module powerbi.extensibility.visual {
                 });
 
                 this.settings.granularity.granularity = granularityType;
+
                 return;
             }
 
@@ -943,9 +808,6 @@ module powerbi.extensibility.visual {
 
             if (!initialized || isCalendarChanged) {
                 calendar = new Calendar(timelineSettings.calendar, timelineSettings.weekDay);
-
-                timelineGranularityData.createGranularities(calendar, locale, localizationManager);
-                timelineGranularityData.createLabels();
                 timelineData.currentGranularity = timelineGranularityData.getGranularity(
                     timelineSettings.granularity.granularity);
             } else {
@@ -1029,7 +891,6 @@ module powerbi.extensibility.visual {
                 + timelineProperties.cellWidth * timelineDatapointsCount;
 
             this.renderTimeRangeText(timelineData, timelineSettings.rangeHeader);
-            this.fillColorGranularity(this.settings.granularity);
 
             this.rootSelection
                 .attr({
@@ -1399,7 +1260,6 @@ module powerbi.extensibility.visual {
                 timelineProperties.cellsYPosition);
 
             this.renderTimeRangeText(timelineData, this.settings.rangeHeader);
-            this.fillColorGranularity(this.settings.granularity);
             this.setSelection(timelineData);
         }
 
@@ -1433,7 +1293,6 @@ module powerbi.extensibility.visual {
                 this.timelineProperties.cellsYPosition);
 
             this.renderTimeRangeText(this.timelineData, this.settings.rangeHeader);
-            this.fillColorGranularity(this.settings.granularity);
         }
 
         /**

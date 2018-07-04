@@ -28,6 +28,10 @@ module powerbi.extensibility.visual.granularity {
     // utils
     import Utils = utils.Utils;
 
+    import Selection = d3.Selection;
+
+    import GranularitySettings = settings.GranularitySettings;
+
     export class TimelineGranularityData {
         private static DayOffset: number = 1;
 
@@ -97,6 +101,37 @@ module powerbi.extensibility.visual.granularity {
             granularity.setNewEndDate(this.endingDate);
 
             this.granularities.push(granularity);
+        }
+
+        /**
+         * Renders all available granularities
+         */
+        public renderGranularities(
+            placeHolder: Selection<any>,
+            startYpoint: number,
+            elementWidth: number,
+            startXpoint: number,
+            granularSettings: GranularitySettings,
+            selectPeriodCallback: (granularityType: GranularityType) => void,
+            selectedType: GranularityType
+        ): void {
+            let seqOffset = 0;
+            this.granularities.forEach((granularity: Granularity, index: number) => {
+                let isRendered: boolean = granularity.render(
+                    placeHolder,
+                    startYpoint,
+                    index - seqOffset,
+                    elementWidth,
+                    startXpoint,
+                    granularSettings,
+                    selectPeriodCallback,
+                    selectedType
+                );
+
+                if (!isRendered) {
+                    seqOffset ++;
+                }
+            });
         }
 
         /**
