@@ -30,7 +30,6 @@ module powerbi.extensibility.visual.granularity {
     // utils
     import Utils = utils.Utils;
     import Selection = d3.Selection;
-    import GranularitySettings = settings.GranularitySettings;
 
     export class YearGranularity extends TimelineGranularityBase {
         constructor(calendar: Calendar, locale: string, protected localizationManager: ILocalizationManager) {
@@ -41,30 +40,12 @@ module powerbi.extensibility.visual.granularity {
             return GranularityType.year;
         }
 
-        public render(
-            placeHolder: Selection<any>,
-            startYpoint: number,
-            sequenceNum: number,
-            elementWidth: number,
-            startXpoint: number,
-            granularSettings: GranularitySettings,
-            selectPeriodCallback: (granularityType: GranularityType) => void,
-            selectedType: GranularityType
-        ): boolean {
-
-            if (!granularSettings.granularityYearVisibility) {
-                return false;
+        public render(props: GranularityRenderProps, isFirst: boolean): Selection<any> {
+            if (!props.granularSettings.granularityYearVisibility) {
+                return null;
             }
 
-            return super.render(
-                placeHolder,
-                startYpoint,
-                sequenceNum,
-                elementWidth,
-                startXpoint,
-                granularSettings,
-                selectPeriodCallback,
-                selectedType);
+            return super.render(props, isFirst);
         }
 
         public splitDate(date: Date): (string | number)[] {

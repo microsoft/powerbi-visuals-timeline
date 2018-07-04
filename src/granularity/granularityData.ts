@@ -32,12 +32,17 @@ module powerbi.extensibility.visual.granularity {
 
     import GranularitySettings = settings.GranularitySettings;
 
+    // powerbi.extensibility.utils.svg
+    import translate = powerbi.extensibility.utils.svg.translate;
+
     export class TimelineGranularityData {
         private static DayOffset: number = 1;
 
         private dates: Date[];
         private granularities: Granularity[];
         private endingDate: Date;
+        private groupXOffset: number = 10;
+        private groupWidth: number = 30;
 
         constructor(startDate: Date, endDate: Date) {
             this.granularities = [];
@@ -106,30 +111,14 @@ module powerbi.extensibility.visual.granularity {
         /**
          * Renders all available granularities
          */
-        public renderGranularities(
-            placeHolder: Selection<any>,
-            startYpoint: number,
-            elementWidth: number,
-            startXpoint: number,
-            granularSettings: GranularitySettings,
-            selectPeriodCallback: (granularityType: GranularityType) => void,
-            selectedType: GranularityType
-        ): void {
-            let seqOffset = 0;
+        public renderGranularities(props: GranularityRenderProps): void {
+            let renderIndex = 0;
             this.granularities.forEach((granularity: Granularity, index: number) => {
-                let isRendered: boolean = granularity.render(
-                    placeHolder,
-                    startYpoint,
-                    index - seqOffset,
-                    elementWidth,
-                    startXpoint,
-                    granularSettings,
-                    selectPeriodCallback,
-                    selectedType
-                );
+                let granularitySelection = granularity.render(props, renderIndex === 0);
 
-                if (!isRendered) {
-                    seqOffset ++;
+                if (granularitySelection !== null) {
+                    granularitySelection.attr("transform", translate(this.groupXOffset + renderIndex * this.groupWidth, 0));
+                    renderIndex++;
                 }
             });
         }
