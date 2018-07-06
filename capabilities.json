@@ -330,7 +330,8 @@
                                 "displayNameKey": "Visual_Granularity_Day"
                             }
                         ]
-                    }
+                    },
+                    "filterState": true
                 },
                 "granularityYearVisibility": {
                     "displayName": "Year visibility",
@@ -434,5 +435,6 @@
             }
         }
     },
-    "supportsHighlight": true
+    "supportsHighlight": true,
+    "supportsSynchronizingFilterState": true
 }
