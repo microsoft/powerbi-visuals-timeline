@@ -1,5 +1,7 @@
 ## 1.9.0
 * ADD: possibility to disable certain granularities for user access (granularity section on format panel)
+* ADD: support of Sync Slicers and API 1.13
+* ADD: support of filterState property that makes a property of a part of filtering
 
 ## 1.8.3
 * FIX: Year format correction was improved by using literals
