@@ -45,5 +45,14 @@
 	"Visual_DisplayAll": "Mostrar todo",
 	"Visual_ForceSelection": "Forzar selección",
 	"Visual_CurrentPeriod": "Período actual",
-	"Visual_LatestAvailableDate": "Último período no que estivo dispoñible"
+	"Visual_LatestAvailableDate": "Último período no que estivo dispoñible",
+	"Visual_Day_Selection": "Selección de día",
+	"Visual_ScrollAutoAdjustment": "Axuste automático da posición de desprazamento",
+	"Visual_GranularityYearVisibility": "Visibilidade anual",
+	"Visual_GranularityQuarterVisibility": "Visibilidade trimestral",
+	"Visual_GranularityMonthVisibility": "Visibilidade mensual",
+	"Visual_GranularityWeekVisibility": "Visibilidade semanal",
+	"Visual_GranularityDayVisibility": "Visibilidade diaria",
+	"Timeline_Short_Description": "Selector gráfico de intervalos de datos que pode usar para filtrar datas.",
+	"Timeline_Long_Description": "Timeline Slicer é un selector gráfico de intervalos de datos que se usa como un compoñente de filtrado en Power BI. Isto fai que o filtrado de datos por dimensión de datas sexa sinxelo e divertido.\nCon que frecuencia ten que filtrar os datos por un intervalo de datas ou un nivel superior, como o mes ou o trimestre? Sempre. Verdade? O filtrado é pesado se ten que premer en moitos números de valores de datas para seleccionar o intervalo que quere. Cambiar os detalles do filtro de meses, trimestres e anos sobre a marcha é moi tedioso. Ou adoitaba selo.\nTimeline Slicer vai converter esta experiencia nun suspiro. Con este sinxelo control do cursor da barra de desprazamento para datas, o único que ten que facer é premer e arrastrar ao intervalo que queira. Así mesmo, pode cambiar á visualización de ano, trimestre ou mes para seleccionar intervalos nun nivel superior do das datas.\nSó ten que premer no control da barra de desprazamento para seleccionar un único valor ou no borde e arrastralo ata o intervalo que queira.\nTamén pode modificar a cor do fondo e da selección, e outras opcións de formato para controlar o aspecto. Con MAIÚS+clic pode seleccionar un intervalo."
 }
