@@ -240,10 +240,6 @@ module powerbi.extensibility.visual {
         }
 
         constructor(options: VisualConstructorOptions) {
-            this.init(options);
-        }
-
-        public init(options: VisualConstructorOptions): void {
             let element: HTMLElement = options.element;
 
             this.host = options.host;

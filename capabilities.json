@@ -1,33 +1,27 @@
 {
-    "dataRoles": [
-        {
-            "name": "Time",
-            "kind": "Grouping",
-            "displayName": "Time",
-            "displayNameKey": "Role_Time"
-        }
-    ],
-    "dataViewMappings": [
-        {
-            "conditions": [
-                {
-                    "Time": {
-                        "max": 1
-                    }
-                }
-            ],
-            "categorical": {
-                "categories": {
-                    "for": {
-                        "in": "Time"
-                    },
-                    "dataReductionAlgorithm": {
-                        "sample": {}
-                    }
+    "dataRoles": [{
+        "name": "Time",
+        "kind": "Grouping",
+        "displayName": "Time",
+        "displayNameKey": "Role_Time"
+    }],
+    "dataViewMappings": [{
+        "conditions": [{
+            "Time": {
+                "max": 1
+            }
+        }],
+        "categorical": {
+            "categories": {
+                "for": {
+                    "in": "Time"
+                },
+                "dataReductionAlgorithm": {
+                    "sample": {}
                 }
             }
         }
-    ],
+    }],
     "objects": {
         "general": {
             "displayName": "General",
@@ -55,7 +49,7 @@
                 }
             }
         },
-        "forceSelection" : {
+        "forceSelection": {
             "displayName": "Force selection",
             "displayNameKey": "Visual_ForceSelection",
             "properties": {
@@ -83,8 +77,7 @@
                     "displayName": "Month",
                     "displayNameKey": "Visual_Month",
                     "type": {
-                        "enumeration": [
-                            {
+                        "enumeration": [{
                                 "value": "0",
                                 "displayName": "January",
                                 "displayNameKey": "Visual_Month_January"
@@ -171,8 +164,7 @@
                     "displayName": "Day",
                     "displayNameKey": "Visual_Day",
                     "type": {
-                        "enumeration": [
-                            {
+                        "enumeration": [{
                                 "value": "0",
                                 "displayName": "Sunday",
                                 "displayNameKey": "Visual_Day_Sunday"
@@ -303,8 +295,7 @@
                     "displayName": "Granularity",
                     "displayNameKey": "Visual_Granularity",
                     "type": {
-                        "enumeration": [
-                            {
+                        "enumeration": [{
                                 "value": "0",
                                 "displayName": "Year",
                                 "displayNameKey": "Visual_Granularity_Year"
