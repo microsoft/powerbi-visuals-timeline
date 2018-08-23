@@ -563,10 +563,10 @@ module powerbi.extensibility.visual {
             this.dataView = options.dataViews[0];
 
             // it contains dates from data view.
-            this.datePeriod = this.createDatePeriod(options.dataViews[0]);
+            this.datePeriod = this.createDatePeriod(this.dataView);
 
             // Setting parsing was moved here from createTimelineData because settings values may be modified before the function is called.
-            this.settings = Timeline.parseSettings(options.dataViews[0]);
+            this.settings = Timeline.parseSettings(this.dataView, this.host.colorPalette);
 
             if (!this.initialized) {
                 this.timelineGranularityData = new TimelineGranularityData(
@@ -666,8 +666,8 @@ module powerbi.extensibility.visual {
 
             d3.selectAll("g." + Timeline.TimelineSelectors.TimelineSlicer.className).remove();
             this.selectorSelection = this.headerSelection
-                    .append("g")
-                    .classed(Timeline.TimelineSelectors.TimelineSlicer.className, true);
+                .append("g")
+                .classed(Timeline.TimelineSelectors.TimelineSlicer.className, true);
 
             this.timelineGranularityData.renderGranularities({
                 selection: this.selectorSelection,
@@ -861,7 +861,7 @@ module powerbi.extensibility.visual {
                 setting.labels.textSize
             );
 
-            Timeline.updateCursors(timelineData, timelineProperties.cellWidth);
+            Timeline.updateCursors(timelineData);
 
             return calendar;
         }
@@ -1096,7 +1096,7 @@ module powerbi.extensibility.visual {
                 .remove();
         }
 
-        private static updateCursors(timelineData: TimelineData, cellWidth: number): void {
+        private static updateCursors(timelineData: TimelineData): void {
             let startDate: TimelineDatePeriod = timelineData.timelineDatapoints[timelineData.selectionStartIndex].datePeriod,
                 endDate: TimelineDatePeriod = timelineData.timelineDatapoints[timelineData.selectionEndIndex].datePeriod;
 
@@ -1104,7 +1104,7 @@ module powerbi.extensibility.visual {
             timelineData.cursorDataPoints[1].selectionIndex = endDate.index + endDate.fraction;
         }
 
-        private static parseSettings(dataView: DataView): VisualSettings {
+        private static parseSettings(dataView: DataView, colorPalette: ISandboxExtendedColorPalette): VisualSettings {
             const settings: VisualSettings = VisualSettings.parse<VisualSettings>(dataView);
 
             Timeline.setValidCalendarSettings(settings.calendar);
@@ -1127,6 +1127,24 @@ module powerbi.extensibility.visual {
                 settings.general.datePeriod = TimelineDatePeriodBase.create(startDate, endDate);
             } else {
                 settings.general.datePeriod = TimelineDatePeriodBase.createEmpty();
+            }
+
+            if (colorPalette.isHighContrast) {
+                const {
+                    foreground,
+                    background,
+                } = colorPalette;
+
+                settings.rangeHeader.fontColor = foreground.value;
+
+                settings.cells.fillSelected = foreground.value;
+                settings.cells.fillUnselected = background.value;
+                settings.cells.strokeColor = foreground.value;
+
+                settings.granularity.scaleColor = foreground.value;
+                settings.granularity.sliderColor = foreground.value;
+
+                settings.labels.fontColor = foreground.value;
             }
 
             return settings;
@@ -1194,7 +1212,8 @@ module powerbi.extensibility.visual {
                     width: (dataPoint: TimelineDatapoint) => {
                         return convertToPx(dataPoint.datePeriod.fraction * timelineProperties.cellWidth);
                     }
-                });
+                })
+                .style("stroke", this.settings.cells.strokeColor);
 
             let clickHandler = (dataPoint: TimelineDatapoint, index: number) => {
                 // If something from Force Selection settings group is enabled, any user filters has no sense

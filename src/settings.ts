@@ -68,6 +68,7 @@ module powerbi.extensibility.visual.settings {
     export class CellsSettings {
         public fillSelected: string = "#ADD8E6";
         public fillUnselected: string = "";
+        public strokeColor: string = "#333444";
     }
 
     export class GranularitySettings {
