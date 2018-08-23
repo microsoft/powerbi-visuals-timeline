@@ -1140,11 +1140,14 @@ module powerbi.extensibility.visual {
                 settings.cells.fillSelected = foreground.value;
                 settings.cells.fillUnselected = background.value;
                 settings.cells.strokeColor = foreground.value;
+                settings.cells.selectedStrokeColor = background.value;
 
                 settings.granularity.scaleColor = foreground.value;
                 settings.granularity.sliderColor = foreground.value;
 
                 settings.labels.fontColor = foreground.value;
+
+                settings.cursor.color = foreground.value;
             }
 
             return settings;
@@ -1170,19 +1173,28 @@ module powerbi.extensibility.visual {
                 cellsSettings: CellsSettings = visSettings.cells;
 
             let singleCaseDone: boolean = false;
-            cellSelection.attr("fill", (dataPoint: TimelineDatapoint, index: number) => {
-                let isSelected: Boolean = Utils.isGranuleSelected(dataPoint, this.timelineData, cellsSettings);
 
-                if (visSettings.scrollAutoAdjustment.show && isSelected && !singleCaseDone) {
-                    const selectedGranulaPos: number = (cellSelection[0][index] as any).x.baseVal.value;
-                    this.selectedGranulaPos = selectedGranulaPos;
-                    singleCaseDone = true;
-                }
+            cellSelection
+                .attr("fill", (dataPoint: TimelineDatapoint, index: number) => {
+                    let isSelected: Boolean = Utils.isGranuleSelected(dataPoint, this.timelineData, cellsSettings);
 
-                return isSelected
-                    ? cellsSettings.fillSelected
-                    : (cellsSettings.fillUnselected || Utils.DefaultCellColor);
-            });
+                    if (visSettings.scrollAutoAdjustment.show && isSelected && !singleCaseDone) {
+                        const selectedGranulaPos: number = (cellSelection[0][index] as any).x.baseVal.value;
+                        this.selectedGranulaPos = selectedGranulaPos;
+                        singleCaseDone = true;
+                    }
+
+                    return isSelected
+                        ? cellsSettings.fillSelected
+                        : (cellsSettings.fillUnselected || Utils.DefaultCellColor);
+                })
+                .style("stroke", (dataPoint: TimelineDatapoint) => {
+                    let isSelected: Boolean = Utils.isGranuleSelected(dataPoint, this.timelineData, cellsSettings);
+
+                    return isSelected
+                        ? cellsSettings.selectedStrokeColor
+                        : cellsSettings.strokeColor;
+                });
         }
 
         public renderCells(timelineData: TimelineData, timelineProperties: TimelineProperties): void {
@@ -1212,8 +1224,7 @@ module powerbi.extensibility.visual {
                     width: (dataPoint: TimelineDatapoint) => {
                         return convertToPx(dataPoint.datePeriod.fraction * timelineProperties.cellWidth);
                     }
-                })
-                .style("stroke", this.settings.cells.strokeColor);
+                });
 
             let clickHandler = (dataPoint: TimelineDatapoint, index: number) => {
                 // If something from Force Selection settings group is enabled, any user filters has no sense
@@ -1374,16 +1385,16 @@ module powerbi.extensibility.visual {
                 .classed(Timeline.TimelineSelectors.SelectionCursor.className, true);
 
             cursorSelection
-                .attr("transform", (cursorDataPoint: CursorDatapoint) => {
-                    let dx: number,
-                        dy: number;
-
-                    dx = cursorDataPoint.selectionIndex * this.timelineProperties.cellWidth;
-                    dy = cellHeight / Timeline.CellHeightDivider + cellsYPosition;
-
-                    return translate(dx, dy);
-                })
                 .attr({
+                    "transform": (cursorDataPoint: CursorDatapoint) => {
+                        let dx: number,
+                            dy: number;
+
+                        dx = cursorDataPoint.selectionIndex * this.timelineProperties.cellWidth;
+                        dy = cellHeight / Timeline.CellHeightDivider + cellsYPosition;
+
+                        return translate(dx, dy);
+                    },
                     d: d3.svg.arc<CursorDatapoint>()
                         .innerRadius(0)
                         .outerRadius(cellHeight / Timeline.CellHeightDivider)
@@ -1394,6 +1405,7 @@ module powerbi.extensibility.visual {
                             return cursorDataPoint.cursorIndex * Math.PI + 2 * Math.PI;
                         })
                 })
+                .style("fill", this.settings.cursor.color)
                 .call(this.cursorDragBehavior);
 
             cursorSelection

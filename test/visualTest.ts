@@ -27,9 +27,6 @@
 /// <reference path="_references.ts"/>
 
 module powerbi.extensibility.visual.test {
-    // powerbi.data
-    import ISQExpr = powerbi.data.ISQExpr;
-
     // powerbi.extensibility.visual.test
     import TimelineData = powerbi.extensibility.visual.test.TimelineData;
     import TimelineBuilder = powerbi.extensibility.visual.test.TimelineBuilder;
@@ -62,6 +59,9 @@ module powerbi.extensibility.visual.test {
     import renderTimeout = powerbi.extensibility.utils.test.helpers.renderTimeout;
     import DefaultWaitForRender = powerbi.extensibility.utils.test.DefaultWaitForRender;
     import assertColorsMatch = powerbi.extensibility.utils.test.helpers.color.assertColorsMatch;
+
+    // powerbi.extensibility.visual.test.helpers
+    import areColorsEqual = powerbi.extensibility.visual.test.helpers.areColorsEqual;
 
     function createFakeFilter(startDate: Date, endDate: Date): any {
         let filterSample: string =
@@ -1540,6 +1540,57 @@ module powerbi.extensibility.visual.test {
                     : value;
 
                 expect(actualValue).toBe(expectedValue);
+            }
+        });
+    });
+
+    describe("Accessibility", () => {
+        let visualBuilder: TimelineBuilder,
+            defaultDataViewBuilder: TimelineData,
+            dataView: DataView;
+
+        beforeEach(() => {
+            visualBuilder = new TimelineBuilder(1000, 500);
+            defaultDataViewBuilder = new TimelineData();
+
+            dataView = defaultDataViewBuilder.getDataView();
+        });
+
+        describe("High contrast mode", () => {
+            const backgroundColor: string = "#000000";
+            const foregroundColor: string = "#ffff00";
+
+            beforeEach(() => {
+                visualBuilder.visualHost.colorPalette.isHighContrast = true;
+
+                visualBuilder.visualHost.colorPalette.background = { value: backgroundColor };
+                visualBuilder.visualHost.colorPalette.foreground = { value: foregroundColor };
+            });
+
+            it("should use proper stroke color from color palette", (done) => {
+                visualBuilder.updateRenderTimeout(dataView, () => {
+                    const layers: JQuery[] = visualBuilder.cellRects.toArray().map($);
+
+                    expect(isColorAppliedToElements(layers, foregroundColor, "stroke"));
+
+                    done();
+                });
+            });
+
+            function isColorAppliedToElements(
+                elements: JQuery[],
+                color?: string,
+                colorStyleName: string = "fill"
+            ): boolean {
+                return elements.some((element: JQuery) => {
+                    const currentColor: string = element.css(colorStyleName);
+
+                    if (!currentColor || !color) {
+                        return currentColor === color;
+                    }
+
+                    return areColorsEqual(currentColor, color);
+                });
             }
         });
     });

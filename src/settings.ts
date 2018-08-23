@@ -69,6 +69,7 @@ module powerbi.extensibility.visual.settings {
         public fillSelected: string = "#ADD8E6";
         public fillUnselected: string = "";
         public strokeColor: string = "#333444";
+        public selectedStrokeColor: string = "#333444";
     }
 
     export class GranularitySettings {
@@ -90,6 +91,10 @@ module powerbi.extensibility.visual.settings {
         show: boolean = false;
     }
 
+    export class CursorSettings {
+        public color: string = "#808080";
+    }
+
     export class VisualSettings extends DataViewObjectsParser {
         public general: GeneralSettings = new GeneralSettings();
         public calendar: CalendarSettings = new CalendarSettings();
@@ -101,5 +106,6 @@ module powerbi.extensibility.visual.settings {
         public labels: LabelsSettings = new LabelsSettings();
         public scaleSizeAdjustment: ScaleSizeAdjustment = new ScaleSizeAdjustment();
         public scrollAutoAdjustment: ScrollAutoAdjustment = new ScrollAutoAdjustment();
+        public cursor: CursorSettings = new CursorSettings();
     }
 }
