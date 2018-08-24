@@ -4,9 +4,9 @@
     "displayName": "Timeline",
     "guid": "Timeline1447991079100",
     "visualClassName": "Timeline",
-    "version": "1.9.0",
+    "version": "1.10.0",
     "description": "Timeline slicer is a graphical date range selector used as a filtering component in the report canvas",
-    "supportUrl": "http://community.powerbi.com",
+    "supportUrl": "https://community.powerbi.com",
     "gitHubUrl": "https://github.com/Microsoft/powerbi-visuals-timeline"
   },
   "apiVersion": "1.13.0",
@@ -20,7 +20,7 @@
   "externalJS": [
     "node_modules/powerbi-models/dist/models.min.js",
     "node_modules/d3/d3.min.js",
-    "node_modules/globalize/lib/globalize.js",    
+    "node_modules/globalize/lib/globalize.js",
     "node_modules/globalize/lib/cultures/globalize.culture.ar-SA.js",
     "node_modules/globalize/lib/cultures/globalize.culture.bg-BG.js",
     "node_modules/globalize/lib/cultures/globalize.culture.ca-ES.js",

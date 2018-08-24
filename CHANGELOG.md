@@ -1,3 +1,6 @@
+## 1.10.0
+* High contrast mode
+
 ## 1.9.0
 * ADD: possibility to disable certain granularities for user access (granularity section on format panel)
 * ADD: support of Sync Slicers and API 1.13

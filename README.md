@@ -18,4 +18,4 @@ You can simply click on the slicer to select a single value or click the edge an
 
 You can also change the background & selection color and number of other formatting options to control the look-n-feel. SHIFT+Click also works for selecting a range.
 
-See also [Timeline Slicer at Microsoft Office store](https://store.office.com/en-us/app.aspx?assetid=WA104380786&sourcecorrid=d6693601-bd92-40f0-90a9-a73ad6b29f1c)
+See also [Timeline Slicer at Microsoft AppSource](https://appsource.microsoft.com/en-us/product/power-bi-visuals/WA104380786)

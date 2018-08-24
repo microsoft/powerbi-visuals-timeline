@@ -240,10 +240,6 @@ module powerbi.extensibility.visual {
         }
 
         constructor(options: VisualConstructorOptions) {
-            this.init(options);
-        }
-
-        public init(options: VisualConstructorOptions): void {
             let element: HTMLElement = options.element;
 
             this.host = options.host;
@@ -567,10 +563,10 @@ module powerbi.extensibility.visual {
             this.dataView = options.dataViews[0];
 
             // it contains dates from data view.
-            this.datePeriod = this.createDatePeriod(options.dataViews[0]);
+            this.datePeriod = this.createDatePeriod(this.dataView);
 
             // Setting parsing was moved here from createTimelineData because settings values may be modified before the function is called.
-            this.settings = Timeline.parseSettings(options.dataViews[0]);
+            this.settings = Timeline.parseSettings(this.dataView, this.host.colorPalette);
 
             if (!this.initialized) {
                 this.timelineGranularityData = new TimelineGranularityData(
@@ -670,8 +666,8 @@ module powerbi.extensibility.visual {
 
             d3.selectAll("g." + Timeline.TimelineSelectors.TimelineSlicer.className).remove();
             this.selectorSelection = this.headerSelection
-                    .append("g")
-                    .classed(Timeline.TimelineSelectors.TimelineSlicer.className, true);
+                .append("g")
+                .classed(Timeline.TimelineSelectors.TimelineSlicer.className, true);
 
             this.timelineGranularityData.renderGranularities({
                 selection: this.selectorSelection,
@@ -865,7 +861,7 @@ module powerbi.extensibility.visual {
                 setting.labels.textSize
             );
 
-            Timeline.updateCursors(timelineData, timelineProperties.cellWidth);
+            Timeline.updateCursors(timelineData);
 
             return calendar;
         }
@@ -1100,7 +1096,7 @@ module powerbi.extensibility.visual {
                 .remove();
         }
 
-        private static updateCursors(timelineData: TimelineData, cellWidth: number): void {
+        private static updateCursors(timelineData: TimelineData): void {
             let startDate: TimelineDatePeriod = timelineData.timelineDatapoints[timelineData.selectionStartIndex].datePeriod,
                 endDate: TimelineDatePeriod = timelineData.timelineDatapoints[timelineData.selectionEndIndex].datePeriod;
 
@@ -1108,7 +1104,7 @@ module powerbi.extensibility.visual {
             timelineData.cursorDataPoints[1].selectionIndex = endDate.index + endDate.fraction;
         }
 
-        private static parseSettings(dataView: DataView): VisualSettings {
+        private static parseSettings(dataView: DataView, colorPalette: ISandboxExtendedColorPalette): VisualSettings {
             const settings: VisualSettings = VisualSettings.parse<VisualSettings>(dataView);
 
             Timeline.setValidCalendarSettings(settings.calendar);
@@ -1131,6 +1127,27 @@ module powerbi.extensibility.visual {
                 settings.general.datePeriod = TimelineDatePeriodBase.create(startDate, endDate);
             } else {
                 settings.general.datePeriod = TimelineDatePeriodBase.createEmpty();
+            }
+
+            if (colorPalette.isHighContrast) {
+                const {
+                    foreground,
+                    background,
+                } = colorPalette;
+
+                settings.rangeHeader.fontColor = foreground.value;
+
+                settings.cells.fillSelected = foreground.value;
+                settings.cells.fillUnselected = background.value;
+                settings.cells.strokeColor = foreground.value;
+                settings.cells.selectedStrokeColor = background.value;
+
+                settings.granularity.scaleColor = foreground.value;
+                settings.granularity.sliderColor = foreground.value;
+
+                settings.labels.fontColor = foreground.value;
+
+                settings.cursor.color = foreground.value;
             }
 
             return settings;
@@ -1156,19 +1173,28 @@ module powerbi.extensibility.visual {
                 cellsSettings: CellsSettings = visSettings.cells;
 
             let singleCaseDone: boolean = false;
-            cellSelection.attr("fill", (dataPoint: TimelineDatapoint, index: number) => {
-                let isSelected: Boolean = Utils.isGranuleSelected(dataPoint, this.timelineData, cellsSettings);
 
-                if (visSettings.scrollAutoAdjustment.show && isSelected && !singleCaseDone) {
-                    const selectedGranulaPos: number = (cellSelection[0][index] as any).x.baseVal.value;
-                    this.selectedGranulaPos = selectedGranulaPos;
-                    singleCaseDone = true;
-                }
+            cellSelection
+                .attr("fill", (dataPoint: TimelineDatapoint, index: number) => {
+                    let isSelected: Boolean = Utils.isGranuleSelected(dataPoint, this.timelineData, cellsSettings);
 
-                return isSelected
-                    ? cellsSettings.fillSelected
-                    : (cellsSettings.fillUnselected || Utils.DefaultCellColor);
-            });
+                    if (visSettings.scrollAutoAdjustment.show && isSelected && !singleCaseDone) {
+                        const selectedGranulaPos: number = (cellSelection[0][index] as any).x.baseVal.value;
+                        this.selectedGranulaPos = selectedGranulaPos;
+                        singleCaseDone = true;
+                    }
+
+                    return isSelected
+                        ? cellsSettings.fillSelected
+                        : (cellsSettings.fillUnselected || Utils.DefaultCellColor);
+                })
+                .style("stroke", (dataPoint: TimelineDatapoint) => {
+                    let isSelected: Boolean = Utils.isGranuleSelected(dataPoint, this.timelineData, cellsSettings);
+
+                    return isSelected
+                        ? cellsSettings.selectedStrokeColor
+                        : cellsSettings.strokeColor;
+                });
         }
 
         public renderCells(timelineData: TimelineData, timelineProperties: TimelineProperties): void {
@@ -1359,16 +1385,16 @@ module powerbi.extensibility.visual {
                 .classed(Timeline.TimelineSelectors.SelectionCursor.className, true);
 
             cursorSelection
-                .attr("transform", (cursorDataPoint: CursorDatapoint) => {
-                    let dx: number,
-                        dy: number;
-
-                    dx = cursorDataPoint.selectionIndex * this.timelineProperties.cellWidth;
-                    dy = cellHeight / Timeline.CellHeightDivider + cellsYPosition;
-
-                    return translate(dx, dy);
-                })
                 .attr({
+                    "transform": (cursorDataPoint: CursorDatapoint) => {
+                        let dx: number,
+                            dy: number;
+
+                        dx = cursorDataPoint.selectionIndex * this.timelineProperties.cellWidth;
+                        dy = cellHeight / Timeline.CellHeightDivider + cellsYPosition;
+
+                        return translate(dx, dy);
+                    },
                     d: d3.svg.arc<CursorDatapoint>()
                         .innerRadius(0)
                         .outerRadius(cellHeight / Timeline.CellHeightDivider)
@@ -1379,6 +1405,7 @@ module powerbi.extensibility.visual {
                             return cursorDataPoint.cursorIndex * Math.PI + 2 * Math.PI;
                         })
                 })
+                .style("fill", this.settings.cursor.color)
                 .call(this.cursorDragBehavior);
 
             cursorSelection
