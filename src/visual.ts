@@ -420,12 +420,9 @@ module powerbi.extensibility.visual {
             locale: string,
             localizationManager: ILocalizationManager
         ) {
-
-            if (!this.initialized) {
-                let calendar = new Calendar(timelineSettings.calendar, timelineSettings.weekDay);
-                timelineGranularityData.createGranularities(calendar, locale, localizationManager);
-                timelineGranularityData.createLabels();
-            }
+            let calendar = new Calendar(timelineSettings.calendar, timelineSettings.weekDay);
+            timelineGranularityData.createGranularities(calendar, locale, localizationManager);
+            timelineGranularityData.createLabels();
 
             if (this.initialized) {
                 let actualEndDate: Date,
@@ -569,14 +566,15 @@ module powerbi.extensibility.visual {
             this.settings = Timeline.parseSettings(this.dataView, this.host.colorPalette);
 
             if (!this.initialized) {
-                this.timelineGranularityData = new TimelineGranularityData(
-                    this.datePeriod.startDate,
-                    this.datePeriod.endDate);
                 this.timelineData = {
                     timelineDatapoints: [],
                     cursorDataPoints: []
                 };
             }
+
+            this.timelineGranularityData = new TimelineGranularityData(
+                this.datePeriod.startDate,
+                this.datePeriod.endDate);
 
             this.createTimelineData(
                 this.settings,
