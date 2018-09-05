@@ -1,5 +1,8 @@
+## 1.10.1
+* FIX: filter applying from other visuals
+
 ## 1.10.0
-* High contrast mode
+* ADD: high contrast mode
 
 ## 1.9.0
 * ADD: possibility to disable certain granularities for user access (granularity section on format panel)
