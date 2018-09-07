@@ -1,3 +1,6 @@
+## 1.10.2
+* FIX: looping when selection is cleared or whole period is chosen
+
 ## 1.10.1
 * FIX: filter applying from other visuals
 

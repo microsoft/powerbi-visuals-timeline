@@ -630,7 +630,7 @@ module powerbi.extensibility.visual {
             }
 
             if (this.prevGranularity !== granularity) {
-                this.applyFilter(false);
+                this.applyFilterSettingsInCapabilities(false);
             }
 
             const filterWasChanged: boolean =
@@ -1459,7 +1459,6 @@ module powerbi.extensibility.visual {
 
                 return;
             }
-
             this.applyDatePeriod(
                 Utils.getStartSelectionDate(timelineData),
                 Utils.getEndSelectionDate(timelineData),
@@ -1468,7 +1467,7 @@ module powerbi.extensibility.visual {
             );
         }
 
-        private applyFilter(isUserSelection: boolean, isClearPeriod?: boolean): void {
+        private applyFilterSettingsInCapabilities(isUserSelection: boolean, isClearPeriod?: boolean): void {
             const instanceOfGeneral: VisualObjectInstance = {
                 objectName: "general",
                 selector: undefined,
@@ -1490,7 +1489,10 @@ module powerbi.extensibility.visual {
         }
 
         public applyDatePeriod(startDate: Date, endDate: Date, target: IFilterColumnTarget, isUserSelection: boolean): void {
-            this.applyFilter(isUserSelection, startDate === null && endDate === null ? true : false);
+            this.applyFilterSettingsInCapabilities(isUserSelection, startDate === null && endDate === null ? true : false);
+
+            const isMerge: boolean = (typeof startDate !== "undefined" && typeof endDate !== "undefined"
+                && startDate !== null && endDate !== null);
 
             // If startDate and EndDate is null then ClearSelection is triggered
             const filter: IAdvancedFilter = new window["powerbi-models"].AdvancedFilter(
@@ -1513,7 +1515,7 @@ module powerbi.extensibility.visual {
                 filter,
                 Timeline.filterObjectProperty.objectName,
                 Timeline.filterObjectProperty.propertyName,
-                (startDate && endDate)
+                isMerge
                     ? FilterAction.merge
                     : FilterAction.remove
             );
@@ -1523,7 +1525,9 @@ module powerbi.extensibility.visual {
             this.prevFilteredStartDate = null;
             this.prevFilteredEndDate = null;
 
-            this.applyDatePeriod(null, null, target, false);
+            // IsUserSelection was false before but it looks logically correct to make it "true" here
+            // because it's kinda user selection and it helps to avoid redundant updates.
+            this.applyDatePeriod(null, null, target, true);
         }
 
         /**
