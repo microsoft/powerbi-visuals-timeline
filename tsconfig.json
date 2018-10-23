@@ -34,7 +34,6 @@
     "src/calendar.ts",
     "src/datePeriod/datePeriod.ts",
     "src/granularity/granularity.ts",
-    "src/persistPropertiesAdapter.ts",
     "src/scaleUtils.ts",
     "src/datePeriod/datePeriodBase.ts",
     "src/settings.ts",

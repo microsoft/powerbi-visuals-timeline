@@ -32,7 +32,6 @@ module powerbi.extensibility.visual {
 
     // powerbi.data
     import ISQExpr = powerbi.data.ISQExpr;
-    import ISemanticFilter = powerbi.data.ISemanticFilter;
 
     // powerbi.extensibility.utils.type
     import convertToPx = powerbi.extensibility.utils.type.PixelConverter.toString;
@@ -49,25 +48,18 @@ module powerbi.extensibility.visual {
 
     // powerbi.extensibility.utils.interactivity
     import appendClearCatcher = powerbi.extensibility.utils.interactivity.appendClearCatcher;
-    import AppliedFilter = powerbi.extensibility.utils.filter.AppliedFilter;
     import FilterManager = powerbi.extensibility.utils.filter.FilterManager;
 
     // powerbi.extensibility.utils.chart
     import getLabelFormattedText = powerbi.extensibility.utils.chart.dataLabel.utils.getLabelFormattedText;
     import LabelFormattedTextOptions = powerbi.extensibility.utils.chart.dataLabel.LabelFormattedTextOptions;
 
-    // scaleUtils
-    import getScale = scaleUtils.getScale;
-    import ElementScale = scaleUtils.ElementScale;
-
     // settings
     import VisualSettings = settings.VisualSettings;
     import CellsSettings = settings.CellsSettings;
     import LabelsSettings = settings.LabelsSettings;
     import CalendarSettings = settings.CalendarSettings;
-    import GranularitySettings = settings.GranularitySettings;
     import ScaleSizeAdjustment = settings.ScaleSizeAdjustment;
-    import ScrollAutoAdjustment = settings.ScrollAutoAdjustment;
 
     // granularity
     import GranularityType = granularity.GranularityType;
@@ -1494,30 +1486,32 @@ module powerbi.extensibility.visual {
             const isMerge: boolean = (typeof startDate !== "undefined" && typeof endDate !== "undefined"
                 && startDate !== null && endDate !== null);
 
-            // If startDate and EndDate is null then ClearSelection is triggered
-            const filter: IAdvancedFilter = new window["powerbi-models"].AdvancedFilter(
-                target,
-                "And",
-                {
-                    operator: "GreaterThanOrEqual",
-                    value: startDate
-                        ? startDate.toJSON()
-                        : null
-                },
-                {
-                    operator: "LessThan",
-                    value: endDate
-                        ? endDate.toJSON()
-                        : null
-                });
-
             this.host.applyJsonFilter(
-                filter,
+                this.getFilter(startDate, endDate, target),
                 Timeline.filterObjectProperty.objectName,
                 Timeline.filterObjectProperty.propertyName,
                 isMerge
                     ? FilterAction.merge
                     : FilterAction.remove
+            );
+        }
+
+        public getFilter(startDate: Date, endDate: Date, target: IFilterColumnTarget): IFilter {
+            if (startDate == null || endDate == null || !target) {
+                return null;
+            }
+
+            return new window["powerbi-models"].AdvancedFilter(
+                target,
+                "And",
+                {
+                    operator: "GreaterThanOrEqual",
+                    value: startDate.toJSON()
+                },
+                {
+                    operator: "LessThan",
+                    value: endDate.toJSON()
+                }
             );
         }
 

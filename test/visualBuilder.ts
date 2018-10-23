@@ -37,9 +37,9 @@ module powerbi.extensibility.visual.test {
     import TimelineDatePeriodBase = SandboxedVisualNameSpace.datePeriod.TimelineDatePeriodBase;
 
     export class TimelineBuilder extends VisualBuilderBase<VisualClass> {
-
         constructor(width: number, height: number) {
             super(width, height, "Timeline1447991079100");
+
             this.visualHost.applyJsonFilter = () => {};
         }
 

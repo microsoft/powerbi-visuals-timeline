@@ -40,7 +40,6 @@ module powerbi.extensibility.visual.test {
     import VisualClass = SandboxedVisualNameSpace.Timeline;
     import ITimelineData = SandboxedVisualNameSpace.TimelineData;
     import Granularity = SandboxedVisualNameSpace.granularity.Granularity;
-    import VisualSettings = SandboxedVisualNameSpace.settings.VisualSettings;
     import WeekDaySettings = SandboxedVisualNameSpace.settings.WeekDaySettings;
     import DayGranularity = SandboxedVisualNameSpace.granularity.DayGranularity;
     import CalendarSettings = SandboxedVisualNameSpace.settings.CalendarSettings;
@@ -1098,6 +1097,14 @@ module powerbi.extensibility.visual.test {
                             expect($(element).css("font-size")).toBe(expectedFontSize);
                         });
                 });
+            });
+        });
+
+        describe("getFilter", () => {
+            it("should return null if startDate or endDate or target is null", () => {
+                const actualFilter: IFilter = visualBuilder.visualObject.getFilter(null, null, null);
+
+                expect(actualFilter).toBeNull();
             });
         });
     });
