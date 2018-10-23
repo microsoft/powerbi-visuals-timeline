@@ -25,9 +25,6 @@
  */
 
 module powerbi.extensibility.visual {
-    // powerbi.data
-    import ISQExpr = powerbi.data.ISQExpr;
-
     // powerbi.extensibility.utils.svg
     import ClassAndSelector = powerbi.extensibility.utils.svg.CssConstants.ClassAndSelector;
 

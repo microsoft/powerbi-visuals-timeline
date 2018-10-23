@@ -1,3 +1,6 @@
+## 1.10.3
+* FIX: unexpected exception if user clears selection
+
 ## 1.10.2
 * FIX: looping when selection is cleared or whole period is chosen
 
