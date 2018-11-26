@@ -24,28 +24,33 @@
  *  THE SOFTWARE.
  */
 
-module powerbi.extensibility.visual.granularity {
-    // datePeriod
-    import TimelineDatePeriod = datePeriod.TimelineDatePeriod;
-    import Selection = d3.Selection;
+import { Selection } from "d3-selection";
 
-    export interface Granularity {
-        getType?(): GranularityType;
-        splitDate(date: Date): (string | number)[];
-        getDatePeriods(): TimelineDatePeriod[];
-        resetDatePeriods(): void;
-        getExtendedLabel(): ExtendedLabel;
-        setExtendedLabel(extendedLabel: ExtendedLabel): void;
-        createLabels(granularity: Granularity): TimelineLabel[];
-        sameLabel?(firstDatePeriod: TimelineDatePeriod, secondDatePeriod: TimelineDatePeriod): boolean;
-        generateLabel?(datePeriod: TimelineDatePeriod): TimelineLabel;
-        addDate(date: Date);
-        setNewEndDate(date: Date): void;
-        splitPeriod(index: number, newFraction: number, newDate: Date): void;
-        splitDateForTitle(date: Date): (string | number)[];
-        render(
-            props: GranularityRenderProps,
-            isFirst: boolean
-        ): Selection<any>;
-    }
+import { GranularityType } from "./granularityType";
+import { GranularityRenderProps } from "./granularityRenderProps";
+import { TimelineDatePeriod } from "../datePeriod/datePeriod";
+
+import {
+    ExtendedLabel,
+    TimelineLabel,
+} from "../dataInterfaces";
+
+export interface Granularity {
+    getType?(): GranularityType;
+    splitDate(date: Date): (string | number)[];
+    getDatePeriods(): TimelineDatePeriod[];
+    resetDatePeriods(): void;
+    getExtendedLabel(): ExtendedLabel;
+    setExtendedLabel(extendedLabel: ExtendedLabel): void;
+    createLabels(granularity: Granularity): TimelineLabel[];
+    sameLabel?(firstDatePeriod: TimelineDatePeriod, secondDatePeriod: TimelineDatePeriod): boolean;
+    generateLabel?(datePeriod: TimelineDatePeriod): TimelineLabel;
+    addDate(date: Date);
+    setNewEndDate(date: Date): void;
+    splitPeriod(index: number, newFraction: number, newDate: Date): void;
+    splitDateForTitle(date: Date): (string | number)[];
+    render(
+        props: GranularityRenderProps,
+        isFirst: boolean
+    ): Selection<any, any, any, any>;
 }

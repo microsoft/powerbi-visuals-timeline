@@ -24,13 +24,13 @@
  *  THE SOFTWARE.
  */
 
-module powerbi.extensibility.visual.granularity {
-    import Selection = d3.Selection;
-    import GranularitySettings = settings.GranularitySettings;
+import { Selection } from "d3-selection";
 
-    export interface GranularityRenderProps {
-        selection: Selection<any>;
-        granularSettings: GranularitySettings;
-        selectPeriodCallback: (granularityType: GranularityType) => void;
-    }
+import { GranularitySettings } from "../settings";
+import { GranularityType } from "./granularityType";
+
+export interface GranularityRenderProps {
+    selection: Selection<any, any, any, any>;
+    granularSettings: GranularitySettings;
+    selectPeriodCallback: (granularityType: GranularityType) => void;
 }

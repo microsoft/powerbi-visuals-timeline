@@ -24,115 +24,109 @@
  *  THE SOFTWARE.
  */
 
-module powerbi.extensibility.visual {
-    // powerbi.extensibility.utils.svg
-    import ClassAndSelector = powerbi.extensibility.utils.svg.CssConstants.ClassAndSelector;
+import { CssConstants } from "powerbi-visuals-utils-svgutils";
 
-    // granularity
-    import Granularity = granularity.Granularity;
+import { Granularity } from "./granularity/granularity";
+import { TimelineDatePeriod } from "./datePeriod/datePeriod";
 
-    // datePeriod
-    import TimelineDatePeriod = datePeriod.TimelineDatePeriod;
+export interface TimelineMargins {
+    LeftMargin: number;
+    RightMargin: number;
+    TopMargin: number;
+    BottomMargin: number;
+    CellWidth: number;
+    CellHeight: number;
+    StartXpoint: number;
+    StartYpoint: number;
+    ElementWidth: number;
+    MinCellWidth: number;
+    MinCellHeight: number;
+    MaxCellHeight: number;
+    PeriodSlicerRectWidth: number;
+    PeriodSlicerRectHeight: number;
+    LegendHeight: number;
+    LegendHeightOffset: number;
+    HeightOffset: number;
+}
 
-    export interface TimelineMargins {
-        LeftMargin: number;
-        RightMargin: number;
-        TopMargin: number;
-        BottomMargin: number;
-        CellWidth: number;
-        CellHeight: number;
-        StartXpoint: number;
-        StartYpoint: number;
-        ElementWidth: number;
-        MinCellWidth: number;
-        MinCellHeight: number;
-        MaxCellHeight: number;
-        PeriodSlicerRectWidth: number;
-        PeriodSlicerRectHeight: number;
-        LegendHeight: number;
-        LegendHeightOffset: number;
-        HeightOffset: number;
-    }
+export interface TimelineSelectors {
+    TimelineVisual: CssConstants.ClassAndSelector;
+    TimelineWrapper: CssConstants.ClassAndSelector;
+    SelectionRangeContainer: CssConstants.ClassAndSelector;
+    textLabel: CssConstants.ClassAndSelector;
+    LowerTextCell: CssConstants.ClassAndSelector;
+    UpperTextCell: CssConstants.ClassAndSelector;
+    UpperTextArea: CssConstants.ClassAndSelector;
+    LowerTextArea: CssConstants.ClassAndSelector;
+    RangeTextArea: CssConstants.ClassAndSelector;
+    CellsArea: CssConstants.ClassAndSelector;
+    CursorsArea: CssConstants.ClassAndSelector;
+    MainArea: CssConstants.ClassAndSelector;
+    SelectionCursor: CssConstants.ClassAndSelector;
+    Cell: CssConstants.ClassAndSelector;
+    CellRect: CssConstants.ClassAndSelector;
+    TimelineSlicer: CssConstants.ClassAndSelector;
+    PeriodSlicerGranularities: CssConstants.ClassAndSelector;
+    PeriodSlicerSelection: CssConstants.ClassAndSelector;
+    PeriodSlicerSelectionRect: CssConstants.ClassAndSelector;
+    PeriodSlicerRect: CssConstants.ClassAndSelector;
+}
 
-    export interface TimelineSelectors {
-        TimelineVisual: ClassAndSelector;
-        TimelineWrapper: ClassAndSelector;
-        SelectionRangeContainer: ClassAndSelector;
-        textLabel: ClassAndSelector;
-        LowerTextCell: ClassAndSelector;
-        UpperTextCell: ClassAndSelector;
-        UpperTextArea: ClassAndSelector;
-        LowerTextArea: ClassAndSelector;
-        RangeTextArea: ClassAndSelector;
-        CellsArea: ClassAndSelector;
-        CursorsArea: ClassAndSelector;
-        MainArea: ClassAndSelector;
-        SelectionCursor: ClassAndSelector;
-        Cell: ClassAndSelector;
-        CellRect: ClassAndSelector;
-        TimelineSlicer: ClassAndSelector;
-        PeriodSlicerGranularities: ClassAndSelector;
-        PeriodSlicerSelection: ClassAndSelector;
-        PeriodSlicerSelectionRect: ClassAndSelector;
-        PeriodSlicerRect: ClassAndSelector;
-    }
+export interface TimelineLabel {
+    title: string;
+    text: string;
+    id: number;
+}
 
-    export interface TimelineLabel {
-        title: string;
-        text: string;
-        id: number;
-    }
+export interface ExtendedLabel {
+    yearLabels?: TimelineLabel[];
+    quarterLabels?: TimelineLabel[];
+    monthLabels?: TimelineLabel[];
+    weekLabels?: TimelineLabel[];
+    dayLabels?: TimelineLabel[];
+}
 
-    export interface ExtendedLabel {
-        yearLabels?: TimelineLabel[];
-        quarterLabels?: TimelineLabel[];
-        monthLabels?: TimelineLabel[];
-        weekLabels?: TimelineLabel[];
-        dayLabels?: TimelineLabel[];
-    }
+export interface ITimelineJSONDatePeriod {
+    startDate: string;
+    endDate: string;
+}
 
-    export interface ITimelineJSONDatePeriod {
-        startDate: string;
-        endDate: string;
-    }
+export interface TimelineCursorOverElement {
+    index: number;
+    datapoint: TimelineDatapoint;
+}
 
-    export interface TimelineCursorOverElement {
-        index: number;
-        datapoint: TimelineDatapoint;
-    }
+export interface TimelineProperties {
+    leftMargin: number;
+    rightMargin: number;
+    topMargin: number;
+    bottomMargin: number;
+    textYPosition: number;
+    startXpoint: number;
+    startYpoint: number;
+    elementWidth: number;
+    cellWidth: number;
+    cellHeight: number;
+    cellsYPosition: number;
+}
 
-    export interface TimelineProperties {
-        leftMargin: number;
-        rightMargin: number;
-        topMargin: number;
-        bottomMargin: number;
-        textYPosition: number;
-        startXpoint: number;
-        startYpoint: number;
-        elementWidth: number;
-        cellWidth: number;
-        cellHeight: number;
-        cellsYPosition: number;
-    }
+export interface TimelineData {
+    filterColumnTarget?: any; /* IFilterColumnTarget */
+    timelineDatapoints?: TimelineDatapoint[];
+    selectionStartIndex?: number;
+    selectionEndIndex?: number;
+    cursorDataPoints?: CursorDatapoint[];
+    currentGranularity?: Granularity;
+}
 
-    export interface TimelineData {
-        filterColumnTarget?: IFilterColumnTarget;
-        timelineDatapoints?: TimelineDatapoint[];
-        selectionStartIndex?: number;
-        selectionEndIndex?: number;
-        cursorDataPoints?: CursorDatapoint[];
-        currentGranularity?: Granularity;
-    }
+export interface CursorDatapoint {
+    x: number;
+    y: number;
+    cursorIndex: number;
+    selectionIndex: number;
+}
 
-    export interface CursorDatapoint {
-        x: number;
-        y: number;
-        cursorIndex: number;
-        selectionIndex: number;
-    }
-
-    export interface TimelineDatapoint {
-        index: number;
-        datePeriod: TimelineDatePeriod;
-    }
+export interface TimelineDatapoint {
+    index: number;
+    datePeriod: TimelineDatePeriod;
 }

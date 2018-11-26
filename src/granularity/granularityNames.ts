@@ -24,33 +24,34 @@
  *  THE SOFTWARE.
  */
 
-module powerbi.extensibility.visual.granularity {
-    export const GranularityNames: GranularityName[] = [
-        {
-            granularityType: GranularityType.year,
-            name: "year",
-            nameKey: "Visual_Granularity_Year",
-            marker: "Y"
-        }, {
-            granularityType: GranularityType.quarter,
-            name: "quarter",
-            nameKey: "Visual_Granularity_Quarter",
-            marker: "Q"
-        }, {
-            granularityType: GranularityType.month,
-            name: "month",
-            nameKey: "Visual_Granularity_Month",
-            marker: "M"
-        }, {
-            granularityType: GranularityType.week,
-            name: "week",
-            nameKey: "Visual_Granularity_Week",
-            marker: "W"
-        }, {
-            granularityType: GranularityType.day,
-            name: "day",
-            nameKey: "Visual_Granularity_Day",
-            marker: "D"
-        }
-    ];
-}
+import { GranularityName } from "./granularityName";
+import { GranularityType } from "./granularityType";
+
+export const GranularityNames: GranularityName[] = [
+    {
+        granularityType: GranularityType.year,
+        name: "year",
+        nameKey: "Visual_Granularity_Year",
+        marker: "Y"
+    }, {
+        granularityType: GranularityType.quarter,
+        name: "quarter",
+        nameKey: "Visual_Granularity_Quarter",
+        marker: "Q"
+    }, {
+        granularityType: GranularityType.month,
+        name: "month",
+        nameKey: "Visual_Granularity_Month",
+        marker: "M"
+    }, {
+        granularityType: GranularityType.week,
+        name: "week",
+        nameKey: "Visual_Granularity_Week",
+        marker: "W"
+    }, {
+        granularityType: GranularityType.day,
+        name: "day",
+        nameKey: "Visual_Granularity_Day",
+        marker: "D"
+    }
+];

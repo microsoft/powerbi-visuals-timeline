@@ -24,54 +24,61 @@
  *  THE SOFTWARE.
  */
 
-module powerbi.extensibility.visual.granularity {
-    // datePeriod
-    import TimelineDatePeriod = datePeriod.TimelineDatePeriod;
-    // utils
-    import Utils = utils.Utils;
-    import Selection = d3.Selection;
+import { Selection } from "d3-selection";
+import powerbi from "powerbi-visuals-api";
 
-    export class WeekGranularity extends TimelineGranularityBase {
-        constructor(calendar: Calendar, locale: string, protected localizationManager: ILocalizationManager) {
-            super(calendar, locale, Utils.getGranularityPropsByMarker("W"));
+import { Calendar } from "../calendar";
+import { Utils } from "../utils";
+import { TimelineLabel } from "../dataInterfaces";
+import { TimelineDatePeriod } from "../datePeriod/datePeriod";
+import { GranularityRenderProps } from "./granularityRenderProps";
+import { TimelineGranularityBase } from "./granularityBase";
+import { GranularityType } from "./granularityType";
+
+export class WeekGranularity extends TimelineGranularityBase {
+    constructor(
+        calendar: Calendar,
+        locale: string,
+        protected localizationManager: powerbi.extensibility.ILocalizationManager,
+    ) {
+        super(calendar, locale, Utils.getGranularityPropsByMarker("W"));
+    }
+
+    public render(props: GranularityRenderProps, isFirst: boolean): Selection<any, any, any, any> {
+        if (!props.granularSettings.granularityWeekVisibility) {
+            return null;
         }
 
-        public render(props: GranularityRenderProps, isFirst: boolean): Selection<any> {
-            if (!props.granularSettings.granularityWeekVisibility) {
-                return null;
-            }
+        return super.render(props, isFirst);
+    }
 
-            return super.render(props, isFirst);
-        }
+    public getType(): GranularityType {
+        return GranularityType.week;
+    }
 
-        public getType(): GranularityType {
-            return GranularityType.week;
-        }
+    public splitDate(date: Date): (string | number)[] {
+        return this.determineWeek(date);
+    }
 
-        public splitDate(date: Date): (string | number)[] {
-            return this.determineWeek(date);
-        }
+    public splitDateForTitle(date: Date): (string | number)[] {
+        const weekData = this.determineWeek(date);
 
-        public splitDateForTitle(date: Date): (string | number)[] {
-            const weekData = this.determineWeek(date);
+        return [
+            `W${weekData[0]}`,
+            weekData[1]
+        ];
+    }
 
-            return [
-                `W${weekData[0]}`,
-                weekData[1]
-            ];
-        }
+    public sameLabel(firstDatePeriod: TimelineDatePeriod, secondDatePeriod: TimelineDatePeriod): boolean {
+        return Utils.arraysEqual(firstDatePeriod.week, secondDatePeriod.week);
+    }
 
-        public sameLabel(firstDatePeriod: TimelineDatePeriod, secondDatePeriod: TimelineDatePeriod): boolean {
-            return Utils.arraysEqual(firstDatePeriod.week, secondDatePeriod.week);
-        }
-
-        public generateLabel(datePeriod: TimelineDatePeriod): TimelineLabel {
-            const localWeek = this.localizationManager.getDisplayName("Visual_Granularity_Week");
-            return {
-                title: `${localWeek} ${datePeriod.week[0]} - ${datePeriod.week[1]}`,
-                text: `W${datePeriod.week[0]}`,
-                id: datePeriod.index
-            };
-        }
+    public generateLabel(datePeriod: TimelineDatePeriod): TimelineLabel {
+        const localWeek = this.localizationManager.getDisplayName("Visual_Granularity_Week");
+        return {
+            title: `${localWeek} ${datePeriod.week[0]} - ${datePeriod.week[1]}`,
+            text: `W${datePeriod.week[0]}`,
+            id: datePeriod.index
+        };
     }
 }

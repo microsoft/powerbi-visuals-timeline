@@ -24,18 +24,16 @@
  *  THE SOFTWARE.
  */
 
-module powerbi.extensibility.visual.scaleUtils {
-    export interface ElementScale {
-        x: number;
-        y: number;
-    }
+export interface ElementScale {
+    x: number;
+    y: number;
+}
 
-    export function getScale(element: HTMLElement): ElementScale {
-        const clientRect: ClientRect = element.getBoundingClientRect();
+export function getScale(element: HTMLElement): ElementScale {
+    const clientRect: ClientRect = element.getBoundingClientRect();
 
-        return {
-            x: clientRect.width / element.offsetWidth,
-            y: clientRect.height / element.offsetHeight
-        };
-    }
+    return {
+        x: clientRect.width / element.offsetWidth,
+        y: clientRect.height / element.offsetHeight
+    };
 }

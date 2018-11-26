@@ -24,45 +24,52 @@
  *  THE SOFTWARE.
  */
 
-module powerbi.extensibility.visual.granularity {
-    // datePeriod
-    import TimelineDatePeriod = datePeriod.TimelineDatePeriod;
-    // utils
-    import Utils = utils.Utils;
-    import Selection = d3.Selection;
+import { Selection } from "d3-selection";
+import powerbi from "powerbi-visuals-api";
 
-    export class YearGranularity extends TimelineGranularityBase {
-        constructor(calendar: Calendar, locale: string, protected localizationManager: ILocalizationManager) {
-            super(calendar, locale, Utils.getGranularityPropsByMarker("Y"));
+import { Calendar } from "../calendar";
+import { Utils } from "../utils";
+import { TimelineLabel } from "../dataInterfaces";
+import { TimelineDatePeriod } from "../datePeriod/datePeriod";
+import { GranularityRenderProps } from "./granularityRenderProps";
+import { TimelineGranularityBase } from "./granularityBase";
+import { GranularityType } from "./granularityType";
+
+export class YearGranularity extends TimelineGranularityBase {
+    constructor(
+        calendar: Calendar,
+        locale: string,
+        protected localizationManager: powerbi.extensibility.ILocalizationManager
+    ) {
+        super(calendar, locale, Utils.getGranularityPropsByMarker("Y"));
+    }
+
+    public getType(): GranularityType {
+        return GranularityType.year;
+    }
+
+    public render(props: GranularityRenderProps, isFirst: boolean): Selection<any, any, any, any> {
+        if (!props.granularSettings.granularityYearVisibility) {
+            return null;
         }
 
-        public getType(): GranularityType {
-            return GranularityType.year;
-        }
+        return super.render(props, isFirst);
+    }
 
-        public render(props: GranularityRenderProps, isFirst: boolean): Selection<any> {
-            if (!props.granularSettings.granularityYearVisibility) {
-                return null;
-            }
+    public splitDate(date: Date): (string | number)[] {
+        return [this.determineYear(date)];
+    }
 
-            return super.render(props, isFirst);
-        }
+    public sameLabel(firstDatePeriod: TimelineDatePeriod, secondDatePeriod: TimelineDatePeriod): boolean {
+        return firstDatePeriod.year === secondDatePeriod.year;
+    }
 
-        public splitDate(date: Date): (string | number)[] {
-            return [this.determineYear(date)];
-        }
-
-        public sameLabel(firstDatePeriod: TimelineDatePeriod, secondDatePeriod: TimelineDatePeriod): boolean {
-            return firstDatePeriod.year === secondDatePeriod.year;
-        }
-
-        public generateLabel(datePeriod: TimelineDatePeriod): TimelineLabel {
-            const localYear = this.localizationManager.getDisplayName("Visual_Granularity_Year");
-            return {
-                title: `${localYear} ${datePeriod.year}`,
-                text: `${datePeriod.year}`,
-                id: datePeriod.index
-            };
-        }
+    public generateLabel(datePeriod: TimelineDatePeriod): TimelineLabel {
+        const localYear = this.localizationManager.getDisplayName("Visual_Granularity_Year");
+        return {
+            title: `${localYear} ${datePeriod.year}`,
+            text: `${datePeriod.year}`,
+            id: datePeriod.index
+        };
     }
 }

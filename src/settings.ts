@@ -24,88 +24,79 @@
  *  THE SOFTWARE.
  */
 
-module powerbi.extensibility.visual.settings {
-    // powerbi.data
-    import ISemanticFilter = powerbi.data.ISemanticFilter;
+import { dataViewObjectsParser } from "powerbi-visuals-utils-dataviewutils";
 
-    // datePeriod
-    import TimelineDatePeriodBase = datePeriod.TimelineDatePeriodBase;
+import { TimelineDatePeriodBase } from "./datePeriod/datePeriodBase";
+import { GranularityType } from "./granularity/granularityType";
 
-    // granularity
-    import GranularityType = granularity.GranularityType;
+export class GeneralSettings {
+    public datePeriod: TimelineDatePeriodBase | string = TimelineDatePeriodBase.createEmpty();
+    public isUserSelection: boolean = false;
+    public filter: any = null; // TODO: ISemanticFilter
+}
 
-    // powerbi.extensibility.utils.dataview
-    import DataViewObjectsParser = powerbi.extensibility.utils.dataview.DataViewObjectsParser;
+export class ForceSelectionSettings {
+    public currentPeriod: boolean = false;
+    public latestAvailableDate: boolean = false;
+}
 
-    export class GeneralSettings {
-        public datePeriod: TimelineDatePeriodBase | string = TimelineDatePeriodBase.createEmpty();
-        public isUserSelection: boolean = false;
-        public filter: ISemanticFilter = null;
-    }
+export class CalendarSettings {
+    public month: number = 0;
+    public day: number = 1;
+}
 
-    export class ForceSelectionSettings {
-        public currentPeriod: boolean = false;
-        public latestAvailableDate: boolean = false;
-    }
+export class WeekDaySettings {
+    public daySelection: boolean = true;
+    public day: number = 0;
+}
 
-    export class CalendarSettings {
-        public month: number = 0;
-        public day: number = 1;
-    }
+export class LabelsSettings {
+    show: boolean = true;
+    displayAll: boolean = true;
+    fontColor: string = "#777777";
+    textSize: number = 9;
+}
 
-    export class WeekDaySettings {
-        public daySelection: boolean = true;
-        public day: number = 0;
-    }
+export class CellsSettings {
+    public fillSelected: string = "#ADD8E6";
+    public fillUnselected: string = "";
+    public strokeColor: string = "#333444";
+    public selectedStrokeColor: string = "#333444";
+}
 
-    export class LabelsSettings {
-        show: boolean = true;
-        displayAll: boolean = true;
-        fontColor: string = "#777777";
-        textSize: number = 9;
-    }
+export class GranularitySettings {
+    public scaleColor: string = "#000000";
+    public sliderColor: string = "#AAAAAA";
+    public granularity: GranularityType = GranularityType.month;
+    public granularityYearVisibility: boolean = true;
+    public granularityQuarterVisibility: boolean = true;
+    public granularityMonthVisibility: boolean = true;
+    public granularityWeekVisibility: boolean = true;
+    public granularityDayVisibility: boolean = true;
+}
 
-    export class CellsSettings {
-        public fillSelected: string = "#ADD8E6";
-        public fillUnselected: string = "";
-        public strokeColor: string = "#333444";
-        public selectedStrokeColor: string = "#333444";
-    }
+export class ScaleSizeAdjustment {
+    show: boolean = false;
+}
 
-    export class GranularitySettings {
-        public scaleColor: string = "#000000";
-        public sliderColor: string = "#AAAAAA";
-        public granularity: GranularityType = GranularityType.month;
-        public granularityYearVisibility: boolean = true;
-        public granularityQuarterVisibility: boolean = true;
-        public granularityMonthVisibility: boolean = true;
-        public granularityWeekVisibility: boolean = true;
-        public granularityDayVisibility: boolean = true;
-    }
+export class ScrollAutoAdjustment {
+    show: boolean = false;
+}
 
-    export class ScaleSizeAdjustment {
-        show: boolean = false;
-    }
+export class CursorSettings {
+    public color: string = "#808080";
+}
 
-    export class ScrollAutoAdjustment {
-        show: boolean = false;
-    }
-
-    export class CursorSettings {
-        public color: string = "#808080";
-    }
-
-    export class VisualSettings extends DataViewObjectsParser {
-        public general: GeneralSettings = new GeneralSettings();
-        public calendar: CalendarSettings = new CalendarSettings();
-        public forceSelection: ForceSelectionSettings = new ForceSelectionSettings();
-        public weekDay: WeekDaySettings = new WeekDaySettings();
-        public rangeHeader: LabelsSettings = new LabelsSettings();
-        public cells: CellsSettings = new CellsSettings();
-        public granularity: GranularitySettings = new GranularitySettings();
-        public labels: LabelsSettings = new LabelsSettings();
-        public scaleSizeAdjustment: ScaleSizeAdjustment = new ScaleSizeAdjustment();
-        public scrollAutoAdjustment: ScrollAutoAdjustment = new ScrollAutoAdjustment();
-        public cursor: CursorSettings = new CursorSettings();
-    }
+export class VisualSettings extends dataViewObjectsParser.DataViewObjectsParser {
+    public general: GeneralSettings = new GeneralSettings();
+    public calendar: CalendarSettings = new CalendarSettings();
+    public forceSelection: ForceSelectionSettings = new ForceSelectionSettings();
+    public weekDay: WeekDaySettings = new WeekDaySettings();
+    public rangeHeader: LabelsSettings = new LabelsSettings();
+    public cells: CellsSettings = new CellsSettings();
+    public granularity: GranularitySettings = new GranularitySettings();
+    public labels: LabelsSettings = new LabelsSettings();
+    public scaleSizeAdjustment: ScaleSizeAdjustment = new ScaleSizeAdjustment();
+    public scrollAutoAdjustment: ScrollAutoAdjustment = new ScrollAutoAdjustment();
+    public cursor: CursorSettings = new CursorSettings();
 }

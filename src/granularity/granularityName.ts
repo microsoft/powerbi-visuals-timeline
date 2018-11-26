@@ -24,11 +24,11 @@
  *  THE SOFTWARE.
  */
 
-module powerbi.extensibility.visual.granularity {
-    export interface GranularityName {
-        granularityType: GranularityType;
-        name: string;
-        nameKey: string;
-        marker: string;
-    }
+import { GranularityType } from "./granularityType";
+
+export interface GranularityName {
+    granularityType: GranularityType;
+    name: string;
+    nameKey: string;
+    marker: string;
 }
