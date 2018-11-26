@@ -24,7 +24,7 @@
  *  THE SOFTWARE.
  */
 
-import "../styles/styles.less";
+import "../style/visual.less";
 
 import {
     select as d3Select,
@@ -1299,7 +1299,7 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
         this.setSelection(timelineData);
     }
 
-    public cursorDrag(currentCursor: CursorDatapoint): void {
+    public onCursorDrag(currentCursor: CursorDatapoint): void {
         let cursorOverElement: TimelineCursorOverElement = this.findCursorOverElement((require("d3").event as MouseEvent).x);
 
         if (!cursorOverElement) {
@@ -1359,30 +1359,29 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
         };
     }
 
-    public cursorDragended(currentCursor: CursorDatapoint): void {
+    public onCursorDragEnd(): void {
         this.setSelection(this.timelineData);
     }
 
     private cursorDragBehavior = d3Drag<any, CursorDatapoint>()
-        // TODO: check it
-        // .origin((cursorDataPoint: CursorDatapoint) => {
-        //     cursorDataPoint.x = cursorDataPoint.selectionIndex * this.timelineProperties.cellWidth;
+        .subject((cursorDataPoint: CursorDatapoint) => {
+            cursorDataPoint.x = cursorDataPoint.selectionIndex * this.timelineProperties.cellWidth;
 
-        //     return cursorDataPoint;
-        // })
+            return cursorDataPoint;
+        })
         .on("drag", (cursorDataPoint: CursorDatapoint) => {
             if (this.settings.forceSelection.currentPeriod || this.settings.forceSelection.latestAvailableDate) {
                 return;
             }
 
-            this.cursorDrag(cursorDataPoint);
+            this.onCursorDrag(cursorDataPoint);
         })
-        .on("dragend", (cursorDataPoint: CursorDatapoint) => {
+        .on("end", () => {
             if (this.settings.forceSelection.currentPeriod || this.settings.forceSelection.latestAvailableDate) {
                 return;
             }
 
-            this.cursorDragended(cursorDataPoint);
+            this.onCursorDragEnd();
         });
 
     public renderCursors(
