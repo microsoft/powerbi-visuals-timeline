@@ -24,87 +24,81 @@
  *  THE SOFTWARE.
  */
 
-/// <reference path="_references.ts"/>
+import powerbi from "powerbi-visuals-api";
 
-module powerbi.extensibility.visual.test {
-    // powerbi.extensibility.utils.test
-    import VisualBuilderBase = powerbi.extensibility.utils.test.VisualBuilderBase;
+import {
+    d3Click,
+    VisualBuilderBase,
+} from "powerbi-visuals-utils-testutils";
 
-    // Timeline1447991079100
-    import SandboxedVisualNameSpace = powerbi.extensibility.visual.Timeline1447991079100;
-    import VisualClass = SandboxedVisualNameSpace.Timeline;
-    import VisualSettings = SandboxedVisualNameSpace.settings.VisualSettings;
-    import TimelineDatePeriodBase = SandboxedVisualNameSpace.datePeriod.TimelineDatePeriodBase;
+import { Timeline } from "../src/visual";
+import { TimelineDatePeriodBase } from "../src/datePeriod/datePeriodBase";
 
-    export class TimelineBuilder extends VisualBuilderBase<VisualClass> {
-        constructor(width: number, height: number) {
-            super(width, height, "Timeline1447991079100");
+export class TimelineBuilder extends VisualBuilderBase<Timeline> {
+    constructor(width: number, height: number) {
+        super(width, height);
 
-            this.visualHost.applyJsonFilter = () => {};
-        }
+        this.visualHost.applyJsonFilter = () => { };
+    }
 
-        protected build(options: VisualConstructorOptions): VisualClass {
-            return new VisualClass(options);
-        }
+    protected build(options: powerbi.extensibility.visual.VisualConstructorOptions): Timeline {
+        return new Timeline(options);
+    }
 
-        public get visualObject(): VisualClass {
-            return this.visual;
-        }
+    public get visualObject(): Timeline {
+        return this.visual;
+    }
 
-        public get mainElement(): JQuery {
-            return this.element
-                .find("svg.timeline");
-        }
+    public get mainElement(): JQuery {
+        return this.element
+            .find("svg.timeline");
+    }
 
-        public get headerElement(): JQuery {
-            return this.element
-                .children("div")
-                .children("svg");
-        }
+    public get headerElement(): JQuery {
+        return this.element
+            .children("div")
+            .children("svg");
+    }
 
-        public get cellRects(): JQuery {
-            return this.mainArea
-                .children(".cellsArea")
-                .children(".cellRect");
-        }
+    public get cellRects(): JQuery {
+        return this.mainArea
+            .children(".cellsArea")
+            .children(".cellRect");
+    }
 
-        public get mainArea() {
-            return this.mainElement
-                .children("g.mainArea");
-        }
+    public get mainArea() {
+        return this.mainElement
+            .children("g.mainArea");
+    }
 
-        public get allLabels() {
-            return this.mainArea
-                .children("g")
-                .children("text.label");
-        }
+    public get allLabels() {
+        return this.mainArea
+            .children("g")
+            .children("text.label");
+    }
 
-        public get rangeHeaderText() {
-            return this.headerElement
-                .children("g.rangeTextArea")
-                .children("text.selectionRangeContainer");
-        }
+    public get rangeHeaderText() {
+        return this.headerElement
+            .children("g.rangeTextArea")
+            .children("text.selectionRangeContainer");
+    }
 
-        public get timelineSlicer() {
-            return this.headerElement
-                .children("g.timelineSlicer");
-        }
+    public get timelineSlicer() {
+        return this.headerElement
+            .children("g.timelineSlicer");
+    }
 
-        public selectTheLatestCell(dataView: DataView): void {
-            this.mainElement
-                .find(".cellRect")
-                .last()
-                .d3Click(0, 0);
-        }
+    public selectTheLatestCell(): void {
+        d3Click(this.mainElement.find(".cellRect").last(), 0, 0);
+    }
 
-        public static setDatePeriod(
-            dataView: DataView,
-            datePeriod: TimelineDatePeriodBase): void {
+    public static setDatePeriod(
+        dataView: powerbi.DataView,
+        datePeriod: TimelineDatePeriodBase): void {
 
-            (dataView.metadata.objects as any).general = {
-                datePeriod: datePeriod.toString(),
-                isUserSelection: true
-            };
-        }
+        (dataView.metadata.objects as any).general = {
+            datePeriod: datePeriod.toString(),
+            isUserSelection: true
+        };
     }
 }

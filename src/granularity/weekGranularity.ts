@@ -30,12 +30,14 @@ import powerbi from "powerbi-visuals-api";
 import { Calendar } from "../calendar";
 import { Utils } from "../utils";
 import { TimelineLabel } from "../dataInterfaces";
-import { TimelineDatePeriod } from "../datePeriod/datePeriod";
+import { ITimelineDatePeriod } from "../datePeriod/datePeriod";
 import { GranularityRenderProps } from "./granularityRenderProps";
 import { TimelineGranularityBase } from "./granularityBase";
 import { GranularityType } from "./granularityType";
 
 export class WeekGranularity extends TimelineGranularityBase {
+    private localizationKey: string = "Visual_Granularity_Year";
+
     constructor(
         calendar: Calendar,
         locale: string,
@@ -69,14 +71,17 @@ export class WeekGranularity extends TimelineGranularityBase {
         ];
     }
 
-    public sameLabel(firstDatePeriod: TimelineDatePeriod, secondDatePeriod: TimelineDatePeriod): boolean {
+    public sameLabel(firstDatePeriod: ITimelineDatePeriod, secondDatePeriod: ITimelineDatePeriod): boolean {
         return Utils.arraysEqual(firstDatePeriod.week, secondDatePeriod.week);
     }
 
-    public generateLabel(datePeriod: TimelineDatePeriod): TimelineLabel {
-        const localWeek = this.localizationManager.getDisplayName("Visual_Granularity_Week");
+    public generateLabel(datePeriod: ITimelineDatePeriod): TimelineLabel {
+        const localizedWeek = this.localizationManager
+            ? this.localizationManager.getDisplayName(this.localizationKey)
+            : this.localizationKey;
+
         return {
-            title: `${localWeek} ${datePeriod.week[0]} - ${datePeriod.week[1]}`,
+            title: `${localizedWeek} ${datePeriod.week[0]} - ${datePeriod.week[1]}`,
             text: `W${datePeriod.week[0]}`,
             id: datePeriod.index
         };

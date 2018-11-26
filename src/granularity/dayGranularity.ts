@@ -31,7 +31,7 @@ import { Calendar } from "../calendar";
 import { TimelineGranularityBase } from "./granularityBase";
 import { GranularityRenderProps } from "./granularityRenderProps";
 import { GranularityType } from "./granularityType";
-import { TimelineDatePeriod } from "../datePeriod/datePeriod";
+import { ITimelineDatePeriod } from "../datePeriod/datePeriod";
 import { TimelineLabel } from "../dataInterfaces";
 
 export class DayGranularity extends TimelineGranularityBase {
@@ -59,11 +59,11 @@ export class DayGranularity extends TimelineGranularityBase {
         ];
     }
 
-    public sameLabel(firstDatePeriod: TimelineDatePeriod, secondDatePeriod: TimelineDatePeriod): boolean {
+    public sameLabel(firstDatePeriod: ITimelineDatePeriod, secondDatePeriod: ITimelineDatePeriod): boolean {
         return firstDatePeriod.startDate.getTime() === secondDatePeriod.startDate.getTime();
     }
 
-    public generateLabel(datePeriod: TimelineDatePeriod): TimelineLabel {
+    public generateLabel(datePeriod: ITimelineDatePeriod): TimelineLabel {
         const title: string = `${this.shortMonthName(datePeriod.startDate)} ${datePeriod.startDate.getDate()} - ${datePeriod.year}`;
 
         return {

@@ -63,7 +63,7 @@ import {
 import {
     CursorDatapoint,
     TimelineCursorOverElement,
-    TimelineData,
+    ITimelineData,
     TimelineDatapoint,
     TimelineLabel,
     TimelineMargins,
@@ -84,8 +84,8 @@ import { GranularityType } from "./granularity/granularityType";
 import { GranularityNames } from "./granularity/granularityNames";
 
 import {
+    ITimelineDatePeriodBase,
     ITimelineDatePeriod,
-    TimelineDatePeriod,
 } from "./datePeriod/datePeriod";
 
 import { TimelineDatePeriodBase } from "./datePeriod/datePeriodBase";
@@ -186,7 +186,7 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
     /**
      * It's public for testability
      */
-    public timelineData: TimelineData;
+    public timelineData: ITimelineData;
 
     private timelineGranularityData: TimelineGranularityData;
 
@@ -214,7 +214,7 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
 
     private svgWidth: number;
 
-    private datePeriod: ITimelineDatePeriod;
+    private datePeriod: ITimelineDatePeriodBase;
     private prevFilteredStartDate: Date | null = null;
     private prevFilteredEndDate: Date | null = null;
     private prevGranularity: GranularityType | null = null;
@@ -334,7 +334,7 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
             .classed(Timeline.TimelineSelectors.CursorsArea.className, true);
     }
 
-    private clear(): void {
+    public clear(): void {
         if (this.initialized) {
             this.selectionManager.clear();
 
@@ -418,7 +418,7 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
         timelineProperties.cellWidth = width;
     }
 
-    private createDatePeriod(dataView: powerbi.DataView): ITimelineDatePeriod {
+    private createDatePeriod(dataView: powerbi.DataView): ITimelineDatePeriodBase {
         return Utils.getDatePeriod(dataView.categorical.categories[0].values);
     }
 
@@ -437,7 +437,7 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
 
         if (this.initialized) {
             let actualEndDate: Date,
-                daysPeriods: TimelineDatePeriod[],
+                daysPeriods: ITimelineDatePeriod[],
                 prevStartDate: Date,
                 prevEndDate: Date,
                 changedSelection: boolean;
@@ -470,7 +470,7 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
     }
 
     public static selectCurrentPeriod(
-        datePeriod: ITimelineDatePeriod,
+        datePeriod: ITimelineDatePeriodBase,
         granularity: GranularityType,
         calendar
     ) {
@@ -478,7 +478,7 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
     }
 
     public static selectPeriod(
-        datePeriod: ITimelineDatePeriod,
+        datePeriod: ITimelineDatePeriodBase,
         granularity: GranularityType,
         calendar,
         periodDate: Date
@@ -626,7 +626,7 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
         if (filterDatePeriod.endDate && adaptedDataEndDate && filterDatePeriod.endDate.getTime() > adaptedDataEndDate.getTime()) {
             filterDatePeriod.endDate = null;
         }
-        const datePeriod: ITimelineDatePeriod = this.datePeriod;
+        const datePeriod: ITimelineDatePeriodBase = this.datePeriod;
 
         const granularity = this.settings.granularity.granularity;
         const currentForceSelection: boolean = this.settings.forceSelection.currentPeriod;
@@ -773,7 +773,7 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
      * TODO: We need to simplify this method.
      */
     public static converter(
-        timelineData: TimelineData,
+        timelineData: ITimelineData,
         timelineProperties: TimelineProperties,
         timelineGranularityData: TimelineGranularityData,
         dataView: powerbi.DataView,
@@ -794,7 +794,7 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
             isCalendarChanged: boolean,
             startDate: Date,
             endDate: Date,
-            timelineElements: TimelineDatePeriod[],
+            timelineElements: ITimelineDatePeriod[],
             countFullCells: number;
         if (!initialized) {
             timelineData.cursorDataPoints = [{
@@ -866,7 +866,7 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
 
         countFullCells = timelineData.currentGranularity
             .getDatePeriods()
-            .filter((datePeriod: TimelineDatePeriod) => {
+            .filter((datePeriod: ITimelineDatePeriod) => {
                 return datePeriod.index % 1 === 0;
             })
             .length;
@@ -888,7 +888,7 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
     }
 
     private render(
-        timelineData: TimelineData,
+        timelineData: ITimelineData,
         timelineSettings: VisualSettings,
         timelineProperties: TimelineProperties,
         options: powerbi.extensibility.visual.VisualUpdateOptions
@@ -1116,9 +1116,9 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
             .remove();
     }
 
-    private static updateCursors(timelineData: TimelineData): void {
-        let startDate: TimelineDatePeriod = timelineData.timelineDatapoints[timelineData.selectionStartIndex].datePeriod,
-            endDate: TimelineDatePeriod = timelineData.timelineDatapoints[timelineData.selectionEndIndex].datePeriod;
+    private static updateCursors(timelineData: ITimelineData): void {
+        let startDate: ITimelineDatePeriod = timelineData.timelineDatapoints[timelineData.selectionStartIndex].datePeriod,
+            endDate: ITimelineDatePeriod = timelineData.timelineDatapoints[timelineData.selectionEndIndex].datePeriod;
 
         timelineData.cursorDataPoints[0].selectionIndex = startDate.index;
         timelineData.cursorDataPoints[1].selectionIndex = endDate.index + endDate.fraction;
@@ -1221,7 +1221,7 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
             });
     }
 
-    public renderCells(timelineData: TimelineData, timelineProperties: TimelineProperties): void {
+    public renderCells(timelineData: ITimelineData, timelineProperties: TimelineProperties): void {
         let dataPoints: TimelineDatapoint[] = timelineData.timelineDatapoints,
             totalX: number = 0;
 
@@ -1275,7 +1275,7 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
         index: number,
         isMultiSelection: boolean): void {
 
-        let timelineData: TimelineData = this.timelineData,
+        let timelineData: ITimelineData = this.timelineData,
             cursorDataPoints: CursorDatapoint[] = timelineData.cursorDataPoints,
             timelineProperties: TimelineProperties = this.timelineProperties;
 
@@ -1393,7 +1393,7 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
         });
 
     public renderCursors(
-        timelineData: TimelineData,
+        timelineData: ITimelineData,
         cellHeight: number,
         cellsYPosition: number
     ): D3Selection<any, any, any, any> {
@@ -1433,7 +1433,7 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
         return cursorSelection;
     }
 
-    public renderTimeRangeText(timelineData: TimelineData, rangeHeaderSettings: LabelsSettings): void {
+    public renderTimeRangeText(timelineData: ITimelineData, rangeHeaderSettings: LabelsSettings): void {
         const leftMargin: number = (GranularityNames.length + Timeline.GranularityNamesLength)
             * this.timelineProperties.elementWidth;
 
@@ -1470,7 +1470,7 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
         }
     }
 
-    public setSelection(timelineData: TimelineData): void {
+    public setSelection(timelineData: ITimelineData): void {
         if (Utils.areBoundsOfSelectionAndAvailableDatesTheSame(timelineData)) {
             this.clearSelection(timelineData.filterColumnTarget);
 

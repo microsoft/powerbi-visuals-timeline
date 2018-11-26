@@ -36,7 +36,7 @@ import { pixelConverter } from "powerbi-visuals-utils-typeutils";
 import { Utils } from "../utils";
 import { Granularity } from "./granularity";
 import { Calendar } from "../calendar";
-import { TimelineDatePeriod } from "../datePeriod/datePeriod";
+import { ITimelineDatePeriod } from "../datePeriod/datePeriod";
 import { GranularityName } from "./granularityName";
 import { GranularityRenderProps } from "./granularityRenderProps";
 import { GranularitySettings } from "../settings";
@@ -75,7 +75,7 @@ export class TimelineGranularityBase implements Granularity {
 
     protected calendar: Calendar;
 
-    private datePeriods: TimelineDatePeriod[] = [];
+    private datePeriods: ITimelineDatePeriod[] = [];
     private extendedLabel: ExtendedLabel;
     private shortMonthFormatter: valueFormatter.IValueFormatter;
     private granularityProps: GranularityName = null;
@@ -190,7 +190,7 @@ export class TimelineGranularityBase implements Granularity {
         this.datePeriods = [];
     }
 
-    public getDatePeriods(): TimelineDatePeriod[] {
+    public getDatePeriods(): ITimelineDatePeriod[] {
         return this.datePeriods;
     }
 
@@ -204,9 +204,9 @@ export class TimelineGranularityBase implements Granularity {
 
     public createLabels(granularity: Granularity): TimelineLabel[] {
         let labels: TimelineLabel[] = [],
-            lastDatePeriod: TimelineDatePeriod;
+            lastDatePeriod: ITimelineDatePeriod;
 
-        this.datePeriods.forEach((datePeriod: TimelineDatePeriod) => {
+        this.datePeriods.forEach((datePeriod: ITimelineDatePeriod) => {
             if (!labels.length || !granularity.sameLabel(datePeriod, lastDatePeriod)) {
                 lastDatePeriod = datePeriod;
                 labels.push(granularity.generateLabel(datePeriod));
@@ -224,8 +224,8 @@ export class TimelineGranularityBase implements Granularity {
     * It is assumed that the given date does not correspond to previous date periods, other than the last date period
     */
     public addDate(date: Date): void {
-        let datePeriods: TimelineDatePeriod[] = this.getDatePeriods(),
-            lastDatePeriod: TimelineDatePeriod = datePeriods[datePeriods.length - 1],
+        let datePeriods: ITimelineDatePeriod[] = this.getDatePeriods(),
+            lastDatePeriod: ITimelineDatePeriod = datePeriods[datePeriods.length - 1],
             identifierArray: (string | number)[] = this.splitDate(date);
 
         if (datePeriods.length === 0
@@ -262,11 +262,11 @@ export class TimelineGranularityBase implements Granularity {
      * @param newDate The date in which the date period is split
      */
     public splitPeriod(index: number, newFraction: number, newDate: Date): void {
-        let oldDatePeriod: TimelineDatePeriod = this.datePeriods[index];
+        let oldDatePeriod: ITimelineDatePeriod = this.datePeriods[index];
 
         oldDatePeriod.fraction -= newFraction;
 
-        let newDateObject: TimelineDatePeriod = {
+        let newDateObject: ITimelineDatePeriod = {
             identifierArray: oldDatePeriod.identifierArray,
             startDate: newDate,
             endDate: oldDatePeriod.endDate,

@@ -24,23 +24,27 @@
  *  THE SOFTWARE.
  */
 
-// Power BI API
-/// <reference path="../.api/v1.13.0/PowerBI-visuals.d.ts" />
+import {
+    RgbColor,
+    parseColorString,
+} from "powerbi-visuals-utils-testutils";
 
-// Power BI Extensibility
-/// <reference path="../node_modules/powerbi-visuals-utils-dataviewutils/lib/index.d.ts" />
-/// <reference path="../node_modules/powerbi-visuals-utils-typeutils/lib/index.d.ts" />
-/// <reference path="../node_modules/powerbi-visuals-utils-svgutils/lib/index.d.ts" />
-/// <reference path="../node_modules/powerbi-visuals-utils-interactivityutils/lib/index.d.ts" />
-/// <reference path="../node_modules/powerbi-visuals-utils-formattingutils/lib/index.d.ts" />
-/// <reference path="../node_modules/powerbi-visuals-utils-chartutils/lib/index.d.ts" />
-/// <reference path="../node_modules/powerbi-visuals-utils-testutils/lib/index.d.ts"/>
+import { range } from "d3-array";
 
-// The visual
-/// <reference path="../.tmp/drop/visual.d.ts" />
+export function areColorsEqual(firstColor: string, secondColor: string): boolean {
+    const firstConvertedColor: RgbColor = parseColorString(firstColor);
+    const secondConvertedColor: RgbColor = parseColorString(secondColor);
 
-// Test
-/// <reference path="helpers/helpers.ts" />
-/// <reference path="mocks/granularityMock.ts" />
-/// <reference path="visualData.ts" />
-/// <reference path="visualBuilder.ts" />
+    return firstConvertedColor.R === secondConvertedColor.R
+        && firstConvertedColor.G === secondConvertedColor.G
+        && firstConvertedColor.B === secondConvertedColor.B;
+}
+
+export function getDateRange(start: Date, stop: Date, step: number): Date[] {
+    return range(start.getTime(), stop.getTime(), step)
+        .map((milliseconds: number) => new Date(milliseconds));
+}
+
+export function getSolidColorStructuralObject(color: string): any {
+    return { solid: { color: color } };
+}

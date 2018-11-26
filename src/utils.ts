@@ -25,12 +25,12 @@
  */
 
 import {
+    ITimelineDatePeriodBase,
     ITimelineDatePeriod,
-    TimelineDatePeriod,
 } from "./datePeriod/datePeriod";
 
 import {
-    TimelineData,
+    ITimelineData,
     TimelineDatapoint,
 } from "./dataInterfaces";
 
@@ -144,7 +144,7 @@ export class Utils {
             date.getDate());
     }
 
-    public static getDatePeriod(values: any[]): ITimelineDatePeriod {
+    public static getDatePeriod(values: any[]): ITimelineDatePeriodBase {
         let startDate: Date,
             endDate: Date;
 
@@ -184,8 +184,8 @@ export class Utils {
         return undefined;
     }
 
-    public static areBoundsOfSelectionAndAvailableDatesTheSame(timelineData: TimelineData): boolean {
-        const datePeriod: TimelineDatePeriod[] = timelineData.currentGranularity.getDatePeriods(),
+    public static areBoundsOfSelectionAndAvailableDatesTheSame(timelineData: ITimelineData): boolean {
+        const datePeriod: ITimelineDatePeriod[] = timelineData.currentGranularity.getDatePeriods(),
             startDate: Date = Utils.getStartSelectionDate(timelineData),
             endDate: Date = Utils.getEndSelectionDate(timelineData);
 
@@ -211,7 +211,7 @@ export class Utils {
      * Returns the date of the start of the selection
      * @param timelineData The TimelineData which contains all the date periods
      */
-    public static getStartSelectionDate(timelineData: TimelineData): Date {
+    public static getStartSelectionDate(timelineData: ITimelineData): Date {
         return timelineData.currentGranularity.getDatePeriods()[timelineData.selectionStartIndex].startDate;
     }
 
@@ -219,7 +219,7 @@ export class Utils {
      * Returns the date of the end of the selection
      * @param timelineData The TimelineData which contains all the date periods
      */
-    public static getEndSelectionDate(timelineData: TimelineData): Date {
+    public static getEndSelectionDate(timelineData: ITimelineData): Date {
         return timelineData.currentGranularity.getDatePeriods()[timelineData.selectionEndIndex].endDate;
     }
 
@@ -227,7 +227,7 @@ export class Utils {
      * Returns the date period of the end of the selection
      * @param timelineData The TimelineData which contains all the date periods
      */
-    public static getEndSelectionPeriod(timelineData: TimelineData): TimelineDatePeriod {
+    public static getEndSelectionPeriod(timelineData: ITimelineData): ITimelineDatePeriod {
         return timelineData.currentGranularity.getDatePeriods()[timelineData.selectionEndIndex];
     }
 
@@ -240,7 +240,7 @@ export class Utils {
      */
     public static getCellColor(
         dataPoint: TimelineDatapoint,
-        timelineData: TimelineData,
+        timelineData: ITimelineData,
         cellSettings: CellsSettings): string {
 
         const inSelectedPeriods: boolean = dataPoint.datePeriod.startDate >= Utils.getStartSelectionDate(timelineData)
@@ -251,7 +251,7 @@ export class Utils {
             : (cellSettings.fillUnselected || Utils.DefaultCellColor);
     }
 
-    public static isGranuleSelected(dataPoint: TimelineDatapoint, timelineData: TimelineData, cellSettings: CellsSettings): boolean {
+    public static isGranuleSelected(dataPoint: TimelineDatapoint, timelineData: ITimelineData, cellSettings: CellsSettings): boolean {
         return dataPoint.datePeriod.startDate >= Utils.getStartSelectionDate(timelineData)
             && dataPoint.datePeriod.endDate <= Utils.getEndSelectionDate(timelineData);
     }
@@ -295,8 +295,8 @@ export class Utils {
      * @param startDate The starting date of the selection
      * @param endDate The ending date of the selection
      */
-    public static separateSelection(timelineData: TimelineData, startDate: Date, endDate: Date): void {
-        let datePeriods: TimelineDatePeriod[] = timelineData.currentGranularity.getDatePeriods(),
+    public static separateSelection(timelineData: ITimelineData, startDate: Date, endDate: Date): void {
+        let datePeriods: ITimelineDatePeriod[] = timelineData.currentGranularity.getDatePeriods(),
             startDateIndex: number = Utils.findIndex(datePeriods, x => startDate < x.endDate),
             endDateIndex: number = Utils.findIndex(datePeriods, x => endDate <= x.endDate);
 
@@ -337,7 +337,7 @@ export class Utils {
      * @param date The date
      * @param fromStart Whether to calculater the ratio from the start of the date period.
      */
-    public static getDateRatio(datePeriod: TimelineDatePeriod, date: Date, fromStart: boolean): number {
+    public static getDateRatio(datePeriod: ITimelineDatePeriod, date: Date, fromStart: boolean): number {
         const dateDifference: number = fromStart
             ? date.getTime() - datePeriod.startDate.getTime()
             : datePeriod.endDate.getTime() - date.getTime();
@@ -352,7 +352,7 @@ export class Utils {
     /**
     * Returns the time range text, depending on the given granularity (e.g. "Feb 3 2014 - Apr 5 2015", "Q1 2014 - Q2 2015")
     */
-    public static timeRangeText(timelineData: TimelineData): string {
+    public static timeRangeText(timelineData: ITimelineData): string {
         let startSelectionDateArray: (string | number)[] = timelineData.currentGranularity
             .splitDateForTitle(Utils.getStartSelectionDate(timelineData));
 
@@ -362,7 +362,7 @@ export class Utils {
         return `${startSelectionDateArray.join(Utils.DateArrayJoiner)}${Utils.DateSplitter}${endSelectionDateArray.join(Utils.DateArrayJoiner)}`;
     }
 
-    public static dateRangeText(datePeriod: TimelineDatePeriod): string {
+    public static dateRangeText(datePeriod: ITimelineDatePeriod): string {
         return `${datePeriod.startDate.toDateString()}${Utils.DateSplitter}${this.previousDay(datePeriod.endDate).toDateString()}`;
     }
 
@@ -371,10 +371,10 @@ export class Utils {
      * i.e. combines "Feb 1 2016 - Feb 5 2016" with "Feb 5 2016 - Feb 29 2016" into "Feb 1 2016 - Feb 29 2016"
      * @param datePeriods The list of date periods
      */
-    public static unseparateSelection(datePeriods: TimelineDatePeriod[]): void {
+    public static unseparateSelection(datePeriods: ITimelineDatePeriod[]): void {
         const separationIndex: number = Utils.findIndex(
             datePeriods,
-            (datePeriod: TimelineDatePeriod) => {
+            (datePeriod: ITimelineDatePeriod) => {
                 return datePeriod.fraction < Utils.MinFraction;
             });
 

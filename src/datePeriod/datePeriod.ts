@@ -24,12 +24,12 @@
  *  THE SOFTWARE.
  */
 
-export interface ITimelineDatePeriod {
+export interface ITimelineDatePeriodBase {
     startDate: Date;
     endDate: Date;
 }
 
-export interface TimelineDatePeriod extends ITimelineDatePeriod {
+export interface ITimelineDatePeriod extends ITimelineDatePeriodBase {
     identifierArray: (string | number)[];
     year: number;
     week: number[];

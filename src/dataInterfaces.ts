@@ -27,7 +27,7 @@
 import { CssConstants } from "powerbi-visuals-utils-svgutils";
 
 import { Granularity } from "./granularity/granularity";
-import { TimelineDatePeriod } from "./datePeriod/datePeriod";
+import { ITimelineDatePeriod } from "./datePeriod/datePeriod";
 
 export interface TimelineMargins {
     LeftMargin: number;
@@ -110,7 +110,7 @@ export interface TimelineProperties {
     cellsYPosition: number;
 }
 
-export interface TimelineData {
+export interface ITimelineData {
     filterColumnTarget?: any; /* IFilterColumnTarget */
     timelineDatapoints?: TimelineDatapoint[];
     selectionStartIndex?: number;
@@ -128,5 +128,5 @@ export interface CursorDatapoint {
 
 export interface TimelineDatapoint {
     index: number;
-    datePeriod: TimelineDatePeriod;
+    datePeriod: ITimelineDatePeriod;
 }

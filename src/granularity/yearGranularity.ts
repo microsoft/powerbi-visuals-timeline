@@ -30,12 +30,14 @@ import powerbi from "powerbi-visuals-api";
 import { Calendar } from "../calendar";
 import { Utils } from "../utils";
 import { TimelineLabel } from "../dataInterfaces";
-import { TimelineDatePeriod } from "../datePeriod/datePeriod";
+import { ITimelineDatePeriod } from "../datePeriod/datePeriod";
 import { GranularityRenderProps } from "./granularityRenderProps";
 import { TimelineGranularityBase } from "./granularityBase";
 import { GranularityType } from "./granularityType";
 
 export class YearGranularity extends TimelineGranularityBase {
+    private localizationKey: string = "Visual_Granularity_Year";
+
     constructor(
         calendar: Calendar,
         locale: string,
@@ -60,14 +62,17 @@ export class YearGranularity extends TimelineGranularityBase {
         return [this.determineYear(date)];
     }
 
-    public sameLabel(firstDatePeriod: TimelineDatePeriod, secondDatePeriod: TimelineDatePeriod): boolean {
+    public sameLabel(firstDatePeriod: ITimelineDatePeriod, secondDatePeriod: ITimelineDatePeriod): boolean {
         return firstDatePeriod.year === secondDatePeriod.year;
     }
 
-    public generateLabel(datePeriod: TimelineDatePeriod): TimelineLabel {
-        const localYear = this.localizationManager.getDisplayName("Visual_Granularity_Year");
+    public generateLabel(datePeriod: ITimelineDatePeriod): TimelineLabel {
+        const localizedYear = this.localizationManager
+            ? this.localizationManager.getDisplayName(this.localizationKey)
+            : this.localizationKey;
+
         return {
-            title: `${localYear} ${datePeriod.year}`,
+            title: `${localizedYear} ${datePeriod.year}`,
             text: `${datePeriod.year}`,
             id: datePeriod.index
         };

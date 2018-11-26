@@ -28,7 +28,7 @@ import { Selection } from "d3-selection";
 
 import { GranularityType } from "./granularityType";
 import { GranularityRenderProps } from "./granularityRenderProps";
-import { TimelineDatePeriod } from "../datePeriod/datePeriod";
+import { ITimelineDatePeriod } from "../datePeriod/datePeriod";
 
 import {
     ExtendedLabel,
@@ -38,13 +38,13 @@ import {
 export interface Granularity {
     getType?(): GranularityType;
     splitDate(date: Date): (string | number)[];
-    getDatePeriods(): TimelineDatePeriod[];
+    getDatePeriods(): ITimelineDatePeriod[];
     resetDatePeriods(): void;
     getExtendedLabel(): ExtendedLabel;
     setExtendedLabel(extendedLabel: ExtendedLabel): void;
     createLabels(granularity: Granularity): TimelineLabel[];
-    sameLabel?(firstDatePeriod: TimelineDatePeriod, secondDatePeriod: TimelineDatePeriod): boolean;
-    generateLabel?(datePeriod: TimelineDatePeriod): TimelineLabel;
+    sameLabel?(firstDatePeriod: ITimelineDatePeriod, secondDatePeriod: ITimelineDatePeriod): boolean;
+    generateLabel?(datePeriod: ITimelineDatePeriod): TimelineLabel;
     addDate(date: Date);
     setNewEndDate(date: Date): void;
     splitPeriod(index: number, newFraction: number, newDate: Date): void;

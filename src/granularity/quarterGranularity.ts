@@ -29,7 +29,7 @@ import { Selection } from "d3-selection";
 import { Calendar } from "../calendar";
 import { Utils } from "../utils";
 import { TimelineLabel } from "../dataInterfaces";
-import { TimelineDatePeriod } from "../datePeriod/datePeriod";
+import { ITimelineDatePeriod } from "../datePeriod/datePeriod";
 import { GranularityRenderProps } from "./granularityRenderProps";
 import { TimelineGranularityBase } from "./granularityBase";
 import { GranularityType } from "./granularityType";
@@ -82,12 +82,12 @@ export class QuarterGranularity extends TimelineGranularityBase {
         ];
     }
 
-    public sameLabel(firstDatePeriod: TimelineDatePeriod, secondDatePeriod: TimelineDatePeriod): boolean {
+    public sameLabel(firstDatePeriod: ITimelineDatePeriod, secondDatePeriod: ITimelineDatePeriod): boolean {
         return this.quarterText(firstDatePeriod.startDate) === this.quarterText(secondDatePeriod.startDate)
             && firstDatePeriod.year === secondDatePeriod.year;
     }
 
-    public generateLabel(datePeriod: TimelineDatePeriod): TimelineLabel {
+    public generateLabel(datePeriod: ITimelineDatePeriod): TimelineLabel {
         const quarter: string = this.quarterText(datePeriod.startDate);
 
         return {

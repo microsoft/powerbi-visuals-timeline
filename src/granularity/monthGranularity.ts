@@ -29,7 +29,7 @@ import { Selection } from "d3-selection";
 import { Calendar } from "../calendar";
 import { Utils } from "../utils";
 import { TimelineLabel } from "../dataInterfaces";
-import { TimelineDatePeriod } from "../datePeriod/datePeriod";
+import { ITimelineDatePeriod } from "../datePeriod/datePeriod";
 import { GranularityRenderProps } from "./granularityRenderProps";
 import { TimelineGranularityBase } from "./granularityBase";
 import { GranularityType } from "./granularityType";
@@ -58,12 +58,12 @@ export class MonthGranularity extends TimelineGranularityBase {
         ];
     }
 
-    public sameLabel(firstDatePeriod: TimelineDatePeriod, secondDatePeriod: TimelineDatePeriod): boolean {
+    public sameLabel(firstDatePeriod: ITimelineDatePeriod, secondDatePeriod: ITimelineDatePeriod): boolean {
         return this.shortMonthName(firstDatePeriod.startDate) === this.shortMonthName(secondDatePeriod.startDate)
             && this.determineYear(firstDatePeriod.startDate) === this.determineYear(secondDatePeriod.startDate);
     }
 
-    public generateLabel(datePeriod: TimelineDatePeriod): TimelineLabel {
+    public generateLabel(datePeriod: ITimelineDatePeriod): TimelineLabel {
         const shortMonthName: string = this.shortMonthName(datePeriod.startDate);
 
         return {

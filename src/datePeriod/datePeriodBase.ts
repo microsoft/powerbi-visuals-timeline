@@ -24,11 +24,11 @@
  *  THE SOFTWARE.
  */
 
-import { ITimelineDatePeriod } from "./datePeriod";
+import { ITimelineDatePeriodBase } from "./datePeriod";
 import { ITimelineJSONDatePeriod } from "../dataInterfaces";
 import { Utils } from "../utils";
 
-export class TimelineDatePeriodBase implements ITimelineDatePeriod {
+export class TimelineDatePeriodBase implements ITimelineDatePeriodBase {
     public startDate: Date = null;
     public endDate: Date = null;
 
