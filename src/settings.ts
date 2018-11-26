@@ -32,7 +32,6 @@ import { GranularityType } from "./granularity/granularityType";
 export class GeneralSettings {
     public datePeriod: TimelineDatePeriodBase | string = TimelineDatePeriodBase.createEmpty();
     public isUserSelection: boolean = false;
-    public filter: any = null; // TODO: ISemanticFilter
 }
 
 export class ForceSelectionSettings {

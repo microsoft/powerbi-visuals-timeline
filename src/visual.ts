@@ -457,11 +457,12 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
                 ||
                 actualEndDate.getTime() !== prevEndDate.getTime();
 
-            if (!changedSelection && !this.settings.general.filter) {
+            if (!changedSelection) {
                 this.changeGranularity(
                     this.settings.granularity.granularity,
                     startDate,
-                    actualEndDate);
+                    actualEndDate
+                );
             } else {
                 this.initialized = false;
             }
@@ -574,7 +575,11 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
         this.datePeriod = this.createDatePeriod(this.dataView);
 
         // Setting parsing was moved here from createTimelineData because settings values may be modified before the function is called.
-        this.settings = Timeline.parseSettings(this.dataView, this.host.colorPalette);
+        this.settings = Timeline.parseSettings(
+            this.dataView,
+            this.options.jsonFilters as AdvancedFilter[],
+            this.host.colorPalette,
+        );
 
         if (!this.initialized) {
             this.timelineData = {
@@ -593,7 +598,8 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
             this.datePeriod.endDate,
             this.timelineGranularityData,
             this.locale,
-            this.localizationManager);
+            this.localizationManager
+        );
 
         this.updateCalendar(this.settings);
 
@@ -604,7 +610,10 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
         // There may be the case when date boundaries that taken from data view are less than slicer filter dates.
         // The case may happen if there is another timeline slicer that works with the same data and already applied a filter.
         // In that case we need to correct slice filter dates.
-        if (filterDatePeriod.startDate && this.datePeriod.startDate && filterDatePeriod.startDate.getTime() < this.datePeriod.startDate.getTime()) {
+        if (filterDatePeriod.startDate
+            && this.datePeriod.startDate
+            && filterDatePeriod.startDate.getTime() < this.datePeriod.startDate.getTime()
+        ) {
             filterDatePeriod.startDate = null;
         }
         // End date from data is always less than date from slicer filter.
@@ -623,8 +632,10 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
         const currentForceSelection: boolean = this.settings.forceSelection.currentPeriod;
         const latestAvailableDate: boolean = this.settings.forceSelection.latestAvailableDate;
         const isUserSelection: boolean = this.settings.general.isUserSelection && !currentForceSelection && !latestAvailableDate;
-        const target: any = this.timelineData.filterColumnTarget; // IFilterColumnTarget
+        const target: IFilterColumnTarget = this.timelineData.filterColumnTarget;
+
         let currentForceSelectionResult = { startDate: null, endDate: null };
+
         if (currentForceSelection) {
             currentForceSelectionResult = ({
                 startDate: filterDatePeriod.startDate,
@@ -1115,30 +1126,27 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
 
     private static parseSettings(
         dataView: powerbi.DataView,
+        jsonFilters: AdvancedFilter[],
         colorPalette: powerbi.extensibility.ISandboxExtendedColorPalette
     ): VisualSettings {
         const settings: VisualSettings = VisualSettings.parse<VisualSettings>(dataView);
 
         Timeline.setValidCalendarSettings(settings.calendar);
 
-        // const filter: IAdvancedFilter = FilterManager.restoreFilter(
-        //     dataView.metadata
-        //     && dataView.metadata.objects
-        //     && dataView.metadata.objects["general"]
-        //     && dataView.metadata.objects["general"]["filter"] as any
-        // ) as IAdvancedFilter;
-
-        const filter = null; // TODO: fix it.
-
-        if (filter
-            && filter.conditions
-            && filter.conditions[0]
-            && filter.conditions[1]
+        if (jsonFilters
+            && jsonFilters[0]
+            && jsonFilters[0].conditions
+            && jsonFilters[0].conditions[0]
+            && jsonFilters[0].conditions[1]
         ) {
-            const startDate: Date = filter.conditions[0].value as any;
-            const endDate: Date = filter.conditions[1].value as any;
+            const startDate: Date = new Date(`${jsonFilters[0].conditions[0].value}`);
+            const endDate: Date = new Date(`${jsonFilters[0].conditions[1].value}`);
 
-            settings.general.datePeriod = TimelineDatePeriodBase.create(startDate, endDate);
+            if (!isNaN(startDate.getTime()) && !isNaN(endDate.getTime())) {
+                settings.general.datePeriod = TimelineDatePeriodBase.create(startDate, endDate);
+            } else {
+                settings.general.datePeriod = TimelineDatePeriodBase.createEmpty();
+            }
         } else {
             settings.general.datePeriod = TimelineDatePeriodBase.createEmpty();
         }
@@ -1400,11 +1408,8 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
             .classed(Timeline.TimelineSelectors.SelectionCursor.className, true)
             .merge(cursorSelection)
             .attr("transform", (cursorDataPoint: CursorDatapoint) => {
-                let dx: number,
-                    dy: number;
-
-                dx = cursorDataPoint.selectionIndex * this.timelineProperties.cellWidth;
-                dy = cellHeight / Timeline.CellHeightDivider + cellsYPosition;
+                const dx: number = cursorDataPoint.selectionIndex * this.timelineProperties.cellWidth;
+                const dy: number = cellHeight / Timeline.CellHeightDivider + cellsYPosition;
 
                 return svgManipulation.translate(dx, dy);
             })
@@ -1471,6 +1476,7 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
 
             return;
         }
+
         this.applyDatePeriod(
             Utils.getStartSelectionDate(timelineData),
             Utils.getEndSelectionDate(timelineData),
@@ -1480,6 +1486,7 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
     }
 
     private applyFilterSettingsInCapabilities(isUserSelection: boolean, isClearPeriod?: boolean): void {
+        console.log("applyFilterSettingsInCapabilities");
         const instanceOfGeneral: powerbi.VisualObjectInstance = {
             objectName: "general",
             selector: undefined,
@@ -1502,7 +1509,7 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
     public applyDatePeriod(
         startDate: Date,
         endDate: Date,
-        target: any, // TODO: IFilterColumnTarget
+        target: IFilterColumnTarget,
         isUserSelection: boolean
     ): void {
         this.applyFilterSettingsInCapabilities(isUserSelection, startDate === null && endDate === null ? true : false);
@@ -1511,7 +1518,7 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
             && startDate !== null && endDate !== null);
 
         this.host.applyJsonFilter(
-            this.getFilter(startDate, endDate, target),
+            this.createFilter(startDate, endDate, target),
             Timeline.filterObjectProperty.objectName,
             Timeline.filterObjectProperty.propertyName,
             isMerge
@@ -1520,7 +1527,7 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
         );
     }
 
-    public getFilter(startDate: Date, endDate: Date, target: IFilterColumnTarget): AdvancedFilter {
+    public createFilter(startDate: Date, endDate: Date, target: IFilterColumnTarget): AdvancedFilter {
         if (startDate == null || endDate == null || !target) {
             return null;
         }
@@ -1558,19 +1565,23 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
             return [];
         }
 
-        const settings: VisualSettings = this.settings
-            || VisualSettings.getDefault() as VisualSettings;
+        const settings: VisualSettings = this.settings || VisualSettings.getDefault() as VisualSettings;
 
         let instancesEnumerator: powerbi.VisualObjectInstanceEnumeration = VisualSettings.enumerateObjectInstances(
             settings,
-            options),
-            instances = instancesEnumerator["instances"] ? instancesEnumerator["instances"] : instancesEnumerator;
+            options
+        );
+
+        const instances = instancesEnumerator["instances"]
+            ? instancesEnumerator["instances"]
+            : instancesEnumerator;
 
         if (options.objectName === "weekDay"
             && !settings.weekDay.daySelection
             && instances
             && instances[0]
-            && instances[0].properties) {
+            && instances[0].properties
+        ) {
             delete instances[0].properties["day"];
         }
 
