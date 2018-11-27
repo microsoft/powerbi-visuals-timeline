@@ -52,7 +52,6 @@ import {
 } from "powerbi-visuals-utils-svgutils";
 
 import { pixelConverter } from "powerbi-visuals-utils-typeutils";
-import { interactivityService } from "powerbi-visuals-utils-interactivityutils";
 
 import { textMeasurementService } from "powerbi-visuals-utils-formattingutils";
 import {
@@ -205,7 +204,6 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
     private cellsSelection: D3Selection<any, any, any, any>;
     private cursorGroupSelection: D3Selection<any, any, any, any>;
     private selectorSelection: D3Selection<any, any, any, any>;
-    private clearCatcherSelection: D3Selection<any, any, any, any>;
 
     private selectionManager: powerbi.extensibility.ISelectionManager;
 
@@ -277,7 +275,15 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
         };
 
         this.rootSelection = d3Select(element)
-            .append("div");
+            .append("div")
+            .classed("timeline-component", true)
+            .on("click", () => {
+                if (!this.settings.forceSelection.currentPeriod
+                    && !this.settings.forceSelection.latestAvailableDate
+                ) {
+                    this.clear();
+                }
+            });
 
         this.headerSelection = this.rootSelection
             .append("svg")
@@ -296,19 +302,11 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
     }
 
     private addElements(): void {
-        this.clearCatcherSelection = interactivityService.appendClearCatcher(this.mainSvgSelection);
-
-        this.clearCatcherSelection
-            .on("click", () => {
-                if (!this.settings.forceSelection.currentPeriod && !this.settings.forceSelection.latestAvailableDate) {
-                    this.clear();
-                }
-            })
-            .on("touchstart", () => {
-                if (!this.settings.forceSelection.currentPeriod && !this.settings.forceSelection.latestAvailableDate) {
-                    this.clear();
-                }
-            });
+        this.rootSelection.on("click", () => {
+            if (!this.settings.forceSelection.currentPeriod && !this.settings.forceSelection.latestAvailableDate) {
+                this.clear();
+            }
+        });
 
         this.rangeTextSelection = this.headerSelection
             .append("g")
@@ -750,8 +748,7 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
             this.options.viewport,
             this.calendar,
             this.settings,
-            this.locale,
-            this.host.createLocalizationManager());
+        );
     }
 
     private static isDataViewValid(dataView): boolean {
@@ -782,8 +779,6 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
         viewport: powerbi.IViewport,
         previousCalendar: Calendar,
         setting: VisualSettings,
-        locale: string,
-        localizationManager: powerbi.extensibility.ILocalizationManager
     ): Calendar {
 
         if (this.isDataViewValid(dataView)) {
@@ -1256,6 +1251,8 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
 
             const event: MouseEvent = require("d3").event as MouseEvent;
 
+            event.stopPropagation();
+
             this.onCellClickHandler(dataPoint, index, event.altKey || event.shiftKey);
         };
 
@@ -1486,7 +1483,6 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
     }
 
     private applyFilterSettingsInCapabilities(isUserSelection: boolean, isClearPeriod?: boolean): void {
-        console.log("applyFilterSettingsInCapabilities");
         const instanceOfGeneral: powerbi.VisualObjectInstance = {
             objectName: "general",
             selector: undefined,

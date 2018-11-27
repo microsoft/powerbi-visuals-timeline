@@ -124,7 +124,11 @@ export class TimelineGranularityBase implements Granularity {
             );
         }
 
-        const granularityTypeClickHandler = (d: any, index: number) => {
+        const granularityTypeClickHandler = () => {
+            const event: MouseEvent = require("d3").event as MouseEvent;
+
+            event.stopPropagation();
+
             props.selectPeriodCallback(this.granularityProps.granularityType);
 
             let sliderSelection = selectAll("rect.periodSlicerRect");

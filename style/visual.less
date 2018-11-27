@@ -32,71 +32,78 @@
 @import (less) "node_modules/powerbi-visuals-utils-formattingutils/lib/index.css";
 @import (less) "node_modules/powerbi-visuals-utils-chartutils/lib/index.css";
 
-.timeline {
-    font-family: helvetica, arial, sans-serif;
-
-    -webkit-tap-highlight-color: transparent;
-
+.timeline-component {
     cursor: default;
 
-    .label,
-    .mainArea .label,
-    .upperTextCell,
-    .lowerTextCell {
-        text-anchor: middle;
-    }
+    .timeline {
+        font-family: helvetica, arial, sans-serif;
 
-    .cellRect {
-        stroke: #333444;
-    }
+        -webkit-tap-highlight-color: transparent;
 
-    .selection {
-        &Cursor {
-            fill: gray;
-        }
+        cursor: default;
 
-        &RangeContainer {
-            text-anchor: start;
-        }
-    }
-
-    .periodSlicerSelectionRect,
-    .timelineVertLine,
-    .cellRect {
-        cursor: pointer;
-    }
-
-    .selectionCursor {
-        cursor: ew-resize;
-    }
-}
-
-.timelineSlicer {
-    fill: #000000;
-    .periodSlicer {
-        &Rect {
-            stroke: #aaa;
-            stroke-width: 2px;
-            fill: transparent;
-        }
-
-        &Granularities,
-        &Selection {
-            font-size: 10px;
+        .label,
+        .mainArea .label,
+        .upperTextCell,
+        .lowerTextCell {
             text-anchor: middle;
         }
 
-        &SelectionRect {
-            fill: transparent;
+        .cellRect {
+            stroke: #333444;
+        }
+
+        .selection {
+            &Cursor {
+                fill: gray;
+            }
+
+            &RangeContainer {
+                text-anchor: start;
+            }
+        }
+
+        .periodSlicerSelectionRect,
+        .timelineVertLine,
+        .cellRect {
+            cursor: pointer;
+        }
+
+        .selectionCursor {
+            cursor: ew-resize;
         }
     }
 
-    .periodSlicerRect {
-        pointer-events: none;
-    }
-}
+    .timelineSlicer {
+        fill: #000000;
 
-.timelineWrapper {
-    overflow: auto;
-    width: 100%;
+        cursor: pointer;
+
+        .periodSlicer {
+            &Rect {
+                stroke: #aaa;
+                stroke-width: 2px;
+                fill: transparent;
+            }
+
+            &Granularities,
+            &Selection {
+                font-size: 10px;
+                text-anchor: middle;
+            }
+
+            &SelectionRect {
+                fill: transparent;
+            }
+        }
+
+        .periodSlicerRect {
+            pointer-events: none;
+        }
+    }
+
+    .timelineWrapper {
+        overflow: auto;
+        width: 100%;
+    }
 }

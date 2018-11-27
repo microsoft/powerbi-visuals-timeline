@@ -49,6 +49,10 @@ export class TimelineBuilder extends VisualBuilderBase<Timeline> {
         return this.visual;
     }
 
+    public get rootElement(): JQuery {
+        return this.element.find(".timeline-component");
+    }
+
     public get mainElement(): JQuery {
         return this.element
             .find("svg.timeline");

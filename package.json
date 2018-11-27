@@ -14,7 +14,8 @@
     "pbiviz": "pbiviz",
     "start": "pbiviz start",
     "package": "pbiviz package",
-    "test": "karma start"
+    "test": "karma start",
+    "watch": "karma start --single-run=false"
   },
   "author": {
     "name": "Microsoft",
@@ -67,7 +68,6 @@
     "powerbi-visuals-utils-chartutils": "^2.2.0",
     "powerbi-visuals-utils-dataviewutils": "^2.1.0",
     "powerbi-visuals-utils-formattingutils": "^4.1.1",
-    "powerbi-visuals-utils-interactivityutils": "^5.1.0",
     "powerbi-visuals-utils-svgutils": "^2.1.0",
     "powerbi-visuals-utils-typeutils": "^2.1.0"
   }
