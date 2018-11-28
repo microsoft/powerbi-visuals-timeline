@@ -27,11 +27,11 @@
 import { Selection } from "d3-selection";
 
 import { Calendar } from "../calendar";
-import { Utils } from "../utils";
-import { TimelineLabel } from "../dataInterfaces";
+import { ITimelineLabel } from "../dataInterfaces";
 import { ITimelineDatePeriod } from "../datePeriod/datePeriod";
-import { GranularityRenderProps } from "./granularityRenderProps";
+import { Utils } from "../utils";
 import { TimelineGranularityBase } from "./granularityBase";
+import { IGranularityRenderProps } from "./granularityRenderProps";
 import { GranularityType } from "./granularityType";
 
 export class MonthGranularity extends TimelineGranularityBase {
@@ -39,7 +39,7 @@ export class MonthGranularity extends TimelineGranularityBase {
         super(calendar, locale, Utils.getGranularityPropsByMarker("M"));
     }
 
-    public render(props: GranularityRenderProps, isFirst: boolean): Selection<any, any, any, any> {
+    public render(props: IGranularityRenderProps, isFirst: boolean): Selection<any, any, any, any> {
         if (!props.granularSettings.granularityMonthVisibility) {
             return null;
         }
@@ -51,10 +51,10 @@ export class MonthGranularity extends TimelineGranularityBase {
         return GranularityType.month;
     }
 
-    public splitDate(date: Date): (string | number)[] {
+    public splitDate(date: Date): Array<string | number> {
         return [
             this.shortMonthName(date),
-            this.determineYear(date)
+            this.determineYear(date),
         ];
     }
 
@@ -63,13 +63,13 @@ export class MonthGranularity extends TimelineGranularityBase {
             && this.determineYear(firstDatePeriod.startDate) === this.determineYear(secondDatePeriod.startDate);
     }
 
-    public generateLabel(datePeriod: ITimelineDatePeriod): TimelineLabel {
+    public generateLabel(datePeriod: ITimelineDatePeriod): ITimelineLabel {
         const shortMonthName: string = this.shortMonthName(datePeriod.startDate);
 
         return {
-            title: shortMonthName,
+            id: datePeriod.index,
             text: shortMonthName,
-            id: datePeriod.index
+            title: shortMonthName,
         };
     }
 }

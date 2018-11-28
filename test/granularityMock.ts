@@ -26,17 +26,17 @@
 
 import { Selection } from "d3-selection";
 
-import { Granularity } from "../src/granularity/granularity";
-import { GranularityType } from "../src/granularity/granularityType";
-import { GranularityRenderProps } from "../src/granularity/granularityRenderProps";
 import { ITimelineDatePeriod } from "../src/datePeriod/datePeriod";
+import { IGranularity } from "../src/granularity/granularity";
+import { IGranularityRenderProps } from "../src/granularity/granularityRenderProps";
+import { GranularityType } from "../src/granularity/granularityType";
 
 import {
-    ExtendedLabel,
-    TimelineLabel,
+    IExtendedLabel,
+    ITimelineLabel,
 } from "../src/dataInterfaces";
 
-export class TimelineGranularityMock implements Granularity {
+export class TimelineGranularityMock implements IGranularity {
     private datePeriod: ITimelineDatePeriod[];
 
     constructor(datePeriod: ITimelineDatePeriod[] = []) {
@@ -51,7 +51,7 @@ export class TimelineGranularityMock implements Granularity {
         return GranularityType.day;
     }
 
-    public splitDate(date: Date): (string | number)[] {
+    public splitDate(date: Date): Array<string | number> {
         return [0];
     }
 
@@ -59,42 +59,52 @@ export class TimelineGranularityMock implements Granularity {
         return this.datePeriod;
     }
 
-    public resetDatePeriods(): void { }
+    public resetDatePeriods(): void {
+        // No need to implement it for UTs
+    }
 
-    public getExtendedLabel(): ExtendedLabel {
+    public getExtendedLabel(): IExtendedLabel {
         return null;
     }
 
-    public setExtendedLabel(extendedLabel: ExtendedLabel): void { }
+    public setExtendedLabel(extendedLabel: IExtendedLabel): void {
+        // No need to implement it for UTs
+    }
 
-    public createLabels(granularity: Granularity): TimelineLabel[] {
+    public createLabels(granularity: IGranularity): ITimelineLabel[] {
         return [];
     }
 
     public sameLabel(
         firstDatePeriod: ITimelineDatePeriod,
-        secondDatePeriod: ITimelineDatePeriod
+        secondDatePeriod: ITimelineDatePeriod,
     ): boolean {
         return false;
     }
 
-    public generateLabel(datePeriod: ITimelineDatePeriod): TimelineLabel {
+    public generateLabel(datePeriod: ITimelineDatePeriod): ITimelineLabel {
         return null;
     }
 
-    public addDate(date: Date) { }
+    public addDate(date: Date) {
+        // No need to implement it for UTs
+    }
 
-    public setNewEndDate(date: Date): void { }
+    public setNewEndDate(date: Date): void {
+        // No need to implement it for UTs
+    }
 
-    public splitPeriod(index: number, newFraction: number, newDate: Date): void { }
+    public splitPeriod(index: number, newFraction: number, newDate: Date): void {
+        // No need to implement it for UTs
+    }
 
-    public splitDateForTitle(date: Date): (string | number)[] {
+    public splitDateForTitle(date: Date): Array<string | number> {
         return [];
     }
 
     public render(
-        props: GranularityRenderProps,
-        isFirst: boolean
+        props: IGranularityRenderProps,
+        isFirst: boolean,
     ): Selection<any, any, any, any> {
         return null;
     }

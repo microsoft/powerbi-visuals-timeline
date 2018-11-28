@@ -27,7 +27,7 @@
 import "jasmine-jquery";
 
 import {
-    select as d3Select
+    select as d3Select,
 } from "d3-selection";
 
 import * as $ from "jquery";
@@ -42,37 +42,35 @@ import {
     renderTimeout,
 } from "powerbi-visuals-utils-testutils";
 
-import { Granularity } from "../src/granularity/granularity";
-import { GranularityType } from "../src/granularity/granularityType";
 import { TimelineDatePeriodBase } from "../src/datePeriod/datePeriodBase";
+import { IGranularity } from "../src/granularity/granularity";
+import { GranularityType } from "../src/granularity/granularityType";
 import { Utils } from "../src/utils";
 import { Timeline } from "../src/visual";
 
-import {
-    CalendarSettings,
-    WeekDaySettings,
-} from "../src/settings";
+import { CalendarSettings } from "../src/settings/calendarSettings";
+import { WeekDaySettings } from "../src/settings/weekDaySettings";
 
 import { Calendar } from "../src/calendar";
+import { DayGranularity } from "../src/granularity/dayGranularity";
+import { MonthGranularity } from "../src/granularity/monthGranularity";
+import { QuarterGranularity } from "../src/granularity/quarterGranularity";
 import { WeekGranularity } from "../src/granularity/weekGranularity";
 import { YearGranularity } from "../src/granularity/yearGranularity";
-import { QuarterGranularity } from "../src/granularity/quarterGranularity";
-import { MonthGranularity } from "../src/granularity/monthGranularity";
-import { DayGranularity } from "../src/granularity/dayGranularity";
 
 import {
-    ITimelineDatePeriodBase,
     ITimelineDatePeriod,
+    ITimelineDatePeriodBase,
 } from "../src/datePeriod/datePeriod";
 
 import {
+    ITimelineCursorOverElement,
     ITimelineData,
-    TimelineCursorOverElement,
 } from "../src/dataInterfaces";
 
+import { TimelineGranularityMock } from "./granularityMock";
 import { TimelineBuilder } from "./visualBuilder";
 import { TimelineData } from "./visualData";
-import { TimelineGranularityMock } from "./granularityMock";
 
 import {
     areColorsEqual,
@@ -97,8 +95,8 @@ describe("Timeline", () => {
         it("basic update", (done) => {
             dataView.metadata.objects = {
                 granularity: {
-                    granularity: GranularityType.day
-                }
+                    granularity: GranularityType.day,
+                },
             };
 
             visualBuilder.update(dataView);
@@ -123,20 +121,19 @@ describe("Timeline", () => {
                 expect(countOfDays).toBe(dataView.categorical.categories[0].values.length);
                 expect(countOfTextItems).toBe(dataView.categorical.categories[0].values.length);
 
-                let cellRects: JQuery = visualBuilder.mainElement.find(".cellRect");
+                const cellRects: JQuery = visualBuilder.mainElement.find(".cellRect");
 
                 d3Click(cellRects.last(), 0, 0);
 
-                let unselectedCellRect: JQuery = visualBuilder
+                const unselectedCellRect: JQuery = visualBuilder
                     .mainElement
                     .find(".cellRect")
                     .first();
 
-                debugger;
                 assertColorsMatch(unselectedCellRect.attr("fill"), "transparent");
 
-                let cellHeightStr: string = cellRects[0].attributes.getNamedItem("height").value,
-                    cellHeight: number = parseInt(cellHeightStr.replace("px", ""), 10);
+                const cellHeightStr: string = cellRects[0].attributes.getNamedItem("height").value;
+                const cellHeight: number = parseInt(cellHeightStr.replace("px", ""), 10);
 
                 expect(cellHeight).toBeLessThan(60.1);
                 expect(cellHeight).toBeGreaterThan(29.9);
@@ -148,8 +145,8 @@ describe("Timeline", () => {
         it("apply blank row data", (done) => {
             dataView.metadata.objects = {
                 granularity: {
-                    granularity: GranularityType.day
-                }
+                    granularity: GranularityType.day,
+                },
             };
 
             visualBuilder.update(dataView);
@@ -175,8 +172,8 @@ describe("Timeline", () => {
         it("basic update", (done) => {
             dataView.metadata.objects = {
                 granularity: {
-                    granularity: GranularityType.year
-                }
+                    granularity: GranularityType.year,
+                },
             };
 
             visualBuilder.update(dataView);
@@ -194,19 +191,19 @@ describe("Timeline", () => {
         });
 
         it("range text cut off with small screen size", (done) => {
-            const visualBuilder: TimelineBuilder = new TimelineBuilder(300, 500);
+            const builder: TimelineBuilder = new TimelineBuilder(300, 500);
 
             dataView.metadata.objects = {
                 granularity: {
-                    granularity: GranularityType.month
-                }
+                    granularity: GranularityType.month,
+                },
             };
 
-            visualBuilder.update(dataView);
+            builder.update(dataView);
 
             renderTimeout(() => {
-                visualBuilder.updateRenderTimeout(dataView, () => {
-                    const indexOfDots: number = visualBuilder.rangeHeaderText
+                builder.updateRenderTimeout(dataView, () => {
+                    const indexOfDots: number = builder.rangeHeaderText
                         .text()
                         .indexOf("...");
 
@@ -221,8 +218,8 @@ describe("Timeline", () => {
             beforeEach(() => {
                 dataView.metadata.objects = {
                     granularity: {
-                        granularity: GranularityType.day
-                    }
+                        granularity: GranularityType.day,
+                    },
                 };
 
                 visualBuilder.update(dataView);
@@ -247,8 +244,8 @@ describe("Timeline", () => {
             beforeEach((done) => {
                 dataView.metadata.objects = {
                     granularity: {
-                        granularity: GranularityType.month
-                    }
+                        granularity: GranularityType.month,
+                    },
                 };
 
                 visualBuilder.update(dataView);
@@ -273,8 +270,8 @@ describe("Timeline", () => {
             it("settings - event", () => {
                 dataView.metadata.objects = {
                     granularity: {
-                        granularity: GranularityType.day
-                    }
+                        granularity: GranularityType.day,
+                    },
                 };
 
                 visualBuilder.update(dataView);
@@ -284,61 +281,70 @@ describe("Timeline", () => {
             it("mousedown - event - with disabled year", () => {
                 dataView.metadata.objects = {
                     granularity: {
-                        granularityYearVisibility: false
-                    }
+                        granularityYearVisibility: false,
+                    },
                 };
 
                 visualBuilder.update(dataView);
-                let periodSlicerSelectionRectElements = visualBuilder.element.find(".periodSlicerSelectionRect");
-                d3MouseDown($(periodSlicerSelectionRectElements[0]), 0, 0);
-                expect(periodSlicerSelectionRectElements.length).toEqual(4);
+                const $periodSlicerSelectionRectElements = visualBuilder.element.find(".periodSlicerSelectionRect");
+
+                d3MouseDown($($periodSlicerSelectionRectElements[0]), 0, 0);
+
+                expect($periodSlicerSelectionRectElements.length).toEqual(4);
                 expectToCallSelectPeriod(GranularityType.quarter);
             });
 
             it("mousedown - event - with disabled quarter", () => {
                 dataView.metadata.objects = {
                     granularity: {
-                        granularityQuarterVisibility: false
-                    }
+                        granularityQuarterVisibility: false,
+                    },
                 };
 
                 visualBuilder.update(dataView);
-                let periodSlicerSelectionRectElements = visualBuilder.element.find(".periodSlicerSelectionRect");
-                d3MouseDown($(periodSlicerSelectionRectElements[1]), 0, 0);
-                expect(periodSlicerSelectionRectElements.length).toEqual(4);
+                const $periodSlicerSelectionRectElements = visualBuilder.element.find(".periodSlicerSelectionRect");
+
+                d3MouseDown($($periodSlicerSelectionRectElements[1]), 0, 0);
+
+                expect($periodSlicerSelectionRectElements.length).toEqual(4);
                 expectToCallSelectPeriod(GranularityType.month);
             });
 
             it("mousedown - event - with disabled year, quarter and month", () => {
                 dataView.metadata.objects = {
                     granularity: {
-                        granularityYearVisibility: false,
+                        granularityMonthVisibility: false,
                         granularityQuarterVisibility: false,
-                        granularityMonthVisibility: false
-                    }
+                        granularityYearVisibility: false,
+                    },
                 };
 
                 visualBuilder.update(dataView);
-                let periodSlicerSelectionRectElements = visualBuilder.element.find(".periodSlicerSelectionRect");
-                d3MouseDown($(periodSlicerSelectionRectElements[1]), 0, 0);
-                expect(periodSlicerSelectionRectElements.length).toEqual(2);
+
+                const $periodSlicerSelectionRectElements = visualBuilder.element.find(".periodSlicerSelectionRect");
+
+                d3MouseDown($($periodSlicerSelectionRectElements[1]), 0, 0);
+
+                expect($periodSlicerSelectionRectElements.length).toEqual(2);
                 expectToCallSelectPeriod(GranularityType.day);
             });
 
             it("mousedown - impossible - all granularities are disabled", () => {
                 dataView.metadata.objects = {
                     granularity: {
-                        granularityYearVisibility: false,
-                        granularityQuarterVisibility: false,
+                        granularityDayVisibility: false,
                         granularityMonthVisibility: false,
+                        granularityQuarterVisibility: false,
                         granularityWeekVisibility: false,
-                        granularityDayVisibility: false
-                    }
+                        granularityYearVisibility: false,
+                    },
                 };
 
                 visualBuilder.update(dataView);
-                let periodSlicerSelectionRectElements = visualBuilder.element.find(".periodSlicerSelectionRect");
-                expect(periodSlicerSelectionRectElements.length).toEqual(0);
+
+                const $periodSlicerSelectionRectElements = visualBuilder.element.find(".periodSlicerSelectionRect");
+
+                expect($periodSlicerSelectionRectElements.length).toEqual(0);
             });
 
             function expectToCallChangeGranularity(granularity: GranularityType): void {
@@ -355,14 +361,14 @@ describe("Timeline", () => {
 
     describe("selection", () => {
         it("selection should be recovered from the dataView after starting", (done) => {
-            const startDate: Date = defaultDataViewBuilder.valuesCategory[0],
-                endDate: Date = defaultDataViewBuilder.valuesCategory[1],
-                datePeriod: TimelineDatePeriodBase = TimelineDatePeriodBase.create(startDate, endDate);
+            const startDate: Date = defaultDataViewBuilder.valuesCategory[0];
+            const endDate: Date = defaultDataViewBuilder.valuesCategory[1];
+            const datePeriod: TimelineDatePeriodBase = TimelineDatePeriodBase.create(startDate, endDate);
 
             dataView.metadata.objects = {
                 granularity: {
-                    granularity: GranularityType.day
-                }
+                    granularity: GranularityType.day,
+                },
             };
 
             TimelineBuilder.setDatePeriod(dataView, datePeriod);
@@ -372,10 +378,10 @@ describe("Timeline", () => {
 
             visualBuilder.updateFlushAllD3Transitions(dataView);
 
-            let cellRects: JQuery = visualBuilder.cellRects;
+            const cellRects: JQuery = visualBuilder.cellRects;
 
             for (let i: number = 0; i < cellRects.length; i++) {
-                let fillColor: string = d3Select(cellRects[i]).attr("fill");
+                const fillColor: string = d3Select(cellRects[i]).attr("fill");
 
                 assertColorsMatch(fillColor, "transparent", i === 0);
             }
@@ -384,55 +390,50 @@ describe("Timeline", () => {
         });
 
         function checkSelectionState(
-            dataView: powerbi.DataView,
-            visualBuilder: TimelineBuilder,
+            dataViewObject: powerbi.DataView,
+            builder: TimelineBuilder,
             done: () => void,
-            modificator?: (dataView: powerbi.DataView) => void
+            modificator?: (dataView: powerbi.DataView) => void,
         ): void {
 
-            dataView.metadata.objects = {
+            dataViewObject.metadata.objects = {
                 granularity: {
-                    granularity: GranularityType.month
-                }
+                    granularity: GranularityType.month,
+                },
             };
 
-            visualBuilder.update(dataView);
+            builder.update(dataViewObject);
 
-            let countOfMonth: number,
-                timelineData: ITimelineData,
-                startDate: Date,
-                endDate: Date;
-
-            countOfMonth = visualBuilder
+            const countOfMonth: number = builder
                 .mainElement
                 .find(".cellRect")
                 .length;
 
-            (dataView.metadata.objects as any).granularity.granularity = GranularityType.day;
+            (dataViewObject.metadata.objects as any).granularity.granularity = GranularityType.day;
 
-            visualBuilder.update(dataView);
+            builder.update(dataViewObject);
 
-            visualBuilder.selectTheLatestCell();
+            builder.selectTheLatestCell();
 
-            timelineData = visualBuilder.visualObject.timelineData;
+            const timelineData: ITimelineData = builder.visualObject.timelineData;
 
-            startDate = Utils.getStartSelectionDate(timelineData);
-            endDate = Utils.getEndSelectionDate(timelineData);
+            const startDate: Date = Utils.getStartSelectionDate(timelineData);
+            const endDate: Date = Utils.getEndSelectionDate(timelineData);
 
-            (dataView.metadata.objects as any).general = {
-                datePeriod: TimelineDatePeriodBase.create(startDate, endDate)
+            (dataViewObject.metadata.objects as any).general = {
+                datePeriod: TimelineDatePeriodBase.create(startDate, endDate),
             };
 
-            visualBuilder.updateflushAllD3TransitionsRenderTimeout(dataView, () => {
-                (dataView.metadata.objects as any).granularity.granularity = GranularityType.month;
+            builder.updateflushAllD3TransitionsRenderTimeout(dataViewObject, () => {
+                (dataViewObject.metadata.objects as any).granularity.granularity = GranularityType.month;
 
                 if (modificator) {
-                    modificator(dataView);
+                    modificator(dataViewObject);
                 }
 
-                visualBuilder.update(dataView);
+                builder.update(dataViewObject);
 
-                let countMonthOfSelectedDays: number = visualBuilder
+                const countMonthOfSelectedDays: number = builder
                     .mainElement
                     .find(".cellRect")
                     .length;
@@ -458,7 +459,7 @@ describe("Timeline", () => {
         });
 
         function checkCalendarSettings(day: number, month: number, expectedDay: number): void {
-            let calendarSettings: CalendarSettings = { day, month };
+            const calendarSettings: CalendarSettings = { day, month };
 
             Timeline.setValidCalendarSettings(calendarSettings);
 
@@ -470,8 +471,8 @@ describe("Timeline", () => {
         beforeEach((done) => {
             dataView.metadata.objects = {
                 granularity: {
-                    granularity: GranularityType.day
-                }
+                    granularity: GranularityType.day,
+                },
             };
 
             visualBuilder.update(dataView);
@@ -496,7 +497,7 @@ describe("Timeline", () => {
         });
 
         function expectToCallFindCursorOverElement(x: number, expectedIndex: number): void {
-            let cursorOverElement: TimelineCursorOverElement = visualBuilder
+            const cursorOverElement: ITimelineCursorOverElement = visualBuilder
                 .visualObject
                 .findCursorOverElement(x);
 
@@ -516,15 +517,15 @@ describe("Timeline", () => {
             expectToCallDatasetsChanged(defaultDataViewBuilder.getUnWorkableDataView(), false);
         });
 
-        function expectToCallDatasetsChanged(dataView: powerbi.DataView, expectedValue: boolean): void {
-            let options: powerbi.extensibility.visual.VisualUpdateOptions,
-                areVisualUpdateOptionsValid: boolean;
-
-            options = {
-                dataViews: [dataView]
+        function expectToCallDatasetsChanged(
+            dataViewObject: powerbi.DataView,
+            expectedValue: boolean,
+        ): void {
+            const options: powerbi.extensibility.visual.VisualUpdateOptions = {
+                dataViews: [dataViewObject],
             } as unknown as powerbi.extensibility.visual.VisualUpdateOptions;
 
-            areVisualUpdateOptionsValid = Timeline.areVisualUpdateOptionsValid(options);
+            const areVisualUpdateOptionsValid: boolean = Timeline.areVisualUpdateOptionsValid(options);
 
             expect(areVisualUpdateOptionsValid).toEqual(expectedValue);
         }
@@ -532,14 +533,15 @@ describe("Timeline", () => {
 
     describe("Format settings test", () => {
         function checkSelectedElement(
-            granularity: string,
-            expectedElementsAmount: number
+            granularity: GranularityType | string,
+            expectedElementsAmount: number,
         ): void {
             dataView.metadata.objects.granularity.granularity = granularity;
 
             visualBuilder.updateFlushAllD3Transitions(dataView);
 
-            let selectedElements: Element[] = [];
+            const selectedElements: Element[] = [];
+
             visualBuilder.cellRects
                 .toArray()
                 .forEach((element: Element) => {
@@ -548,18 +550,20 @@ describe("Timeline", () => {
                         selectedElements.push(element);
                     }
                 });
+
             expect(selectedElements.length).toEqual(expectedElementsAmount);
         }
 
         function checkSelectedElementIsLatestAvailable(
-            granularity: string
+            granularity: string,
         ): void {
             dataView.metadata.objects.granularity.granularity = granularity;
 
             visualBuilder.updateFlushAllD3Transitions(dataView);
 
-            let selectedElements: Element[] = [],
-                lastElement = visualBuilder.cellRects.last();
+            const selectedElements: Element[] = [];
+            const lastElement = visualBuilder.cellRects.last();
+
             visualBuilder.cellRects
                 .toArray()
                 .forEach((element: Element) => {
@@ -577,8 +581,8 @@ describe("Timeline", () => {
             beforeEach(() => {
                 dataView.metadata.objects = {
                     rangeHeader: {
-                        show: true
-                    }
+                        show: true,
+                    },
                 };
             });
 
@@ -604,8 +608,8 @@ describe("Timeline", () => {
             });
 
             it("font size", () => {
-                const fontSize: number = 22,
-                    expectedFontSize: string = "29.3333px";
+                const fontSize: number = 22;
+                const expectedFontSize: string = "29.3333px";
 
                 (dataView.metadata.objects as any).rangeHeader.textSize = fontSize;
                 visualBuilder.updateFlushAllD3Transitions(dataView);
@@ -620,8 +624,8 @@ describe("Timeline", () => {
 
                 dataView.metadata.objects = {
                     cells: {
-                        fillSelected: getSolidColorStructuralObject(color)
-                    }
+                        fillSelected: getSolidColorStructuralObject(color),
+                    },
                 };
 
                 visualBuilder.updateFlushAllD3Transitions(dataView);
@@ -638,11 +642,11 @@ describe("Timeline", () => {
 
                 dataView.metadata.objects = {
                     cells: {
-                        fillUnselected: getSolidColorStructuralObject(color)
+                        fillUnselected: getSolidColorStructuralObject(color),
                     },
                     granularity: {
-                        granularity: GranularityType.day
-                    }
+                        granularity: GranularityType.day,
+                    },
                 };
 
                 visualBuilder.updateFlushAllD3Transitions(dataView);
@@ -670,8 +674,8 @@ describe("Timeline", () => {
 
                 dataView.metadata.objects = {
                     granularity: {
-                        scaleColor: getSolidColorStructuralObject(color)
-                    }
+                        scaleColor: getSolidColorStructuralObject(color),
+                    },
                 };
 
                 visualBuilder.updateFlushAllD3Transitions(dataView);
@@ -689,8 +693,8 @@ describe("Timeline", () => {
 
                 dataView.metadata.objects = {
                     granularity: {
-                        sliderColor: getSolidColorStructuralObject(color)
-                    }
+                        sliderColor: getSolidColorStructuralObject(color),
+                    },
                 };
 
                 visualBuilder.updateFlushAllD3Transitions(dataView);
@@ -704,12 +708,11 @@ describe("Timeline", () => {
         });
 
         describe("First day of week option", () => {
-            const daySelection: boolean = true,
-                startDateRange: Date = new Date(2015, 0, 1),
-                weekFromStartRange: Date = new Date(2015, 0, 7);
-            let calendar: Calendar,
-                granularity: string = "week",
-                selectedWeekCount: number = 0;
+            const daySelection: boolean = true;
+            const startDateRange: Date = new Date(2015, 0, 1);
+            const weekFromStartRange: Date = new Date(2015, 0, 7);
+
+            const granularity: string = "week";
 
             beforeEach(() => {
                 visualBuilder = new TimelineBuilder(1000, 500);
@@ -721,83 +724,88 @@ describe("Timeline", () => {
 
             it("check calendar with default day of week - Sunday", () => {
                 const dayOfWeekSundayNumber = 0;
-                selectedWeekCount = 2;
 
                 dataView.metadata.objects = {
+                    granularity: {},
                     weekDay: {
                         day: dayOfWeekSundayNumber,
-                        daySelection: daySelection
+                        daySelection,
                     },
-                    granularity: {}
                 };
 
-                checkSelectedElement(GranularityType[granularity], selectedWeekCount);
+                checkSelectedElement(GranularityType.week, 2);
             });
 
             it("check calendar with setted day of week - Tuesday", () => {
                 const dayOfWeekThursdayNumber = 2;
-                selectedWeekCount = 2;
 
                 dataView.metadata.objects = {
+                    granularity: {},
                     weekDay: {
                         day: dayOfWeekThursdayNumber,
-                        daySelection: daySelection
+                        daySelection,
                     },
-                    granularity: {}
                 };
 
-                checkSelectedElement(GranularityType[granularity], selectedWeekCount);
+                checkSelectedElement(GranularityType.week, 2);
             });
 
             it("check calendar getWeekperiod function with day of week option off", () => {
                 dataView.metadata.objects = {
+                    granularity: {},
                     weekDay: {
-                        daySelection: !daySelection
+                        daySelection: !daySelection,
                     },
-                    granularity: {}
                 };
 
                 visualBuilder.updateFlushAllD3Transitions(dataView);
 
-                let visualCalendar: Calendar = visualBuilder.visualObject["calendar"];
+                const visualCalendar: Calendar = visualBuilder.visualObject.calendar;
+
                 let dates: any = visualCalendar.getWeekPeriod(new Date(2014, 0, 1));
+
                 expect(dates.startDate as Date).toEqual(new Date(2014, 0, 1));
                 expect(dates.endDate as Date).toEqual(new Date(2014, 0, 8));
+
                 dates = visualCalendar.getWeekPeriod(new Date(2015, 0, 1));
                 expect(dates.startDate as Date).toEqual(new Date(2015, 0, 1));
+
                 expect(dates.endDate as Date).toEqual(new Date(2015, 0, 8));
+
                 dates = visualCalendar.getWeekPeriod(new Date(2016, 0, 1));
+
                 expect(dates.startDate as Date).toEqual(new Date(2016, 0, 1));
                 expect(dates.endDate as Date).toEqual(new Date(2016, 0, 8));
+
                 dates = visualCalendar.getWeekPeriod(new Date(2017, 0, 1));
+
                 expect(dates.startDate as Date).toEqual(new Date(2017, 0, 1));
                 expect(dates.endDate as Date).toEqual(new Date(2017, 0, 8));
+
                 dates = visualCalendar.getWeekPeriod(new Date(2018, 0, 1));
+
                 expect(dates.startDate as Date).toEqual(new Date(2018, 0, 1));
                 expect(dates.endDate as Date).toEqual(new Date(2018, 0, 8));
             });
 
             it("check calendar with day of week option off", () => {
-                // January,1 must be first day of week by default for every year in period
-                selectedWeekCount = 1;
-
                 visualBuilder = new TimelineBuilder(1000, 500);
                 defaultDataViewBuilder = new TimelineData();
                 defaultDataViewBuilder.setDateRange(new Date(2015, 0, 1), new Date(2016, 0, 12));
                 dataView = defaultDataViewBuilder.getDataView();
 
                 dataView.metadata.objects = {
-                    weekDay: {
-                        daySelection: !daySelection
-                    },
                     granularity: {
-                        granularity: GranularityType[granularity]
-                    }
+                        granularity: GranularityType[granularity],
+                    },
+                    weekDay: {
+                        daySelection: !daySelection,
+                    },
                 };
 
                 visualBuilder.updateFlushAllD3Transitions(dataView);
 
-                let periods: any[] = visualBuilder.visualObject.timelineData.currentGranularity.getDatePeriods();
+                const periods: any[] = visualBuilder.visualObject.timelineData.currentGranularity.getDatePeriods();
                 expect(periods.length).toEqual(55);
                 expect(periods[0].startDate as Date).toEqual(new Date(2015, 0, 1));
                 expect(periods[53].startDate as Date).toEqual(new Date(2016, 0, 1));
@@ -805,7 +813,7 @@ describe("Timeline", () => {
         });
 
         describe("Force selection", () => {
-            for (let granularity in GranularityType) {
+            for (const granularity in GranularityType) {
                 if (isNaN(+granularity)) {
                     it("disabled both -- possible to make user selection", () => {
                         const currentDate: Date = new Date();
@@ -819,14 +827,14 @@ describe("Timeline", () => {
                         dataView = defaultDataViewBuilder.getDataView();
                         dataView.metadata.objects = {
                             cells: {
+                                fillSelected: getSolidColorStructuralObject(colorSel),
                                 fillUnselected: getSolidColorStructuralObject(color),
-                                fillSelected: getSolidColorStructuralObject(colorSel)
                             },
                             forceSelection: {
                                 currentPeriod: false,
-                                latestAvailableDate: false
+                                latestAvailableDate: false,
                             },
-                            granularity: {}
+                            granularity: {},
                         };
 
                         visualBuilder.updateFlushAllD3Transitions(dataView);
@@ -852,14 +860,14 @@ describe("Timeline", () => {
                         dataView = defaultDataViewBuilder.getDataView();
                         dataView.metadata.objects = {
                             cells: {
+                                fillSelected: getSolidColorStructuralObject(colorSel),
                                 fillUnselected: getSolidColorStructuralObject(color),
-                                fillSelected: getSolidColorStructuralObject(colorSel)
                             },
                             forceSelection: {
                                 currentPeriod: true,
-                                latestAvailableDate: false
+                                latestAvailableDate: false,
                             },
-                            granularity: {}
+                            granularity: {},
                         };
 
                         visualBuilder.updateFlushAllD3Transitions(dataView);
@@ -885,14 +893,14 @@ describe("Timeline", () => {
                         dataView = defaultDataViewBuilder.getDataView();
                         dataView.metadata.objects = {
                             cells: {
+                                fillSelected: getSolidColorStructuralObject(colorSel),
                                 fillUnselected: getSolidColorStructuralObject(color),
-                                fillSelected: getSolidColorStructuralObject(colorSel)
                             },
                             forceSelection: {
                                 currentPeriod: false,
-                                latestAvailableDate: true
+                                latestAvailableDate: true,
                             },
-                            granularity: {}
+                            granularity: {},
                         };
 
                         visualBuilder.updateFlushAllD3Transitions(dataView);
@@ -906,7 +914,7 @@ describe("Timeline", () => {
                             color);
                     });
 
-                    it(`current period for '${granularity}' granularity`, () => {
+                    it(`current period for 'week' granularity`, () => {
                         const currentDate: Date = new Date();
                         const startDateRange: Date = new Date(currentDate.getFullYear(), 0, 1);
                         const endDateRange: Date = new Date(currentDate.getFullYear() + 1, 11, 31);
@@ -916,16 +924,15 @@ describe("Timeline", () => {
                         dataView = defaultDataViewBuilder.getDataView();
                         dataView.metadata.objects = {
                             forceSelection: {
-                                currentPeriod: true
+                                currentPeriod: true,
                             },
-                            granularity: {}
+                            granularity: {},
                         };
 
-                        checkSelectedElement(GranularityType[granularity], 1);
+                        checkSelectedElement(GranularityType.week, 1);
                     });
 
                     it(`current period out of data set for '${granularity}' granularity`, () => {
-                        const currentDate: Date = new Date();
                         const startDateRange: Date = new Date(2010, 0, 1);
                         const endDateRange: Date = new Date(2011, 11, 31);
 
@@ -936,20 +943,16 @@ describe("Timeline", () => {
                         dataView = defaultDataViewBuilder.getDataView();
                         dataView.metadata.objects = {
                             forceSelection: {
-                                currentPeriod: true
+                                currentPeriod: true,
                             },
                             granularity: {
-                                granularity
-                            }
+                                granularity,
+                            },
                         };
 
                         const startDateSelection: Date =
                             defaultDataViewBuilder.valuesCategory[amountOfDaysFromStart];
-                        const endDateSelection: Date =
-                            defaultDataViewBuilder.valuesCategory[amountOfDaysFromStart + 1];
 
-                        const yearOfEndDate: number = endDateSelection.getFullYear();
-                        const yearOfStartDateSelection: number = startDateSelection.getFullYear();
                         const monthOfEndDate: number = endDateRange.getMonth();
                         const monthOfStartDateSelection: number = startDateSelection.getMonth();
 
@@ -992,9 +995,9 @@ describe("Timeline", () => {
                         dataView = defaultDataViewBuilder.getDataView();
                         dataView.metadata.objects = {
                             forceSelection: {
-                                latestAvailableDate: true
+                                latestAvailableDate: true,
                             },
-                            granularity: {}
+                            granularity: {},
                         };
 
                         checkSelectedElementIsLatestAvailable(GranularityType[granularity]);
@@ -1011,9 +1014,9 @@ describe("Timeline", () => {
                         dataView.metadata.objects = {
                             forceSelection: {
                                 currentPeriod: true,
-                                latestAvailableDate: true
+                                latestAvailableDate: true,
                             },
-                            granularity: {}
+                            granularity: {},
                         };
 
                         checkSelectedElementIsLatestAvailable(GranularityType[granularity]);
@@ -1026,9 +1029,9 @@ describe("Timeline", () => {
             beforeEach(() => {
                 dataView.metadata.objects = {
                     labels: {
+                        displayAll: true,
                         show: true,
-                        displayAll: true
-                    }
+                    },
                 };
             });
 
@@ -1068,8 +1071,8 @@ describe("Timeline", () => {
             });
 
             it("font size", () => {
-                const fontSize: number = 22,
-                    expectedFontSize: string = "29.3333px";
+                const fontSize: number = 22;
+                const expectedFontSize: string = "29.3333px";
 
                 (dataView.metadata.objects as any).labels.textSize = fontSize;
 
@@ -1085,8 +1088,8 @@ describe("Timeline", () => {
 });
 
 describe("Timeline - Granularity", () => {
-    let calendar: Calendar,
-        granularities: Granularity[];
+    let calendar: Calendar;
+    let granularities: IGranularity[];
 
     beforeEach(() => {
         calendar = createCalendar();
@@ -1104,7 +1107,7 @@ describe("Timeline - Granularity", () => {
         it("should return a correct year", () => {
             const date: Date = new Date(2015, 0, 1);
 
-            granularities.forEach((granularity: Granularity) => {
+            granularities.forEach((granularity: IGranularity) => {
                 const actualResult = granularity.splitDate(date);
 
                 expect(actualResult[actualResult.length - 1]).toBe(2014);
@@ -1127,42 +1130,38 @@ describe("Timeline - Granularity", () => {
 
 describe("Timeline - TimelineUtils", () => {
     describe("getIndexByPosition", () => {
-        const indexes: number[] = [0, 1, 2, 3, 3.14, 4, 4.15, 5],
-            widthOfElement: number = 25;
+        const indexes: number[] = [0, 1, 2, 3, 3.14, 4, 4.15, 5];
+        const widthOfElement: number = 25;
 
         it("should return 0 when position is lower than 0", () => {
-            let position: number = -99,
-                index: number;
+            const position: number = -99;
 
-            index = getIndexByPosition(position);
+            const index: number = getIndexByPosition(position);
 
             expect(index).toBe(0);
         });
 
         it("should return max index when position is greater than widthOfElement * maxIndex", () => {
-            let position: number = indexes[indexes.length - 1] * widthOfElement * 2,
-                index: number;
+            const position: number = indexes[indexes.length - 1] * widthOfElement * 2;
 
-            index = getIndexByPosition(position);
+            const index: number = getIndexByPosition(position);
 
             expect(index).toBe(indexes.length - 1);
         });
 
         it("should return 4 when position is between 3.14 and 4", () => {
-            let position: number = 80,
-                index: number;
+            const position: number = 80;
 
-            index = getIndexByPosition(position);
+            const index: number = getIndexByPosition(position);
 
             expect(index).toBe(4);
         });
 
         it("should return 1 when offset is 10 and position is between 1 and 2", () => {
-            let position: number = 45,
-                offset: number = 10,
-                index: number;
+            const position: number = 45;
+            const offset: number = 10;
 
-            index = getIndexByPosition(position, offset);
+            const index: number = getIndexByPosition(position, offset);
 
             expect(index).toBe(1);
         });
@@ -1182,14 +1181,14 @@ describe("Timeline - TimelineUtils", () => {
         });
 
         it("should return a date in the string format without timezone", () => {
-            let date: Date = new Date(2008, 1, 1, 23, 59, 59, 999),
-                expectedString: string = "2008-02-01T23:59:59.999Z";
+            const date: Date = new Date(2008, 1, 1, 23, 59, 59, 999);
+            const expectedString: string = "2008-02-01T23:59:59.999Z";
 
             checkStringWithoutTimezone(date, expectedString);
         });
 
         function checkStringWithoutTimezone(date: Date, expectedString: string): void {
-            let actualString: string = Utils.toStringDateWithoutTimezone(date);
+            const actualString: string = Utils.toStringDateWithoutTimezone(date);
 
             expect(actualString).toBe(expectedString);
         }
@@ -1197,17 +1196,16 @@ describe("Timeline - TimelineUtils", () => {
 
     describe("parseDateWithoutTimezone", () => {
         it("should return null when a dateString is null", () => {
-            let actualDate: Date = Utils.parseDateWithoutTimezone(null);
+            const actualDate: Date = Utils.parseDateWithoutTimezone(null);
 
             expect(actualDate).toBe(null);
         });
 
         it("should return a date without timezone", () => {
-            let actualString: string = "2008-02-01T23:59:59.999Z",
-                expectedDate: Date = new Date(2008, 1, 1, 23, 59, 59, 999),
-                actualDate: Date;
+            const actualString: string = "2008-02-01T23:59:59.999Z";
+            const expectedDate: Date = new Date(2008, 1, 1, 23, 59, 59, 999);
 
-            actualDate = Utils.parseDateWithoutTimezone(actualString);
+            const actualDate: Date = Utils.parseDateWithoutTimezone(actualString);
 
             expect(actualDate.getTime()).toBe(expectedDate.getTime());
         });
@@ -1215,10 +1213,9 @@ describe("Timeline - TimelineUtils", () => {
 
     describe("convertToDaysFromMilliseconds", () => {
         it("should return amount of days", () => {
-            let milliseconds: number = 432000000,
-                amountOfDays: number;
+            const milliseconds: number = 432000000;
 
-            amountOfDays = Utils.convertToDaysFromMilliseconds(milliseconds);
+            const amountOfDays: number = Utils.convertToDaysFromMilliseconds(milliseconds);
 
             expect(amountOfDays).toBe(5);
         });
@@ -1226,40 +1223,39 @@ describe("Timeline - TimelineUtils", () => {
 
     describe("getAmountOfDaysBetweenDates", () => {
         it("should return amout of days between dates when startDate < endDate", () => {
-            let startDate: Date,
-                endDate: Date,
-                amountOfDays: number = 10;
+            const amountOfDays: number = 10;
 
-            startDate = new Date(2016, 8, 0);
-            endDate = new Date(2016, 8, amountOfDays);
+            const startDate: Date = new Date(2016, 8, 0);
+            const endDate: Date = new Date(2016, 8, amountOfDays);
 
             checkGetAmountOfDaysBetweenDates(
                 startDate,
                 endDate,
-                amountOfDays);
+                amountOfDays,
+            );
         });
 
         it("should return amout of days between dates when startDate > endDate", () => {
-            let startDate: Date,
-                endDate: Date,
-                amountOfDays: number = 10;
+            const amountOfDays: number = 10;
 
-            startDate = new Date(2016, 8, 0);
-            endDate = new Date(2016, 8, amountOfDays);
+            const startDate: Date = new Date(2016, 8, 0);
+            const endDate: Date = new Date(2016, 8, amountOfDays);
 
             checkGetAmountOfDaysBetweenDates(
                 endDate,
                 startDate,
-                amountOfDays);
+                amountOfDays,
+            );
         });
 
         it("should 0 when dates are the same", () => {
-            let startDate: Date = new Date(2016, 8, 0);
+            const startDate: Date = new Date(2016, 8, 0);
 
             checkGetAmountOfDaysBetweenDates(
                 startDate,
                 startDate,
-                0);
+                0,
+            );
         });
 
         function checkGetAmountOfDaysBetweenDates(
@@ -1277,14 +1273,10 @@ describe("Timeline - TimelineUtils", () => {
 
     describe("countWeeks", () => {
         it("should return ID of the week", () => {
-            let startDate: Date,
-                endDate: Date,
-                idOfTheWeek: number;
+            const startDate: Date = new Date(2016, 0, 3);
+            const endDate: Date = new Date(2016, 7, 12);
 
-            startDate = new Date(2016, 0, 3);
-            endDate = new Date(2016, 7, 12);
-
-            idOfTheWeek = Utils.getAmountOfWeeksBetweenDates(startDate, endDate);
+            const idOfTheWeek: number = Utils.getAmountOfWeeksBetweenDates(startDate, endDate);
 
             expect(idOfTheWeek).toBe(32);
         });
@@ -1347,15 +1339,15 @@ describe("Timeline - TimelineUtils", () => {
     });
 
     describe("areBoundsOfSelectionAndAvailableDatesTheSame", () => {
-        let datePeriod: ITimelineDatePeriod[],
-            dates: Date[];
+        let datePeriod: ITimelineDatePeriod[];
+        let dates: Date[];
 
         beforeEach(() => {
             dates = [
                 new Date(2008, 1, 1),
                 new Date(2008, 1, 2),
                 new Date(2008, 1, 3),
-                new Date(2008, 1, 4)
+                new Date(2008, 1, 4),
             ];
 
             datePeriod = createDatePeriod(dates);
@@ -1370,20 +1362,19 @@ describe("Timeline - TimelineUtils", () => {
         });
 
         function checkDates(
-            datePeriod: ITimelineDatePeriod[],
+            timelineDatePeriod: ITimelineDatePeriod[],
             selectionStartIndex: number,
             selectionEndIndex: number,
-            expectedValue: boolean): void {
+            expectedValue: boolean,
+        ): void {
 
-            let actualValue: boolean,
-                timelineData: ITimelineData;
-
-            timelineData = createTimelineData(
-                datePeriod,
+            const timelineData: ITimelineData = createTimelineData(
+                timelineDatePeriod,
                 selectionStartIndex,
-                selectionEndIndex);
+                selectionEndIndex,
+            );
 
-            actualValue = Utils.areBoundsOfSelectionAndAvailableDatesTheSame(timelineData);
+            const actualValue: boolean = Utils.areBoundsOfSelectionAndAvailableDatesTheSame(timelineData);
 
             expect(actualValue).toBe(expectedValue);
         }
@@ -1399,24 +1390,23 @@ describe("Timeline - TimelineUtils", () => {
         });
 
         it("should return the correct values when values are dates", () => {
-            let minDate: Date = new Date(1969, 6, 20),
-                maxDate: Date = new Date(2016, 7, 17),
-                dates: Date[];
+            const minDate: Date = new Date(1969, 6, 20);
+            const maxDate: Date = new Date(2016, 7, 17);
 
-            dates = [
+            const dates: Date[] = [
                 maxDate,
                 new Date(2015, 1, 1),
                 new Date(2014, 8, 8),
                 minDate,
                 new Date(2010, 8, 8),
-                new Date(2005, 8, 8)
+                new Date(2005, 8, 8),
             ];
 
             checkBoundsOfDates(dates, minDate, maxDate);
         });
 
         function checkBoundsOfDates(values: any[], startDate: any, endDate: any): void {
-            let actualDatePeriod: ITimelineDatePeriodBase = Utils.getDatePeriod(values);
+            const actualDatePeriod: ITimelineDatePeriodBase = Utils.getDatePeriod(values);
 
             expect(getTime(actualDatePeriod.startDate)).toBe(getTime(startDate));
             expect(getTime(actualDatePeriod.endDate)).toBe(getTime(endDate));
@@ -1425,8 +1415,8 @@ describe("Timeline - TimelineUtils", () => {
 
     describe("getEndOfThePreviousDate", () => {
         it("should return the previous date", () => {
-            const date: Date = new Date(2016, 9, 9),
-                expectedDay: number = 8;
+            const date: Date = new Date(2016, 9, 9);
+            const expectedDay: number = 8;
 
             expect(Utils.getEndOfThePreviousDate(date).getDate()).toBe(expectedDay);
         });
@@ -1448,8 +1438,8 @@ describe("Timeline - TimelineUtils", () => {
         });
 
         it("should return return a date when valueType is number", () => {
-            const year: number = 2016,
-                expectedDate = new Date(year, 0);
+            const year: number = 2016;
+            const expectedDate = new Date(year, 0);
 
             checkParsedValue(year, expectedDate);
         });
@@ -1471,9 +1461,9 @@ describe("Timeline - TimelineUtils", () => {
         it("all items having displayName should have displayNameKey property", () => {
             const capabilitiesJsonFile = require("../capabilities.json");
 
-            let objectsChecker = (obj) => {
-                for (let property in obj) {
-                    let value: any = obj[property];
+            const objectsChecker = (obj) => {
+                for (const property in obj) {
+                    const value: any = obj[property];
 
                     if (value.displayName) {
                         expect(value.displayNameKey).toBeDefined();
@@ -1554,9 +1544,9 @@ describe("Accessibility", () => {
         });
 
         function isColorAppliedToElements(
-            elements: JQuery<any>[],
+            elements: Array<JQuery<any>>,
             color?: string,
-            colorStyleName: string = "fill"
+            colorStyleName: string = "fill",
         ): boolean {
             return elements.some((element: JQuery) => {
                 const currentColor: string = element.css(colorStyleName);
@@ -1575,19 +1565,17 @@ function createCalendar(
     month: number = 1,
     day: number = 1,
     week: number = 1,
-    dayOfWeekSelectionOn: boolean = false): Calendar {
+    dayOfWeekSelectionOn: boolean = false,
+): Calendar {
 
-    let calendarSettings: CalendarSettings,
-        weekDaySettings: WeekDaySettings;
-
-    calendarSettings = {
-        month: month,
-        day: day
+    const calendarSettings: CalendarSettings = {
+        day,
+        month,
     };
 
-    weekDaySettings = {
+    const weekDaySettings: WeekDaySettings = {
         day: week,
-        daySelection: dayOfWeekSelectionOn
+        daySelection: dayOfWeekSelectionOn,
     };
 
     return new Calendar(calendarSettings, weekDaySettings);
@@ -1596,13 +1584,13 @@ function createCalendar(
 function createDatePeriod(dates: Date[]): ITimelineDatePeriod[] {
     return dates.map((date: Date, index: number) => {
         return {
-            startDate: date,
             endDate: date,
-            identifierArray: [],
-            year: 0,
-            week: [],
             fraction: 0,
-            index: index
+            identifierArray: [],
+            index,
+            startDate: date,
+            week: [],
+            year: 0,
         };
     });
 }
@@ -1616,7 +1604,7 @@ function createTimelineData(
 
     return {
         currentGranularity: timelineGranularityMock,
+        selectionEndIndex,
         selectionStartIndex,
-        selectionEndIndex
     };
 }

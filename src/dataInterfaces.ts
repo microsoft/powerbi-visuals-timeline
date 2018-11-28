@@ -26,10 +26,10 @@
 
 import { CssConstants } from "powerbi-visuals-utils-svgutils";
 
-import { Granularity } from "./granularity/granularity";
 import { ITimelineDatePeriod } from "./datePeriod/datePeriod";
+import { IGranularity } from "./granularity/granularity";
 
-export interface TimelineMargins {
+export interface ITimelineMargins {
     LeftMargin: number;
     RightMargin: number;
     TopMargin: number;
@@ -49,41 +49,41 @@ export interface TimelineMargins {
     HeightOffset: number;
 }
 
-export interface TimelineSelectors {
-    TimelineVisual: CssConstants.ClassAndSelector;
-    TimelineWrapper: CssConstants.ClassAndSelector;
-    SelectionRangeContainer: CssConstants.ClassAndSelector;
-    textLabel: CssConstants.ClassAndSelector;
-    LowerTextCell: CssConstants.ClassAndSelector;
-    UpperTextCell: CssConstants.ClassAndSelector;
-    UpperTextArea: CssConstants.ClassAndSelector;
-    LowerTextArea: CssConstants.ClassAndSelector;
-    RangeTextArea: CssConstants.ClassAndSelector;
-    CellsArea: CssConstants.ClassAndSelector;
-    CursorsArea: CssConstants.ClassAndSelector;
-    MainArea: CssConstants.ClassAndSelector;
-    SelectionCursor: CssConstants.ClassAndSelector;
+export interface ITimelineSelectors {
     Cell: CssConstants.ClassAndSelector;
     CellRect: CssConstants.ClassAndSelector;
-    TimelineSlicer: CssConstants.ClassAndSelector;
+    CellsArea: CssConstants.ClassAndSelector;
+    CursorsArea: CssConstants.ClassAndSelector;
+    LowerTextArea: CssConstants.ClassAndSelector;
+    LowerTextCell: CssConstants.ClassAndSelector;
+    MainArea: CssConstants.ClassAndSelector;
     PeriodSlicerGranularities: CssConstants.ClassAndSelector;
+    PeriodSlicerRect: CssConstants.ClassAndSelector;
     PeriodSlicerSelection: CssConstants.ClassAndSelector;
     PeriodSlicerSelectionRect: CssConstants.ClassAndSelector;
-    PeriodSlicerRect: CssConstants.ClassAndSelector;
+    RangeTextArea: CssConstants.ClassAndSelector;
+    SelectionCursor: CssConstants.ClassAndSelector;
+    SelectionRangeContainer: CssConstants.ClassAndSelector;
+    TextLabel: CssConstants.ClassAndSelector;
+    TimelineSlicer: CssConstants.ClassAndSelector;
+    TimelineVisual: CssConstants.ClassAndSelector;
+    TimelineWrapper: CssConstants.ClassAndSelector;
+    UpperTextArea: CssConstants.ClassAndSelector;
+    UpperTextCell: CssConstants.ClassAndSelector;
 }
 
-export interface TimelineLabel {
+export interface ITimelineLabel {
     title: string;
     text: string;
     id: number;
 }
 
-export interface ExtendedLabel {
-    yearLabels?: TimelineLabel[];
-    quarterLabels?: TimelineLabel[];
-    monthLabels?: TimelineLabel[];
-    weekLabels?: TimelineLabel[];
-    dayLabels?: TimelineLabel[];
+export interface IExtendedLabel {
+    yearLabels?: ITimelineLabel[];
+    quarterLabels?: ITimelineLabel[];
+    monthLabels?: ITimelineLabel[];
+    weekLabels?: ITimelineLabel[];
+    dayLabels?: ITimelineLabel[];
 }
 
 export interface ITimelineJSONDatePeriod {
@@ -91,12 +91,12 @@ export interface ITimelineJSONDatePeriod {
     endDate: string;
 }
 
-export interface TimelineCursorOverElement {
+export interface ITimelineCursorOverElement {
     index: number;
-    datapoint: TimelineDatapoint;
+    datapoint: ITimelineDataPoint;
 }
 
-export interface TimelineProperties {
+export interface ITimelineProperties {
     leftMargin: number;
     rightMargin: number;
     topMargin: number;
@@ -112,21 +112,21 @@ export interface TimelineProperties {
 
 export interface ITimelineData {
     filterColumnTarget?: any; /* IFilterColumnTarget */
-    timelineDatapoints?: TimelineDatapoint[];
+    timelineDataPoints?: ITimelineDataPoint[];
     selectionStartIndex?: number;
     selectionEndIndex?: number;
-    cursorDataPoints?: CursorDatapoint[];
-    currentGranularity?: Granularity;
+    cursorDataPoints?: ICursorDataPoint[];
+    currentGranularity?: IGranularity;
 }
 
-export interface CursorDatapoint {
+export interface ICursorDataPoint {
     x: number;
     y: number;
     cursorIndex: number;
     selectionIndex: number;
 }
 
-export interface TimelineDatapoint {
+export interface ITimelineDataPoint {
     index: number;
     datePeriod: ITimelineDatePeriod;
 }

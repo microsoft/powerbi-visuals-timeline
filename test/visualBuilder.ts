@@ -27,7 +27,7 @@
 import powerbi from "powerbi-visuals-api";
 
 import {
-    AdvancedFilter
+    AdvancedFilter,
 } from "powerbi-models";
 
 import {
@@ -35,20 +35,28 @@ import {
     VisualBuilderBase,
 } from "powerbi-visuals-utils-testutils";
 
-import { Timeline } from "../src/visual";
 import { TimelineDatePeriodBase } from "../src/datePeriod/datePeriodBase";
+import { Timeline } from "../src/visual";
 
 export class TimelineBuilder extends VisualBuilderBase<Timeline> {
+    public static setDatePeriod(
+        dataView: powerbi.DataView,
+        datePeriod: TimelineDatePeriodBase): void {
+
+        (dataView.metadata.objects as any).general = {
+            datePeriod: datePeriod.toString(),
+            isUserSelection: true,
+        };
+    }
+
     private jsonFilters: powerbi.IFilter[] = [];
 
     constructor(width: number, height: number) {
         super(width, height);
 
-        this.visualHost.applyJsonFilter = () => { };
-    }
-
-    protected build(options: powerbi.extensibility.visual.VisualConstructorOptions): Timeline {
-        return new Timeline(options);
+        this.visualHost.applyJsonFilter = () => {
+            // No need to implement it
+        };
     }
 
     public get visualObject(): Timeline {
@@ -106,38 +114,32 @@ export class TimelineBuilder extends VisualBuilderBase<Timeline> {
         const filter = new AdvancedFilter(
             {
                 column: "Test",
-                table: "Demo"
+                table: "Demo",
             },
             "And",
             {
                 operator: "GreaterThanOrEqual",
-                value: startDate
+                value: startDate,
             },
             {
                 operator: "LessThanOrEqual",
                 value: endDate,
-            }
+            },
         );
 
         this.jsonFilters = [filter];
     }
 
-    public static setDatePeriod(
-        dataView: powerbi.DataView,
-        datePeriod: TimelineDatePeriodBase): void {
-
-        (dataView.metadata.objects as any).general = {
-            datePeriod: datePeriod.toString(),
-            isUserSelection: true
-        };
-    }
-
     public update(dataView) {
         this.visual.update({
             dataViews: [].concat(dataView),
-            viewport: this.viewport,
-            type: undefined,
             jsonFilters: this.jsonFilters,
+            type: undefined,
+            viewport: this.viewport,
         });
+    }
+
+    protected build(options: powerbi.extensibility.visual.VisualConstructorOptions): Timeline {
+        return new Timeline(options);
     }
 }

@@ -24,16 +24,16 @@
  *  THE SOFTWARE.
  */
 
-export interface ElementScale {
+export interface IElementScale {
     x: number;
     y: number;
 }
 
-export function getScale(element: HTMLElement): ElementScale {
+export function getScale(element: HTMLElement): IElementScale {
     const clientRect: ClientRect = element.getBoundingClientRect();
 
     return {
         x: clientRect.width / element.offsetWidth,
-        y: clientRect.height / element.offsetHeight
+        y: clientRect.height / element.offsetHeight,
     };
 }

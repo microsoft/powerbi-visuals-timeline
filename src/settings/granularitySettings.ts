@@ -24,27 +24,15 @@
  *  THE SOFTWARE.
  */
 
-import {
-    parseColorString,
-    RgbColor,
-} from "powerbi-visuals-utils-testutils";
+import { GranularityType } from "../granularity/granularityType";
 
-import { range } from "d3-array";
-
-export function areColorsEqual(firstColor: string, secondColor: string): boolean {
-    const firstConvertedColor: RgbColor = parseColorString(firstColor);
-    const secondConvertedColor: RgbColor = parseColorString(secondColor);
-
-    return firstConvertedColor.R === secondConvertedColor.R
-        && firstConvertedColor.G === secondConvertedColor.G
-        && firstConvertedColor.B === secondConvertedColor.B;
-}
-
-export function getDateRange(start: Date, stop: Date, step: number): Date[] {
-    return range(start.getTime(), stop.getTime(), step)
-        .map((milliseconds: number) => new Date(milliseconds));
-}
-
-export function getSolidColorStructuralObject(color: string): any {
-    return { solid: { color } };
+export class GranularitySettings {
+    public scaleColor: string = "#000000";
+    public sliderColor: string = "#AAAAAA";
+    public granularity: GranularityType = GranularityType.month;
+    public granularityYearVisibility: boolean = true;
+    public granularityQuarterVisibility: boolean = true;
+    public granularityMonthVisibility: boolean = true;
+    public granularityWeekVisibility: boolean = true;
+    public granularityDayVisibility: boolean = true;
 }

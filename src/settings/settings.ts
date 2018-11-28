@@ -26,65 +26,16 @@
 
 import { dataViewObjectsParser } from "powerbi-visuals-utils-dataviewutils";
 
-import { TimelineDatePeriodBase } from "./datePeriod/datePeriodBase";
-import { GranularityType } from "./granularity/granularityType";
-
-export class GeneralSettings {
-    public datePeriod: TimelineDatePeriodBase | string = TimelineDatePeriodBase.createEmpty();
-    public isUserSelection: boolean = false;
-}
-
-export class ForceSelectionSettings {
-    public currentPeriod: boolean = false;
-    public latestAvailableDate: boolean = false;
-}
-
-export class CalendarSettings {
-    public month: number = 0;
-    public day: number = 1;
-}
-
-export class WeekDaySettings {
-    public daySelection: boolean = true;
-    public day: number = 0;
-}
-
-export class LabelsSettings {
-    show: boolean = true;
-    displayAll: boolean = true;
-    fontColor: string = "#777777";
-    textSize: number = 9;
-}
-
-export class CellsSettings {
-    public fillSelected: string = "#ADD8E6";
-    public fillUnselected: string = "";
-    public strokeColor: string = "#333444";
-    public selectedStrokeColor: string = "#333444";
-}
-
-export class GranularitySettings {
-    public scaleColor: string = "#000000";
-    public sliderColor: string = "#AAAAAA";
-    public granularity: GranularityType = GranularityType.month;
-    public granularityYearVisibility: boolean = true;
-    public granularityQuarterVisibility: boolean = true;
-    public granularityMonthVisibility: boolean = true;
-    public granularityWeekVisibility: boolean = true;
-    public granularityDayVisibility: boolean = true;
-}
-
-export class ScaleSizeAdjustment {
-    show: boolean = false;
-}
-
-export class ScrollAutoAdjustment {
-    show: boolean = false;
-}
-
-export class CursorSettings {
-    public color: string = "#808080";
-}
+import { CalendarSettings } from "./calendarSettings";
+import { CellsSettings } from "./cellsSettings";
+import { CursorSettings } from "./cursorSettings";
+import { ForceSelectionSettings } from "./forceSelectionSettings";
+import { GeneralSettings } from "./generalSettings";
+import { GranularitySettings } from "./granularitySettings";
+import { LabelsSettings } from "./labelsSettings";
+import { ScaleSizeAdjustment } from "./scaleSizeAdjustment";
+import { ScrollAutoAdjustment } from "./scrollAutoAdjustment";
+import { WeekDaySettings } from "./weekDaySettings";
 
 export class VisualSettings extends dataViewObjectsParser.DataViewObjectsParser {
     public general: GeneralSettings = new GeneralSettings();

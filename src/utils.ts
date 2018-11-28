@@ -25,44 +25,26 @@
  */
 
 import {
-    ITimelineDatePeriodBase,
     ITimelineDatePeriod,
+    ITimelineDatePeriodBase,
 } from "./datePeriod/datePeriod";
 
 import {
     ITimelineData,
-    TimelineDatapoint,
+    ITimelineDataPoint,
 } from "./dataInterfaces";
 
-import { CellsSettings } from "./settings";
-import { GranularityName } from "./granularity/granularityName";
+import { IGranularityName } from "./granularity/granularityName";
 import { GranularityNames } from "./granularity/granularityNames";
 import { GranularityType } from "./granularity/granularityType";
+import { CellsSettings } from "./settings/cellsSettings";
 
 export class Utils {
-    private static DateSplitter: string = " - ";
-    private static MinFraction: number = 1;
-    private static TotalDaysInWeek: number = 7;
-    private static WeekDayOffset: number = 1;
-    private static DateArrayJoiner: string = " ";
-
     public static DefaultCellColor: string = "transparent";
     public static TotalMilliseconds: number = 1000;
     public static TotalSeconds: number = 60;
     public static TotalMinutes: number = 60;
     public static TotalHours: number = 24;
-
-    /**
-     * We should reduce the latest date of selection using this value,
-     * because, as far as I understand, PBI Framework rounds off milliseconds.
-     */
-    private static OffsetMilliseconds: number = 999;
-
-    private static TotalMillisecondsInADay: number =
-        Utils.TotalMilliseconds
-        * Utils.TotalSeconds
-        * Utils.TotalMinutes
-        * Utils.TotalHours;
 
     public static convertToDaysFromMilliseconds(milliseconds: number): number {
         return milliseconds / (Utils.TotalMillisecondsInADay);
@@ -124,14 +106,13 @@ export class Utils {
             return null;
         }
 
-        let timeInMilliseconds: number,
-            date: Date = new Date(dateString);
+        const date: Date = new Date(dateString);
 
         if (date.toString() === "Invalid Date") {
             return null;
         }
 
-        timeInMilliseconds = date.getTime()
+        const timeInMilliseconds: number = date.getTime()
             + date.getTimezoneOffset() * Utils.TotalMilliseconds * Utils.TotalSeconds;
 
         return new Date(timeInMilliseconds);
@@ -145,13 +126,13 @@ export class Utils {
     }
 
     public static getDatePeriod(values: any[]): ITimelineDatePeriodBase {
-        let startDate: Date,
-            endDate: Date;
+        let startDate: Date;
+        let endDate: Date;
 
         values = [].concat(values);
 
         values.forEach((value: any) => {
-            let date: Date = Utils.parseDate(value);
+            const date: Date = Utils.parseDate(value);
 
             if (date < startDate || startDate === undefined) {
                 startDate = date;
@@ -166,8 +147,8 @@ export class Utils {
     }
 
     public static parseDate(value: any): Date {
-        let typeOfValue: string = typeof value,
-            date: Date = value;
+        const typeOfValue: string = typeof value;
+        let date: Date = value;
 
         if (typeOfValue === "number") {
             date = new Date(value, 0);
@@ -185,9 +166,9 @@ export class Utils {
     }
 
     public static areBoundsOfSelectionAndAvailableDatesTheSame(timelineData: ITimelineData): boolean {
-        const datePeriod: ITimelineDatePeriod[] = timelineData.currentGranularity.getDatePeriods(),
-            startDate: Date = Utils.getStartSelectionDate(timelineData),
-            endDate: Date = Utils.getEndSelectionDate(timelineData);
+        const datePeriod: ITimelineDatePeriod[] = timelineData.currentGranularity.getDatePeriods();
+        const startDate: Date = Utils.getStartSelectionDate(timelineData);
+        const endDate: Date = Utils.getEndSelectionDate(timelineData);
 
         return datePeriod
             && datePeriod.length >= 1
@@ -239,7 +220,7 @@ export class Utils {
      * @param timelineFormat The TimelineFormat with the chosen colors
      */
     public static getCellColor(
-        dataPoint: TimelineDatapoint,
+        dataPoint: ITimelineDataPoint,
         timelineData: ITimelineData,
         cellSettings: CellsSettings): string {
 
@@ -251,7 +232,7 @@ export class Utils {
             : (cellSettings.fillUnselected || Utils.DefaultCellColor);
     }
 
-    public static isGranuleSelected(dataPoint: TimelineDatapoint, timelineData: ITimelineData, cellSettings: CellsSettings): boolean {
+    public static isGranuleSelected(dataPoint: ITimelineDataPoint, timelineData: ITimelineData, cellSettings: CellsSettings): boolean {
         return dataPoint.datePeriod.startDate >= Utils.getStartSelectionDate(timelineData)
             && dataPoint.datePeriod.endDate <= Utils.getEndSelectionDate(timelineData);
     }
@@ -261,15 +242,15 @@ export class Utils {
      * @param granularityName The name of the granularity
      */
     public static getGranularityType(granularityName: string): GranularityType {
-        const index: number = Utils.findIndex(GranularityNames, (granularity: GranularityName) => {
+        const index: number = Utils.findIndex(GranularityNames, (granularity: IGranularityName) => {
             return granularity.name === granularityName;
         });
 
         return GranularityNames[index].granularityType;
     }
 
-    public static getGranularityPropsByMarker(marker: string): GranularityName {
-        const index: number = Utils.findIndex(GranularityNames, (granularity: GranularityName) => {
+    public static getGranularityPropsByMarker(marker: string): IGranularityName {
+        const index: number = Utils.findIndex(GranularityNames, (granularity: IGranularityName) => {
             return granularity.marker === marker;
         });
 
@@ -281,7 +262,7 @@ export class Utils {
      * @param granularity The type of granularity
      */
     public static getGranularityNameKey(granularityType: GranularityType): string {
-        const index: number = Utils.findIndex(GranularityNames, (granularity: GranularityName) => {
+        const index: number = Utils.findIndex(GranularityNames, (granularity: IGranularityName) => {
             return granularity.granularityType === granularityType;
         });
 
@@ -296,9 +277,10 @@ export class Utils {
      * @param endDate The ending date of the selection
      */
     public static separateSelection(timelineData: ITimelineData, startDate: Date, endDate: Date): void {
-        let datePeriods: ITimelineDatePeriod[] = timelineData.currentGranularity.getDatePeriods(),
-            startDateIndex: number = Utils.findIndex(datePeriods, x => startDate < x.endDate),
-            endDateIndex: number = Utils.findIndex(datePeriods, x => endDate <= x.endDate);
+        const datePeriods: ITimelineDatePeriod[] = timelineData.currentGranularity.getDatePeriods();
+
+        let startDateIndex: number = Utils.findIndex(datePeriods, (x) => startDate < x.endDate);
+        let endDateIndex: number = Utils.findIndex(datePeriods, (x) => endDate <= x.endDate);
 
         startDateIndex = startDateIndex >= 0
             ? startDateIndex
@@ -311,8 +293,8 @@ export class Utils {
         timelineData.selectionStartIndex = startDateIndex;
         timelineData.selectionEndIndex = endDateIndex;
 
-        const startRatio: number = Utils.getDateRatio(datePeriods[startDateIndex], startDate, true),
-            endRatio: number = Utils.getDateRatio(datePeriods[endDateIndex], endDate, false);
+        const startRatio: number = Utils.getDateRatio(datePeriods[startDateIndex], startDate, true);
+        const endRatio: number = Utils.getDateRatio(datePeriods[endDateIndex], endDate, false);
 
         if (endRatio > 0) {
             timelineData.currentGranularity.splitPeriod(endDateIndex, endRatio, endDate);
@@ -350,16 +332,19 @@ export class Utils {
     }
 
     /**
-    * Returns the time range text, depending on the given granularity (e.g. "Feb 3 2014 - Apr 5 2015", "Q1 2014 - Q2 2015")
-    */
+     * Returns the time range text, depending on the given granularity (e.g. "Feb 3 2014 - Apr 5 2015", "Q1 2014 - Q2 2015")
+     */
     public static timeRangeText(timelineData: ITimelineData): string {
-        let startSelectionDateArray: (string | number)[] = timelineData.currentGranularity
+        const startSelectionDateArray: Array<string | number> = timelineData.currentGranularity
             .splitDateForTitle(Utils.getStartSelectionDate(timelineData));
 
-        let endSelectionDateArray: (string | number)[] = timelineData.currentGranularity
+        const endSelectionDateArray: Array<string | number> = timelineData.currentGranularity
             .splitDateForTitle(Utils.getEndSelectionPeriod(timelineData).startDate);
 
-        return `${startSelectionDateArray.join(Utils.DateArrayJoiner)}${Utils.DateSplitter}${endSelectionDateArray.join(Utils.DateArrayJoiner)}`;
+        const startSelectionString: string = startSelectionDateArray.join(Utils.DateArrayJoiner);
+        const endSelectionString: string = endSelectionDateArray.join(Utils.DateArrayJoiner);
+
+        return `${startSelectionString}${Utils.DateSplitter}${endSelectionString}`;
     }
 
     public static dateRangeText(datePeriod: ITimelineDatePeriod): string {
@@ -411,8 +396,8 @@ export class Utils {
         }
 
         for (let i: number = 1; i < length; i++) {
-            const left: number = elements[i] * widthOfElement + offset,
-                right: number = elements[i + 1] * widthOfElement + offset;
+            const left: number = elements[i] * widthOfElement + offset;
+            const right: number = elements[i + 1] * widthOfElement + offset;
 
             if (position >= left && position <= right) {
                 return i;
@@ -423,28 +408,63 @@ export class Utils {
     }
 
     public static arraysEqual(a: any[], b: any[]): boolean {
-        if (a === b) return true;
-        if (a === null || b === null) return false;
-        if (a.length !== b.length) return false;
+        if (a === b) {
+            return true;
+        }
+
+        if (a === null || b === null) {
+            return false;
+        }
+
+        if (a.length !== b.length) {
+            return false;
+        }
 
         // If you don't care about the order of the elements inside
         // the array, you should sort both arrays here.
 
         for (let i = 0; i < a.length; ++i) {
-            if (a[i] !== b[i]) return false;
+            if (a[i] !== b[i]) {
+                return false;
+            }
         }
+
         return true;
     }
-    public static findIndex(array: any[], predicate: Function): number {
+
+    public static findIndex(
+        array: any[],
+        predicate: (value: any, index: number, array: any[]) => boolean,
+    ): number {
         let value: any;
+
         for (let i = 0; i < array.length; i++) {
             value = array[i];
             if (predicate(value, i, array)) {
                 return i;
             }
         }
+
         return -1;
     }
+
+    private static DateSplitter: string = " - ";
+    private static MinFraction: number = 1;
+    private static TotalDaysInWeek: number = 7;
+    private static WeekDayOffset: number = 1;
+    private static DateArrayJoiner: string = " ";
+
+    /**
+     * We should reduce the latest date of selection using this value,
+     * because, as far as I understand, PBI Framework rounds off milliseconds.
+     */
+    private static OffsetMilliseconds: number = 999;
+
+    private static TotalMillisecondsInADay: number =
+        Utils.TotalMilliseconds
+        * Utils.TotalSeconds
+        * Utils.TotalMinutes
+        * Utils.TotalHours;
 
     private static previousDay(date: Date): Date {
         const prevDay: Date = Utils.resetTime(date);

@@ -25,14 +25,14 @@
  */
 
 export interface ITimelineDatePeriodBase {
-    startDate: Date;
     endDate: Date;
+    startDate: Date;
 }
 
 export interface ITimelineDatePeriod extends ITimelineDatePeriodBase {
-    identifierArray: (string | number)[];
-    year: number;
-    week: number[];
     fraction: number;
+    identifierArray: Array<string | number>;
     index: number;
+    week: number[];
+    year: number;
 }

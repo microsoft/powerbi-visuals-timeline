@@ -26,8 +26,8 @@
 
 import powerbi from "powerbi-visuals-api";
 
-import { valueType } from "powerbi-visuals-utils-typeutils";
 import { testDataViewBuilder } from "powerbi-visuals-utils-testutils";
+import { valueType } from "powerbi-visuals-utils-typeutils";
 
 import { getDateRange } from "./helpers";
 
@@ -37,7 +37,7 @@ export class TimelineData extends testDataViewBuilder.TestDataViewBuilder {
     public valuesCategory: Date[] = getDateRange(
         new Date(2016, 0, 1),
         new Date(2016, 0, 10),
-        1000 * 24 * 3600
+        1000 * 24 * 3600,
     );
 
     public setDateRange(startDate: Date, endDate: Date) {
@@ -50,10 +50,10 @@ export class TimelineData extends testDataViewBuilder.TestDataViewBuilder {
                 source: {
                     displayName: TimelineData.ColumnCategory,
                     roles: { Category: true },
-                    type: valueType.ValueType.fromDescriptor({ dateTime: true })
+                    type: valueType.ValueType.fromDescriptor({ dateTime: true }),
                 },
-                values: this.valuesCategory
-            }
+                values: this.valuesCategory,
+            },
 
         ], null, columnNames).build();
     }
@@ -63,8 +63,8 @@ export class TimelineData extends testDataViewBuilder.TestDataViewBuilder {
             {
                 source: {
                     displayName: "Country",
+                    roles: { Category: true },
                     type: valueType.ValueType.fromDescriptor({ text: true }),
-                    roles: { Category: true }
                 },
                 values: [
                     "Australia",
@@ -72,9 +72,9 @@ export class TimelineData extends testDataViewBuilder.TestDataViewBuilder {
                     "France",
                     "Germany",
                     "United Kingdom",
-                    "United States"
-                ]
-            }
+                    "United States",
+                ],
+            },
         ], null, null).build();
     }
 }

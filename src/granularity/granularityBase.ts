@@ -25,31 +25,33 @@
  */
 
 import {
-    Selection,
     selectAll,
+    Selection,
 } from "d3-selection";
 
 import { valueFormatter } from "powerbi-visuals-utils-formattingutils";
 import { manipulation as svgManipulation } from "powerbi-visuals-utils-svgutils";
 import { pixelConverter } from "powerbi-visuals-utils-typeutils";
 
-import { Utils } from "../utils";
-import { Granularity } from "./granularity";
 import { Calendar } from "../calendar";
 import { ITimelineDatePeriod } from "../datePeriod/datePeriod";
-import { GranularityName } from "./granularityName";
-import { GranularityRenderProps } from "./granularityRenderProps";
-import { GranularitySettings } from "../settings";
+import { GranularitySettings } from "../settings/granularitySettings";
+import { Utils } from "../utils";
+import { IGranularity } from "./granularity";
+import { IGranularityName } from "./granularityName";
+import { IGranularityRenderProps } from "./granularityRenderProps";
 
 import {
-    ExtendedLabel,
-    TimelineLabel,
+    IExtendedLabel,
+    ITimelineLabel,
 } from "../dataInterfaces";
 
-export class TimelineGranularityBase implements Granularity {
+export class TimelineGranularityBase implements IGranularity {
     private static DefaultFraction: number = 1;
     private static EmptyYearOffset: number = 0;
     private static YearOffset: number = 1;
+
+    protected calendar: Calendar;
 
     private clickableRectHeight: number = 23;
     private clickableRectFactor: number = 2;
@@ -73,21 +75,20 @@ export class TimelineGranularityBase implements Granularity {
     private textLabelYOffset: number = 3;
     private textLabelDx: string = "0.5em";
 
-    protected calendar: Calendar;
-
     private datePeriods: ITimelineDatePeriod[] = [];
-    private extendedLabel: ExtendedLabel;
+    private extendedLabel: IExtendedLabel;
     private shortMonthFormatter: valueFormatter.IValueFormatter;
-    private granularityProps: GranularityName = null;
+    private granularityProps: IGranularityName = null;
 
-    constructor(calendar: Calendar, private locale: string, granularityProps: GranularityName) {
+    constructor(calendar: Calendar, private locale: string, granularityProps: IGranularityName) {
         this.calendar = calendar;
         this.shortMonthFormatter = valueFormatter.valueFormatter.create({ format: "MMM", cultureSelector: this.locale });
         this.granularityProps = granularityProps;
     }
 
-    public render(props: GranularityRenderProps, isFirst: boolean): Selection<any, any, any, any> {
-        let granularitySelection = props.selection.append("g")
+    public render(props: IGranularityRenderProps, isFirst: boolean): Selection<any, any, any, any> {
+        const granularitySelection = props.selection
+            .append("g")
             .attr("transform", svgManipulation.translate(0, 0));
 
         // render vetical line
@@ -120,7 +121,7 @@ export class TimelineGranularityBase implements Granularity {
         if (props.granularSettings.granularity === this.granularityProps.granularityType) {
             this.renderSlider(
                 granularitySelection,
-                props.granularSettings
+                props.granularSettings,
             );
         }
 
@@ -131,7 +132,7 @@ export class TimelineGranularityBase implements Granularity {
 
             props.selectPeriodCallback(this.granularityProps.granularityType);
 
-            let sliderSelection = selectAll("rect.periodSlicerRect");
+            const sliderSelection = selectAll("rect.periodSlicerRect");
 
             if (sliderSelection) {
                 sliderSelection.remove();
@@ -139,7 +140,7 @@ export class TimelineGranularityBase implements Granularity {
 
             this.renderSlider(
                 granularitySelection,
-                props.granularSettings
+                props.granularSettings,
             );
         };
 
@@ -159,33 +160,14 @@ export class TimelineGranularityBase implements Granularity {
         return granularitySelection;
     }
 
-    private renderSlider(
-        selection: Selection<any, any, any, any>,
-        granularSettings: GranularitySettings
-    ): void {
-        selection
-            .append("rect")
-            .classed("periodSlicerRect", true)
-            .style("stroke", granularSettings.sliderColor)
-            .attr("x", pixelConverter.toString(0 - this.sliderXOffset))
-            .attr("y", pixelConverter.toString(0 - this.sliderYOffset))
-            .attr("rx", pixelConverter.toString(this.sliderRx))
-            .attr("width", pixelConverter.toString(this.sliderWidth))
-            .attr("height", pixelConverter.toString(this.sliderHeight))
-            .data([granularSettings.granularity]);
-    }
-
-    public splitDate(date: Date): (string | number)[] {
+    public splitDate(date: Date): Array<string | number> {
         return [];
     }
 
-    public splitDateForTitle(date: Date): (string | number)[] {
+    public splitDateForTitle(date: Date): Array<string | number> {
         return this.splitDate(date);
     }
 
-    /**
-    * Returns the short month name of the given date (e.g. Jan, Feb, Mar)
-    */
     public shortMonthName(date: Date): string {
         return this.shortMonthFormatter.format(date);
     }
@@ -198,17 +180,17 @@ export class TimelineGranularityBase implements Granularity {
         return this.datePeriods;
     }
 
-    public getExtendedLabel(): ExtendedLabel {
+    public getExtendedLabel(): IExtendedLabel {
         return this.extendedLabel;
     }
 
-    public setExtendedLabel(extendedLabel: ExtendedLabel): void {
+    public setExtendedLabel(extendedLabel: IExtendedLabel): void {
         this.extendedLabel = extendedLabel;
     }
 
-    public createLabels(granularity: Granularity): TimelineLabel[] {
-        let labels: TimelineLabel[] = [],
-            lastDatePeriod: ITimelineDatePeriod;
+    public createLabels(granularity: IGranularity): ITimelineLabel[] {
+        const labels: ITimelineLabel[] = [];
+        let lastDatePeriod: ITimelineDatePeriod;
 
         this.datePeriods.forEach((datePeriod: ITimelineDatePeriod) => {
             if (!labels.length || !granularity.sameLabel(datePeriod, lastDatePeriod)) {
@@ -221,16 +203,16 @@ export class TimelineGranularityBase implements Granularity {
     }
 
     /**
-    * Adds the new date into the given datePeriods array
-    * If the date corresponds to the last date period, given the current granularity,
-    * it will be added to that date period. Otherwise, a new date period will be added to the array.
-    * i.e. using Month granularity, Feb 2 2015 corresponds to Feb 3 2015.
-    * It is assumed that the given date does not correspond to previous date periods, other than the last date period
-    */
+     * Adds the new date into the given datePeriods array
+     * If the date corresponds to the last date period, given the current granularity,
+     * it will be added to that date period. Otherwise, a new date period will be added to the array.
+     * i.e. using Month granularity, Feb 2 2015 corresponds to Feb 3 2015.
+     * It is assumed that the given date does not correspond to previous date periods, other than the last date period
+     */
     public addDate(date: Date): void {
-        let datePeriods: ITimelineDatePeriod[] = this.getDatePeriods(),
-            lastDatePeriod: ITimelineDatePeriod = datePeriods[datePeriods.length - 1],
-            identifierArray: (string | number)[] = this.splitDate(date);
+        const datePeriods: ITimelineDatePeriod[] = this.getDatePeriods();
+        const lastDatePeriod: ITimelineDatePeriod = datePeriods[datePeriods.length - 1];
+        const identifierArray: Array<string | number> = this.splitDate(date);
 
         if (datePeriods.length === 0
             || !Utils.arraysEqual(lastDatePeriod.identifierArray, identifierArray)) {
@@ -240,13 +222,13 @@ export class TimelineGranularityBase implements Granularity {
             }
 
             datePeriods.push({
-                identifierArray: identifierArray,
-                startDate: date,
                 endDate: date,
+                fraction: TimelineGranularityBase.DefaultFraction,
+                identifierArray,
+                index: datePeriods.length,
+                startDate: date,
                 week: this.determineWeek(date),
                 year: this.determineYear(date),
-                fraction: TimelineGranularityBase.DefaultFraction,
-                index: datePeriods.length
             });
         }
         else {
@@ -266,18 +248,18 @@ export class TimelineGranularityBase implements Granularity {
      * @param newDate The date in which the date period is split
      */
     public splitPeriod(index: number, newFraction: number, newDate: Date): void {
-        let oldDatePeriod: ITimelineDatePeriod = this.datePeriods[index];
+        const oldDatePeriod: ITimelineDatePeriod = this.datePeriods[index];
 
         oldDatePeriod.fraction -= newFraction;
 
-        let newDateObject: ITimelineDatePeriod = {
-            identifierArray: oldDatePeriod.identifierArray,
-            startDate: newDate,
+        const newDateObject: ITimelineDatePeriod = {
             endDate: oldDatePeriod.endDate,
+            fraction: newFraction,
+            identifierArray: oldDatePeriod.identifierArray,
+            index: oldDatePeriod.index + oldDatePeriod.fraction,
+            startDate: newDate,
             week: this.determineWeek(newDate),
             year: this.determineYear(newDate),
-            fraction: newFraction,
-            index: oldDatePeriod.index + oldDatePeriod.fraction
         };
 
         oldDatePeriod.endDate = newDate;
@@ -286,7 +268,7 @@ export class TimelineGranularityBase implements Granularity {
     }
 
     public determineWeek(date: Date): number[] {
-        let year: number = this.determineYear(date);
+        const year: number = this.determineYear(date);
 
         const dateOfFirstWeek: Date = this.calendar.getDateOfFirstWeek(year);
         const dateOfFirstFullWeek: Date = this.calendar.getDateOfFirstFullWeek(year);
@@ -303,10 +285,27 @@ export class TimelineGranularityBase implements Granularity {
         const firstDay: Date = new Date(
             date.getFullYear(),
             this.calendar.getFirstMonthOfYear(),
-            this.calendar.getFirstDayOfYear());
+            this.calendar.getFirstDayOfYear(),
+        );
 
         return date.getFullYear() - ((firstDay <= date)
             ? TimelineGranularityBase.EmptyYearOffset
             : TimelineGranularityBase.YearOffset);
+    }
+
+    private renderSlider(
+        selection: Selection<any, any, any, any>,
+        granularSettings: GranularitySettings,
+    ): void {
+        selection
+            .append("rect")
+            .classed("periodSlicerRect", true)
+            .style("stroke", granularSettings.sliderColor)
+            .attr("x", pixelConverter.toString(0 - this.sliderXOffset))
+            .attr("y", pixelConverter.toString(0 - this.sliderYOffset))
+            .attr("rx", pixelConverter.toString(this.sliderRx))
+            .attr("width", pixelConverter.toString(this.sliderWidth))
+            .attr("height", pixelConverter.toString(this.sliderHeight))
+            .data([granularSettings.granularity]);
     }
 }

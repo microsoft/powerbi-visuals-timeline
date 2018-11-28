@@ -27,36 +27,19 @@
 import powerbi from "powerbi-visuals-api";
 import { manipulation as svgManipulation } from "powerbi-visuals-utils-svgutils";
 
-import { Granularity } from "./granularity";
-import { GranularityType } from "./granularityType";
-import { GranularityRenderProps } from "./granularityRenderProps";
-import { YearGranularity } from "./yearGranularity";
-import { QuarterGranularity } from "./quarterGranularity";
-import { MonthGranularity } from "./monthGranularity";
-import { WeekGranularity } from "./weekGranularity";
 import { DayGranularity } from "./dayGranularity";
+import { IGranularity } from "./granularity";
+import { IGranularityRenderProps } from "./granularityRenderProps";
+import { GranularityType } from "./granularityType";
+import { MonthGranularity } from "./monthGranularity";
+import { QuarterGranularity } from "./quarterGranularity";
+import { WeekGranularity } from "./weekGranularity";
+import { YearGranularity } from "./yearGranularity";
 
-import { Utils } from "../utils";
 import { Calendar } from "../calendar";
+import { Utils } from "../utils";
 
 export class TimelineGranularityData {
-    private static DayOffset: number = 1;
-
-    private dates: Date[];
-    private granularities: Granularity[];
-    private endingDate: Date;
-    private groupXOffset: number = 10;
-    private groupWidth: number = 30;
-
-    constructor(startDate: Date, endDate: Date) {
-        this.granularities = [];
-        this.setDatesRange(startDate, endDate);
-
-        const lastDate: Date = this.dates[this.dates.length - 1];
-
-        this.endingDate = TimelineGranularityData.nextDay(lastDate);
-    }
-
     /**
      * Returns the date of the previos day
      * @param date The following date
@@ -81,18 +64,21 @@ export class TimelineGranularityData {
         return nextDay;
     }
 
-    /**
-    * Returns an array of dates with all the days between the start date and the end date
-    */
-    private setDatesRange(startDate: Date, endDate: Date): void {
-        let date: Date = startDate;
+    private static DayOffset: number = 1;
 
-        this.dates = [];
+    private dates: Date[];
+    private granularities: IGranularity[];
+    private endingDate: Date;
+    private groupXOffset: number = 10;
+    private groupWidth: number = 30;
 
-        while (date <= endDate) {
-            this.dates.push(date);
-            date = TimelineGranularityData.nextDay(date);
-        }
+    constructor(startDate: Date, endDate: Date) {
+        this.granularities = [];
+        this.setDatesRange(startDate, endDate);
+
+        const lastDate: Date = this.dates[this.dates.length - 1];
+
+        this.endingDate = TimelineGranularityData.nextDay(lastDate);
     }
 
     /**
@@ -100,10 +86,10 @@ export class TimelineGranularityData {
      * Resets the new granularity, adds all dates to it, and then edits the last date period with the ending date.
      * @param granularity The new granularity to be added
      */
-    public addGranularity(granularity: Granularity): void {
+    public addGranularity(granularity: IGranularity): void {
         granularity.resetDatePeriods();
 
-        for (let date of this.dates) {
+        for (const date of this.dates) {
             granularity.addDate(date);
         }
 
@@ -115,13 +101,17 @@ export class TimelineGranularityData {
     /**
      * Renders all available granularities
      */
-    public renderGranularities(props: GranularityRenderProps): void {
+    public renderGranularities(props: IGranularityRenderProps): void {
         let renderIndex = 0;
-        this.granularities.forEach((granularity: Granularity, index: number) => {
-            let granularitySelection = granularity.render(props, renderIndex === 0);
+        this.granularities.forEach((granularity: IGranularity, index: number) => {
+            const granularitySelection = granularity.render(props, renderIndex === 0);
 
             if (granularitySelection !== null) {
-                granularitySelection.attr("transform", svgManipulation.translate(this.groupXOffset + renderIndex * this.groupWidth, 0));
+                granularitySelection.attr(
+                    "transform",
+                    svgManipulation.translate(this.groupXOffset + renderIndex * this.groupWidth, 0),
+                );
+
                 renderIndex++;
             }
         });
@@ -131,14 +121,14 @@ export class TimelineGranularityData {
      * Returns a specific granularity from the array of granularities
      * @param index The index of the requested granularity
      */
-    public getGranularity(index: number): Granularity {
+    public getGranularity(index: number): IGranularity {
         return this.granularities[index];
     }
 
     public createGranularities(
         calendar: Calendar,
         locale: string,
-        localizationManager: powerbi.extensibility.ILocalizationManager
+        localizationManager: powerbi.extensibility.ILocalizationManager,
     ): void {
         this.granularities = [];
 
@@ -150,13 +140,10 @@ export class TimelineGranularityData {
     }
 
     public createLabels(): void {
-        this.granularities.forEach((granularity: Granularity) => {
+        this.granularities.forEach((granularity: IGranularity) => {
             granularity.setExtendedLabel({
                 dayLabels: granularity.getType() >= GranularityType.day
                     ? granularity.createLabels(this.granularities[GranularityType.day])
-                    : [],
-                weekLabels: granularity.getType() >= GranularityType.week
-                    ? granularity.createLabels(this.granularities[GranularityType.week])
                     : [],
                 monthLabels: granularity.getType() >= GranularityType.month
                     ? granularity.createLabels(this.granularities[GranularityType.month])
@@ -164,10 +151,27 @@ export class TimelineGranularityData {
                 quarterLabels: granularity.getType() >= GranularityType.quarter
                     ? granularity.createLabels(this.granularities[GranularityType.quarter])
                     : [],
+                weekLabels: granularity.getType() >= GranularityType.week
+                    ? granularity.createLabels(this.granularities[GranularityType.week])
+                    : [],
                 yearLabels: granularity.getType() >= GranularityType.year
                     ? granularity.createLabels(this.granularities[GranularityType.year])
                     : [],
             });
         });
+    }
+
+    /**
+     * Returns an array of dates with all the days between the start date and the end date
+     */
+    private setDatesRange(startDate: Date, endDate: Date): void {
+        let date: Date = startDate;
+
+        this.dates = [];
+
+        while (date <= endDate) {
+            this.dates.push(date);
+            date = TimelineGranularityData.nextDay(date);
+        }
     }
 }

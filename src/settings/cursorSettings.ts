@@ -24,27 +24,6 @@
  *  THE SOFTWARE.
  */
 
-import {
-    parseColorString,
-    RgbColor,
-} from "powerbi-visuals-utils-testutils";
-
-import { range } from "d3-array";
-
-export function areColorsEqual(firstColor: string, secondColor: string): boolean {
-    const firstConvertedColor: RgbColor = parseColorString(firstColor);
-    const secondConvertedColor: RgbColor = parseColorString(secondColor);
-
-    return firstConvertedColor.R === secondConvertedColor.R
-        && firstConvertedColor.G === secondConvertedColor.G
-        && firstConvertedColor.B === secondConvertedColor.B;
-}
-
-export function getDateRange(start: Date, stop: Date, step: number): Date[] {
-    return range(start.getTime(), stop.getTime(), step)
-        .map((milliseconds: number) => new Date(milliseconds));
-}
-
-export function getSolidColorStructuralObject(color: string): any {
-    return { solid: { color } };
+export class CursorSettings {
+    public color: string = "#808080";
 }

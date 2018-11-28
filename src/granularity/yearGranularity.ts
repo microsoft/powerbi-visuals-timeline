@@ -28,11 +28,11 @@ import { Selection } from "d3-selection";
 import powerbi from "powerbi-visuals-api";
 
 import { Calendar } from "../calendar";
-import { Utils } from "../utils";
-import { TimelineLabel } from "../dataInterfaces";
+import { ITimelineLabel } from "../dataInterfaces";
 import { ITimelineDatePeriod } from "../datePeriod/datePeriod";
-import { GranularityRenderProps } from "./granularityRenderProps";
+import { Utils } from "../utils";
 import { TimelineGranularityBase } from "./granularityBase";
+import { IGranularityRenderProps } from "./granularityRenderProps";
 import { GranularityType } from "./granularityType";
 
 export class YearGranularity extends TimelineGranularityBase {
@@ -41,7 +41,7 @@ export class YearGranularity extends TimelineGranularityBase {
     constructor(
         calendar: Calendar,
         locale: string,
-        protected localizationManager: powerbi.extensibility.ILocalizationManager
+        protected localizationManager: powerbi.extensibility.ILocalizationManager,
     ) {
         super(calendar, locale, Utils.getGranularityPropsByMarker("Y"));
     }
@@ -50,7 +50,7 @@ export class YearGranularity extends TimelineGranularityBase {
         return GranularityType.year;
     }
 
-    public render(props: GranularityRenderProps, isFirst: boolean): Selection<any, any, any, any> {
+    public render(props: IGranularityRenderProps, isFirst: boolean): Selection<any, any, any, any> {
         if (!props.granularSettings.granularityYearVisibility) {
             return null;
         }
@@ -58,7 +58,7 @@ export class YearGranularity extends TimelineGranularityBase {
         return super.render(props, isFirst);
     }
 
-    public splitDate(date: Date): (string | number)[] {
+    public splitDate(date: Date): Array<string | number> {
         return [this.determineYear(date)];
     }
 
@@ -66,15 +66,15 @@ export class YearGranularity extends TimelineGranularityBase {
         return firstDatePeriod.year === secondDatePeriod.year;
     }
 
-    public generateLabel(datePeriod: ITimelineDatePeriod): TimelineLabel {
+    public generateLabel(datePeriod: ITimelineDatePeriod): ITimelineLabel {
         const localizedYear = this.localizationManager
             ? this.localizationManager.getDisplayName(this.localizationKey)
             : this.localizationKey;
 
         return {
-            title: `${localizedYear} ${datePeriod.year}`,
+            id: datePeriod.index,
             text: `${datePeriod.year}`,
-            id: datePeriod.index
+            title: `${localizedYear} ${datePeriod.year}`,
         };
     }
 }

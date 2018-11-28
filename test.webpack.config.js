@@ -15,7 +15,7 @@ module.exports = {
                     options: {
                         emitErrors: true,
                         failOnHint: true,
-                        fix: false
+                        fix: false,
                     }
                 }]
             },

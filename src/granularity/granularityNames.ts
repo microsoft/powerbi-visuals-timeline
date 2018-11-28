@@ -24,34 +24,34 @@
  *  THE SOFTWARE.
  */
 
-import { GranularityName } from "./granularityName";
+import { IGranularityName } from "./granularityName";
 import { GranularityType } from "./granularityType";
 
-export const GranularityNames: GranularityName[] = [
+export const GranularityNames: IGranularityName[] = [
     {
         granularityType: GranularityType.year,
+        marker: "Y",
         name: "year",
         nameKey: "Visual_Granularity_Year",
-        marker: "Y"
     }, {
         granularityType: GranularityType.quarter,
+        marker: "Q",
         name: "quarter",
         nameKey: "Visual_Granularity_Quarter",
-        marker: "Q"
     }, {
         granularityType: GranularityType.month,
+        marker: "M",
         name: "month",
         nameKey: "Visual_Granularity_Month",
-        marker: "M"
     }, {
         granularityType: GranularityType.week,
+        marker: "W",
         name: "week",
         nameKey: "Visual_Granularity_Week",
-        marker: "W"
     }, {
         granularityType: GranularityType.day,
+        marker: "D",
         name: "day",
         nameKey: "Visual_Granularity_Day",
-        marker: "D"
-    }
+    },
 ];

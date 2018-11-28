@@ -26,16 +26,14 @@
 
 import { TimelineGranularityData } from "./granularity/granularityData";
 
-import {
-    CalendarSettings,
-    WeekDaySettings,
-} from "./settings";
+import { CalendarSettings } from "./settings/calendarSettings";
+import { WeekDaySettings } from "./settings/weekDaySettings";
 
-interface DateDictionary {
+interface IDateDictionary {
     [year: number]: Date;
 }
 
-export interface PeriodDates {
+export interface IPeriodDates {
     startDate: Date;
     endDate: Date;
 }
@@ -46,10 +44,27 @@ export class Calendar {
     private firstDayOfWeek: number;
     private firstMonthOfYear: number;
     private firstDayOfYear: number;
-    private dateOfFirstWeek: DateDictionary;
-    private dateOfFirstFullWeek: DateDictionary;
+    private dateOfFirstWeek: IDateDictionary;
+    private dateOfFirstFullWeek: IDateDictionary;
     private quarterFirstMonths: number[];
     private isDaySelection: boolean;
+
+    constructor(
+        calendarFormat: CalendarSettings,
+        weekDaySettings: WeekDaySettings) {
+
+        this.isDaySelection = weekDaySettings.daySelection;
+        this.firstDayOfWeek = weekDaySettings.day;
+        this.firstMonthOfYear = calendarFormat.month;
+        this.firstDayOfYear = calendarFormat.day;
+
+        this.dateOfFirstWeek = {};
+        this.dateOfFirstFullWeek = {};
+
+        this.quarterFirstMonths = Calendar.QuarterFirstMonths.map((monthIndex: number) => {
+            return monthIndex + this.firstMonthOfYear;
+        });
+    }
 
     public getFirstDayOfWeek(): number {
         return this.firstDayOfWeek;
@@ -67,14 +82,14 @@ export class Calendar {
         return TimelineGranularityData.nextDay(date);
     }
 
-    public getWeekPeriod(date: Date): PeriodDates {
+    public getWeekPeriod(date: Date): IPeriodDates {
         const year: number = date.getFullYear();
         const month: number = date.getMonth();
         const dayOfWeek: number = date.getDay();
 
-        let weekDay = this.isDaySelection ?
-            this.firstDayOfWeek :
-            new Date(year, this.firstMonthOfYear, this.firstDayOfYear).getDay();
+        const weekDay = this.isDaySelection
+            ? this.firstDayOfWeek
+            : new Date(year, this.firstMonthOfYear, this.firstDayOfYear).getDay();
 
         let deltaDays: number = 0;
         if (weekDay !== dayOfWeek) {
@@ -104,30 +119,30 @@ export class Calendar {
         return new Date(date.getFullYear(), date.getMonth() + 3, this.firstDayOfYear);
     }
 
-    public getQuarterPeriod(date: Date): PeriodDates {
+    public getQuarterPeriod(date: Date): IPeriodDates {
         const quarterIndex = this.getQuarterIndex(date);
 
-        let startDate: Date = this.getQuarterStartDate(date.getFullYear(), quarterIndex);
-        let endDate: Date = this.getQuarterEndDate(startDate);
+        const startDate: Date = this.getQuarterStartDate(date.getFullYear(), quarterIndex);
+        const endDate: Date = this.getQuarterEndDate(startDate);
 
         return { startDate, endDate };
     }
 
-    public getMonthPeriod(date: Date): PeriodDates {
+    public getMonthPeriod(date: Date): IPeriodDates {
         const year: number = date.getFullYear();
         const month: number = date.getMonth();
 
-        let startDate: Date = new Date(year, month, this.firstDayOfYear);
-        let endDate: Date = new Date(year, month + 1, this.firstDayOfYear);
+        const startDate: Date = new Date(year, month, this.firstDayOfYear);
+        const endDate: Date = new Date(year, month + 1, this.firstDayOfYear);
 
         return { startDate, endDate };
     }
 
-    public getYearPeriod(date: Date): PeriodDates {
+    public getYearPeriod(date: Date): IPeriodDates {
         const year: number = date.getFullYear();
 
-        let startDate: Date = new Date(year, this.firstMonthOfYear, this.firstDayOfYear);
-        let endDate: Date = new Date(year + 1, this.firstMonthOfYear, this.firstDayOfYear);
+        const startDate: Date = new Date(year, this.firstMonthOfYear, this.firstDayOfYear);
+        const endDate: Date = new Date(year + 1, this.firstMonthOfYear, this.firstDayOfYear);
 
         return { startDate, endDate };
     }
@@ -139,37 +154,6 @@ export class Calendar {
         return this.firstMonthOfYear !== calendarSettings.month
             || this.firstDayOfYear !== calendarSettings.day
             || this.firstDayOfWeek !== weekDaySettings.day;
-    }
-
-    constructor(
-        calendarFormat: CalendarSettings,
-        weekDaySettings: WeekDaySettings) {
-
-        this.isDaySelection = weekDaySettings.daySelection;
-        this.firstDayOfWeek = weekDaySettings.day;
-        this.firstMonthOfYear = calendarFormat.month;
-        this.firstDayOfYear = calendarFormat.day;
-
-        this.dateOfFirstWeek = {};
-        this.dateOfFirstFullWeek = {};
-
-        this.quarterFirstMonths = Calendar.QuarterFirstMonths.map((monthIndex: number) => {
-            return monthIndex + this.firstMonthOfYear;
-        });
-    }
-
-    private calculateDateOfFirstFullWeek(year: number): Date {
-        let date: Date = new Date(year, this.firstMonthOfYear, this.firstDayOfYear);
-
-        let weekDay = this.isDaySelection ?
-            this.firstDayOfWeek :
-            new Date(year, this.firstMonthOfYear, this.firstDayOfYear).getDay();
-
-        while (date.getDay() !== weekDay) {
-            date = TimelineGranularityData.nextDay(date);
-        }
-
-        return date;
     }
 
     public getDateOfFirstWeek(year: number): Date {
@@ -186,5 +170,19 @@ export class Calendar {
         }
 
         return this.dateOfFirstFullWeek[year];
+    }
+
+    private calculateDateOfFirstFullWeek(year: number): Date {
+        let date: Date = new Date(year, this.firstMonthOfYear, this.firstDayOfYear);
+
+        const weekDay = this.isDaySelection
+            ? this.firstDayOfWeek
+            : new Date(year, this.firstMonthOfYear, this.firstDayOfYear).getDay();
+
+        while (date.getDay() !== weekDay) {
+            date = TimelineGranularityData.nextDay(date);
+        }
+
+        return date;
     }
 }

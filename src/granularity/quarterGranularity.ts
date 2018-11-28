@@ -27,11 +27,11 @@
 import { Selection } from "d3-selection";
 
 import { Calendar } from "../calendar";
-import { Utils } from "../utils";
-import { TimelineLabel } from "../dataInterfaces";
+import { ITimelineLabel } from "../dataInterfaces";
 import { ITimelineDatePeriod } from "../datePeriod/datePeriod";
-import { GranularityRenderProps } from "./granularityRenderProps";
+import { Utils } from "../utils";
 import { TimelineGranularityBase } from "./granularityBase";
+import { IGranularityRenderProps } from "./granularityRenderProps";
 import { GranularityType } from "./granularityType";
 
 export class QuarterGranularity extends TimelineGranularityBase {
@@ -41,7 +41,7 @@ export class QuarterGranularity extends TimelineGranularityBase {
         super(calendar, locale, Utils.getGranularityPropsByMarker("Q"));
     }
 
-    public render(props: GranularityRenderProps, isFirst: boolean): Selection<any, any, any, any> {
+    public render(props: IGranularityRenderProps, isFirst: boolean): Selection<any, any, any, any> {
         if (!props.granularSettings.granularityQuarterVisibility) {
             return null;
         }
@@ -49,36 +49,14 @@ export class QuarterGranularity extends TimelineGranularityBase {
         return super.render(props, isFirst);
     }
 
-    /**
-     * Returns the date's quarter name (e.g. Q1, Q2, Q3, Q4)
-     * @param date A date
-     */
-    private quarterText(date: Date): string {
-        let quarter: number = QuarterGranularity.DefaultQuarter,
-            year: number = this.determineYear(date);
-
-        while (date < this.calendar.getQuarterStartDate(year, quarter))
-            if (quarter > 0) {
-                quarter--;
-            }
-            else {
-                quarter = QuarterGranularity.DefaultQuarter;
-                year--;
-            }
-
-        quarter++;
-
-        return `Q${quarter}`;
-    }
-
     public getType(): GranularityType {
         return GranularityType.quarter;
     }
 
-    public splitDate(date: Date): (string | number)[] {
+    public splitDate(date: Date): Array<string | number> {
         return [
             this.quarterText(date),
-            this.determineYear(date)
+            this.determineYear(date),
         ];
     }
 
@@ -87,13 +65,36 @@ export class QuarterGranularity extends TimelineGranularityBase {
             && firstDatePeriod.year === secondDatePeriod.year;
     }
 
-    public generateLabel(datePeriod: ITimelineDatePeriod): TimelineLabel {
+    public generateLabel(datePeriod: ITimelineDatePeriod): ITimelineLabel {
         const quarter: string = this.quarterText(datePeriod.startDate);
 
         return {
-            title: `${quarter} ${datePeriod.year}`,
+            id: datePeriod.index,
             text: quarter,
-            id: datePeriod.index
+            title: `${quarter} ${datePeriod.year}`,
         };
+    }
+
+    /**
+     * Returns the date's quarter name (e.g. Q1, Q2, Q3, Q4)
+     * @param date A date
+     */
+    private quarterText(date: Date): string {
+        let quarter: number = QuarterGranularity.DefaultQuarter;
+        let year: number = this.determineYear(date);
+
+        while (date < this.calendar.getQuarterStartDate(year, quarter)) {
+            if (quarter > 0) {
+                quarter--;
+            }
+            else {
+                quarter = QuarterGranularity.DefaultQuarter;
+                year--;
+            }
+        }
+
+        quarter++;
+
+        return `Q${quarter}`;
     }
 }

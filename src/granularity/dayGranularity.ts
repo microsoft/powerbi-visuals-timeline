@@ -26,20 +26,20 @@
 
 import { Selection } from "d3-selection";
 
-import { Utils } from "../utils";
 import { Calendar } from "../calendar";
-import { TimelineGranularityBase } from "./granularityBase";
-import { GranularityRenderProps } from "./granularityRenderProps";
-import { GranularityType } from "./granularityType";
+import { ITimelineLabel } from "../dataInterfaces";
 import { ITimelineDatePeriod } from "../datePeriod/datePeriod";
-import { TimelineLabel } from "../dataInterfaces";
+import { Utils } from "../utils";
+import { TimelineGranularityBase } from "./granularityBase";
+import { IGranularityRenderProps } from "./granularityRenderProps";
+import { GranularityType } from "./granularityType";
 
 export class DayGranularity extends TimelineGranularityBase {
     constructor(calendar: Calendar, locale: string) {
         super(calendar, locale, Utils.getGranularityPropsByMarker("D"));
     }
 
-    public render(props: GranularityRenderProps, isFirst: boolean): Selection<any, any, any, any> {
+    public render(props: IGranularityRenderProps, isFirst: boolean): Selection<any, any, any, any> {
         if (!props.granularSettings.granularityDayVisibility) {
             return null;
         }
@@ -51,11 +51,11 @@ export class DayGranularity extends TimelineGranularityBase {
         return GranularityType.day;
     }
 
-    public splitDate(date: Date): (string | number)[] {
+    public splitDate(date: Date): Array<string | number> {
         return [
             this.shortMonthName(date),
             date.getDate(),
-            this.determineYear(date)
+            this.determineYear(date),
         ];
     }
 
@@ -63,13 +63,13 @@ export class DayGranularity extends TimelineGranularityBase {
         return firstDatePeriod.startDate.getTime() === secondDatePeriod.startDate.getTime();
     }
 
-    public generateLabel(datePeriod: ITimelineDatePeriod): TimelineLabel {
+    public generateLabel(datePeriod: ITimelineDatePeriod): ITimelineLabel {
         const title: string = `${this.shortMonthName(datePeriod.startDate)} ${datePeriod.startDate.getDate()} - ${datePeriod.year}`;
 
         return {
-            title,
+            id: datePeriod.index,
             text: datePeriod.startDate.getDate().toLocaleString(),
-            id: datePeriod.index
+            title,
         };
     }
 }

@@ -26,7 +26,7 @@
 
 import { GranularityType } from "./granularityType";
 
-export interface GranularityName {
+export interface IGranularityName {
     granularityType: GranularityType;
     name: string;
     nameKey: string;
