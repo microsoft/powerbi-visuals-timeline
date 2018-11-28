@@ -26,6 +26,10 @@
 
 import "jasmine-jquery";
 
+import {
+    select as d3Select
+} from "d3-selection";
+
 import * as $ from "jquery";
 
 import powerbi from "powerbi-visuals-api";
@@ -35,7 +39,6 @@ import {
     clickElement,
     d3Click,
     d3MouseDown,
-    d3TouchStart,
     renderTimeout,
 } from "powerbi-visuals-utils-testutils";
 
@@ -76,28 +79,6 @@ import {
     getSolidColorStructuralObject,
 } from "./helpers";
 
-function createFakeFilter(startDate: Date, endDate: Date): any {
-    let filterSample: string =
-        `{"fromValue":{"items":{"m":{"entity":"MSFT"}}},` +
-        `"whereItems":[{"condition":{"_kind":8,"left":{"_kind":13,"comparison":2,` +
-        `"left":{"_kind":2,"source":{"_kind":0,"entity":"MSFT","variable":"m"},"ref":"Date"},` +
-        `"right":{"_kind":18,"unit":5,"arg":{"_kind":17,"type":{"underlyingType":519,"category":null,` +
-        `"temporalType":{"underlyingType":519}},` +
-        `"value":"${startDate.toString()}","typeEncodedValue":"datetime'${startDate.toString()}'"}}},` +
-        `"right":{"_kind":13,"comparison":3,` +
-        `"left":{"_kind":2,"source":{"_kind":0,"entity":"MSFT","variable":"m"},"ref":"Date"},` +
-        `"right":{"_kind":18,"unit":5,"arg":{"_kind":17,"type":{"underlyingType":519,"category":null,` +
-        `"temporalType":{"underlyingType":519}},` +
-        `"value":"${endDate.toString()}","typeEncodedValue":"datetime'${endDate.toString()}'"}}}}}]}`;
-
-    // simulate filter string
-    let fakeFilter = JSON.parse(filterSample);
-    fakeFilter.whereItems[0].condition.left.right.arg.value = startDate;
-    fakeFilter.whereItems[0].condition.right.right.arg.value = startDate;
-
-    return fakeFilter;
-}
-
 describe("Timeline", () => {
     let visualBuilder: TimelineBuilder;
     let defaultDataViewBuilder: TimelineData;
@@ -113,7 +94,7 @@ describe("Timeline", () => {
     describe("DOM tests", () => {
         it("svg element created", () => expect(visualBuilder.mainElement[0]).toBeInDOM());
 
-        xit("basic update", (done) => {
+        it("basic update", (done) => {
             dataView.metadata.objects = {
                 granularity: {
                     granularity: GranularityType.day
@@ -151,6 +132,7 @@ describe("Timeline", () => {
                     .find(".cellRect")
                     .first();
 
+                debugger;
                 assertColorsMatch(unselectedCellRect.attr("fill"), "transparent");
 
                 let cellHeightStr: string = cellRects[0].attributes.getNamedItem("height").value,
@@ -372,7 +354,7 @@ describe("Timeline", () => {
     });
 
     describe("selection", () => {
-        xit("selection should be recovered from the dataView after starting", (done) => {
+        it("selection should be recovered from the dataView after starting", (done) => {
             const startDate: Date = defaultDataViewBuilder.valuesCategory[0],
                 endDate: Date = defaultDataViewBuilder.valuesCategory[1],
                 datePeriod: TimelineDatePeriodBase = TimelineDatePeriodBase.create(startDate, endDate);
@@ -384,15 +366,16 @@ describe("Timeline", () => {
             };
 
             TimelineBuilder.setDatePeriod(dataView, datePeriod);
+
             // simulate filter restoring
-            dataView.metadata.objects.general.filter = createFakeFilter(startDate, endDate);
+            visualBuilder.setFilter(startDate, endDate);
 
             visualBuilder.updateFlushAllD3Transitions(dataView);
 
             let cellRects: JQuery = visualBuilder.cellRects;
 
             for (let i: number = 0; i < cellRects.length; i++) {
-                let fillColor: string = $(cellRects[i]).attr("fill");
+                let fillColor: string = d3Select(cellRects[i]).attr("fill");
 
                 assertColorsMatch(fillColor, "transparent", i === 0);
             }
@@ -547,7 +530,7 @@ describe("Timeline", () => {
         }
     });
 
-    xdescribe("Format settings test", () => {
+    describe("Format settings test", () => {
         function checkSelectedElement(
             granularity: string,
             expectedElementsAmount: number
@@ -1484,13 +1467,11 @@ describe("Timeline - TimelineUtils", () => {
         }
     });
 
-    xdescribe("Capabilities tests", () => {
+    describe("Capabilities tests", () => {
         it("all items having displayName should have displayNameKey property", () => {
-            jasmine.getJSONFixtures().fixturesPath = "base";
+            const capabilitiesJsonFile = require("../capabilities.json");
 
-            let jsonData = getJSONFixture("capabilities.json");
-
-            let objectsChecker: Function = (obj) => {
+            let objectsChecker = (obj) => {
                 for (let property in obj) {
                     let value: any = obj[property];
 
@@ -1504,7 +1485,7 @@ describe("Timeline - TimelineUtils", () => {
                 }
             };
 
-            objectsChecker(jsonData);
+            objectsChecker(capabilitiesJsonFile);
         });
     });
 

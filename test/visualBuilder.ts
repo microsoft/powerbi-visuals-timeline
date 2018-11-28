@@ -27,6 +27,10 @@
 import powerbi from "powerbi-visuals-api";
 
 import {
+    AdvancedFilter
+} from "powerbi-models";
+
+import {
     d3Click,
     VisualBuilderBase,
 } from "powerbi-visuals-utils-testutils";
@@ -35,6 +39,8 @@ import { Timeline } from "../src/visual";
 import { TimelineDatePeriodBase } from "../src/datePeriod/datePeriodBase";
 
 export class TimelineBuilder extends VisualBuilderBase<Timeline> {
+    private jsonFilters: powerbi.IFilter[] = [];
+
     constructor(width: number, height: number) {
         super(width, height);
 
@@ -96,6 +102,26 @@ export class TimelineBuilder extends VisualBuilderBase<Timeline> {
         d3Click(this.mainElement.find(".cellRect").last(), 0, 0);
     }
 
+    public setFilter(startDate: Date, endDate: Date): void {
+        const filter = new AdvancedFilter(
+            {
+                column: "Test",
+                table: "Demo"
+            },
+            "And",
+            {
+                operator: "GreaterThanOrEqual",
+                value: startDate
+            },
+            {
+                operator: "LessThanOrEqual",
+                value: endDate,
+            }
+        );
+
+        this.jsonFilters = [filter];
+    }
+
     public static setDatePeriod(
         dataView: powerbi.DataView,
         datePeriod: TimelineDatePeriodBase): void {
@@ -104,5 +130,14 @@ export class TimelineBuilder extends VisualBuilderBase<Timeline> {
             datePeriod: datePeriod.toString(),
             isUserSelection: true
         };
+    }
+
+    public update(dataView) {
+        this.visual.update({
+            dataViews: [].concat(dataView),
+            viewport: this.viewport,
+            type: undefined,
+            jsonFilters: this.jsonFilters,
+        });
     }
 }

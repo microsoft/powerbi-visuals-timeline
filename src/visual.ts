@@ -1224,25 +1224,6 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
             .selectAll(Timeline.TimelineSelectors.CellRect.selectorName)
             .data(dataPoints);
 
-        cellsSelection
-            .enter()
-            .append("rect")
-            .classed(Timeline.TimelineSelectors.CellRect.className, true)
-            .merge(cellsSelection)
-            .attr("x", (dataPoint: TimelineDatapoint) => {
-                let position: number = totalX;
-
-                totalX += dataPoint.datePeriod.fraction * timelineProperties.cellWidth;
-
-                return pixelConverter.toString(position);
-            })
-            .attr("y", pixelConverter.toString(timelineProperties.cellsYPosition))
-            .attr("height", pixelConverter.toString(timelineProperties.cellHeight))
-            .attr("width", (dataPoint: TimelineDatapoint) => {
-                return pixelConverter.toString(dataPoint.datePeriod.fraction * timelineProperties.cellWidth);
-            });
-
-
         let clickHandler = (dataPoint: TimelineDatapoint, index: number) => {
             // If something from Force Selection settings group is enabled, any user filters has no sense
             if (this.settings.forceSelection.currentPeriod || this.settings.forceSelection.latestAvailableDate) {
@@ -1257,8 +1238,24 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
         };
 
         cellsSelection
+            .enter()
+            .append("rect")
+            .classed(Timeline.TimelineSelectors.CellRect.className, true)
             .on("click", clickHandler)
-            .on("touchstart", clickHandler);
+            .on("touchstart", clickHandler)
+            .merge(cellsSelection)
+            .attr("x", (dataPoint: TimelineDatapoint) => {
+                let position: number = totalX;
+
+                totalX += dataPoint.datePeriod.fraction * timelineProperties.cellWidth;
+
+                return pixelConverter.toString(position);
+            })
+            .attr("y", pixelConverter.toString(timelineProperties.cellsYPosition))
+            .attr("height", pixelConverter.toString(timelineProperties.cellHeight))
+            .attr("width", (dataPoint: TimelineDatapoint) => {
+                return pixelConverter.toString(dataPoint.datePeriod.fraction * timelineProperties.cellWidth);
+            });
 
         this.fillCells(this.settings);
 
