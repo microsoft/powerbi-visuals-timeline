@@ -6,19 +6,19 @@ module.exports = {
     mode: 'development',
     module: {
         rules: [
-            // {
-            //     test: /\.ts$/,
-            //     enforce: 'pre',
-            //     exclude: /node_modules/,
-            //     use: [{
-            //         loader: 'tslint-loader',
-            //         options: {
-            //             emitErrors: true,
-            //             failOnHint: true,
-            //             fix: false
-            //         }
-            //     }]
-            // },
+            {
+                test: /\.ts$/,
+                enforce: 'pre',
+                exclude: /node_modules/,
+                use: [{
+                    loader: 'tslint-loader',
+                    options: {
+                        emitErrors: true,
+                        failOnHint: true,
+                        fix: false
+                    }
+                }]
+            },
             {
                 test: /\.ts$/,
                 use: 'ts-loader',
