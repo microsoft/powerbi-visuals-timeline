@@ -191,7 +191,7 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
         };
 
         if (category.source.type.numeric) {
-            (timelineData.filterColumnTarget).ref = "Date";
+            (timelineData.filterColumnTarget as any).ref = "Date";
         }
 
         if (isCalendarChanged && startDate && endDate) {

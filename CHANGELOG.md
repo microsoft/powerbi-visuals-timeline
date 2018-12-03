@@ -1,3 +1,11 @@
+## 2.0.0
+* Updates API version to 2.3.0
+* Converts code to ES2015 syntax
+* Uses PBIVIZ 3.x.x
+* Gets rid of Interactive Utils
+* Uses jsonFilter to restore a filter
+* Updates TSLint flow and rules
+
 ## 1.10.3
 * FIX: unexpected exception if user clears selection
 
@@ -43,7 +51,7 @@
 * Increased API version to 1.11.0
 
 ## 1.6.4
-* Fix issue with incorrect selection after granularity change 
+* Fix issue with incorrect selection after granularity change
 * Increased minimum width of cells for weeks, months, quarters and years
 * Changed title of week granularity
 

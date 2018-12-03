@@ -26,6 +26,8 @@
 
 import { CssConstants } from "powerbi-visuals-utils-svgutils";
 
+import { IFilterColumnTarget } from "powerbi-models";
+
 import { ITimelineDatePeriod } from "./datePeriod/datePeriod";
 import { IGranularity } from "./granularity/granularity";
 
@@ -111,7 +113,7 @@ export interface ITimelineProperties {
 }
 
 export interface ITimelineData {
-    filterColumnTarget?: any; /* IFilterColumnTarget */
+    filterColumnTarget?: IFilterColumnTarget;
     timelineDataPoints?: ITimelineDataPoint[];
     selectionStartIndex?: number;
     selectionEndIndex?: number;
