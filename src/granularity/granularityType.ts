@@ -27,9 +27,6 @@
 module powerbi.extensibility.visual.granularity {
     export enum GranularityType {
         year,
-        quarter,
-        month,
-        week,
-        day
+   week  
     }
 }
