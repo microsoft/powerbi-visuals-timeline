@@ -26,6 +26,8 @@
 
 import "../style/visual.less";
 
+import "@babel/polyfill";
+
 import {
     select as d3Select,
     selectAll as d3SelectAll,
