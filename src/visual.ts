@@ -856,7 +856,7 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
                 const isSelected: boolean = Utils.isGranuleSelected(dataPoint, this.timelineData, cellsSettings);
 
                 if (visSettings.scrollAutoAdjustment.show && isSelected && !singleCaseDone) {
-                    const selectedGranulaPos: number = (cellSelection[0][index] as any).x.baseVal.value;
+                    const selectedGranulaPos: number = (cellSelection.nodes()[index] as any).x.baseVal.value;
                     this.selectedGranulaPos = selectedGranulaPos;
                     singleCaseDone = true;
                 }
@@ -1577,7 +1577,7 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
 
     private scrollAutoFocusFunc = (selectedGranulaPos: number) => {
         if (selectedGranulaPos) {
-            (this.mainSvgWrapperSelection[0][0] as any).scrollLeft = selectedGranulaPos - this.horizontalAutoScrollingPositionOffset;
+            this.mainSvgWrapperSelection.node().scrollLeft = selectedGranulaPos - this.horizontalAutoScrollingPositionOffset;
         }
     }
 }
