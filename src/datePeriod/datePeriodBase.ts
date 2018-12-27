@@ -24,51 +24,52 @@
  *  THE SOFTWARE.
  */
 
-module powerbi.extensibility.visual.datePeriod {
-    // utils
-    import Utils = utils.Utils;
+import { ITimelineJSONDatePeriod } from "../dataInterfaces";
+import { Utils } from "../utils";
+import { ITimelineDatePeriodBase } from "./datePeriod";
 
-    export class TimelineDatePeriodBase implements ITimelineDatePeriod {
-        public startDate: Date = null;
-        public endDate: Date = null;
+export class TimelineDatePeriodBase implements ITimelineDatePeriodBase {
+    public static parse(jsonString: string): TimelineDatePeriodBase {
+        let datePeriod: ITimelineJSONDatePeriod;
+        let startDate: Date = null;
+        let endDate: Date = null;
 
-        public static parse(jsonString: string): TimelineDatePeriodBase {
-            let datePeriod: ITimelineJSONDatePeriod,
-                startDate: Date = null,
-                endDate: Date = null;
-
-            try {
-                datePeriod = JSON.parse(jsonString);
-            } finally { }
-
-            if (datePeriod) {
-                startDate = Utils.parseDateWithoutTimezone(datePeriod.startDate);
-                endDate = Utils.parseDateWithoutTimezone(datePeriod.endDate);
-            }
-
-            return TimelineDatePeriodBase.create(startDate, endDate);
+        try {
+            datePeriod = JSON.parse(jsonString);
+        } catch (_) {
+            datePeriod = null;
         }
 
-        public static create(startDate: Date, endDate: Date): TimelineDatePeriodBase {
-            return new TimelineDatePeriodBase(startDate, endDate);
+        if (datePeriod) {
+            startDate = Utils.parseDateWithoutTimezone(datePeriod.startDate);
+            endDate = Utils.parseDateWithoutTimezone(datePeriod.endDate);
         }
 
-        public static createEmpty(): TimelineDatePeriodBase {
-            return TimelineDatePeriodBase.create(null, null);
-        }
+        return TimelineDatePeriodBase.create(startDate, endDate);
+    }
 
-        constructor(startDate: Date, endDate: Date) {
-            this.startDate = startDate;
-            this.endDate = endDate;
-        }
+    public static create(startDate: Date, endDate: Date): TimelineDatePeriodBase {
+        return new TimelineDatePeriodBase(startDate, endDate);
+    }
 
-        public toString(): string {
-            let jsonDatePeriod: ITimelineJSONDatePeriod = {
-                startDate: Utils.toStringDateWithoutTimezone(this.startDate),
-                endDate: Utils.toStringDateWithoutTimezone(this.endDate)
-            };
+    public static createEmpty(): TimelineDatePeriodBase {
+        return TimelineDatePeriodBase.create(null, null);
+    }
 
-            return JSON.stringify(jsonDatePeriod);
-        }
+    public startDate: Date = null;
+    public endDate: Date = null;
+
+    constructor(startDate: Date, endDate: Date) {
+        this.startDate = startDate;
+        this.endDate = endDate;
+    }
+
+    public toString(): string {
+        const jsonDatePeriod: ITimelineJSONDatePeriod = {
+            endDate: Utils.toStringDateWithoutTimezone(this.endDate),
+            startDate: Utils.toStringDateWithoutTimezone(this.startDate),
+        };
+
+        return JSON.stringify(jsonDatePeriod);
     }
 }

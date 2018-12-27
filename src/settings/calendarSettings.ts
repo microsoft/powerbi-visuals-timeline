@@ -24,16 +24,7 @@
  *  THE SOFTWARE.
  */
 
-export interface IElementScale {
-    x: number;
-    y: number;
-}
-
-export function getScale(element: HTMLElement): IElementScale {
-    const clientRect: ClientRect = element.getBoundingClientRect();
-
-    return {
-        x: clientRect.width / element.offsetWidth,
-        y: clientRect.height / element.offsetHeight,
-    };
+export class CalendarSettings {
+    public month: number = 0;
+    public day: number = 1;
 }

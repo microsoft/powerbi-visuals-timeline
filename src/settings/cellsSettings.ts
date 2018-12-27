@@ -24,16 +24,9 @@
  *  THE SOFTWARE.
  */
 
-export interface IElementScale {
-    x: number;
-    y: number;
-}
-
-export function getScale(element: HTMLElement): IElementScale {
-    const clientRect: ClientRect = element.getBoundingClientRect();
-
-    return {
-        x: clientRect.width / element.offsetWidth,
-        y: clientRect.height / element.offsetHeight,
-    };
+export class CellsSettings {
+    public fillSelected: string = "#ADD8E6";
+    public fillUnselected: string = "";
+    public strokeColor: string = "#333444";
+    public selectedStrokeColor: string = "#333444";
 }

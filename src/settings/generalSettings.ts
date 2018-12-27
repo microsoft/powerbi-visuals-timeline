@@ -24,16 +24,9 @@
  *  THE SOFTWARE.
  */
 
-export interface IElementScale {
-    x: number;
-    y: number;
-}
+import { TimelineDatePeriodBase } from "../datePeriod/datePeriodBase";
 
-export function getScale(element: HTMLElement): IElementScale {
-    const clientRect: ClientRect = element.getBoundingClientRect();
-
-    return {
-        x: clientRect.width / element.offsetWidth,
-        y: clientRect.height / element.offsetHeight,
-    };
+export class GeneralSettings {
+    public datePeriod: TimelineDatePeriodBase | string = TimelineDatePeriodBase.createEmpty();
+    public isUserSelection: boolean = false;
 }

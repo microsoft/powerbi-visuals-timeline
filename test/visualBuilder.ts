@@ -24,87 +24,122 @@
  *  THE SOFTWARE.
  */
 
-/// <reference path="_references.ts"/>
+import powerbi from "powerbi-visuals-api";
 
-module powerbi.extensibility.visual.test {
-    // powerbi.extensibility.utils.test
-    import VisualBuilderBase = powerbi.extensibility.utils.test.VisualBuilderBase;
+import {
+    AdvancedFilter,
+} from "powerbi-models";
 
-    // Timeline1447991079100
-    import SandboxedVisualNameSpace = powerbi.extensibility.visual.Timeline1447991079100;
-    import VisualClass = SandboxedVisualNameSpace.Timeline;
-    import VisualSettings = SandboxedVisualNameSpace.settings.VisualSettings;
-    import TimelineDatePeriodBase = SandboxedVisualNameSpace.datePeriod.TimelineDatePeriodBase;
+import {
+    d3Click,
+    VisualBuilderBase,
+} from "powerbi-visuals-utils-testutils";
 
-    export class TimelineBuilder extends VisualBuilderBase<VisualClass> {
-        constructor(width: number, height: number) {
-            super(width, height, "Timeline1447991079100");
+import { TimelineDatePeriodBase } from "../src/datePeriod/datePeriodBase";
+import { Timeline } from "../src/visual";
 
-            this.visualHost.applyJsonFilter = () => {};
-        }
+export class TimelineBuilder extends VisualBuilderBase<Timeline> {
+    public static setDatePeriod(
+        dataView: powerbi.DataView,
+        datePeriod: TimelineDatePeriodBase): void {
 
-        protected build(options: VisualConstructorOptions): VisualClass {
-            return new VisualClass(options);
-        }
+        (dataView.metadata.objects as any).general = {
+            datePeriod: datePeriod.toString(),
+            isUserSelection: true,
+        };
+    }
 
-        public get visualObject(): VisualClass {
-            return this.visual;
-        }
+    private jsonFilters: powerbi.IFilter[] = [];
 
-        public get mainElement(): JQuery {
-            return this.element
-                .find("svg.timeline");
-        }
+    constructor(width: number, height: number) {
+        super(width, height);
 
-        public get headerElement(): JQuery {
-            return this.element
-                .children("div")
-                .children("svg");
-        }
+        this.visualHost.applyJsonFilter = () => {
+            // No need to implement it
+        };
+    }
 
-        public get cellRects(): JQuery {
-            return this.mainArea
-                .children(".cellsArea")
-                .children(".cellRect");
-        }
+    public get visualObject(): Timeline {
+        return this.visual;
+    }
 
-        public get mainArea() {
-            return this.mainElement
-                .children("g.mainArea");
-        }
+    public get rootElement(): JQuery {
+        return this.element.find(".timeline-component");
+    }
 
-        public get allLabels() {
-            return this.mainArea
-                .children("g")
-                .children("text.label");
-        }
+    public get mainElement(): JQuery {
+        return this.element
+            .find("svg.timeline");
+    }
 
-        public get rangeHeaderText() {
-            return this.headerElement
-                .children("g.rangeTextArea")
-                .children("text.selectionRangeContainer");
-        }
+    public get headerElement(): JQuery {
+        return this.element
+            .children("div")
+            .children("svg");
+    }
 
-        public get timelineSlicer() {
-            return this.headerElement
-                .children("g.timelineSlicer");
-        }
+    public get cellRects(): JQuery {
+        return this.mainArea
+            .children(".cellsArea")
+            .children(".cellRect");
+    }
 
-        public selectTheLatestCell(dataView: DataView): void {
-            this.mainElement
-                .find(".cellRect")
-                .last()
-                .d3Click(0, 0);
-        }
+    public get mainArea() {
+        return this.mainElement
+            .children("g.mainArea");
+    }
 
-        public static setDatePeriod(
-            dataView: DataView,
-            datePeriod: TimelineDatePeriodBase): void {
+    public get allLabels() {
+        return this.mainArea
+            .children("g")
+            .children("text.label");
+    }
 
-            (dataView.metadata.objects as any).general = {
-                datePeriod: datePeriod.toString(),
-                isUserSelection: true
-            };
-        }
+    public get rangeHeaderText() {
+        return this.headerElement
+            .children("g.rangeTextArea")
+            .children("text.selectionRangeContainer");
+    }
+
+    public get timelineSlicer() {
+        return this.headerElement
+            .children("g.timelineSlicer");
+    }
+
+    public selectTheLatestCell(): void {
+        d3Click(this.mainElement.find(".cellRect").last(), 0, 0);
+    }
+
+    public setFilter(startDate: Date, endDate: Date): void {
+        const filter = new AdvancedFilter(
+            {
+                column: "Test",
+                table: "Demo",
+            },
+            "And",
+            {
+                operator: "GreaterThanOrEqual",
+                value: startDate,
+            },
+            {
+                operator: "LessThanOrEqual",
+                value: endDate,
+            },
+        );
+
+        this.jsonFilters = [filter];
+    }
+
+    public update(dataView) {
+        this.visual.update({
+            dataViews: [].concat(dataView),
+            jsonFilters: this.jsonFilters,
+            type: undefined,
+            viewport: this.viewport,
+        });
+    }
+
+    protected build(options: powerbi.extensibility.visual.VisualConstructorOptions): Timeline {
+        return new Timeline(options);
     }
 }

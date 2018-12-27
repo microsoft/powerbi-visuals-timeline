@@ -24,17 +24,15 @@
  *  THE SOFTWARE.
  */
 
-module powerbi.extensibility.visual.datePeriod {
-    export interface ITimelineDatePeriod {
-        startDate: Date;
-        endDate: Date;
-    }
+export interface ITimelineDatePeriodBase {
+    endDate: Date;
+    startDate: Date;
+}
 
-    export interface TimelineDatePeriod extends ITimelineDatePeriod {
-        identifierArray: (string | number)[];
-        year: number;
-        week: number[];
-        fraction: number;
-        index: number;
-    }
+export interface ITimelineDatePeriod extends ITimelineDatePeriodBase {
+    fraction: number;
+    identifierArray: Array<string | number>;
+    index: number;
+    week: number[];
+    year: number;
 }

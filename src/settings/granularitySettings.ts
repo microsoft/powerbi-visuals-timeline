@@ -24,31 +24,15 @@
  *  THE SOFTWARE.
  */
 
-/// <reference path="../_references.ts"/>
+import { GranularityType } from "../granularity/granularityType";
 
-module powerbi.extensibility.visual.test.helpers {
-    // powerbi.extensibility.utils.test
-    import RgbColor = powerbi.extensibility.utils.test.helpers.color.RgbColor;
-    import parseColorString = powerbi.extensibility.utils.test.helpers.color.parseColorString;
-
-    export function areColorsEqual(firstColor: string, secondColor: string): boolean {
-        const firstConvertedColor: RgbColor = parseColorString(firstColor),
-            secondConvertedColor: RgbColor = parseColorString(secondColor);
-
-        return firstConvertedColor.R === secondConvertedColor.R
-            && firstConvertedColor.G === secondConvertedColor.G
-            && firstConvertedColor.B === secondConvertedColor.B;
-    }
-
-    export function getDateRange(start: Date, stop: Date, step: number): Date[] {
-        return _.range(
-            start.getTime(),
-            stop.getTime(),
-            step)
-            .map((milliseconds: number) => new Date(milliseconds));
-    }
-
-    export function getSolidColorStructuralObject(color: string): any {
-        return { solid: { color: color } };
-    }
+export class GranularitySettings {
+    public scaleColor: string = "#000000";
+    public sliderColor: string = "#AAAAAA";
+    public granularity: GranularityType = GranularityType.month;
+    public granularityYearVisibility: boolean = true;
+    public granularityQuarterVisibility: boolean = true;
+    public granularityMonthVisibility: boolean = true;
+    public granularityWeekVisibility: boolean = true;
+    public granularityDayVisibility: boolean = true;
 }

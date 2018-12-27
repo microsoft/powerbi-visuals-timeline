@@ -24,74 +24,77 @@
  *  THE SOFTWARE.
  */
 
-module powerbi.extensibility.visual.granularity {
-    // datePeriod
-    import TimelineDatePeriod = datePeriod.TimelineDatePeriod;
-    // utils
-    import Utils = utils.Utils;
-    import Selection = d3.Selection;
+import { Selection } from "d3-selection";
 
-    export class QuarterGranularity extends TimelineGranularityBase {
-        private static DefaultQuarter: number = 3;
+import { Calendar } from "../calendar";
+import { ITimelineLabel } from "../dataInterfaces";
+import { ITimelineDatePeriod } from "../datePeriod/datePeriod";
+import { Utils } from "../utils";
+import { TimelineGranularityBase } from "./granularityBase";
+import { IGranularityRenderProps } from "./granularityRenderProps";
+import { GranularityType } from "./granularityType";
 
-        constructor(calendar: Calendar, locale: string) {
-            super(calendar, locale, Utils.getGranularityPropsByMarker("Q"));
+export class QuarterGranularity extends TimelineGranularityBase {
+    private static DefaultQuarter: number = 3;
+
+    constructor(calendar: Calendar, locale: string) {
+        super(calendar, locale, Utils.getGranularityPropsByMarker("Q"));
+    }
+
+    public render(props: IGranularityRenderProps, isFirst: boolean): Selection<any, any, any, any> {
+        if (!props.granularSettings.granularityQuarterVisibility) {
+            return null;
         }
 
-        public render(props: GranularityRenderProps, isFirst: boolean): Selection<any> {
-            if (!props.granularSettings.granularityQuarterVisibility) {
-                return null;
+        return super.render(props, isFirst);
+    }
+
+    public getType(): GranularityType {
+        return GranularityType.quarter;
+    }
+
+    public splitDate(date: Date): Array<string | number> {
+        return [
+            this.quarterText(date),
+            this.determineYear(date),
+        ];
+    }
+
+    public sameLabel(firstDatePeriod: ITimelineDatePeriod, secondDatePeriod: ITimelineDatePeriod): boolean {
+        return this.quarterText(firstDatePeriod.startDate) === this.quarterText(secondDatePeriod.startDate)
+            && firstDatePeriod.year === secondDatePeriod.year;
+    }
+
+    public generateLabel(datePeriod: ITimelineDatePeriod): ITimelineLabel {
+        const quarter: string = this.quarterText(datePeriod.startDate);
+
+        return {
+            id: datePeriod.index,
+            text: quarter,
+            title: `${quarter} ${datePeriod.year}`,
+        };
+    }
+
+    /**
+     * Returns the date's quarter name (e.g. Q1, Q2, Q3, Q4)
+     * @param date A date
+     */
+    private quarterText(date: Date): string {
+        let quarter: number = QuarterGranularity.DefaultQuarter;
+        let year: number = this.determineYear(date);
+
+        while (date < this.calendar.getQuarterStartDate(year, quarter)) {
+            if (quarter > 0) {
+                quarter--;
             }
-
-            return super.render(props, isFirst);
+            else {
+                quarter = QuarterGranularity.DefaultQuarter;
+                year--;
+            }
         }
 
-        /**
-         * Returns the date's quarter name (e.g. Q1, Q2, Q3, Q4)
-         * @param date A date
-         */
-        private quarterText(date: Date): string {
-            let quarter: number = QuarterGranularity.DefaultQuarter,
-                year: number = this.determineYear(date);
+        quarter++;
 
-            while (date < this.calendar.getQuarterStartDate(year, quarter))
-                if (quarter > 0) {
-                    quarter--;
-                }
-                else {
-                    quarter = QuarterGranularity.DefaultQuarter;
-                    year--;
-                }
-
-            quarter++;
-
-            return `Q${quarter}`;
-        }
-
-        public getType(): GranularityType {
-            return GranularityType.quarter;
-        }
-
-        public splitDate(date: Date): (string | number)[] {
-            return [
-                this.quarterText(date),
-                this.determineYear(date)
-            ];
-        }
-
-        public sameLabel(firstDatePeriod: TimelineDatePeriod, secondDatePeriod: TimelineDatePeriod): boolean {
-            return this.quarterText(firstDatePeriod.startDate) === this.quarterText(secondDatePeriod.startDate)
-                && firstDatePeriod.year === secondDatePeriod.year;
-        }
-
-        public generateLabel(datePeriod: TimelineDatePeriod): TimelineLabel {
-            const quarter: string = this.quarterText(datePeriod.startDate);
-
-            return {
-                title: `${quarter} ${datePeriod.year}`,
-                text: quarter,
-                id: datePeriod.index
-            };
-        }
+        return `Q${quarter}`;
     }
 }

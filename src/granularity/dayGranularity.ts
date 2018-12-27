@@ -24,50 +24,52 @@
  *  THE SOFTWARE.
  */
 
-module powerbi.extensibility.visual.granularity {
-    // datePeriod
-    import TimelineDatePeriod = datePeriod.TimelineDatePeriod;
-    // utils
-    import Utils = utils.Utils;
-    import Selection = d3.Selection;
+import { Selection } from "d3-selection";
 
-    export class DayGranularity extends TimelineGranularityBase {
-        constructor(calendar: Calendar, locale: string) {
-            super(calendar, locale, Utils.getGranularityPropsByMarker("D"));
+import { Calendar } from "../calendar";
+import { ITimelineLabel } from "../dataInterfaces";
+import { ITimelineDatePeriod } from "../datePeriod/datePeriod";
+import { Utils } from "../utils";
+import { TimelineGranularityBase } from "./granularityBase";
+import { IGranularityRenderProps } from "./granularityRenderProps";
+import { GranularityType } from "./granularityType";
+
+export class DayGranularity extends TimelineGranularityBase {
+    constructor(calendar: Calendar, locale: string) {
+        super(calendar, locale, Utils.getGranularityPropsByMarker("D"));
+    }
+
+    public render(props: IGranularityRenderProps, isFirst: boolean): Selection<any, any, any, any> {
+        if (!props.granularSettings.granularityDayVisibility) {
+            return null;
         }
 
-        public render(props: GranularityRenderProps, isFirst: boolean): Selection<any> {
-            if (!props.granularSettings.granularityDayVisibility) {
-                return null;
-            }
+        return super.render(props, isFirst);
+    }
 
-            return super.render(props, isFirst);
-        }
+    public getType(): GranularityType {
+        return GranularityType.day;
+    }
 
-        public getType(): GranularityType {
-            return GranularityType.day;
-        }
+    public splitDate(date: Date): Array<string | number> {
+        return [
+            this.shortMonthName(date),
+            date.getDate(),
+            this.determineYear(date),
+        ];
+    }
 
-        public splitDate(date: Date): (string | number)[] {
-            return [
-                this.shortMonthName(date),
-                date.getDate(),
-                this.determineYear(date)
-            ];
-        }
+    public sameLabel(firstDatePeriod: ITimelineDatePeriod, secondDatePeriod: ITimelineDatePeriod): boolean {
+        return firstDatePeriod.startDate.getTime() === secondDatePeriod.startDate.getTime();
+    }
 
-        public sameLabel(firstDatePeriod: TimelineDatePeriod, secondDatePeriod: TimelineDatePeriod): boolean {
-            return firstDatePeriod.startDate.getTime() === secondDatePeriod.startDate.getTime();
-        }
+    public generateLabel(datePeriod: ITimelineDatePeriod): ITimelineLabel {
+        const title: string = `${this.shortMonthName(datePeriod.startDate)} ${datePeriod.startDate.getDate()} - ${datePeriod.year}`;
 
-        public generateLabel(datePeriod: TimelineDatePeriod): TimelineLabel {
-            const title: string = `${this.shortMonthName(datePeriod.startDate)} ${datePeriod.startDate.getDate()} - ${datePeriod.year}`;
-
-            return {
-                title,
-                text: datePeriod.startDate.getDate().toLocaleString(),
-                id: datePeriod.index
-            };
-        }
+        return {
+            id: datePeriod.index,
+            text: datePeriod.startDate.getDate().toLocaleString(),
+            title,
+        };
     }
 }

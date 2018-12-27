@@ -24,16 +24,27 @@
  *  THE SOFTWARE.
  */
 
-export interface IElementScale {
-    x: number;
-    y: number;
+import {
+    parseColorString,
+    RgbColor,
+} from "powerbi-visuals-utils-testutils";
+
+import { range } from "d3-array";
+
+export function areColorsEqual(firstColor: string, secondColor: string): boolean {
+    const firstConvertedColor: RgbColor = parseColorString(firstColor);
+    const secondConvertedColor: RgbColor = parseColorString(secondColor);
+
+    return firstConvertedColor.R === secondConvertedColor.R
+        && firstConvertedColor.G === secondConvertedColor.G
+        && firstConvertedColor.B === secondConvertedColor.B;
 }
 
-export function getScale(element: HTMLElement): IElementScale {
-    const clientRect: ClientRect = element.getBoundingClientRect();
+export function getDateRange(start: Date, stop: Date, step: number): Date[] {
+    return range(start.getTime(), stop.getTime(), step)
+        .map((milliseconds: number) => new Date(milliseconds));
+}
 
-    return {
-        x: clientRect.width / element.offsetWidth,
-        y: clientRect.height / element.offsetHeight,
-    };
+export function getSolidColorStructuralObject(color: string): any {
+    return { solid: { color } };
 }

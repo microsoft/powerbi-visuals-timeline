@@ -24,50 +24,52 @@
  *  THE SOFTWARE.
  */
 
-module powerbi.extensibility.visual.granularity {
-    // datePeriod
-    import TimelineDatePeriod = datePeriod.TimelineDatePeriod;
-    // utils
-    import Utils = utils.Utils;
-    import Selection = d3.Selection;
+import { Selection } from "d3-selection";
 
-    export class MonthGranularity extends TimelineGranularityBase {
-        constructor(calendar: Calendar, locale: string) {
-            super(calendar, locale, Utils.getGranularityPropsByMarker("M"));
+import { Calendar } from "../calendar";
+import { ITimelineLabel } from "../dataInterfaces";
+import { ITimelineDatePeriod } from "../datePeriod/datePeriod";
+import { Utils } from "../utils";
+import { TimelineGranularityBase } from "./granularityBase";
+import { IGranularityRenderProps } from "./granularityRenderProps";
+import { GranularityType } from "./granularityType";
+
+export class MonthGranularity extends TimelineGranularityBase {
+    constructor(calendar: Calendar, locale: string) {
+        super(calendar, locale, Utils.getGranularityPropsByMarker("M"));
+    }
+
+    public render(props: IGranularityRenderProps, isFirst: boolean): Selection<any, any, any, any> {
+        if (!props.granularSettings.granularityMonthVisibility) {
+            return null;
         }
 
-        public render(props: GranularityRenderProps, isFirst: boolean): Selection<any> {
-            if (!props.granularSettings.granularityMonthVisibility) {
-                return null;
-            }
+        return super.render(props, isFirst);
+    }
 
-            return super.render(props, isFirst);
-        }
+    public getType(): GranularityType {
+        return GranularityType.month;
+    }
 
-        public getType(): GranularityType {
-            return GranularityType.month;
-        }
+    public splitDate(date: Date): Array<string | number> {
+        return [
+            this.shortMonthName(date),
+            this.determineYear(date),
+        ];
+    }
 
-        public splitDate(date: Date): (string | number)[] {
-            return [
-                this.shortMonthName(date),
-                this.determineYear(date)
-            ];
-        }
+    public sameLabel(firstDatePeriod: ITimelineDatePeriod, secondDatePeriod: ITimelineDatePeriod): boolean {
+        return this.shortMonthName(firstDatePeriod.startDate) === this.shortMonthName(secondDatePeriod.startDate)
+            && this.determineYear(firstDatePeriod.startDate) === this.determineYear(secondDatePeriod.startDate);
+    }
 
-        public sameLabel(firstDatePeriod: TimelineDatePeriod, secondDatePeriod: TimelineDatePeriod): boolean {
-            return this.shortMonthName(firstDatePeriod.startDate) === this.shortMonthName(secondDatePeriod.startDate)
-                && this.determineYear(firstDatePeriod.startDate) === this.determineYear(secondDatePeriod.startDate);
-        }
+    public generateLabel(datePeriod: ITimelineDatePeriod): ITimelineLabel {
+        const shortMonthName: string = this.shortMonthName(datePeriod.startDate);
 
-        public generateLabel(datePeriod: TimelineDatePeriod): TimelineLabel {
-            const shortMonthName: string = this.shortMonthName(datePeriod.startDate);
-
-            return {
-                title: shortMonthName,
-                text: shortMonthName,
-                id: datePeriod.index
-            };
-        }
+        return {
+            id: datePeriod.index,
+            text: shortMonthName,
+            title: shortMonthName,
+        };
     }
 }

@@ -24,62 +24,57 @@
  *  THE SOFTWARE.
  */
 
-/// <reference path="_references.ts"/>
+import powerbi from "powerbi-visuals-api";
 
-module powerbi.extensibility.visual.test {
-    // powerbi.extensibility.visual.test
-    import getDateRange = powerbi.extensibility.visual.test.helpers.getDateRange;
+import { testDataViewBuilder } from "powerbi-visuals-utils-testutils";
+import { valueType } from "powerbi-visuals-utils-typeutils";
 
-    // powerbi.extensibility.utils.type
-    import ValueType = powerbi.extensibility.utils.type.ValueType;
+import { getDateRange } from "./helpers";
 
-    // powerbi.extensibility.utils.test
-    import TestDataViewBuilder = powerbi.extensibility.utils.test.dataViewBuilder.TestDataViewBuilder;
+export class TimelineData extends testDataViewBuilder.TestDataViewBuilder {
+    public static ColumnCategory: string = "Date";
 
-    export class TimelineData extends TestDataViewBuilder {
-        public static ColumnCategory: string = "Date";
+    public valuesCategory: Date[] = getDateRange(
+        new Date(2016, 0, 1),
+        new Date(2016, 0, 10),
+        1000 * 24 * 3600,
+    );
 
-        public valuesCategory: Date[] = getDateRange(
-            new Date(2016, 0, 1),
-            new Date(2016, 0, 10),
-            1000 * 24 * 3600);
+    public setDateRange(startDate: Date, endDate: Date) {
+        this.valuesCategory = getDateRange(startDate, endDate, 1000 * 24 * 3600);
+    }
 
-        public setDateRange(startDate: Date, endDate: Date) {
-            this.valuesCategory = getDateRange(startDate, endDate, 1000 * 24 * 3600);
-        }
+    public getDataView(columnNames?: string[]): powerbi.DataView {
+        return this.createCategoricalDataViewBuilder([
+            {
+                source: {
+                    displayName: TimelineData.ColumnCategory,
+                    roles: { Category: true },
+                    type: valueType.ValueType.fromDescriptor({ dateTime: true }),
+                },
+                values: this.valuesCategory,
+            },
 
-        public getDataView(columnNames?: string[]): powerbi.DataView {
-            return this.createCategoricalDataViewBuilder([
-                {
-                    source: {
-                        displayName: TimelineData.ColumnCategory,
-                        roles: { Category: true },
-                        type: ValueType.fromDescriptor({ dateTime: true })
-                    },
-                    values: this.valuesCategory
-                }
+        ], null, columnNames).build();
+    }
 
-            ], null, columnNames).build();
-        }
-
-        public getUnWorkableDataView(columnNames?: string[]): powerbi.DataView {
-            return this.createCategoricalDataViewBuilder([
-                {
-                    source: {
-                        displayName: "Country",
-                        type: ValueType.fromDescriptor({ text: true }),
-                        roles: { Category: true }
-                    },
-                    values: [
-                        "Australia",
-                        "Canada",
-                        "France",
-                        "Germany",
-                        "United Kingdom",
-                        "United States"
-                    ]
-                }
-            ], null, null).build();
-        }
+    public getUnWorkableDataView(): powerbi.DataView {
+        return this.createCategoricalDataViewBuilder([
+            {
+                source: {
+                    displayName: "Country",
+                    roles: { Category: true },
+                    type: valueType.ValueType.fromDescriptor({ text: true }),
+                },
+                values: [
+                    "Australia",
+                    "Canada",
+                    "France",
+                    "Germany",
+                    "United Kingdom",
+                    "United States",
+                ],
+            },
+        ], null, null).build();
     }
 }

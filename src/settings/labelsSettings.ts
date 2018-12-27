@@ -24,16 +24,9 @@
  *  THE SOFTWARE.
  */
 
-export interface IElementScale {
-    x: number;
-    y: number;
-}
-
-export function getScale(element: HTMLElement): IElementScale {
-    const clientRect: ClientRect = element.getBoundingClientRect();
-
-    return {
-        x: clientRect.width / element.offsetWidth,
-        y: clientRect.height / element.offsetHeight,
-    };
+export class LabelsSettings {
+    public show: boolean = true;
+    public displayAll: boolean = true;
+    public fontColor: string = "#777777";
+    public textSize: number = 9;
 }

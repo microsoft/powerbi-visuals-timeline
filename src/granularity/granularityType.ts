@@ -24,12 +24,10 @@
  *  THE SOFTWARE.
  */
 
-module powerbi.extensibility.visual.granularity {
-    export enum GranularityType {
-        year,
-        quarter,
-        month,
-        week,
-        day
-    }
+export enum GranularityType {
+    year,
+    quarter,
+    month,
+    week,
+    day,
 }
