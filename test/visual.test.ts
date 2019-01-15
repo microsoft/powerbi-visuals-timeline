@@ -38,7 +38,6 @@ import {
     assertColorsMatch,
     clickElement,
     d3Click,
-    d3MouseDown,
     renderTimeout,
 } from "powerbi-visuals-utils-testutils";
 
@@ -262,8 +261,8 @@ describe("Timeline", () => {
                 });
             });
 
-            it("mousedown - event", () => {
-                d3MouseDown($(periodSlicerSelectionRectElements[0]), 0, 0);
+            it("click - event", () => {
+                d3Click($(periodSlicerSelectionRectElements[0]), 0, 0);
                 expectToCallSelectPeriod(GranularityType.year);
             });
 
@@ -278,7 +277,7 @@ describe("Timeline", () => {
                 expectToCallChangeGranularity(GranularityType.day);
             });
 
-            it("mousedown - event - with disabled year", () => {
+            it("click - event - with disabled year", () => {
                 dataView.metadata.objects = {
                     granularity: {
                         granularityYearVisibility: false,
@@ -288,13 +287,13 @@ describe("Timeline", () => {
                 visualBuilder.update(dataView);
                 const $periodSlicerSelectionRectElements = visualBuilder.element.find(".periodSlicerSelectionRect");
 
-                d3MouseDown($($periodSlicerSelectionRectElements[0]), 0, 0);
+                d3Click($($periodSlicerSelectionRectElements[0]), 0, 0);
 
                 expect($periodSlicerSelectionRectElements.length).toEqual(4);
                 expectToCallSelectPeriod(GranularityType.quarter);
             });
 
-            it("mousedown - event - with disabled quarter", () => {
+            it("click - event - with disabled quarter", () => {
                 dataView.metadata.objects = {
                     granularity: {
                         granularityQuarterVisibility: false,
@@ -304,13 +303,13 @@ describe("Timeline", () => {
                 visualBuilder.update(dataView);
                 const $periodSlicerSelectionRectElements = visualBuilder.element.find(".periodSlicerSelectionRect");
 
-                d3MouseDown($($periodSlicerSelectionRectElements[1]), 0, 0);
+                d3Click($($periodSlicerSelectionRectElements[1]), 0, 0);
 
                 expect($periodSlicerSelectionRectElements.length).toEqual(4);
                 expectToCallSelectPeriod(GranularityType.month);
             });
 
-            it("mousedown - event - with disabled year, quarter and month", () => {
+            it("click - event - with disabled year, quarter and month", () => {
                 dataView.metadata.objects = {
                     granularity: {
                         granularityMonthVisibility: false,
@@ -323,13 +322,13 @@ describe("Timeline", () => {
 
                 const $periodSlicerSelectionRectElements = visualBuilder.element.find(".periodSlicerSelectionRect");
 
-                d3MouseDown($($periodSlicerSelectionRectElements[1]), 0, 0);
+                d3Click($($periodSlicerSelectionRectElements[1]), 0, 0);
 
                 expect($periodSlicerSelectionRectElements.length).toEqual(2);
                 expectToCallSelectPeriod(GranularityType.day);
             });
 
-            it("mousedown - impossible - all granularities are disabled", () => {
+            it("click - impossible - all granularities are disabled", () => {
                 dataView.metadata.objects = {
                     granularity: {
                         granularityDayVisibility: false,

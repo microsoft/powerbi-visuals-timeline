@@ -570,7 +570,6 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
     private datePeriod: ITimelineDatePeriodBase;
     private prevFilteredStartDate: Date | null = null;
     private prevFilteredEndDate: Date | null = null;
-    private prevGranularity: GranularityType | null = null;
 
     private initialized: boolean;
 
@@ -750,15 +749,17 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
             adaptedDataEndDate = new Date(this.datePeriod.endDate as any);
             adaptedDataEndDate.setDate(adaptedDataEndDate.getDate() + 1);
         }
+
         if (filterDatePeriod.endDate && adaptedDataEndDate && filterDatePeriod.endDate.getTime() > adaptedDataEndDate.getTime()) {
             filterDatePeriod.endDate = null;
         }
+
         const datePeriod: ITimelineDatePeriodBase = this.datePeriod;
 
         const granularity = this.settings.granularity.granularity;
         const currentForceSelection: boolean = this.settings.forceSelection.currentPeriod;
         const latestAvailableDate: boolean = this.settings.forceSelection.latestAvailableDate;
-        const isUserSelection: boolean = this.settings.general.isUserSelection && !currentForceSelection && !latestAvailableDate;
+        const isUserSelection: boolean = !currentForceSelection && !latestAvailableDate;
         const target: IFilterColumnTarget = this.timelineData.filterColumnTarget;
 
         let currentForceSelectionResult = { startDate: null, endDate: null };
@@ -778,23 +779,16 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
             } = Timeline.selectPeriod(datePeriod, granularity, this.calendar, this.datePeriod.endDate));
         }
 
-        if (this.prevGranularity !== granularity) {
-            this.applyFilterSettingsInCapabilities(false);
-        }
-
         const filterWasChanged: boolean =
             String(this.prevFilteredStartDate) !== String(filterDatePeriod.startDate) ||
             String(this.prevFilteredEndDate) !== String(filterDatePeriod.endDate);
 
-        if ((!isUserSelection && filterWasChanged) ||
-            (!this.initialized && !currentForceSelection)) {
-            this.applyDatePeriod(filterDatePeriod.startDate, filterDatePeriod.endDate, target, isUserSelection);
+        if ((!isUserSelection && filterWasChanged)) {
+            this.applyDatePeriod(filterDatePeriod.startDate, filterDatePeriod.endDate, target);
         }
 
         this.prevFilteredStartDate = filterDatePeriod.startDate;
         this.prevFilteredEndDate = filterDatePeriod.endDate;
-
-        this.prevGranularity = granularity;
 
         if (!this.initialized) {
             this.initialized = true;
@@ -921,17 +915,21 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
             .exit()
             .remove();
     }
+
     public renderCursors(
         timelineData: ITimelineData,
         cellHeight: number,
         cellsYPosition: number,
     ): D3Selection<any, any, any, any> {
-
         const cursorSelection: D3Selection<any, ICursorDataPoint, any, any> = this.cursorGroupSelection
             .selectAll(Timeline.TimelineSelectors.SelectionCursor.selectorName)
             .data(timelineData.cursorDataPoints);
 
         cursorSelection
+            .exit()
+            .remove();
+
+        return cursorSelection
             .enter()
             .append("path")
             .classed(Timeline.TimelineSelectors.SelectionCursor.className, true)
@@ -954,12 +952,6 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
             )
             .style("fill", this.settings.cursor.color)
             .call(this.cursorDragBehavior);
-
-        cursorSelection
-            .exit()
-            .remove();
-
-        return cursorSelection;
     }
 
     public renderTimeRangeText(timelineData: ITimelineData, rangeHeaderSettings: LabelsSettings): void {
@@ -1010,7 +1002,6 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
             Utils.getStartSelectionDate(timelineData),
             Utils.getEndSelectionDate(timelineData),
             timelineData.filterColumnTarget,
-            true,
         );
     }
 
@@ -1018,21 +1009,22 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
         startDate: Date,
         endDate: Date,
         target: IFilterColumnTarget,
-        isUserSelection: boolean,
     ): void {
-        this.applyFilterSettingsInCapabilities(isUserSelection, startDate === null && endDate === null ? true : false);
-
-        const isMerge: boolean = (typeof startDate !== "undefined" && typeof endDate !== "undefined"
-            && startDate !== null && endDate !== null);
-
         this.host.applyJsonFilter(
             this.createFilter(startDate, endDate, target),
             Timeline.filterObjectProperty.objectName,
             Timeline.filterObjectProperty.propertyName,
-            isMerge
-                ? powerbi.FilterAction.merge
-                : powerbi.FilterAction.remove,
+            this.getFilterAction(startDate, endDate),
         );
+    }
+
+    public getFilterAction(startDate: Date, endDate: Date): powerbi.FilterAction {
+        return typeof startDate !== "undefined"
+            && typeof endDate !== "undefined"
+            && startDate !== null
+            && endDate !== null
+            ? powerbi.FilterAction.merge
+            : powerbi.FilterAction.remove;
     }
 
     /**
@@ -1071,9 +1063,7 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
         this.prevFilteredStartDate = null;
         this.prevFilteredEndDate = null;
 
-        // IsUserSelection was false before but it looks logically correct to make it "true" here
-        // because it's kinda user selection and it helps to avoid redundant updates.
-        this.applyDatePeriod(null, null, target, true);
+        this.applyDatePeriod(null, null, target);
     }
 
     /**
@@ -1110,29 +1100,19 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
     }
 
     public selectPeriod(granularityType: GranularityType): void {
-        if (this.timelineData.currentGranularity.getType() !== granularityType) {
-            this.host.persistProperties({
-                merge: [{
-                    objectName: "granularity",
-                    properties: { granularity: granularityType },
-                    selector: null,
-                }],
-            });
-
-            this.settings.granularity.granularity = granularityType;
-
+        if (this.timelineData.currentGranularity.getType() === granularityType) {
             return;
         }
 
-        this.redrawPeriod(granularityType);
+        this.host.persistProperties({
+            merge: [{
+                objectName: "granularity",
+                properties: { granularity: granularityType },
+                selector: null,
+            }],
+        });
 
-        this.updateCalendar(this.settings);
-
-        this.render(
-            this.timelineData,
-            this.settings,
-            this.timelineProperties,
-            this.options);
+        this.settings.granularity.granularity = granularityType;
     }
 
     public onCursorDrag(currentCursor: ICursorDataPoint): void {
@@ -1415,7 +1395,8 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
         this.renderCursors(
             timelineData,
             timelineProperties.cellHeight,
-            timelineProperties.cellsYPosition);
+            timelineProperties.cellsYPosition,
+        );
 
         this.scrollAutoFocusFunc(this.selectedGranulaPos);
     }
@@ -1424,8 +1405,8 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
         labels: ITimelineLabel[],
         labelsElement: D3Selection<any, any, any, any>,
         index: number,
-        isLast: boolean): void {
-
+        isLast: boolean,
+    ): void {
         const labelTextSelection: D3Selection<any, ITimelineLabel, any, any> = labelsElement
             .selectAll(Timeline.TimelineSelectors.TextLabel.selectorName);
 
@@ -1523,7 +1504,8 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
     private onCellClickHandler(
         dataPoint: ITimelineDataPoint,
         index: number,
-        isMultiSelection: boolean): void {
+        isMultiSelection: boolean,
+    ): void {
 
         const timelineData: ITimelineData = this.timelineData;
         const cursorDataPoints: ICursorDataPoint[] = timelineData.cursorDataPoints;
@@ -1551,33 +1533,18 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
         this.renderCursors(
             timelineData,
             timelineProperties.cellHeight,
-            timelineProperties.cellsYPosition);
+            timelineProperties.cellsYPosition,
+        );
 
         this.renderTimeRangeText(timelineData, this.settings.rangeHeader);
         this.setSelection(timelineData);
     }
 
-    private applyFilterSettingsInCapabilities(isUserSelection: boolean, isClearPeriod?: boolean): void {
-        const instanceOfGeneral: powerbi.VisualObjectInstance = {
-            objectName: "general",
-            properties: { isUserSelection },
-            selector: undefined,
-        };
-
-        if (isClearPeriod) {
-            instanceOfGeneral.properties.datePeriod = null;
+    private scrollAutoFocusFunc(selectedGranulaPos: number): void {
+        if (!selectedGranulaPos) {
+            return;
         }
 
-        this.host.persistProperties({
-            merge: [
-                instanceOfGeneral,
-            ],
-        });
-    }
-
-    private scrollAutoFocusFunc = (selectedGranulaPos: number) => {
-        if (selectedGranulaPos) {
-            this.mainSvgWrapperSelection.node().scrollLeft = selectedGranulaPos - this.horizontalAutoScrollingPositionOffset;
-        }
+        this.mainSvgWrapperSelection.node().scrollLeft = selectedGranulaPos - this.horizontalAutoScrollingPositionOffset;
     }
 }

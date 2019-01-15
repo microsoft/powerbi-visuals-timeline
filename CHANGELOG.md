@@ -1,3 +1,6 @@
+## 2.0.1
+* Fixes race condition that happened if we change granularity and select any date range. For users this issue looked like blinking issue
+
 ## 2.0.0
 * Updates API version to 2.3.0
 * Converts code to ES2015 syntax
