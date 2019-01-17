@@ -53,7 +53,7 @@ export class TimelineGranularityBase implements IGranularity {
 
     protected calendar: Calendar;
 
-    private clickableRectHeight: number = 23;
+    private clickableRectHeight: number = 30;
     private clickableRectFactor: number = 2;
     private clickableRectWidth: number = 30;
 
@@ -125,26 +125,6 @@ export class TimelineGranularityBase implements IGranularity {
             );
         }
 
-        const granularityTypeClickHandler = () => {
-            const event: MouseEvent = require("d3").event as MouseEvent;
-
-            event.stopPropagation();
-
-            props.selectPeriodCallback(this.granularityProps.granularityType);
-
-            const sliderSelection = selectAll("rect.periodSlicerRect");
-
-            if (sliderSelection) {
-                sliderSelection.remove();
-            }
-
-            this.renderSlider(
-                granularitySelection,
-                props.granularSettings,
-            );
-        };
-
-        // render selection rects
         granularitySelection
             .append("rect")
             .classed("periodSlicerSelectionRect", true)
@@ -152,8 +132,24 @@ export class TimelineGranularityBase implements IGranularity {
             .attr("y", pixelConverter.toString(0 - this.clickableRectWidth / this.clickableRectFactor))
             .attr("width", pixelConverter.toString(this.clickableRectWidth))
             .attr("height", pixelConverter.toString(this.clickableRectHeight))
-            .on("mousedown", granularityTypeClickHandler)
-            .on("touchstart", granularityTypeClickHandler);
+            .on("click", () => {
+                const event: MouseEvent = require("d3").event as MouseEvent;
+
+                event.stopPropagation();
+
+                props.selectPeriodCallback(this.granularityProps.granularityType);
+
+                const sliderSelection = selectAll("rect.periodSlicerRect");
+
+                if (sliderSelection) {
+                    sliderSelection.remove();
+                }
+
+                this.renderSlider(
+                    granularitySelection,
+                    props.granularSettings,
+                );
+            });
 
         granularitySelection.attr("fill", props.granularSettings.scaleColor);
 

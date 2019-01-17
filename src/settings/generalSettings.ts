@@ -28,5 +28,4 @@ import { TimelineDatePeriodBase } from "../datePeriod/datePeriodBase";
 
 export class GeneralSettings {
     public datePeriod: TimelineDatePeriodBase | string = TimelineDatePeriodBase.createEmpty();
-    public isUserSelection: boolean = false;
 }

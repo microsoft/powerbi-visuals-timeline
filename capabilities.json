@@ -32,16 +32,6 @@
                         "bool": true
                     }
                 },
-                "datePeriod": {
-                    "type": {
-                        "text": true
-                    }
-                },
-                "isUserSelection": {
-                    "type": {
-                        "bool": true
-                    }
-                },
                 "filter": {
                     "type": {
                         "filter": true
