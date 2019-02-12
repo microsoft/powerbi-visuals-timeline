@@ -876,25 +876,16 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
             .selectAll(Timeline.TimelineSelectors.CellRect.selectorName)
             .data(dataPoints);
 
-        const clickHandler = (dataPoint: ITimelineDataPoint, index: number) => {
-            // If something from Force Selection settings group is enabled, any user filters has no sense
-            if (this.settings.forceSelection.currentPeriod || this.settings.forceSelection.latestAvailableDate) {
-                return;
-            }
-
-            const event: MouseEvent = require("d3").event as MouseEvent;
-
-            event.stopPropagation();
-
-            this.onCellClickHandler(dataPoint, index, event.altKey || event.shiftKey);
-        };
+        cellsSelection
+            .exit()
+            .remove();
 
         cellsSelection
             .enter()
             .append("rect")
             .classed(Timeline.TimelineSelectors.CellRect.className, true)
-            .on("click", clickHandler)
-            .on("touchstart", clickHandler)
+            .on("click", this.handleClick.bind(this))
+            .on("touchstart", this.handleClick.bind(this))
             .merge(cellsSelection)
             .attr("x", (dataPoint: ITimelineDataPoint) => {
                 const position: number = totalX;
@@ -910,10 +901,6 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
             });
 
         this.fillCells(this.settings);
-
-        cellsSelection
-            .exit()
-            .remove();
     }
 
     public renderCursors(
@@ -1175,6 +1162,14 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
 
     public onCursorDragEnd(): void {
         this.setSelection(this.timelineData);
+    }
+
+    private handleClick(dataPoint: ITimelineDataPoint, index: number): void {
+        const event: MouseEvent = require("d3").event as MouseEvent;
+
+        event.stopPropagation();
+
+        this.onCellClickHandler(dataPoint, index, event.altKey || event.shiftKey);
     }
 
     private addElements(): void {
@@ -1538,6 +1533,9 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
 
         this.renderTimeRangeText(timelineData, this.settings.rangeHeader);
         this.setSelection(timelineData);
+
+        // Turns off Force Selection options to allow user's selection
+        this.toggleForceSelectionOptions();
     }
 
     private scrollAutoFocusFunc(selectedGranulaPos: number): void {
@@ -1546,5 +1544,27 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
         }
 
         this.mainSvgWrapperSelection.node().scrollLeft = selectedGranulaPos - this.horizontalAutoScrollingPositionOffset;
+    }
+
+    private toggleForceSelectionOptions(): void {
+        const isForceSelectionTurnedOn: boolean = this.settings.forceSelection.currentPeriod
+            || this.settings.forceSelection.latestAvailableDate;
+
+        if (isForceSelectionTurnedOn) {
+            this.turnOffForceSelectionOptions();
+        }
+    }
+
+    private turnOffForceSelectionOptions(): void {
+        this.host.persistProperties({
+            merge: [{
+                objectName: "forceSelection",
+                properties: {
+                    currentPeriod: false,
+                    latestAvailableDate: false,
+                },
+                selector: null,
+            }],
+        });
     }
 }

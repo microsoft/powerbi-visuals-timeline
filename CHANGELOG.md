@@ -1,3 +1,6 @@
+## 2.0.2
+* Allows to select any date range even if Force Selection options are selected
+
 ## 2.0.1
 * Fixes race condition that happened if we change granularity and select any date range. For users this issue looked like blinking issue
 

@@ -847,19 +847,21 @@ describe("Timeline", () => {
                             colorSel);
                     });
 
-                    it("current enabled -- impossible to make user selection", () => {
+                    it("user selection is allowed if forceSelection.currentPeriod is enabled", () => {
                         const currentDate: Date = new Date();
                         const startDateRange: Date = new Date(currentDate.getFullYear() - 1, 0, 1);
                         const endDateRange: Date = new Date(currentDate.getFullYear() + 1, 11, 31);
+
                         const color: string = "#ABCDEF";
-                        const colorSel: string = "#AAAAAA";
+                        const selectedColor: string = "#AAAAAA";
 
                         defaultDataViewBuilder.setDateRange(startDateRange, endDateRange);
 
                         dataView = defaultDataViewBuilder.getDataView();
+
                         dataView.metadata.objects = {
                             cells: {
-                                fillSelected: getSolidColorStructuralObject(colorSel),
+                                fillSelected: getSolidColorStructuralObject(selectedColor),
                                 fillUnselected: getSolidColorStructuralObject(color),
                             },
                             forceSelection: {
@@ -877,22 +879,24 @@ describe("Timeline", () => {
 
                         assertColorsMatch(
                             lastCell.css("fill"),
-                            color);
+                            selectedColor,
+                        );
                     });
 
-                    it("latest enabled -- impossible to make user selection", () => {
+                    it("user selection is allowed if forceSelection.latestAvailableDate is enabled", () => {
                         const currentDate: Date = new Date();
                         const startDateRange: Date = new Date(currentDate.getFullYear() - 1, 0, 1);
                         const endDateRange: Date = new Date(currentDate.getFullYear() + 1, 11, 31);
+
                         const color: string = "#ABCDEF";
-                        const colorSel: string = "#AAAAAA";
+                        const selectedColor: string = "#AAAAAA";
 
                         defaultDataViewBuilder.setDateRange(startDateRange, endDateRange);
 
                         dataView = defaultDataViewBuilder.getDataView();
                         dataView.metadata.objects = {
                             cells: {
-                                fillSelected: getSolidColorStructuralObject(colorSel),
+                                fillSelected: getSolidColorStructuralObject(selectedColor),
                                 fillUnselected: getSolidColorStructuralObject(color),
                             },
                             forceSelection: {
@@ -910,7 +914,8 @@ describe("Timeline", () => {
 
                         assertColorsMatch(
                             firstCell.css("fill"),
-                            color);
+                            selectedColor,
+                        );
                     });
 
                     it(`current period for 'week' granularity`, () => {
