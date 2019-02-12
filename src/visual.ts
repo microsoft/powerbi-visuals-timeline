@@ -560,8 +560,6 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
     private cursorGroupSelection: D3Selection<any, any, any, any>;
     private selectorSelection: D3Selection<any, any, any, any>;
 
-    private selectionManager: powerbi.extensibility.ISelectionManager;
-
     private options: powerbi.extensibility.visual.VisualUpdateOptions;
     private dataView: powerbi.DataView;
 
@@ -587,24 +585,8 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
 
             return cursorDataPoint;
         })
-        .on("drag", (cursorDataPoint: ICursorDataPoint) => {
-            if (this.settings.forceSelection.currentPeriod
-                || this.settings.forceSelection.latestAvailableDate
-            ) {
-                return;
-            }
-
-            this.onCursorDrag(cursorDataPoint);
-        })
-        .on("end", () => {
-            if (this.settings.forceSelection.currentPeriod
-                || this.settings.forceSelection.latestAvailableDate
-            ) {
-                return;
-            }
-
-            this.onCursorDragEnd();
-        });
+        .on("drag", this.onCursorDrag.bind(this))
+        .on("end", this.onCursorDragEnd.bind(this));
 
     constructor(options: powerbi.extensibility.visual.VisualConstructorOptions) {
         const element: HTMLElement = options.element;
@@ -614,7 +596,6 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
         this.initialized = false;
         this.locale = this.host.locale;
 
-        this.selectionManager = this.host.createSelectionManager();
         this.localizationManager = this.host.createLocalizationManager();
 
         this.timelineProperties = {
@@ -634,13 +615,7 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
         this.rootSelection = d3Select(element)
             .append("div")
             .classed("timeline-component", true)
-            .on("click", () => {
-                if (!this.settings.forceSelection.currentPeriod
-                    && !this.settings.forceSelection.latestAvailableDate
-                ) {
-                    this.clear();
-                }
-            });
+            .on("click", () => this.clearUserSelection());
 
         this.headerSelection = this.rootSelection
             .append("svg")
@@ -658,14 +633,13 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
         this.addElements();
     }
 
-    public clear(): void {
-        if (this.initialized) {
-            this.selectionManager.clear();
-
-            if (this.timelineData) {
-                this.clearSelection(this.timelineData.filterColumnTarget);
-            }
+    public clearUserSelection(): void {
+        if (!this.initialized || !this.timelineData) {
+            return;
         }
+
+        this.clearSelection(this.timelineData.filterColumnTarget);
+        this.toggleForceSelectionOptions();
     }
 
     public doesPeriodSlicerRectPositionNeedToUpdate(granularity: GranularityType): boolean {
@@ -1162,6 +1136,7 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
 
     public onCursorDragEnd(): void {
         this.setSelection(this.timelineData);
+        this.toggleForceSelectionOptions();
     }
 
     private handleClick(dataPoint: ITimelineDataPoint, index: number): void {
@@ -1173,12 +1148,6 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
     }
 
     private addElements(): void {
-        this.rootSelection.on("click", () => {
-            if (!this.settings.forceSelection.currentPeriod && !this.settings.forceSelection.latestAvailableDate) {
-                this.clear();
-            }
-        });
-
         this.rangeTextSelection = this.headerSelection
             .append("g")
             .classed(Timeline.TimelineSelectors.RangeTextArea.className, true)
@@ -1532,9 +1501,8 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
         );
 
         this.renderTimeRangeText(timelineData, this.settings.rangeHeader);
-        this.setSelection(timelineData);
 
-        // Turns off Force Selection options to allow user's selection
+        this.setSelection(timelineData);
         this.toggleForceSelectionOptions();
     }
 

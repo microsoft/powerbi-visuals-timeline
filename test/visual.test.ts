@@ -223,14 +223,14 @@ describe("Timeline", () => {
 
                 visualBuilder.update(dataView);
 
-                spyOn(visualBuilder.visualObject, "clear");
+                spyOn(visualBuilder.visualObject, "clearUserSelection");
             });
 
             it("click - event", (done) => {
                 d3Click(visualBuilder.rootElement, 0, 0);
 
                 renderTimeout(() => {
-                    expect(visualBuilder.visualObject.clear).toHaveBeenCalled();
+                    expect(visualBuilder.visualObject.clearUserSelection).toHaveBeenCalled();
 
                     done();
                 });
