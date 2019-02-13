@@ -560,8 +560,6 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
     private cursorGroupSelection: D3Selection<any, any, any, any>;
     private selectorSelection: D3Selection<any, any, any, any>;
 
-    private selectionManager: powerbi.extensibility.ISelectionManager;
-
     private options: powerbi.extensibility.visual.VisualUpdateOptions;
     private dataView: powerbi.DataView;
 
@@ -581,30 +579,16 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
 
     private selectedGranulaPos: number = null;
 
+    private isForceSelectionReset: boolean = false;
+
     private cursorDragBehavior = d3Drag<any, ICursorDataPoint>()
         .subject((cursorDataPoint: ICursorDataPoint) => {
             cursorDataPoint.x = cursorDataPoint.selectionIndex * this.timelineProperties.cellWidth;
 
             return cursorDataPoint;
         })
-        .on("drag", (cursorDataPoint: ICursorDataPoint) => {
-            if (this.settings.forceSelection.currentPeriod
-                || this.settings.forceSelection.latestAvailableDate
-            ) {
-                return;
-            }
-
-            this.onCursorDrag(cursorDataPoint);
-        })
-        .on("end", () => {
-            if (this.settings.forceSelection.currentPeriod
-                || this.settings.forceSelection.latestAvailableDate
-            ) {
-                return;
-            }
-
-            this.onCursorDragEnd();
-        });
+        .on("drag", this.onCursorDrag.bind(this))
+        .on("end", this.onCursorDragEnd.bind(this));
 
     constructor(options: powerbi.extensibility.visual.VisualConstructorOptions) {
         const element: HTMLElement = options.element;
@@ -614,7 +598,6 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
         this.initialized = false;
         this.locale = this.host.locale;
 
-        this.selectionManager = this.host.createSelectionManager();
         this.localizationManager = this.host.createLocalizationManager();
 
         this.timelineProperties = {
@@ -634,13 +617,7 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
         this.rootSelection = d3Select(element)
             .append("div")
             .classed("timeline-component", true)
-            .on("click", () => {
-                if (!this.settings.forceSelection.currentPeriod
-                    && !this.settings.forceSelection.latestAvailableDate
-                ) {
-                    this.clear();
-                }
-            });
+            .on("click", () => this.clearUserSelection());
 
         this.headerSelection = this.rootSelection
             .append("svg")
@@ -658,14 +635,13 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
         this.addElements();
     }
 
-    public clear(): void {
-        if (this.initialized) {
-            this.selectionManager.clear();
-
-            if (this.timelineData) {
-                this.clearSelection(this.timelineData.filterColumnTarget);
-            }
+    public clearUserSelection(): void {
+        if (!this.initialized || !this.timelineData) {
+            return;
         }
+
+        this.clearSelection(this.timelineData.filterColumnTarget);
+        this.toggleForceSelectionOptions();
     }
 
     public doesPeriodSlicerRectPositionNeedToUpdate(granularity: GranularityType): boolean {
@@ -757,21 +733,32 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
         const datePeriod: ITimelineDatePeriodBase = this.datePeriod;
 
         const granularity = this.settings.granularity.granularity;
-        const currentForceSelection: boolean = this.settings.forceSelection.currentPeriod;
-        const latestAvailableDate: boolean = this.settings.forceSelection.latestAvailableDate;
-        const isUserSelection: boolean = !currentForceSelection && !latestAvailableDate;
+
+        const isCurrentPeriodSelected: boolean = !this.isForceSelectionReset && this.settings.forceSelection.currentPeriod;
+        const isLatestAvailableDateSelected: boolean = !this.isForceSelectionReset && this.settings.forceSelection.latestAvailableDate;
+        const isForceSelected: boolean = !this.isForceSelectionReset && (isCurrentPeriodSelected || isLatestAvailableDateSelected);
+
+        this.isForceSelectionReset = false; // Reset it to default state to allow re-enabling Force Selection
+
         const target: IFilterColumnTarget = this.timelineData.filterColumnTarget;
 
         let currentForceSelectionResult = { startDate: null, endDate: null };
 
-        if (currentForceSelection) {
+        if (isCurrentPeriodSelected) {
             currentForceSelectionResult = ({
                 endDate: filterDatePeriod.endDate,
                 startDate: filterDatePeriod.startDate,
             } = Timeline.selectCurrentPeriod(datePeriod, granularity, this.calendar));
         }
-        if (latestAvailableDate && (!currentForceSelection ||
-            (currentForceSelection && !currentForceSelectionResult.startDate && !currentForceSelectionResult.endDate))) {
+        if (isLatestAvailableDateSelected
+            && (
+                !isCurrentPeriodSelected
+                || (isCurrentPeriodSelected
+                    && !currentForceSelectionResult.startDate
+                    && !currentForceSelectionResult.endDate
+                )
+            )
+        ) {
             filterDatePeriod.endDate = adaptedDataEndDate;
             ({
                 endDate: filterDatePeriod.endDate,
@@ -779,11 +766,11 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
             } = Timeline.selectPeriod(datePeriod, granularity, this.calendar, this.datePeriod.endDate));
         }
 
-        const filterWasChanged: boolean =
+        const wasFilterChanged: boolean =
             String(this.prevFilteredStartDate) !== String(filterDatePeriod.startDate) ||
             String(this.prevFilteredEndDate) !== String(filterDatePeriod.endDate);
 
-        if ((!isUserSelection && filterWasChanged)) {
+        if (isForceSelected && wasFilterChanged) {
             this.applyDatePeriod(filterDatePeriod.startDate, filterDatePeriod.endDate, target);
         }
 
@@ -876,25 +863,16 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
             .selectAll(Timeline.TimelineSelectors.CellRect.selectorName)
             .data(dataPoints);
 
-        const clickHandler = (dataPoint: ITimelineDataPoint, index: number) => {
-            // If something from Force Selection settings group is enabled, any user filters has no sense
-            if (this.settings.forceSelection.currentPeriod || this.settings.forceSelection.latestAvailableDate) {
-                return;
-            }
-
-            const event: MouseEvent = require("d3").event as MouseEvent;
-
-            event.stopPropagation();
-
-            this.onCellClickHandler(dataPoint, index, event.altKey || event.shiftKey);
-        };
+        cellsSelection
+            .exit()
+            .remove();
 
         cellsSelection
             .enter()
             .append("rect")
             .classed(Timeline.TimelineSelectors.CellRect.className, true)
-            .on("click", clickHandler)
-            .on("touchstart", clickHandler)
+            .on("click", this.handleClick.bind(this))
+            .on("touchstart", this.handleClick.bind(this))
             .merge(cellsSelection)
             .attr("x", (dataPoint: ITimelineDataPoint) => {
                 const position: number = totalX;
@@ -910,10 +888,6 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
             });
 
         this.fillCells(this.settings);
-
-        cellsSelection
-            .exit()
-            .remove();
     }
 
     public renderCursors(
@@ -1175,15 +1149,18 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
 
     public onCursorDragEnd(): void {
         this.setSelection(this.timelineData);
+        this.toggleForceSelectionOptions();
+    }
+
+    private handleClick(dataPoint: ITimelineDataPoint, index: number): void {
+        const event: MouseEvent = require("d3").event as MouseEvent;
+
+        event.stopPropagation();
+
+        this.onCellClickHandler(dataPoint, index, event.altKey || event.shiftKey);
     }
 
     private addElements(): void {
-        this.rootSelection.on("click", () => {
-            if (!this.settings.forceSelection.currentPeriod && !this.settings.forceSelection.latestAvailableDate) {
-                this.clear();
-            }
-        });
-
         this.rangeTextSelection = this.headerSelection
             .append("g")
             .classed(Timeline.TimelineSelectors.RangeTextArea.className, true)
@@ -1537,7 +1514,9 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
         );
 
         this.renderTimeRangeText(timelineData, this.settings.rangeHeader);
+
         this.setSelection(timelineData);
+        this.toggleForceSelectionOptions();
     }
 
     private scrollAutoFocusFunc(selectedGranulaPos: number): void {
@@ -1546,5 +1525,29 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
         }
 
         this.mainSvgWrapperSelection.node().scrollLeft = selectedGranulaPos - this.horizontalAutoScrollingPositionOffset;
+    }
+
+    private toggleForceSelectionOptions(): void {
+        const isForceSelectionTurnedOn: boolean = this.settings.forceSelection.currentPeriod
+            || this.settings.forceSelection.latestAvailableDate;
+
+        if (isForceSelectionTurnedOn) {
+            this.turnOffForceSelectionOptions();
+        }
+    }
+
+    private turnOffForceSelectionOptions(): void {
+        this.host.persistProperties({
+            merge: [{
+                objectName: "forceSelection",
+                properties: {
+                    currentPeriod: false,
+                    latestAvailableDate: false,
+                },
+                selector: null,
+            }],
+        });
+
+        this.isForceSelectionReset = true;
     }
 }
