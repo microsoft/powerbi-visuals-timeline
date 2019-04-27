@@ -27,6 +27,7 @@
 import { GranularityType } from "../granularity/granularityType";
 
 export class GranularitySettings {
+    public show: boolean = true;
     public scaleColor: string = "#000000";
     public sliderColor: string = "#AAAAAA";
     public granularity: GranularityType = GranularityType.month;

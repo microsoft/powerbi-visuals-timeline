@@ -80,6 +80,8 @@ export class TimelineGranularityBase implements IGranularity {
     private shortMonthFormatter: valueFormatter.IValueFormatter;
     private granularityProps: IGranularityName = null;
 
+    private DefaultQuarter: number = 3;
+
     constructor(calendar: Calendar, private locale: string, granularityProps: IGranularityName) {
         this.calendar = calendar;
         this.shortMonthFormatter = valueFormatter.valueFormatter.create({ format: "MMM", cultureSelector: this.locale });
@@ -187,7 +189,6 @@ export class TimelineGranularityBase implements IGranularity {
     public createLabels(granularity: IGranularity): ITimelineLabel[] {
         const labels: ITimelineLabel[] = [];
         let lastDatePeriod: ITimelineDatePeriod;
-
         this.datePeriods.forEach((datePeriod: ITimelineDatePeriod) => {
             if (!labels.length || !granularity.sameLabel(datePeriod, lastDatePeriod)) {
                 lastDatePeriod = datePeriod;
@@ -264,10 +265,15 @@ export class TimelineGranularityBase implements IGranularity {
     }
 
     public determineWeek(date: Date): number[] {
+        // For fiscal calendar case that started not from the 1st January a year may be greater on 1.
+        // It's Ok until this year is used to calculate date of first week.
+        // So, here is some adjustment was applied.
         const year: number = this.determineYear(date);
+        const fiscalYearAdjustment = this.getFiscalYearAdjustment();
 
-        const dateOfFirstWeek: Date = this.calendar.getDateOfFirstWeek(year);
-        const dateOfFirstFullWeek: Date = this.calendar.getDateOfFirstFullWeek(year);
+        const dateOfFirstWeek: Date = this.calendar.getDateOfFirstWeek(year - fiscalYearAdjustment);
+        const dateOfFirstFullWeek: Date = this.calendar.getDateOfFirstFullWeek(year - fiscalYearAdjustment);
+        // But number of weeks must be calculated using original date.
         const weeks: number = Utils.getAmountOfWeeksBetweenDates(dateOfFirstFullWeek, date);
 
         if (date >= dateOfFirstFullWeek && dateOfFirstWeek < dateOfFirstFullWeek) {
@@ -278,15 +284,51 @@ export class TimelineGranularityBase implements IGranularity {
     }
 
     public determineYear(date: Date): number {
-        const firstDay: Date = new Date(
+        const firstMonthOfYear = this.calendar.getFirstMonthOfYear();
+        const firstDayOfYear = this.calendar.getFirstDayOfYear();
+
+        const firstDate: Date = new Date(
             date.getFullYear(),
-            this.calendar.getFirstMonthOfYear(),
-            this.calendar.getFirstDayOfYear(),
+            firstMonthOfYear,
+            firstDayOfYear,
         );
 
-        return date.getFullYear() - ((firstDay <= date)
+        const year = date.getFullYear() + this.getFiscalYearAdjustment() - ((firstDate <= date)
             ? TimelineGranularityBase.EmptyYearOffset
             : TimelineGranularityBase.YearOffset);
+
+        return year;
+    }
+
+    /**
+     * Returns the date's quarter name (e.g. Q1, Q2, Q3, Q4)
+     * @param date A date
+     */
+    protected quarterText(date: Date): string {
+        let quarter: number = this.DefaultQuarter;
+        let year: number = this.determineYear(date);
+
+        while (date < this.calendar.getQuarterStartDate(year, quarter)) {
+            if (quarter > 0) {
+                quarter--;
+            }
+            else {
+                quarter = this.DefaultQuarter;
+                year--;
+            }
+        }
+
+        quarter++;
+
+        return `Q${quarter}`;
+    }
+
+    private getFiscalYearAdjustment(): number {
+        const firstMonthOfYear = this.calendar.getFirstMonthOfYear();
+        const firstDayOfYear = this.calendar.getFirstDayOfYear();
+        const fiscalYearAdjustment: number = ((firstMonthOfYear === 0 && firstDayOfYear === 1) ? 0 : 1);
+
+        return fiscalYearAdjustment;
     }
 
     private renderSlider(

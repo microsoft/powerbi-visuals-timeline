@@ -64,12 +64,14 @@ export class MonthGranularity extends TimelineGranularityBase {
     }
 
     public generateLabel(datePeriod: ITimelineDatePeriod): ITimelineLabel {
-        const shortMonthName: string = this.shortMonthName(datePeriod.startDate);
+        const quarter: string = this.quarterText(datePeriod.startDate);
+        const monthName: string = `${this.shortMonthName(datePeriod.startDate)} ${datePeriod.year}, ${quarter}`;
+        const monthShortName: string = this.shortMonthName(datePeriod.startDate);
 
         return {
             id: datePeriod.index,
-            text: shortMonthName,
-            title: shortMonthName,
+            text: monthShortName,
+            title: monthName,
         };
     }
 }

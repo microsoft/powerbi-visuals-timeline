@@ -35,8 +35,6 @@ import { IGranularityRenderProps } from "./granularityRenderProps";
 import { GranularityType } from "./granularityType";
 
 export class QuarterGranularity extends TimelineGranularityBase {
-    private static DefaultQuarter: number = 3;
-
     constructor(calendar: Calendar, locale: string) {
         super(calendar, locale, Utils.getGranularityPropsByMarker("Q"));
     }
@@ -73,28 +71,5 @@ export class QuarterGranularity extends TimelineGranularityBase {
             text: quarter,
             title: `${quarter} ${datePeriod.year}`,
         };
-    }
-
-    /**
-     * Returns the date's quarter name (e.g. Q1, Q2, Q3, Q4)
-     * @param date A date
-     */
-    private quarterText(date: Date): string {
-        let quarter: number = QuarterGranularity.DefaultQuarter;
-        let year: number = this.determineYear(date);
-
-        while (date < this.calendar.getQuarterStartDate(year, quarter)) {
-            if (quarter > 0) {
-                quarter--;
-            }
-            else {
-                quarter = QuarterGranularity.DefaultQuarter;
-                year--;
-            }
-        }
-
-        quarter++;
-
-        return `Q${quarter}`;
     }
 }

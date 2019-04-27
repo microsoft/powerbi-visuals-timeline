@@ -1091,7 +1091,7 @@ describe("Timeline", () => {
     });
 });
 
-describe("Timeline - Granularity", () => {
+describe("Timeline - Granularity - 1 Jan (Regular Calendar)", () => {
     let calendar: Calendar;
     let granularities: IGranularity[];
 
@@ -1114,7 +1114,7 @@ describe("Timeline - Granularity", () => {
             granularities.forEach((granularity: IGranularity) => {
                 const actualResult = granularity.splitDate(date);
 
-                expect(actualResult[actualResult.length - 1]).toBe(2014);
+                expect(actualResult[actualResult.length - 1]).toBe(2015);
             });
         });
     });
@@ -1128,6 +1128,87 @@ describe("Timeline - Granularity", () => {
             const firstDayOfYear = calendar.getFirstDayOfYear();
 
             expect(firstDayOfWeek).toEqual(firstDayOfYear);
+        });
+    });
+});
+
+describe("Timeline - Granularity - 1 Apr (Fiscal Calendar)", () => {
+    let calendar: Calendar;
+    let granularities: IGranularity[];
+
+    beforeEach(() => {
+        calendar = createCalendar(3);
+
+        granularities = [
+            new YearGranularity(calendar, null, null),
+            new QuarterGranularity(calendar, null),
+            new WeekGranularity(calendar, null, null),
+            new MonthGranularity(calendar, null),
+            new DayGranularity(calendar, null),
+        ];
+    });
+
+    describe("splitDate", () => {
+        it("before the first fiscal year day and after 1st Jan", () => {
+            const date: Date = new Date(2015, 1, 11);
+
+            granularities.forEach((granularity: IGranularity) => {
+                const actualResult = granularity.splitDate(date);
+
+                expect(actualResult[actualResult.length - 1]).toBe(2015);
+            });
+        });
+
+        it("before the first fiscal year day and before 1st Jan", () => {
+            const date: Date = new Date(2014, 10, 15);
+
+            granularities.forEach((granularity: IGranularity) => {
+                const actualResult = granularity.splitDate(date);
+
+                expect(actualResult[actualResult.length - 1]).toBe(2015);
+            });
+        });
+
+        it("after the first fiscal year day and before 1st Jan", () => {
+            const date: Date = new Date(2015, 3, 7);
+
+            granularities.forEach((granularity: IGranularity) => {
+                const actualResult = granularity.splitDate(date);
+
+                expect(actualResult[actualResult.length - 1]).toBe(2016);
+            });
+        });
+
+        it("after the first fiscal year day and after 1st Jan", () => {
+            const date: Date = new Date(2016, 0, 7);
+
+            granularities.forEach((granularity: IGranularity) => {
+                const actualResult = granularity.splitDate(date);
+
+                expect(actualResult[actualResult.length - 1]).toBe(2016);
+            });
+        });
+    });
+
+    describe("first week", () => {
+        const year2010 = 2010;
+
+        it("should return a first day of year", () => {
+            const date = calendar.getDateOfFirstWeek(year2010);
+            const firstDayOfWeek = date.getDate();
+            const firstDayOfYear = calendar.getFirstDayOfYear();
+
+            expect(firstDayOfWeek).toEqual(firstDayOfYear);
+        });
+    });
+
+    describe("weeks order", () => {
+        it("order ascending", () => {
+            const week1: number[] = granularities[0].determineWeek(new Date(2016, 3, 1));
+            const week2: number[] = granularities[0].determineWeek(new Date(2016, 3, 8));
+
+            expect(week1[0]).toEqual(1);
+            expect(week2[0]).toEqual(2);
         });
     });
 });
@@ -1566,7 +1647,7 @@ describe("Accessibility", () => {
 });
 
 function createCalendar(
-    month: number = 1,
+    month: number = 0,
     day: number = 1,
     week: number = 1,
     dayOfWeekSelectionOn: boolean = false,
