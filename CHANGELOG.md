@@ -1,3 +1,11 @@
+## 2.1.0
+* ADD: API was updated up to 2.5.0
+* ADD: "Scale size auto adjustment" option was removed
+* ADD: Granularity legend can be disabled now
+* ADD: Titles for granulas were added
+* FIX: Scalability was improved
+* FIX: Fiscal year is displayed correctly now
+
 ## 2.0.2
 * Allows to select any date range even if Force Selection options are selected
 
