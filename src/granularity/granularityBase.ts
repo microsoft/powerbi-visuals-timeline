@@ -47,6 +47,14 @@ import {
 } from "../dataInterfaces";
 
 export class TimelineGranularityBase implements IGranularity {
+    public static getFiscalYearAdjustment(calendar: Calendar): number {
+        const firstMonthOfYear = calendar.getFirstMonthOfYear();
+        const firstDayOfYear = calendar.getFirstDayOfYear();
+        const fiscalYearAdjustment: number = ((firstMonthOfYear === 0 && firstDayOfYear === 1) ? 0 : 1);
+
+        return fiscalYearAdjustment;
+    }
+
     private static DefaultFraction: number = 1;
     private static EmptyYearOffset: number = 0;
     private static YearOffset: number = 1;
@@ -269,7 +277,7 @@ export class TimelineGranularityBase implements IGranularity {
         // It's Ok until this year is used to calculate date of first week.
         // So, here is some adjustment was applied.
         const year: number = this.determineYear(date);
-        const fiscalYearAdjustment = this.getFiscalYearAdjustment();
+        const fiscalYearAdjustment = TimelineGranularityBase.getFiscalYearAdjustment(this.calendar);
 
         const dateOfFirstWeek: Date = this.calendar.getDateOfFirstWeek(year - fiscalYearAdjustment);
         const dateOfFirstFullWeek: Date = this.calendar.getDateOfFirstFullWeek(year - fiscalYearAdjustment);
@@ -293,7 +301,7 @@ export class TimelineGranularityBase implements IGranularity {
             firstDayOfYear,
         );
 
-        const year = date.getFullYear() + this.getFiscalYearAdjustment() - ((firstDate <= date)
+        const year = date.getFullYear() + TimelineGranularityBase.getFiscalYearAdjustment(this.calendar) - ((firstDate <= date)
             ? TimelineGranularityBase.EmptyYearOffset
             : TimelineGranularityBase.YearOffset);
 
@@ -321,14 +329,6 @@ export class TimelineGranularityBase implements IGranularity {
         quarter++;
 
         return `Q${quarter}`;
-    }
-
-    private getFiscalYearAdjustment(): number {
-        const firstMonthOfYear = this.calendar.getFirstMonthOfYear();
-        const firstDayOfYear = this.calendar.getFirstDayOfYear();
-        const fiscalYearAdjustment: number = ((firstMonthOfYear === 0 && firstDayOfYear === 1) ? 0 : 1);
-
-        return fiscalYearAdjustment;
     }
 
     private renderSlider(
