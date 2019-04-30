@@ -23,58 +23,35 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
  */
-
 import "jasmine-jquery";
 
-import {
-    select as d3Select,
-} from "d3-selection";
-
+import { select as d3Select } from "d3-selection";
 import * as $ from "jquery";
-
 import powerbi from "powerbi-visuals-api";
-
 import {
-    assertColorsMatch,
-    clickElement,
-    d3Click,
-    renderTimeout,
+    assertColorsMatch, clickElement, d3Click, renderTimeout,
 } from "powerbi-visuals-utils-testutils";
 
-import { TimelineDatePeriodBase } from "../src/datePeriod/datePeriodBase";
-import { IGranularity } from "../src/granularity/granularity";
-import { GranularityType } from "../src/granularity/granularityType";
-import { Utils } from "../src/utils";
-import { Timeline } from "../src/visual";
-
-import { CalendarSettings } from "../src/settings/calendarSettings";
-import { WeekDaySettings } from "../src/settings/weekDaySettings";
-
 import { Calendar } from "../src/calendar";
+import { ITimelineCursorOverElement, ITimelineData } from "../src/dataInterfaces";
+import { ITimelineDatePeriod, ITimelineDatePeriodBase } from "../src/datePeriod/datePeriod";
+import { TimelineDatePeriodBase } from "../src/datePeriod/datePeriodBase";
 import { DayGranularity } from "../src/granularity/dayGranularity";
+import { IGranularity } from "../src/granularity/granularity";
+import { TimelineGranularityBase } from "../src/granularity/granularityBase";
+import { GranularityType } from "../src/granularity/granularityType";
 import { MonthGranularity } from "../src/granularity/monthGranularity";
 import { QuarterGranularity } from "../src/granularity/quarterGranularity";
 import { WeekGranularity } from "../src/granularity/weekGranularity";
 import { YearGranularity } from "../src/granularity/yearGranularity";
-
-import {
-    ITimelineDatePeriod,
-    ITimelineDatePeriodBase,
-} from "../src/datePeriod/datePeriod";
-
-import {
-    ITimelineCursorOverElement,
-    ITimelineData,
-} from "../src/dataInterfaces";
-
+import { CalendarSettings } from "../src/settings/calendarSettings";
+import { WeekDaySettings } from "../src/settings/weekDaySettings";
+import { Utils } from "../src/utils";
+import { Timeline } from "../src/visual";
 import { TimelineGranularityMock } from "./granularityMock";
+import { areColorsEqual, getSolidColorStructuralObject } from "./helpers";
 import { TimelineBuilder } from "./visualBuilder";
 import { TimelineData } from "./visualData";
-
-import {
-    areColorsEqual,
-    getSolidColorStructuralObject,
-} from "./helpers";
 
 describe("Timeline", () => {
     let visualBuilder: TimelineBuilder;
@@ -1091,7 +1068,7 @@ describe("Timeline", () => {
     });
 });
 
-describe("Timeline - Granularity", () => {
+describe("Timeline - Granularity - 1 Jan (Regular Calendar)", () => {
     let calendar: Calendar;
     let granularities: IGranularity[];
 
@@ -1114,7 +1091,7 @@ describe("Timeline - Granularity", () => {
             granularities.forEach((granularity: IGranularity) => {
                 const actualResult = granularity.splitDate(date);
 
-                expect(actualResult[actualResult.length - 1]).toBe(2014);
+                expect(actualResult[actualResult.length - 1]).toBe(2015);
             });
         });
     });
@@ -1128,6 +1105,97 @@ describe("Timeline - Granularity", () => {
             const firstDayOfYear = calendar.getFirstDayOfYear();
 
             expect(firstDayOfWeek).toEqual(firstDayOfYear);
+        });
+
+        it("should return zero adjustment for a year", () => {
+            const yearAdjustment = TimelineGranularityBase.getFiscalYearAdjustment(calendar);
+            expect(yearAdjustment).toEqual(0);
+        });
+    });
+});
+
+describe("Timeline - Granularity - 1 Apr (Fiscal Calendar)", () => {
+    let calendar: Calendar;
+    let granularities: IGranularity[];
+
+    beforeEach(() => {
+        calendar = createCalendar(3);
+
+        granularities = [
+            new YearGranularity(calendar, null, null),
+            new QuarterGranularity(calendar, null),
+            new WeekGranularity(calendar, null, null),
+            new MonthGranularity(calendar, null),
+            new DayGranularity(calendar, null),
+        ];
+    });
+
+    describe("splitDate", () => {
+        it("before the first fiscal year day and after 1st Jan", () => {
+            const date: Date = new Date(2015, 1, 11);
+
+            granularities.forEach((granularity: IGranularity) => {
+                const actualResult = granularity.splitDate(date);
+
+                expect(actualResult[actualResult.length - 1]).toBe(2015);
+            });
+        });
+
+        it("before the first fiscal year day and before 1st Jan", () => {
+            const date: Date = new Date(2014, 10, 15);
+
+            granularities.forEach((granularity: IGranularity) => {
+                const actualResult = granularity.splitDate(date);
+
+                expect(actualResult[actualResult.length - 1]).toBe(2015);
+            });
+        });
+
+        it("after the first fiscal year day and before 1st Jan", () => {
+            const date: Date = new Date(2015, 3, 7);
+
+            granularities.forEach((granularity: IGranularity) => {
+                const actualResult = granularity.splitDate(date);
+
+                expect(actualResult[actualResult.length - 1]).toBe(2016);
+            });
+        });
+
+        it("after the first fiscal year day and after 1st Jan", () => {
+            const date: Date = new Date(2016, 0, 7);
+
+            granularities.forEach((granularity: IGranularity) => {
+                const actualResult = granularity.splitDate(date);
+
+                expect(actualResult[actualResult.length - 1]).toBe(2016);
+            });
+        });
+    });
+
+    describe("first week", () => {
+        const year2010 = 2010;
+
+        it("should return a first day of year", () => {
+            const date = calendar.getDateOfFirstWeek(year2010);
+            const firstDayOfWeek = date.getDate();
+            const firstDayOfYear = calendar.getFirstDayOfYear();
+
+            expect(firstDayOfWeek).toEqual(firstDayOfYear);
+        });
+
+        it("should return [1] adjustment for a year", () => {
+            const yearAdjustment = TimelineGranularityBase.getFiscalYearAdjustment(calendar);
+            expect(yearAdjustment).toEqual(1);
+        });
+    });
+
+    describe("weeks order", () => {
+        it("order ascending", () => {
+            const week1: number[] = granularities[0].determineWeek(new Date(2016, 3, 1));
+            const week2: number[] = granularities[0].determineWeek(new Date(2016, 3, 8));
+
+            expect(week1[0]).toEqual(1);
+            expect(week2[0]).toEqual(2);
         });
     });
 });
@@ -1566,7 +1634,7 @@ describe("Accessibility", () => {
 });
 
 function createCalendar(
-    month: number = 1,
+    month: number = 0,
     day: number = 1,
     week: number = 1,
     dayOfWeekSelectionOn: boolean = false,

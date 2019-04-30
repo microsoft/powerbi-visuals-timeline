@@ -60,8 +60,8 @@
             }
         },
         "calendar": {
-            "displayName": "Fiscal Year Start",
-            "displayNameKey": "Visual_FiscalYearStart",
+            "displayName": "Fiscal Year",
+            "displayNameKey": "Visual_FiscalYear",
             "properties": {
                 "month": {
                     "displayName": "Month",
@@ -259,6 +259,13 @@
             "displayName": "Granularity",
             "displayNameKey": "Visual_Granularity",
             "properties": {
+                "show": {
+                    "displayName": "Show",
+                    "displayNameKey": "Visual_Show",
+                    "type": {
+                        "bool": true
+                    }
+                },
                 "scaleColor": {
                     "displayName": "Scale color",
                     "displayNameKey": "Visual_ScaleColor",
@@ -385,19 +392,6 @@
                     "displayNameKey": "Visual_TextSize",
                     "type": {
                         "numeric": true
-                    }
-                }
-            }
-        },
-        "scaleSizeAdjustment": {
-            "displayName": "Scale size auto adjustment",
-            "displayNameKey": "Visual_ScaleSizeAdjustment",
-            "properties": {
-                "show": {
-                    "displayName": "Show",
-                    "displayNameKey": "Visual_Show",
-                    "type": {
-                        "bool": true
                     }
                 }
             }

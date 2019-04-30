@@ -48,6 +48,7 @@ export interface ITimelineMargins {
     PeriodSlicerRectHeight: number;
     LegendHeight: number;
     LegendHeightOffset: number;
+    LegendHeightRange: number;
     HeightOffset: number;
 }
 
@@ -110,6 +111,7 @@ export interface ITimelineProperties {
     cellWidth: number;
     cellHeight: number;
     cellsYPosition: number;
+    legendHeight: number;
 }
 
 export interface ITimelineData {

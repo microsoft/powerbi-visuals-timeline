@@ -33,7 +33,6 @@ import { ForceSelectionSettings } from "./forceSelectionSettings";
 import { GeneralSettings } from "./generalSettings";
 import { GranularitySettings } from "./granularitySettings";
 import { LabelsSettings } from "./labelsSettings";
-import { ScaleSizeAdjustment } from "./scaleSizeAdjustment";
 import { ScrollAutoAdjustment } from "./scrollAutoAdjustment";
 import { WeekDaySettings } from "./weekDaySettings";
 
@@ -46,7 +45,6 @@ export class VisualSettings extends dataViewObjectsParser.DataViewObjectsParser 
     public cells: CellsSettings = new CellsSettings();
     public granularity: GranularitySettings = new GranularitySettings();
     public labels: LabelsSettings = new LabelsSettings();
-    public scaleSizeAdjustment: ScaleSizeAdjustment = new ScaleSizeAdjustment();
     public scrollAutoAdjustment: ScrollAutoAdjustment = new ScrollAutoAdjustment();
     public cursor: CursorSettings = new CursorSettings();
 }

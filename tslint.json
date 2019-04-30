@@ -82,7 +82,6 @@
       "check-separator",
       "check-type"
     ],
-    "forin": false,
-    "no-reserved-keywords": false
+    "forin": false
   }
 }

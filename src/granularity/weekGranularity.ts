@@ -80,10 +80,13 @@ export class WeekGranularity extends TimelineGranularityBase {
             ? this.localizationManager.getDisplayName(this.localizationKey)
             : this.localizationKey;
 
+        const quarter: string = this.quarterText(datePeriod.startDate);
+        const monthName: string = this.shortMonthName(datePeriod.startDate);
+
         return {
             id: datePeriod.index,
             text: `W${datePeriod.week[0]}`,
-            title: `${localizedWeek} ${datePeriod.week[0]} - ${datePeriod.week[1]}`,
+            title: `${localizedWeek} ${datePeriod.week[0]} - ${datePeriod.week[1]}, ${quarter} ${monthName}`,
         };
     }
 }

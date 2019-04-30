@@ -36,6 +36,7 @@ import {
 } from "../dataInterfaces";
 
 export interface IGranularity {
+    determineWeek?(date: Date): number[];
     getType?(): GranularityType;
     splitDate(date: Date): Array<string | number>;
     getDatePeriods(): ITimelineDatePeriod[];
