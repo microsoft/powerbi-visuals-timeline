@@ -608,11 +608,18 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
         this.headerSelection = this.rootSelection
             .append("svg")
             .attr("width", "15%")
-            .style("display", "block");
+            .attr("float", "left")
+            .style("display", "inline-block")
+            .style("vertical-align", "middle");
 
         this.mainSvgWrapperSelection = this.rootSelection
             .append("div")
-            .classed(Timeline.TimelineSelectors.TimelineWrapper.className, true);
+            .classed(Timeline.TimelineSelectors.TimelineWrapper.className, true)
+            .attr("float", "left")
+            .style("width", "85%")
+            .style("display", "inline-block")
+            .style("height", "100%")
+            .style("vertical-align", "middle");
 
         this.mainSvgSelection = this.mainSvgWrapperSelection
             .append("svg")
@@ -1271,16 +1278,7 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
             .style("height", pixelConverter.toString(options.viewport.height))
             .style("width", pixelConverter.toString(options.viewport.width));
 
-        this.mainSvgWrapperSelection.style(
-            "height",
-            pixelConverter.toString(Math.max(
-                Timeline.MinSizeOfViewport,
-                options.viewport.height
-                - this.timelineProperties.legendHeight
-                - Timeline.TimelineMargins.TopMargin
-                - Timeline.TimelineMargins.LegendHeightOffset),
-            ),
-        );
+        this.mainSvgWrapperSelection.style("height", "100%");
         const mainAreaHeight: number = timelineProperties.cellsYPosition - Timeline.TimelineMargins.LegendHeight
             + timelineProperties.cellHeight;
 
