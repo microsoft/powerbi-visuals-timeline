@@ -607,7 +607,7 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
 
         this.headerSelection = this.rootSelection
             .append("svg")
-            .attr("width", "100%")
+            .attr("width", "15%")
             .style("display", "block");
 
         this.mainSvgWrapperSelection = this.rootSelection
