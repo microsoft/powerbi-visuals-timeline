@@ -460,7 +460,7 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
         // that in fact is half of cell height for each of them
         width = Math.max(
             timelineMargins.MinCellWidth,
-            (viewport.width * 0.8 - height - Timeline.ViewportWidthAdjustment) / (datePeriodsCount));
+            (viewport.width * 0.6 - height - Timeline.ViewportWidthAdjustment) / (datePeriodsCount));
 
         timelineProperties.cellHeight = height;
         timelineProperties.cellWidth = width;
@@ -611,42 +611,42 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
 
         var container = this.rootSelection
             .append("g")
-            .style("width", "20%")
+            .style("width", "40%")
             .attr("float", "left")
             .style("display", "inline-block")
-            .style("vertical-align", "top");
+            .style("margin-top", "10px");
 
         this.headerSelection = container
             .append("svg")
-            .style("width", "100%")
-            .style("display", "block")
-            .style("vertical-align", "top");
+            .style("width", "33%")
+            .style("float", "left")
+            .style("display", "inline-block");
 
         this.mainSvgWrapperSelection = this.rootSelection
             .append("div")
             .classed(Timeline.TimelineSelectors.TimelineWrapper.className, true)
             .attr("float", "right")
-            .style("width", "80%")
+            .style("width", "60%")
             .style("display", "inline-block")
-            .style("height", "100%")
-            .style("vertical-align", "top");
+            .style("vertical-align", "top")
+            .style("overflow-y", "hidden");
 
         var datepickers = container
             .append("div")
-            .style("width", "100%")
-            .style("display", "block");
+            .style("width", "67%")
+            .style("display", "inline-block")
+            .style("float", "right")
+            .style("margin-top", "10px");
 
         this.startDatePicker = datepickers.append("input")
             .attr("type", "date")
             .style("width", "48%")
-            .style("vertical-align", "top")
             .style("display", "inline-block")
             .style("float", "left");
 
         this.endDatePicker = datepickers.append("input")
             .attr("type", "date")
             .style("width", "48%")
-            .style("vertical-align", "top")
             .style("display", "inline-block")
             .style("float", "right");
 
@@ -717,8 +717,8 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
         let endDatePicker = this.endDatePicker;
         let self = this;
 
-        this.endDatePicker.on("input", function () { self.updateDate(startDatePicker, endDatePicker) }).attr("max", endDateFormatted).attr("min", startDateFormatted);
-        this.startDatePicker.on("input", function () { self.updateDate(startDatePicker, endDatePicker) }).attr("max", endDateFormatted).attr("min", startDateFormatted);
+        this.endDatePicker.on("input", function () { self.updateDate(startDatePicker, endDatePicker) }).attr("min", endDateFormatted).attr("max", startDateFormatted);
+        this.startDatePicker.on("input", function () { self.updateDate(startDatePicker, endDatePicker) }).attr("min", endDateFormatted).attr("max", startDateFormatted);
 
         // Setting parsing was moved here from createTimelineData because settings values may be modified before the function is called.
         this.settings = Timeline.parseSettings(
@@ -830,8 +830,11 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
         }
 
         //Set the value of the date pickers to be that closest and further date available
-        this.endDatePicker.node().defaultValue = this.getDateInDefaultFormat(filterDatePeriod.endDate);
-        this.startDatePicker.node().defaultValue = this.getDateInDefaultFormat(filterDatePeriod.startDate);
+        this.endDatePicker.node().value = this.getDateInDefaultFormat(filterDatePeriod.endDate);
+        this.startDatePicker.node().value = this.getDateInDefaultFormat(filterDatePeriod.startDate);
+
+        console.log(startDatePicker);
+        console.log(filterDatePeriod.startDate);
 
         this.prevFilteredStartDate = filterDatePeriod.startDate;
         this.prevFilteredEndDate = filterDatePeriod.endDate;
@@ -1330,7 +1333,7 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
         this.rootSelection
             .attr("drag-resize-disabled", true)
             .style("overflow-x", Timeline.DefaultOverflow)
-            .style("overflow-y", Timeline.DefaultOverflow)
+            .style("overflow-y", "hidden")
             .style("height", pixelConverter.toString(options.viewport.height))
             .style("width", pixelConverter.toString(options.viewport.width));
 
