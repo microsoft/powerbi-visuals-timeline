@@ -460,7 +460,7 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
         // that in fact is half of cell height for each of them
         width = Math.max(
             timelineMargins.MinCellWidth,
-            (viewport.width - height - Timeline.ViewportWidthAdjustment) / (datePeriodsCount));
+            (viewport.width * 0.85 - height - Timeline.ViewportWidthAdjustment) / (datePeriodsCount));
 
         timelineProperties.cellHeight = height;
         timelineProperties.cellWidth = width;
