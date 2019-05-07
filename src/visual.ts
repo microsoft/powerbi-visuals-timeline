@@ -566,6 +566,10 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
 
     private isForceSelectionReset: boolean = false;
 
+    //Datepickers declaration
+    private startDatePicker;
+    private endDatePicker;
+
     private cursorDragBehavior = d3Drag<any, ICursorDataPoint>()
         .subject((cursorDataPoint: ICursorDataPoint) => {
             cursorDataPoint.x = cursorDataPoint.selectionIndex * this.timelineProperties.cellWidth;
@@ -607,19 +611,33 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
 
         this.headerSelection = this.rootSelection
             .append("svg")
-            .attr("width", "15%")
+            .style("width", "15%")
             .attr("float", "left")
             .style("display", "inline-block")
-            .style("vertical-align", "middle");
+            .style("vertical-align", "top");
 
         this.mainSvgWrapperSelection = this.rootSelection
             .append("div")
             .classed(Timeline.TimelineSelectors.TimelineWrapper.className, true)
-            .attr("float", "left")
+            .attr("float", "right")
             .style("width", "85%")
             .style("display", "inline-block")
             .style("height", "100%")
-            .style("vertical-align", "middle");
+            .style("vertical-align", "top");
+
+        var datepickers = this.rootSelection
+            .append("div")
+            .style("width", "15%")
+            .attr("float", "left")
+            .style("display", "inline-block");
+
+        this.startDatePicker = datepickers.append("input")
+            .attr("type", "date")
+            .style("vertical-align", "top");
+
+        this.endDatePicker = datepickers.append("input")
+            .attr("type", "date")
+            .style("vertical-align", "top");
 
         this.mainSvgSelection = this.mainSvgWrapperSelection
             .append("svg")
@@ -656,6 +674,15 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
         }
     }
 
+    
+    private updateDate(startDatePicker, endDatePicker) {
+        this.applyDatePeriod(
+            new Date(startDatePicker.node().value),
+            new Date(endDatePicker.node().value),
+            this.timelineData.filterColumnTarget,
+        );
+    }
+
     public update(options: powerbi.extensibility.visual.VisualUpdateOptions): void {
         if (!Timeline.areVisualUpdateOptionsValid(options)) {
             this.clearData();
@@ -668,6 +695,17 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
         // it contains dates from data view.
         this.datePeriod = this.createDatePeriod(this.dataView);
 
+        //Set the value of the date pickers to be that closest and further date available
+        this.endDatePicker.node().defaultValue = this.getDateInDefaultFormat(this.datePeriod.endDate);
+        this.startDatePicker.node().defaultValue = this.getDateInDefaultFormat(this.datePeriod.startDate);
+
+        let startDatePicker = this.startDatePicker;
+        let endDatePicker = this.endDatePicker;
+        let self = this;
+
+        this.endDatePicker.on("input", function() { self.updateDate(startDatePicker, endDatePicker) });
+        this.startDatePicker.on("input", function() { self.updateDate(startDatePicker, endDatePicker) });
+        
         // Setting parsing was moved here from createTimelineData because settings values may be modified before the function is called.
         this.settings = Timeline.parseSettings(
             this.dataView,
@@ -776,6 +814,12 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
         if (isForceSelected && wasFilterChanged) {
             this.applyDatePeriod(filterDatePeriod.startDate, filterDatePeriod.endDate, target);
         }
+
+        //Set the value of the date pickers to be that closest and further date available
+        this.endDatePicker.node().defaultValue = this.getDateInDefaultFormat(filterDatePeriod.endDate);
+        this.startDatePicker.node().defaultValue = this.getDateInDefaultFormat(filterDatePeriod.startDate);
+
+        console.log(filterDatePeriod.startDate);
 
         this.prevFilteredStartDate = filterDatePeriod.startDate;
         this.prevFilteredEndDate = filterDatePeriod.endDate;
@@ -1583,5 +1627,20 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
         });
 
         this.isForceSelectionReset = true;
+    }
+
+    private getDateInDefaultFormat(date) {
+        var year = date.getFullYear();
+        var month = date.getMonth() + 1;
+
+        if (month < 10)
+            month = "0" + month;
+
+        var day = date.getDate();
+
+        if (day < 10)
+            day = "0" + day;
+        
+        return year + "-" + month + "-" + day;
     }
 }
