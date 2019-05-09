@@ -26,7 +26,7 @@
 
 export class LabelsSettings {
     public show: boolean = true;
-    public displayAll: boolean = true;
+    public displayAll: boolean = false;
     public fontColor: string = "#777777";
     public textSize: number = 9;
 }
