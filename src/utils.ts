@@ -143,7 +143,8 @@ export class Utils {
             }
         });
 
-        return { startDate, endDate };
+
+        return { startDate , endDate };
     }
 
     public static parseDate(value: any): Date {

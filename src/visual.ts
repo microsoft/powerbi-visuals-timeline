@@ -921,6 +921,7 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
 
     public renderCells(timelineData: ITimelineData, timelineProperties: ITimelineProperties, yPos: number): void {
         const dataPoints: ITimelineDataPoint[] = timelineData.timelineDataPoints;
+
         let totalX: number = 0;
 
         const cellsSelection: D3Selection<any, ITimelineDataPoint, any, any> = this.cellsSelection
@@ -1436,6 +1437,7 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
                 } else {
                     y = this.calculateYOffset(yPos + 1.5);
 
+                    //Change the label text to be the title so that it is more precise
                     labels = extendedLabels.monthLabels.map(x => {
                         x.text = x.title;
                         return x;
@@ -1476,16 +1478,19 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
                     yPos += yDiff;
                 }
             }
-        }
+        } 
 
         yPos -= 1;
         this.timelineProperties.cellsYPosition = this.calculateYOffset(yPos);
 
+        var t0 = performance.now();
         this.renderCells(
             timelineData,
             timelineProperties,
             this.calculateYOffset(yPos),
         );
+        var t1 = performance.now();
+        console.log("Time to execute: " + (t1 - t0));
 
         this.renderCursors(
             timelineData,
@@ -1606,7 +1611,8 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
             var i = 0;
             var y1 = this.calculateYOffset(yIndex);
             var y2 = this.calculateYOffset(yIndex + 1);
-            var averageY = (this.calculateYOffset(yIndex) * 0.75 + this.calculateYOffset(yIndex + 1) * 0.25);
+            var averageY = (y1 * 0.75 + y2 * 0.25);
+            var lengthOfText = this.getLengthOfText(labels[i].id) as number;
 
             for (i; i < labels.length; i++) {
                 //Draw vertical line to show start of one year and the end of another
@@ -1614,8 +1620,6 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
                 var middleOfLine = (labels[i].id + averageOfDiff + Timeline.LabelIdOffset) * this.timelineProperties.cellWidth;
 
                 this.drawLine(labelsElement, x, x, y1, y2, "black");
-
-                var lengthOfText = this.getLengthOfText(labels[i].id) as number;
 
                 //Draw the horizontal lines between the vertical ones
                 this.drawLine(labelsElement, x, middleOfLine - lengthOfText, averageY, averageY, "black");
@@ -1629,7 +1633,7 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
     }
 
     private getLengthOfText(id) {
-        return (d3Select("#id" + id).node() as any).getBBox().width * 0.6;
+        return (d3Select("#id" + id).node() as any).getBBox().width * 0.65;
     }
 
     private drawLine(container, x1, x2, y1, y2, strokeColor) {
