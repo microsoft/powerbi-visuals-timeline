@@ -1585,14 +1585,11 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
         yPos -= 1;
         this.timelineProperties.cellsYPosition = this.calculateYOffset(yPos);
 
-        var t0 = performance.now();
         this.renderCells(
             timelineData,
             timelineProperties,
             this.calculateYOffset(yPos),
-        );
-        var t1 = performance.now();
-        console.log("Time to execute: " + (t1 - t0));
+        )
 
         this.renderCursors(
             timelineData,
@@ -1602,8 +1599,8 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
 
         this.scrollAutoFocusFunc(this.selectedGranulaPos);
 
-        //TODO change so that it doesn't need to loop through all of the elements of the document with the class label and make it for only the container                 
-        d3SelectAll(Timeline.TimelineSelectors.TextLabel.selectorName)
+        //Bring foward the container containing the labels
+        d3Select(Timeline.TimelineSelectors.TextLabel.selectorName)
             .each(function (d, i) {
                 (this as any).parentNode.parentNode.appendChild((this as any).parentNode);
             });
