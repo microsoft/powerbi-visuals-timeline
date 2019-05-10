@@ -129,7 +129,6 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
         previousCalendar: Calendar,
         setting: VisualSettings,
     ): Calendar {
-
         if (this.isDataViewValid(dataView)) {
             return null;
         }
@@ -1319,6 +1318,9 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
         timelineProperties: ITimelineProperties,
         options: powerbi.extensibility.visual.VisualUpdateOptions,
     ): void {
+           //Removes all of the lines from the svg before drawing new ones
+           d3SelectAll(".lineAxis").remove();
+
         const timelineDatapointsCount = this.timelineData.timelineDataPoints
             .filter((dataPoint: ITimelineDataPoint) => {
                 return dataPoint.index % 1 === 0;
@@ -1390,56 +1392,86 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
             .remove();
 
         if (timelineSettings.labels.show) {
-            if (timelineSettings.labels.displayAll || granularityType === GranularityType.year) {
+            if ((timelineSettings.labels.displayAll && granularityType !== GranularityType.day) || granularityType === GranularityType.year) {
+                var y = 0;
+
+                if (granularityType === GranularityType.year) {
+                    yPos++;
+                    y = this.calculateYOffset(yPos + 1) + timelineProperties.cellHeight / 2;
+                } else {
+                    y = this.calculateYOffset(yPos + 1.5);
+                }
+
                 this.renderLabels(
                     extendedLabels.yearLabels,
                     this.yearLabelsSelection,
-                    this.calculateYOffset(yPos),
-                    granularityType === 0);
+                    y,
+                    granularityType === 0,
+                    yPos + 1);
+
                 if (granularityType >= GranularityType.year) {
                     yPos += yDiff;
                 }
             }
 
-            if (timelineSettings.labels.displayAll || granularityType === GranularityType.quarter) {
+            if (granularityType === GranularityType.quarter) {
                 this.renderLabels(
                     extendedLabels.quarterLabels,
                     this.quarterLabelsSelection,
-                    this.calculateYOffset(yPos),
-                    granularityType === 1);
+                    this.calculateYOffset(yPos + 1) + timelineProperties.cellHeight / 2,
+                    granularityType === 1,
+                    yPos + 1);
                 if (granularityType >= GranularityType.quarter) {
                     yPos += yDiff;
                 }
             }
 
-            if (timelineSettings.labels.displayAll || granularityType === GranularityType.month) {
+            if ((timelineSettings.labels.displayAll && granularityType === GranularityType.day) || granularityType === GranularityType.month) {
+                var y = 0;
+
+                var labels = extendedLabels.monthLabels;
+
+                if (granularityType === GranularityType.month) {
+                    y = this.calculateYOffset(yPos + 1) + timelineProperties.cellHeight / 2;
+                } else {
+                    y = this.calculateYOffset(yPos + 1.5);
+
+                    labels = extendedLabels.monthLabels.map(x => {
+                        x.text = x.title;
+                        return x;
+                    });
+                }
+
                 this.renderLabels(
-                    extendedLabels.monthLabels,
+                    labels,
                     this.monthLabelsSelection,
-                    this.calculateYOffset(yPos),
-                    granularityType === 2);
+                    y,
+                    granularityType === 2,
+                    yPos + 1);
                 if (granularityType >= GranularityType.month) {
                     yPos += yDiff;
                 }
             }
 
-            if (timelineSettings.labels.displayAll || granularityType === GranularityType.week) {
+            if (granularityType === GranularityType.week) {
                 this.renderLabels(
                     extendedLabels.weekLabels,
                     this.weekLabelsSelection,
-                    this.calculateYOffset(yPos),
-                    granularityType === 3);
+                    this.calculateYOffset(yPos + 1) + timelineProperties.cellHeight / 2,
+                    granularityType === 3,
+                    yPos + 1);
                 if (granularityType >= GranularityType.week) {
                     yPos += yDiff;
                 }
             }
 
-            if (timelineSettings.labels.displayAll || granularityType === GranularityType.day) {
+            if (granularityType === GranularityType.day) {
                 this.renderLabels(
                     extendedLabels.dayLabels,
                     this.dayLabelsSelection,
-                    this.calculateYOffset(yPos),
-                    granularityType === 4);
+                    this.calculateYOffset(yPos + 1) + timelineProperties.cellHeight / 2,
+                    granularityType === 4,
+                    yPos + 1);
                 if (granularityType >= GranularityType.day) {
                     yPos += yDiff;
                 }
@@ -1447,6 +1479,7 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
         }
 
         yPos -= 1;
+        this.timelineProperties.cellsYPosition = this.calculateYOffset(yPos);
 
         this.renderCells(
             timelineData,
@@ -1457,10 +1490,16 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
         this.renderCursors(
             timelineData,
             timelineProperties.cellHeight,
-            this.calculateYOffset(yPos),
+            this.timelineProperties.cellsYPosition,
         );
 
         this.scrollAutoFocusFunc(this.selectedGranulaPos);
+
+        //TODO change so that it doesn't need to loop through all of the elements of the document with the class label and make it for only the container                 
+        d3SelectAll(Timeline.TimelineSelectors.TextLabel.selectorName)
+            .each(function (d, i) {
+                (this as any).parentNode.parentNode.appendChild((this as any).parentNode);
+            });
     }
 
     private calculateYOffset(index: number): number {
@@ -1469,7 +1508,7 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
         }
 
         return this.timelineProperties.textYPosition
-            + (1 + index) * pixelConverter.fromPointToPixel(this.settings.labels.textSize);
+            + (index) * pixelConverter.fromPointToPixel(this.settings.labels.textSize);
     }
 
     private renderLabels(
@@ -1477,6 +1516,7 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
         labelsElement: D3Selection<any, any, any, any>,
         yPosition: number,
         isLast: boolean,
+        yIndex: number
     ): void {
         const labelTextSelection: D3Selection<any, ITimelineLabel, any, any> = labelsElement
             .selectAll(Timeline.TimelineSelectors.TextLabel.selectorName);
@@ -1484,6 +1524,15 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
         if (!this.settings.labels.show) {
             labelTextSelection.remove();
             return;
+        }
+
+        var diffBetweenId = 0;
+        var averageOfDiff = 0;
+
+        if (labels.length > 2 && !isLast) {
+            //Get the number of cells between each label - 0.5 since it takes up one spot
+            diffBetweenId = (labels[1].id - labels[0].id);
+            averageOfDiff = (diffBetweenId / 2) - 0.5;
         }
 
         const labelsGroupSelection: D3Selection<any, ITimelineLabel, any, any> = labelTextSelection.data(labels);
@@ -1535,17 +1584,64 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
             })
             .style("font-size", pixelConverter.fromPoint(this.settings.labels.textSize))
             .attr("x", (label: ITimelineLabel) => {
-                return (label.id + Timeline.LabelIdOffset) * this.timelineProperties.cellWidth;
+                return (label.id + averageOfDiff + Timeline.LabelIdOffset) * this.timelineProperties.cellWidth;
             })
             .attr("y", yPosition)
             .attr("fill", this.settings.labels.fontColor)
+            .attr("id", (label: ITimelineLabel) => "id" + label.id)
             .append("title")
             .text((label: ITimelineLabel) => label.title);
 
         labelsGroupSelection
             .exit()
             .remove();
+
+        this.drawAxisLinesAboveTimeline(labels, labelsElement, yIndex, isLast, averageOfDiff, diffBetweenId);
     }
+
+
+    private drawAxisLinesAboveTimeline(labels, labelsElement, yIndex, isLast, averageOfDiff, diffBetweenId) {
+        //Draw the lines to help demontrate the years
+        if (!isLast) {
+            var i = 0;
+            var y1 = this.calculateYOffset(yIndex);
+            var y2 = this.calculateYOffset(yIndex + 1);
+            var averageY = (this.calculateYOffset(yIndex) * 0.75 + this.calculateYOffset(yIndex + 1) * 0.25);
+
+            for (i; i < labels.length; i++) {
+                //Draw vertical line to show start of one year and the end of another
+                var x = labels[i].id * this.timelineProperties.cellWidth;
+                var middleOfLine = (labels[i].id + averageOfDiff + Timeline.LabelIdOffset) * this.timelineProperties.cellWidth;
+
+                this.drawLine(labelsElement, x, x, y1, y2, "black");
+
+                var lengthOfText = this.getLengthOfText(labels[i].id) as number;
+
+                //Draw the horizontal lines between the vertical ones
+                this.drawLine(labelsElement, x, middleOfLine - lengthOfText, averageY, averageY, "black");
+                this.drawLine(labelsElement, middleOfLine + lengthOfText, (labels[i].id + diffBetweenId) * this.timelineProperties.cellWidth, averageY, averageY, "black");
+            }
+
+            //Draw the final vertical line
+            var x = (labels[i - 1].id + diffBetweenId) * this.timelineProperties.cellWidth;
+            this.drawLine(labelsElement, x, x, y1, y2, "black");
+        }
+    }
+
+    private getLengthOfText(id) {
+        return (d3Select("#id" + id).node() as any).getBBox().width * 0.6;
+    }
+
+    private drawLine(container, x1, x2, y1, y2, strokeColor) {
+        container.append("line")
+            .attr("x1", x1)
+            .attr("x2", x2)
+            .attr("y1", y1)
+            .attr("y2", y2)
+            .classed("lineAxis", true)
+            .style("stroke", strokeColor);
+    }
+
 
     private clearData(): void {
         this.initialized = false;
