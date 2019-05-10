@@ -35,6 +35,7 @@ import { GranularitySettings } from "./granularitySettings";
 import { LabelsSettings } from "./labelsSettings";
 import { ScrollAutoAdjustment } from "./scrollAutoAdjustment";
 import { WeekDaySettings } from "./weekDaySettings";
+import { LimitDateSpan } from "./limitDateSpan";
 
 export class VisualSettings extends dataViewObjectsParser.DataViewObjectsParser {
     public general: GeneralSettings = new GeneralSettings();
@@ -47,4 +48,5 @@ export class VisualSettings extends dataViewObjectsParser.DataViewObjectsParser 
     public labels: LabelsSettings = new LabelsSettings();
     public scrollAutoAdjustment: ScrollAutoAdjustment = new ScrollAutoAdjustment();
     public cursor: CursorSettings = new CursorSettings();
+    public limitDateSpan: LimitDateSpan = new LimitDateSpan();
 }

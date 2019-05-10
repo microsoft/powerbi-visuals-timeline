@@ -142,8 +142,7 @@ export class Utils {
                 endDate = date;
             }
         });
-
-
+        
         return { startDate , endDate };
     }
 

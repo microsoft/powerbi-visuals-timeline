@@ -128,6 +128,7 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
         viewport: powerbi.IViewport,
         previousCalendar: Calendar,
         setting: VisualSettings,
+        timelineSize: number
     ): Calendar {
         if (this.isDataViewValid(dataView)) {
             return null;
@@ -215,6 +216,7 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
             viewport,
             timelineProperties,
             Timeline.TimelineMargins,
+            timelineSize
         );
 
         Timeline.updateCursors(timelineData);
@@ -427,6 +429,7 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
         viewport: powerbi.IViewport,
         timelineProperties: ITimelineProperties,
         timelineMargins: ITimelineMargins,
+        timelineSize: number
     ): void {
 
         timelineProperties.cellsYPosition = timelineProperties.textYPosition;
@@ -459,7 +462,7 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
         // that in fact is half of cell height for each of them
         width = Math.max(
             timelineMargins.MinCellWidth,
-            (viewport.width * 0.78 - height - Timeline.ViewportWidthAdjustment) / (datePeriodsCount));
+            (viewport.width * timelineSize - height - Timeline.ViewportWidthAdjustment) / (datePeriodsCount));
 
         timelineProperties.cellHeight = height;
         timelineProperties.cellWidth = width;
@@ -564,6 +567,9 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
     private selectedGranulaPos: number = null;
 
     private isForceSelectionReset: boolean = false;
+    private containerGranularityAndDatePickers;
+    private datePickers;
+    private timelineSize = 0;
 
     //Datepickers declaration
     private startDatePicker;
@@ -630,19 +636,19 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
             .style("vertical-align", "top")
             .style("overflow-y", "hidden");
 
-        var datepickers = container
+        this.datePickers = container
             .append("div")
             .style("width", "38%")
             .style("display", "inline-block")
             .style("margin-left", "1%");
 
-        this.startDatePicker = datepickers.append("input")
+        this.startDatePicker = this.datePickers.append("input")
             .attr("type", "date")
             .style("display", "block")
             .style("border", "none")
             .style("margin", "auto");
 
-        this.endDatePicker = datepickers.append("input")
+        this.endDatePicker = this.datePickers.append("input")
             .attr("type", "date")
             .style("display", "block")
             .style("border", "none")
@@ -652,6 +658,8 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
             .append("svg")
             .classed(Timeline.TimelineSelectors.TimelineVisual.className, true);
 
+        this.containerGranularityAndDatePickers = container;
+
         this.addElements();
     }
 
@@ -660,8 +668,11 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
             return;
         }
 
+        //TODO if (this.dataLimited === true)
+
         this.clearSelection(this.timelineData.filterColumnTarget);
         this.toggleForceSelectionOptions();
+        this.applyDatePeriod(this.datePeriod.startDate, this.datePeriod.endDate, this.timelineData.filterColumnTarget);
     }
 
     public doesPeriodSlicerRectPositionNeedToUpdate(granularity: GranularityType): boolean {
@@ -701,8 +712,35 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
         this.options = options;
         this.dataView = options.dataViews[0];
 
+        // Setting parsing was moved here from createTimelineData because settings values may be modified before the function is called.
+        this.settings = Timeline.parseSettings(
+            this.dataView,
+            this.options.jsonFilters as AdvancedFilter[],
+            this.host.colorPalette,
+        );
+
         // it contains dates from data view.
         this.datePeriod = this.createDatePeriod(this.dataView);
+
+        //Limit the date period based on the users formatting options
+        if (this.settings.limitDateSpan.startDate !== "") {
+            var date = new Date(this.settings.limitDateSpan.startDate);
+
+            if (date.toString() !== "Invalid Date" && this.datePeriod.startDate < date) {
+                this.datePeriod.startDate = date;
+            }
+        }
+
+        if (this.settings.limitDateSpan.endDate !== "") {
+            var date = new Date(this.settings.limitDateSpan.endDate);
+
+            if (date.toString() !== "Invalid Date" && this.datePeriod.endDate > date) {
+                this.datePeriod.endDate = date;
+            }
+        }
+
+        //change the div's holding the scalers and time slicer based on how many scalers are being showed
+        this.changeDivSizeBasedOnGranularityOptionsShown();
 
         //Set the value of the date pickers to be that closest and further date available
         var endDateFormatted = this.getDateInDefaultFormat(this.datePeriod.endDate);
@@ -718,12 +756,6 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
         this.endDatePicker.on("input", function () { self.updateDate(startDatePicker, endDatePicker) }).attr("min", startDateFormatted).attr("max", endDateFormatted);
         this.startDatePicker.on("input", function () { self.updateDate(startDatePicker, endDatePicker) }).attr("min", startDateFormatted).attr("max", endDateFormatted);
 
-        // Setting parsing was moved here from createTimelineData because settings values may be modified before the function is called.
-        this.settings = Timeline.parseSettings(
-            this.dataView,
-            this.options.jsonFilters as AdvancedFilter[],
-            this.host.colorPalette,
-        );
 
         this.timelineProperties.legendHeight = 0;
         if (this.settings.rangeHeader.show) {
@@ -883,6 +915,48 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
             this.timelineProperties,
             options,
         );
+    }
+
+    private changeDivSizeBasedOnGranularityOptionsShown() {
+        var granularityShown = this.granularityShownCount();
+
+        var granularityPercentage = granularityShown / 5;
+
+        // console.log("Width of the timeline: " + (78 + (11 * (1 - granularityPercentage))) + "%");
+        // console.log("Width of the other stuff: " + (11 + (11 * granularityPercentage)) + "%");
+        // console.log("Width of the datepickers: " + (38 + (60 * (1 - granularityPercentage))) + "%");
+        // console.log("Width of the header selection : " + (62  * granularityPercentage) + "%");
+
+        this.timelineSize = (78 + (13.2 * (1 - granularityPercentage)));
+
+        this.mainSvgWrapperSelection.style("width", this.timelineSize + "%");
+        this.containerGranularityAndDatePickers.style("width", (7.8 + (13.2 * granularityPercentage)) + "%");
+
+        this.datePickers.style("width", (38 + (50 * (1 - granularityPercentage))) + "%");
+        this.headerSelection.style("width", 10 + (50 * granularityPercentage) + "%");
+
+        this.timelineSize = this.timelineSize / 100;
+    }
+
+    private granularityShownCount() {
+        var count = 0;
+
+        if (this.settings.granularity.granularityDayVisibility === true)
+            count++;
+
+        if (this.settings.granularity.granularityMonthVisibility === true)
+            count++;
+
+        if (this.settings.granularity.granularityQuarterVisibility === true)
+            count++;
+
+        if (this.settings.granularity.granularityWeekVisibility === true)
+            count++;
+
+        if (this.settings.granularity.granularityYearVisibility === true)
+            count++;
+
+        return count;
     }
 
     public fillCells(visSettings: VisualSettings): void {
@@ -1310,6 +1384,7 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
             this.options.viewport,
             this.calendar,
             this.settings,
+            this.timelineSize
         );
     }
 
@@ -1319,8 +1394,8 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
         timelineProperties: ITimelineProperties,
         options: powerbi.extensibility.visual.VisualUpdateOptions,
     ): void {
-           //Removes all of the lines from the svg before drawing new ones
-           d3SelectAll(".lineAxis").remove();
+        //Removes all of the lines from the svg before drawing new ones
+        d3SelectAll(".lineAxis").remove();
 
         const timelineDatapointsCount = this.timelineData.timelineDataPoints
             .filter((dataPoint: ITimelineDataPoint) => {
@@ -1362,7 +1437,7 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
             );
 
         const fixedTranslateString: string = svgManipulation.translate(
-            timelineProperties.leftMargin,
+            0,
             timelineProperties.topMargin + this.timelineProperties.startYpoint,
         );
 
@@ -1393,6 +1468,21 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
             .remove();
 
         if (timelineSettings.labels.show) {
+            var lastIndex = 0;
+            var lastId = -1;
+
+            if (granularityType === GranularityType.day) {
+                lastIndex = extendedLabels.dayLabels.length;
+            } else if (granularityType === GranularityType.month) {
+                lastIndex = extendedLabels.monthLabels.length;
+            } else if (granularityType === GranularityType.quarter) {
+                lastIndex = extendedLabels.quarterLabels.length;
+            } else if (granularityType === GranularityType.week) {
+                lastIndex = extendedLabels.weekLabels.length;
+            } else if (granularityType === GranularityType.year) {
+                lastIndex = extendedLabels.yearLabels.length;
+            }
+
             if ((timelineSettings.labels.displayAll && granularityType !== GranularityType.day) || granularityType === GranularityType.year) {
                 var y = 0;
 
@@ -1401,6 +1491,7 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
                     y = this.calculateYOffset(yPos + 1) + timelineProperties.cellHeight / 2;
                 } else {
                     y = this.calculateYOffset(yPos + 1.5);
+                    lastId = extendedLabels.yearLabels[extendedLabels.yearLabels.length - 1].id;
                 }
 
                 this.renderLabels(
@@ -1408,7 +1499,11 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
                     this.yearLabelsSelection,
                     y,
                     granularityType === 0,
-                    yPos + 1);
+                    yPos + 1,
+                    lastIndex,
+                    lastId);
+
+                lastId = -1;
 
                 if (granularityType >= GranularityType.year) {
                     yPos += yDiff;
@@ -1421,7 +1516,8 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
                     this.quarterLabelsSelection,
                     this.calculateYOffset(yPos + 1) + timelineProperties.cellHeight / 2,
                     granularityType === 1,
-                    yPos + 1);
+                    yPos + 1,
+                    lastIndex);
                 if (granularityType >= GranularityType.quarter) {
                     yPos += yDiff;
                 }
@@ -1442,6 +1538,8 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
                         x.text = x.title;
                         return x;
                     });
+
+                    lastId = extendedLabels.monthLabels[extendedLabels.monthLabels.length - 1].id;
                 }
 
                 this.renderLabels(
@@ -1449,7 +1547,9 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
                     this.monthLabelsSelection,
                     y,
                     granularityType === 2,
-                    yPos + 1);
+                    yPos + 1,
+                    lastIndex,
+                    lastId);
                 if (granularityType >= GranularityType.month) {
                     yPos += yDiff;
                 }
@@ -1461,7 +1561,8 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
                     this.weekLabelsSelection,
                     this.calculateYOffset(yPos + 1) + timelineProperties.cellHeight / 2,
                     granularityType === 3,
-                    yPos + 1);
+                    yPos + 1,
+                    lastIndex);
                 if (granularityType >= GranularityType.week) {
                     yPos += yDiff;
                 }
@@ -1473,12 +1574,13 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
                     this.dayLabelsSelection,
                     this.calculateYOffset(yPos + 1) + timelineProperties.cellHeight / 2,
                     granularityType === 4,
-                    yPos + 1);
+                    yPos + 1,
+                    lastIndex);
                 if (granularityType >= GranularityType.day) {
                     yPos += yDiff;
                 }
             }
-        } 
+        }
 
         yPos -= 1;
         this.timelineProperties.cellsYPosition = this.calculateYOffset(yPos);
@@ -1521,7 +1623,9 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
         labelsElement: D3Selection<any, any, any, any>,
         yPosition: number,
         isLast: boolean,
-        yIndex: number
+        yIndex: number,
+        lastIndex: number,
+        lastId = -1
     ): void {
         const labelTextSelection: D3Selection<any, ITimelineLabel, any, any> = labelsElement
             .selectAll(Timeline.TimelineSelectors.TextLabel.selectorName);
@@ -1534,7 +1638,7 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
         var diffBetweenId = 0;
         var averageOfDiff = 0;
 
-        if (labels.length > 2 && !isLast) {
+        if (labels.length > 1 && !isLast) {
             //Get the number of cells between each label - 0.5 since it takes up one spot
             diffBetweenId = (labels[1].id - labels[0].id);
             averageOfDiff = (diffBetweenId / 2) - 0.5;
@@ -1589,6 +1693,9 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
             })
             .style("font-size", pixelConverter.fromPoint(this.settings.labels.textSize))
             .attr("x", (label: ITimelineLabel) => {
+                if (label.id === lastId)
+                    return (label.id + ((lastIndex - label.id) / 2) + Timeline.LabelIdOffset - 0.5) * this.timelineProperties.cellWidth;
+
                 return (label.id + averageOfDiff + Timeline.LabelIdOffset) * this.timelineProperties.cellWidth;
             })
             .attr("y", yPosition)
@@ -1601,11 +1708,11 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
             .exit()
             .remove();
 
-        this.drawAxisLinesAboveTimeline(labels, labelsElement, yIndex, isLast, averageOfDiff, diffBetweenId);
+        this.drawAxisLinesAboveTimeline(labels, labelsElement, yIndex, isLast, averageOfDiff, diffBetweenId, lastIndex);
     }
 
 
-    private drawAxisLinesAboveTimeline(labels, labelsElement, yIndex, isLast, averageOfDiff, diffBetweenId) {
+    private drawAxisLinesAboveTimeline(labels, labelsElement, yIndex, isLast, averageOfDiff, diffBetweenId, lastIndex) {
         //Draw the lines to help demontrate the years
         if (!isLast) {
             var i = 0;
@@ -1617,7 +1724,16 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
             for (i; i < labels.length; i++) {
                 //Draw vertical line to show start of one year and the end of another
                 var x = labels[i].id * this.timelineProperties.cellWidth;
-                var middleOfLine = (labels[i].id + averageOfDiff + Timeline.LabelIdOffset) * this.timelineProperties.cellWidth;
+                var middleOfLine = 0;
+
+                if (i !== labels.length - 1) {
+                    middleOfLine = (labels[i].id + averageOfDiff + Timeline.LabelIdOffset) * this.timelineProperties.cellWidth;
+                } else {
+                    var cellsLeft = lastIndex - labels[i].id;
+                    diffBetweenId = cellsLeft;
+
+                    middleOfLine = (labels[i].id + (cellsLeft / 2) + Timeline.LabelIdOffset - 0.5) * this.timelineProperties.cellWidth;
+                }
 
                 this.drawLine(labelsElement, x, x, y1, y2, "black");
 
@@ -1627,7 +1743,7 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
             }
 
             //Draw the final vertical line
-            var x = (labels[i - 1].id + diffBetweenId) * this.timelineProperties.cellWidth;
+            var x = lastIndex * this.timelineProperties.cellWidth;
             this.drawLine(labelsElement, x, x, y1, y2, "black");
         }
     }

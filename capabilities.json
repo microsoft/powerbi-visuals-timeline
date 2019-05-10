@@ -59,6 +59,24 @@
                 }
             }
         },
+        "limitDateSpan": {
+            "displayName": "Limit Date Span",
+            "displayNameKey": "Limit_Date_Span",
+            "properties": {
+                "startDate": {
+                    "displayName": "Start Date",
+                    "type": {
+                        "text": true
+                    }
+                },
+                "endDate": {
+                    "displayName": "End Date",
+                    "type": {
+                        "text": true
+                    }
+                }
+            }
+        },
         "calendar": {
             "displayName": "Fiscal Year",
             "displayNameKey": "Visual_FiscalYear",
