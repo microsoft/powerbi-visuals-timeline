@@ -609,6 +609,7 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
             topMargin: Timeline.TimelineMargins.TopMargin,
         };
 
+        //Set the css in order for all elements to appear on the same line
         this.rootSelection = d3Select(element)
             .append("div")
             .classed("timeline-component", true)
@@ -641,6 +642,11 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
             .style("width", "38%")
             .style("display", "inline-block")
             .style("margin-left", "1%");
+
+            this.datePickers.on("click", function() {
+                const event: MouseEvent = require("d3").event as MouseEvent;
+                event.stopPropagation();
+            });
 
         this.startDatePicker = this.datePickers.append("input")
             .attr("type", "date")
@@ -899,14 +905,16 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
                 selection: this.selectorSelection,
             });
 
-            // create selected period text
-            this.selectorSelection
-                .append("text")
-                .attr("fill", this.settings.granularity.scaleColor)
-                .classed(Timeline.TimelineSelectors.PeriodSlicerSelection.className, true)
-                .text(this.localizationManager.getDisplayName(Utils.getGranularityNameKey(granularity)))
-                .attr("x", pixelConverter.toString(startXpoint + Timeline.SelectedTextSelectionFactor * elementWidth))
-                .attr("y", pixelConverter.toString(Timeline.SelectedTextSelectionYOffset));
+            if (this.granularityShownCount() === 4) {
+                // create selected period text
+                this.selectorSelection
+                    .append("text")
+                    .attr("fill", this.settings.granularity.scaleColor)
+                    .classed(Timeline.TimelineSelectors.PeriodSlicerSelection.className, true)
+                    .text(this.localizationManager.getDisplayName(Utils.getGranularityNameKey(granularity)))
+                    .attr("x", pixelConverter.toString(startXpoint + Timeline.SelectedTextSelectionFactor * elementWidth))
+                    .attr("y", pixelConverter.toString(Timeline.SelectedTextSelectionYOffset));
+            }
         }
 
         this.render(
@@ -915,17 +923,18 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
             this.timelineProperties,
             options,
         );
+
+        //Bring foward the container containing the labels
+        d3Select(".lastId")
+            .each(function (d, i) {
+                (this as any).parentNode.parentNode.appendChild((this as any).parentNode);
+            });
     }
 
     private changeDivSizeBasedOnGranularityOptionsShown() {
         var granularityShown = this.granularityShownCount();
 
         var granularityPercentage = granularityShown / 5;
-
-        // console.log("Width of the timeline: " + (78 + (11 * (1 - granularityPercentage))) + "%");
-        // console.log("Width of the other stuff: " + (11 + (11 * granularityPercentage)) + "%");
-        // console.log("Width of the datepickers: " + (38 + (60 * (1 - granularityPercentage))) + "%");
-        // console.log("Width of the header selection : " + (62  * granularityPercentage) + "%");
 
         this.timelineSize = (78 + (13.2 * (1 - granularityPercentage)));
 
@@ -1598,12 +1607,6 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
         );
 
         this.scrollAutoFocusFunc(this.selectedGranulaPos);
-
-        //Bring foward the container containing the labels
-        d3Select(Timeline.TimelineSelectors.TextLabel.selectorName)
-            .each(function (d, i) {
-                (this as any).parentNode.parentNode.appendChild((this as any).parentNode);
-            });
     }
 
     private calculateYOffset(index: number): number {
@@ -1648,6 +1651,7 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
             .enter()
             .append("text")
             .classed(Timeline.TimelineSelectors.TextLabel.className, true)
+            .classed("lastId", isLast)
             .merge(labelsGroupSelection)
             .text((label: ITimelineLabel, id: number) => {
                 if (!isLast && id === 0 && labels.length > 1) {
