@@ -66,7 +66,7 @@ export class DayGranularity extends TimelineGranularityBase {
     public generateLabel(datePeriod: ITimelineDatePeriod): ITimelineLabel {
         const quarter: string = this.quarterText(datePeriod.startDate);
         const monthName: string = this.shortMonthName(datePeriod.startDate);
-        const title: string = `${monthName} ${datePeriod.startDate.getDate()} - ${datePeriod.year}, ${quarter} W${datePeriod.week[0]}}`;
+        const title: string = `${monthName} ${datePeriod.startDate.getDate()} - ${datePeriod.year}, ${quarter} W${datePeriod.week[0]}`;
 
         return {
             id: datePeriod.index,
