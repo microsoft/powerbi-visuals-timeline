@@ -92,7 +92,7 @@ export class TimelineGranularityBase implements IGranularity {
 
     constructor(calendar: Calendar, private locale: string, granularityProps: IGranularityName) {
         this.calendar = calendar;
-        this.shortMonthFormatter = valueFormatter.valueFormatter.create({ format: "MMM", cultureSelector: this.locale });
+        this.shortMonthFormatter = valueFormatter.create({ format: "MMM", cultureSelector: this.locale });
         this.granularityProps = granularityProps;
     }
 

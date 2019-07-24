@@ -26,8 +26,6 @@
 
 import "../style/visual.less";
 
-import "@babel/polyfill";
-
 import {
     select as d3Select,
     selectAll as d3SelectAll,
@@ -576,6 +574,10 @@ export class Timeline implements powerbi.extensibility.visual.IVisual {
         .on("end", this.onCursorDragEnd.bind(this));
 
     constructor(options: powerbi.extensibility.visual.VisualConstructorOptions) {
+        if (window.location !== window.parent.location) {
+            require("core-js/stable");
+        }
+
         const element: HTMLElement = options.element;
 
         this.host = options.host;

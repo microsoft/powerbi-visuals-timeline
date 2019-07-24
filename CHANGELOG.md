@@ -1,3 +1,7 @@
+## 2.2.0
+* Moved to API v2.6 
+* Updated dependencies
+
 ## 2.1.0
 * ADD: API was updated up to 2.5.0
 * ADD: "Scale size auto adjustment" option was removed
