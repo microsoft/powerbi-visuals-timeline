@@ -25,25 +25,25 @@
  */
 
 import { Selection } from "d3-selection";
-import powerbi from "powerbi-visuals-api";
+import powerbiVisualsApi from "powerbi-visuals-api";
 
 import { Calendar } from "../calendar";
 import { ITimelineLabel } from "../dataInterfaces";
 import { ITimelineDatePeriod } from "../datePeriod/datePeriod";
 import { Utils } from "../utils";
-import { TimelineGranularityBase } from "./granularityBase";
+import { GranularityBase } from "./granularityBase";
 import { IGranularityRenderProps } from "./granularityRenderProps";
 import { GranularityType } from "./granularityType";
 
-export class YearGranularity extends TimelineGranularityBase {
+export class YearGranularity extends GranularityBase {
     private localizationKey: string = "Visual_Granularity_Year";
 
     constructor(
         calendar: Calendar,
         locale: string,
-        protected localizationManager: powerbi.extensibility.ILocalizationManager,
+        protected localizationManager: powerbiVisualsApi.extensibility.ILocalizationManager,
     ) {
-        super(calendar, locale, Utils.getGranularityPropsByMarker("Y"));
+        super(calendar, locale, Utils.GET_GRANULARITY_PROPS_BY_MARKER("Y"));
     }
 
     public getType(): GranularityType {
@@ -58,7 +58,7 @@ export class YearGranularity extends TimelineGranularityBase {
         return super.render(props, isFirst);
     }
 
-    public splitDate(date: Date): Array<string | number> {
+    public splitDate(date: Date): (string | number)[] {
         return [this.determineYear(date)];
     }
 

@@ -24,14 +24,14 @@
  *  THE SOFTWARE.
  */
 
-import powerbi from "powerbi-visuals-api";
+import powerbiVisualsApi from "powerbi-visuals-api";
 
 import { testDataViewBuilder } from "powerbi-visuals-utils-testutils";
 import { valueType } from "powerbi-visuals-utils-typeutils";
 
 import { getDateRange } from "./helpers";
 
-export class TimelineData extends testDataViewBuilder.TestDataViewBuilder {
+export class VisualData extends testDataViewBuilder.TestDataViewBuilder {
     public static ColumnCategory: string = "Date";
 
     public valuesCategory: Date[] = getDateRange(
@@ -44,11 +44,11 @@ export class TimelineData extends testDataViewBuilder.TestDataViewBuilder {
         this.valuesCategory = getDateRange(startDate, endDate, 1000 * 24 * 3600);
     }
 
-    public getDataView(columnNames?: string[]): powerbi.DataView {
+    public getDataView(columnNames?: string[]): powerbiVisualsApi.DataView {
         return this.createCategoricalDataViewBuilder([
             {
                 source: {
-                    displayName: TimelineData.ColumnCategory,
+                    displayName: VisualData.ColumnCategory,
                     roles: { Category: true },
                     type: valueType.ValueType.fromDescriptor({ dateTime: true }),
                 },
@@ -58,7 +58,7 @@ export class TimelineData extends testDataViewBuilder.TestDataViewBuilder {
         ], null, columnNames).build();
     }
 
-    public getUnWorkableDataView(): powerbi.DataView {
+    public getUnWorkableDataView(): powerbiVisualsApi.DataView {
         return this.createCategoricalDataViewBuilder([
             {
                 source: {

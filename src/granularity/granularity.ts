@@ -38,7 +38,7 @@ import {
 export interface IGranularity {
     determineWeek?(date: Date): number[];
     getType?(): GranularityType;
-    splitDate(date: Date): Array<string | number>;
+    splitDate(date: Date): (string | number)[];
     getDatePeriods(): ITimelineDatePeriod[];
     resetDatePeriods(): void;
     getExtendedLabel(): IExtendedLabel;
@@ -49,7 +49,7 @@ export interface IGranularity {
     addDate(date: Date);
     setNewEndDate(date: Date): void;
     splitPeriod(index: number, newFraction: number, newDate: Date): void;
-    splitDateForTitle(date: Date): Array<string | number>;
+    splitDateForTitle(date: Date): (string | number)[];
     render(
         props: IGranularityRenderProps,
         isFirst: boolean,

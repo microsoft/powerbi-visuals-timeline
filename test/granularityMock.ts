@@ -36,7 +36,7 @@ import {
     ITimelineLabel,
 } from "../src/dataInterfaces";
 
-export class TimelineGranularityMock implements IGranularity {
+export class GranularityMock implements IGranularity {
     private datePeriod: ITimelineDatePeriod[];
 
     constructor(datePeriod: ITimelineDatePeriod[] = []) {
@@ -51,7 +51,7 @@ export class TimelineGranularityMock implements IGranularity {
         return GranularityType.day;
     }
 
-    public splitDate(date: Date): Array<string | number> {
+    public splitDate(date: Date): (string | number)[] {
         return [0];
     }
 
@@ -98,7 +98,7 @@ export class TimelineGranularityMock implements IGranularity {
         // No need to implement it for UTs
     }
 
-    public splitDateForTitle(date: Date): Array<string | number> {
+    public splitDateForTitle(date: Date): (string | number)[] {
         return [];
     }
 

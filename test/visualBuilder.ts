@@ -24,7 +24,7 @@
  *  THE SOFTWARE.
  */
 
-import powerbi from "powerbi-visuals-api";
+import powerbiVisualsApi from "powerbi-visuals-api";
 
 import {
     AdvancedFilter,
@@ -35,21 +35,21 @@ import {
     VisualBuilderBase,
 } from "powerbi-visuals-utils-testutils";
 
-import { TimelineDatePeriodBase } from "../src/datePeriod/datePeriodBase";
-import { Timeline } from "../src/visual";
+import { DatePeriodBase } from "../src/datePeriod/datePeriodBase";
+import { Timeline } from "../src/timeLine";
 
-export class TimelineBuilder extends VisualBuilderBase<Timeline> {
-    public static setDatePeriod(
-        dataView: powerbi.DataView,
-        datePeriod: TimelineDatePeriodBase): void {
+export class VisualBuilder extends VisualBuilderBase<Timeline> {
+    public static SET_DATE_PERIOD(
+        dataView: powerbiVisualsApi.DataView,
+        datePeriod: DatePeriodBase): void {
 
-        (dataView.metadata.objects as any).general = {
+        (<any>(dataView.metadata.objects)).general = {
             datePeriod: datePeriod.toString(),
             isUserSelection: true,
         };
     }
 
-    private jsonFilters: powerbi.IFilter[] = [];
+    private jsonFilters: powerbiVisualsApi.IFilter[] = [];
 
     constructor(width: number, height: number) {
         super(width, height);
@@ -74,6 +74,7 @@ export class TimelineBuilder extends VisualBuilderBase<Timeline> {
 
     public get headerElement(): JQuery {
         return this.element
+            .children("div")
             .children("div")
             .children("svg");
     }
@@ -139,7 +140,7 @@ export class TimelineBuilder extends VisualBuilderBase<Timeline> {
         });
     }
 
-    protected build(options: powerbi.extensibility.visual.VisualConstructorOptions): Timeline {
+    protected build(options: powerbiVisualsApi.extensibility.visual.VisualConstructorOptions): Timeline {
         return new Timeline(options);
     }
 }

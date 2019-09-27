@@ -31,7 +31,7 @@ export interface ITimelineDatePeriodBase {
 
 export interface ITimelineDatePeriod extends ITimelineDatePeriodBase {
     fraction: number;
-    identifierArray: Array<string | number>;
+    identifierArray: (string | number)[];
     index: number;
     week: number[];
     year: number;

@@ -24,7 +24,7 @@
  *  THE SOFTWARE.
  */
 
-import powerbi from "powerbi-visuals-api";
+import powerbiVisualsApi from "powerbi-visuals-api";
 import { manipulation as svgManipulation } from "powerbi-visuals-utils-svgutils";
 
 import { DayGranularity } from "./dayGranularity";
@@ -39,15 +39,15 @@ import { YearGranularity } from "./yearGranularity";
 import { Calendar } from "../calendar";
 import { Utils } from "../utils";
 
-export class TimelineGranularityData {
+export class GranularityData {
     /**
      * Returns the date of the previos day
      * @param date The following date
      */
-    public static previousDay(date: Date): Date {
-        const prevDay: Date = Utils.resetTime(date);
+    public static PREVIOUS_DAY(date: Date): Date {
+        const prevDay: Date = Utils.RESET_TIME(date);
 
-        prevDay.setDate(prevDay.getDate() - TimelineGranularityData.DayOffset);
+        prevDay.setDate(prevDay.getDate() - GranularityData.DayOffset);
 
         return prevDay;
     }
@@ -56,10 +56,10 @@ export class TimelineGranularityData {
      * Returns the date of the next day
      * @param date The previous date
      */
-    public static nextDay(date: Date): Date {
-        const nextDay: Date = Utils.resetTime(date);
+    public static NEXT_DAY(date: Date): Date {
+        const nextDay: Date = Utils.RESET_TIME(date);
 
-        nextDay.setDate(nextDay.getDate() + TimelineGranularityData.DayOffset);
+        nextDay.setDate(nextDay.getDate() + GranularityData.DayOffset);
 
         return nextDay;
     }
@@ -78,7 +78,7 @@ export class TimelineGranularityData {
 
         const lastDate: Date = this.dates[this.dates.length - 1];
 
-        this.endingDate = TimelineGranularityData.nextDay(lastDate);
+        this.endingDate = GranularityData.NEXT_DAY(lastDate);
     }
 
     /**
@@ -128,7 +128,7 @@ export class TimelineGranularityData {
     public createGranularities(
         calendar: Calendar,
         locale: string,
-        localizationManager: powerbi.extensibility.ILocalizationManager,
+        localizationManager: powerbiVisualsApi.extensibility.ILocalizationManager,
     ): void {
         this.granularities = [];
 
@@ -171,7 +171,7 @@ export class TimelineGranularityData {
 
         while (date <= endDate) {
             this.dates.push(date);
-            date = TimelineGranularityData.nextDay(date);
+            date = GranularityData.NEXT_DAY(date);
         }
     }
 }
