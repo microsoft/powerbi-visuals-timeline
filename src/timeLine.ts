@@ -1113,15 +1113,15 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
         isForceSelected: boolean,
         target: IFilterColumnTarget): void {
         const wasFilterChanged: boolean =
-                String(this.prevFilteredStartDate) !== String(adjustedPeriod.period.startDate) ||
-                String(this.prevFilteredEndDate) !== String(adjustedPeriod.period.endDate);
+            String(this.prevFilteredStartDate) !== String(adjustedPeriod.period.startDate) ||
+            String(this.prevFilteredEndDate) !== String(adjustedPeriod.period.endDate);
 
-            if (isForceSelected && wasFilterChanged) {
-                this.applyDatePeriod(adjustedPeriod.period.startDate, adjustedPeriod.period.endDate, target);
-            }
+        if (isForceSelected && wasFilterChanged) {
+            this.applyDatePeriod(adjustedPeriod.period.startDate, adjustedPeriod.period.endDate, target);
+        }
 
-            this.prevFilteredStartDate = adjustedPeriod.period.startDate;
-            this.prevFilteredEndDate = adjustedPeriod.period.endDate;
+        this.prevFilteredStartDate = adjustedPeriod.period.startDate;
+        this.prevFilteredEndDate = adjustedPeriod.period.endDate;
     }
 
     private adjustFilterDatePeriod(): IAdjustedFilterDatePeriod {
@@ -1625,7 +1625,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
             return;
         }
 
-        this.mainSvgWrapperSelection.node().scrollLeft = selectedGranulaPos - this.horizontalAutoScrollingPositionOffset;
+        this.rootSelection.node().scrollLeft = selectedGranulaPos - this.horizontalAutoScrollingPositionOffset;
     }
 
     private toggleForceSelectionOptions(): void {
