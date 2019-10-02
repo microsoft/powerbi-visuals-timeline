@@ -1,3 +1,11 @@
+## 2.1.1
+* ADD: API was updated up to 2.6.0
+* ADD: Packages was updated
+* ADD: Context menu was added
+* ADD: Render props were added
+* ADD: Code was adjusted to recommended TSLint rules [tslint-microsoft-contrib]
+* FIX: Empty scrolled space that could appear after switching between different types of granularity
+
 ## 2.1.0
 * ADD: API was updated up to 2.5.0
 * ADD: "Scale size auto adjustment" option was removed

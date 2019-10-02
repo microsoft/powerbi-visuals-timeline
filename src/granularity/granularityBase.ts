@@ -46,13 +46,12 @@ import {
     ITimelineLabel,
 } from "../dataInterfaces";
 
-export class TimelineGranularityBase implements IGranularity {
-    public static getFiscalYearAdjustment(calendar: Calendar): number {
+export class GranularityBase implements IGranularity {
+    public static GET_FISCAL_YEAR_ADJUSTMENT(calendar: Calendar): number {
         const firstMonthOfYear = calendar.getFirstMonthOfYear();
         const firstDayOfYear = calendar.getFirstDayOfYear();
-        const fiscalYearAdjustment: number = ((firstMonthOfYear === 0 && firstDayOfYear === 1) ? 0 : 1);
 
-        return fiscalYearAdjustment;
+        return ((firstMonthOfYear === 0 && firstDayOfYear === 1) ? 0 : 1);;
     }
 
     private static DefaultFraction: number = 1;
@@ -92,7 +91,7 @@ export class TimelineGranularityBase implements IGranularity {
 
     constructor(calendar: Calendar, private locale: string, granularityProps: IGranularityName) {
         this.calendar = calendar;
-        this.shortMonthFormatter = valueFormatter.valueFormatter.create({ format: "MMM", cultureSelector: this.locale });
+        this.shortMonthFormatter = valueFormatter.create({ format: "MMM", cultureSelector: this.locale });
         this.granularityProps = granularityProps;
     }
 
@@ -142,8 +141,9 @@ export class TimelineGranularityBase implements IGranularity {
             .attr("y", pixelConverter.toString(0 - this.clickableRectWidth / this.clickableRectFactor))
             .attr("width", pixelConverter.toString(this.clickableRectWidth))
             .attr("height", pixelConverter.toString(this.clickableRectHeight))
+            .on("click", null)
             .on("click", () => {
-                const event: MouseEvent = require("d3").event as MouseEvent;
+                const event: MouseEvent = <MouseEvent>(require("d3").event);
 
                 event.stopPropagation();
 
@@ -166,11 +166,11 @@ export class TimelineGranularityBase implements IGranularity {
         return granularitySelection;
     }
 
-    public splitDate(date: Date): Array<string | number> {
+    public splitDate(date: Date): (string | number)[] {
         return [];
     }
 
-    public splitDateForTitle(date: Date): Array<string | number> {
+    public splitDateForTitle(date: Date): (string | number)[] {
         return this.splitDate(date);
     }
 
@@ -217,10 +217,10 @@ export class TimelineGranularityBase implements IGranularity {
     public addDate(date: Date): void {
         const datePeriods: ITimelineDatePeriod[] = this.getDatePeriods();
         const lastDatePeriod: ITimelineDatePeriod = datePeriods[datePeriods.length - 1];
-        const identifierArray: Array<string | number> = this.splitDate(date);
+        const identifierArray: (string | number)[] = this.splitDate(date);
 
         if (datePeriods.length === 0
-            || !Utils.arraysEqual(lastDatePeriod.identifierArray, identifierArray)) {
+            || !Utils.IS_ARRAYS_EQUAL(lastDatePeriod.identifierArray, identifierArray)) {
 
             if (datePeriods.length > 0) {
                 lastDatePeriod.endDate = date;
@@ -228,7 +228,7 @@ export class TimelineGranularityBase implements IGranularity {
 
             datePeriods.push({
                 endDate: date,
-                fraction: TimelineGranularityBase.DefaultFraction,
+                fraction: GranularityBase.DefaultFraction,
                 identifierArray,
                 index: datePeriods.length,
                 startDate: date,
@@ -277,12 +277,12 @@ export class TimelineGranularityBase implements IGranularity {
         // It's Ok until this year is used to calculate date of first week.
         // So, here is some adjustment was applied.
         const year: number = this.determineYear(date);
-        const fiscalYearAdjustment = TimelineGranularityBase.getFiscalYearAdjustment(this.calendar);
+        const fiscalYearAdjustment = GranularityBase.GET_FISCAL_YEAR_ADJUSTMENT(this.calendar);
 
         const dateOfFirstWeek: Date = this.calendar.getDateOfFirstWeek(year - fiscalYearAdjustment);
         const dateOfFirstFullWeek: Date = this.calendar.getDateOfFirstFullWeek(year - fiscalYearAdjustment);
         // But number of weeks must be calculated using original date.
-        const weeks: number = Utils.getAmountOfWeeksBetweenDates(dateOfFirstFullWeek, date);
+        const weeks: number = Utils.GET_NUMBER_OF_WEEKS_BETWEEN_DATES(dateOfFirstFullWeek, date);
 
         if (date >= dateOfFirstFullWeek && dateOfFirstWeek < dateOfFirstFullWeek) {
             return [weeks + 1, year];
@@ -301,11 +301,9 @@ export class TimelineGranularityBase implements IGranularity {
             firstDayOfYear,
         );
 
-        const year = date.getFullYear() + TimelineGranularityBase.getFiscalYearAdjustment(this.calendar) - ((firstDate <= date)
-            ? TimelineGranularityBase.EmptyYearOffset
-            : TimelineGranularityBase.YearOffset);
-
-        return year;
+        return date.getFullYear() + GranularityBase.GET_FISCAL_YEAR_ADJUSTMENT(this.calendar) - ((firstDate <= date)
+            ? GranularityBase.EmptyYearOffset
+            : GranularityBase.YearOffset);
     }
 
     /**

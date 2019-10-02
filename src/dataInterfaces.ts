@@ -47,7 +47,7 @@ export interface ITimelineMargins {
     PeriodSlicerRectWidth: number;
     PeriodSlicerRectHeight: number;
     LegendHeight: number;
-    LegendHeightOffset: number;
+    FramePadding: number;
     LegendHeightRange: number;
     HeightOffset: number;
 }

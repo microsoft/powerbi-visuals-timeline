@@ -36,7 +36,7 @@ import { LabelsSettings } from "./labelsSettings";
 import { ScrollAutoAdjustment } from "./scrollAutoAdjustment";
 import { WeekDaySettings } from "./weekDaySettings";
 
-export class VisualSettings extends dataViewObjectsParser.DataViewObjectsParser {
+export class Settings extends dataViewObjectsParser.DataViewObjectsParser {
     public general: GeneralSettings = new GeneralSettings();
     public calendar: CalendarSettings = new CalendarSettings();
     public forceSelection: ForceSelectionSettings = new ForceSelectionSettings();
