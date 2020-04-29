@@ -41,7 +41,7 @@
     "istanbul-instrumenter-loader": "^3.0.1",
     "jasmine": "^3.5.0",
     "jasmine-jquery": "^2.1.1",
-    "jquery": "^3.4.1",
+    "jquery": "^3.5.0",
     "karma": "^4.3.0",
     "karma-chrome-launcher": "^3.1.0",
     "karma-coverage-istanbul-reporter": "^2.1.0",
