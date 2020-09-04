@@ -51,7 +51,7 @@ export class GranularityBase implements IGranularity {
         const firstMonthOfYear = calendar.getFirstMonthOfYear();
         const firstDayOfYear = calendar.getFirstDayOfYear();
 
-        return ((firstMonthOfYear === 0 && firstDayOfYear === 1) ? 0 : 1);;
+        return ((firstMonthOfYear === 0 && firstDayOfYear === 1) ? 0 : 1);
     }
 
     private static DefaultFraction: number = 1;
@@ -167,7 +167,11 @@ export class GranularityBase implements IGranularity {
     }
 
     public splitDate(date: Date): (string | number)[] {
-        return [];
+        return [
+            this.shortMonthName(date),
+            date.getDate(),
+            this.determineYear(date),
+        ];
     }
 
     public splitDateForTitle(date: Date): (string | number)[] {

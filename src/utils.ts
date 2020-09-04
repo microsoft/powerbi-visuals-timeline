@@ -232,7 +232,7 @@ export class Utils {
             : (cellSettings.fillUnselected || Utils.DefaultCellColor);
     }
 
-    public static IS_GRANULE_SELECTED(dataPoint: ITimelineDataPoint, timelineData: ITimelineData, cellSettings: CellsSettings): boolean {
+    public static IS_GRANULE_SELECTED(dataPoint: ITimelineDataPoint, timelineData: ITimelineData): boolean {
         return dataPoint.datePeriod.startDate >= Utils.GET_START_SELECTION_DATE(timelineData)
             && dataPoint.datePeriod.endDate <= Utils.GET_END_SELECTION_DATE(timelineData);
     }

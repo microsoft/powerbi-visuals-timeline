@@ -103,7 +103,7 @@ export class GranularityData {
      */
     public renderGranularities(props: IGranularityRenderProps): void {
         let renderIndex = 0;
-        this.granularities.forEach((granularity: IGranularity, index: number) => {
+        this.granularities.forEach((granularity: IGranularity) => {
             const granularitySelection = granularity.render(props, renderIndex === 0);
 
             if (granularitySelection !== null) {

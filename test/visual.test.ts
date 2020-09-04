@@ -230,8 +230,7 @@ describe("Timeline", () => {
                 spyOn(visualBuilder.visualObject, "selectPeriod");
 
                 renderTimeout(() => {
-                    periodSlicerSelectionRectElements = visualBuilder
-                        .element
+                    periodSlicerSelectionRectElements = $(visualBuilder.element)
                         .find(".periodSlicerSelectionRect");
 
                     done();
@@ -262,7 +261,7 @@ describe("Timeline", () => {
                 };
 
                 visualBuilder.update(dataView);
-                const $periodSlicerSelectionRectElements = visualBuilder.element.find(".periodSlicerSelectionRect");
+                const $periodSlicerSelectionRectElements = $(visualBuilder.element).find(".periodSlicerSelectionRect");
 
                 d3Click($($periodSlicerSelectionRectElements[0]), 0, 0);
 
@@ -278,7 +277,7 @@ describe("Timeline", () => {
                 };
 
                 visualBuilder.update(dataView);
-                const $periodSlicerSelectionRectElements = visualBuilder.element.find(".periodSlicerSelectionRect");
+                const $periodSlicerSelectionRectElements = $(visualBuilder.element).find(".periodSlicerSelectionRect");
 
                 d3Click($($periodSlicerSelectionRectElements[1]), 0, 0);
 
@@ -297,7 +296,7 @@ describe("Timeline", () => {
 
                 visualBuilder.update(dataView);
 
-                const $periodSlicerSelectionRectElements = visualBuilder.element.find(".periodSlicerSelectionRect");
+                const $periodSlicerSelectionRectElements = $(visualBuilder.element).find(".periodSlicerSelectionRect");
 
                 d3Click($($periodSlicerSelectionRectElements[1]), 0, 0);
 
@@ -318,7 +317,7 @@ describe("Timeline", () => {
 
                 visualBuilder.update(dataView);
 
-                const $periodSlicerSelectionRectElements = visualBuilder.element.find(".periodSlicerSelectionRect");
+                const $periodSlicerSelectionRectElements = $(visualBuilder.element).find(".periodSlicerSelectionRect");
 
                 expect($periodSlicerSelectionRectElements.length).toEqual(0);
             });

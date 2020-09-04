@@ -1,3 +1,9 @@
+## 2.2.0
+* API was updated to 3.2.0
+* Packages update
+* ESLint was added as an alternative linter
+* Code was adjusted to ESLint issues
+
 ## 2.1.1
 * ADD: API was updated up to 2.6.0
 * ADD: Packages was updated
