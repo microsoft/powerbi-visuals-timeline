@@ -30,6 +30,8 @@ import {
     AdvancedFilter,
 } from "powerbi-models";
 
+import * as $ from "jquery";
+
 import {
     d3Click,
     VisualBuilderBase,
@@ -64,17 +66,15 @@ export class VisualBuilder extends VisualBuilderBase<Timeline> {
     }
 
     public get rootElement(): JQuery {
-        return this.element.find(".timeline-component");
+        return $(this.element).find(".timeline-component");
     }
 
     public get mainElement(): JQuery {
-        return this.element
-            .find("svg.timeline");
+        return $(this.element).find("svg.timeline");
     }
 
     public get headerElement(): JQuery {
-        return this.element
-            .children("div")
+        return $(this.element).children("div")
             .children("div")
             .children("svg");
     }
