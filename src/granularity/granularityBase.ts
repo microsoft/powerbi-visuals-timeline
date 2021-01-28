@@ -33,7 +33,7 @@ import { valueFormatter } from "powerbi-visuals-utils-formattingutils";
 import { manipulation as svgManipulation } from "powerbi-visuals-utils-svgutils";
 import { pixelConverter } from "powerbi-visuals-utils-typeutils";
 
-import { Calendar } from "../calendar";
+import { Calendar } from "../calendars/calendar";
 import { ITimelineDatePeriod } from "../datePeriod/datePeriod";
 import { GranularitySettings } from "../settings/granularitySettings";
 import { Utils } from "../utils";
@@ -47,16 +47,7 @@ import {
 } from "../dataInterfaces";
 
 export class GranularityBase implements IGranularity {
-    public static GET_FISCAL_YEAR_ADJUSTMENT(calendar: Calendar): number {
-        const firstMonthOfYear = calendar.getFirstMonthOfYear();
-        const firstDayOfYear = calendar.getFirstDayOfYear();
-
-        return ((firstMonthOfYear === 0 && firstDayOfYear === 1) ? 0 : 1);
-    }
-
     private static DefaultFraction: number = 1;
-    private static EmptyYearOffset: number = 0;
-    private static YearOffset: number = 1;
 
     protected calendar: Calendar;
 
@@ -170,7 +161,7 @@ export class GranularityBase implements IGranularity {
         return [
             this.shortMonthName(date),
             date.getDate(),
-            this.determineYear(date),
+            this.calendar.determineYear(date),
         ];
     }
 
@@ -236,8 +227,8 @@ export class GranularityBase implements IGranularity {
                 identifierArray,
                 index: datePeriods.length,
                 startDate: date,
-                week: this.determineWeek(date),
-                year: this.determineYear(date),
+                week: this.calendar.determineWeek(date),
+                year: this.calendar.determineYear(date),
             });
         }
         else {
@@ -267,47 +258,13 @@ export class GranularityBase implements IGranularity {
             identifierArray: oldDatePeriod.identifierArray,
             index: oldDatePeriod.index + oldDatePeriod.fraction,
             startDate: newDate,
-            week: this.determineWeek(newDate),
-            year: this.determineYear(newDate),
+            week: this.calendar.determineWeek(newDate),
+            year: this.calendar.determineYear(newDate),
         };
 
         oldDatePeriod.endDate = newDate;
 
         this.datePeriods.splice(index + 1, 0, newDateObject);
-    }
-
-    public determineWeek(date: Date): number[] {
-        // For fiscal calendar case that started not from the 1st January a year may be greater on 1.
-        // It's Ok until this year is used to calculate date of first week.
-        // So, here is some adjustment was applied.
-        const year: number = this.determineYear(date);
-        const fiscalYearAdjustment = GranularityBase.GET_FISCAL_YEAR_ADJUSTMENT(this.calendar);
-
-        const dateOfFirstWeek: Date = this.calendar.getDateOfFirstWeek(year - fiscalYearAdjustment);
-        const dateOfFirstFullWeek: Date = this.calendar.getDateOfFirstFullWeek(year - fiscalYearAdjustment);
-        // But number of weeks must be calculated using original date.
-        const weeks: number = Utils.GET_NUMBER_OF_WEEKS_BETWEEN_DATES(dateOfFirstFullWeek, date);
-
-        if (date >= dateOfFirstFullWeek && dateOfFirstWeek < dateOfFirstFullWeek) {
-            return [weeks + 1, year];
-        }
-
-        return [weeks, year];
-    }
-
-    public determineYear(date: Date): number {
-        const firstMonthOfYear = this.calendar.getFirstMonthOfYear();
-        const firstDayOfYear = this.calendar.getFirstDayOfYear();
-
-        const firstDate: Date = new Date(
-            date.getFullYear(),
-            firstMonthOfYear,
-            firstDayOfYear,
-        );
-
-        return date.getFullYear() + GranularityBase.GET_FISCAL_YEAR_ADJUSTMENT(this.calendar) - ((firstDate <= date)
-            ? GranularityBase.EmptyYearOffset
-            : GranularityBase.YearOffset);
     }
 
     /**
@@ -316,7 +273,7 @@ export class GranularityBase implements IGranularity {
      */
     protected quarterText(date: Date): string {
         let quarter: number = this.DefaultQuarter;
-        let year: number = this.determineYear(date);
+        let year: number = this.calendar.determineYear(date);
 
         while (date < this.calendar.getQuarterStartDate(year, quarter)) {
             if (quarter > 0) {

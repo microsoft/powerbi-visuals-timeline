@@ -26,7 +26,7 @@
 
 import { Selection } from "d3-selection";
 
-import { Calendar } from "../calendar";
+import { Calendar } from "../calendars/calendar";
 import { ITimelineLabel } from "../dataInterfaces";
 import { ITimelineDatePeriod } from "../datePeriod/datePeriod";
 import { Utils } from "../utils";
@@ -55,7 +55,7 @@ export class DayGranularity extends GranularityBase {
         return [
             this.shortMonthName(date),
             date.getDate(),
-            this.determineYear(date),
+            this.calendar.determineYear(date),
         ];
     }
 

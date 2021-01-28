@@ -27,7 +27,7 @@
 import { Selection } from "d3-selection";
 import powerbiVisualsApi from "powerbi-visuals-api";
 
-import { Calendar } from "../calendar";
+import { Calendar } from "../calendars/calendar";
 import { ITimelineLabel } from "../dataInterfaces";
 import { ITimelineDatePeriod } from "../datePeriod/datePeriod";
 import { Utils } from "../utils";
@@ -59,11 +59,11 @@ export class WeekGranularity extends GranularityBase {
     }
 
     public splitDate(date: Date): (string | number)[] {
-        return this.determineWeek(date);
+        return this.calendar.determineWeek(date);
     }
 
     public splitDateForTitle(date: Date): (string | number)[] {
-        const weekData = this.determineWeek(date);
+        const weekData = this.calendar.determineWeek(date);
 
         return [
             `W${weekData[0]}`,

@@ -26,7 +26,7 @@
 
 import { Selection } from "d3-selection";
 
-import { Calendar } from "../calendar";
+import { Calendar } from "../calendars/calendar";
 import { ITimelineLabel } from "../dataInterfaces";
 import { ITimelineDatePeriod } from "../datePeriod/datePeriod";
 import { Utils } from "../utils";
@@ -54,13 +54,13 @@ export class MonthGranularity extends GranularityBase {
     public splitDate(date: Date): (string | number)[] {
         return [
             this.shortMonthName(date),
-            this.determineYear(date),
+            this.calendar.determineYear(date),
         ];
     }
 
     public sameLabel(firstDatePeriod: ITimelineDatePeriod, secondDatePeriod: ITimelineDatePeriod): boolean {
         return this.shortMonthName(firstDatePeriod.startDate) === this.shortMonthName(secondDatePeriod.startDate)
-            && this.determineYear(firstDatePeriod.startDate) === this.determineYear(secondDatePeriod.startDate);
+            && this.calendar.determineYear(firstDatePeriod.startDate) === this.calendar.determineYear(secondDatePeriod.startDate);
     }
 
     public generateLabel(datePeriod: ITimelineDatePeriod): ITimelineLabel {

@@ -95,8 +95,11 @@ import {
 
 import { DatePeriodBase } from "./datePeriod/datePeriodBase";
 
-import { Calendar } from "./calendar";
+import { Calendar } from "./calendars/calendar";
 import { Utils } from "./utils";
+import { CalendarISO8061 } from "./calendars/calendarISO8061";
+import { WeekStandards } from "./calendars/weekStandards";
+import { CalendarFactory } from "./calendars/calendarFactory";
 
 interface IAdjustedFilterDatePeriod {
     period: DatePeriodBase;
@@ -157,7 +160,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
         }
 
         const isCalendarChanged: boolean = previousCalendar
-            && previousCalendar.isChanged(timelineSettings.calendar, timelineSettings.weekDay);
+            && previousCalendar.isChanged(timelineSettings.calendar, timelineSettings.weekDay, timelineSettings.weeksDetermintaionStandards);
 
         if (timelineData && timelineData.currentGranularity) {
             startDate = Utils.GET_START_SELECTION_DATE(timelineData);
@@ -165,7 +168,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
         }
 
         if (!initialized || isCalendarChanged) {
-            calendar = new Calendar(timelineSettings.calendar, timelineSettings.weekDay);
+            calendar = new CalendarFactory().create(timelineSettings.weeksDetermintaionStandards, timelineSettings.calendar, timelineSettings.weekDay);
             timelineData.currentGranularity = timelineGranularityData.getGranularity(
                 timelineSettings.granularity.granularity);
         } else {
@@ -576,10 +579,14 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
         .on("drag", this.onCursorDrag.bind(this))
         .on("end", this.onCursorDragEnd.bind(this));
 
+    private calendarFactory: CalendarFactory = null;
+
     constructor(options: powerbiVisualsApi.extensibility.visual.VisualConstructorOptions) {
         const element: HTMLElement = options.element;
 
         this.host = options.host;
+
+        this.calendarFactory = new CalendarFactory();
 
         this.selectionManager = this.host.createSelectionManager();
 
@@ -1018,6 +1025,12 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
             delete instances[0].properties.day;
         }
 
+        // This options have no sense if ISO standard was picked
+        if ((options.objectName === "weekDay" || options.objectName === "calendar")
+            && settings.weeksDetermintaionStandards.weekStandard !== WeekStandards.NotSet) {
+            return null;
+        }
+
         return instances;
     }
 
@@ -1252,7 +1265,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
         locale: string,
         localizationManager: powerbiVisualsApi.extensibility.ILocalizationManager,
     ) {
-        const calendar = new Calendar(timelineSettings.calendar, timelineSettings.weekDay);
+        const calendar: Calendar = this.calendarFactory.create(timelineSettings.weeksDetermintaionStandards, timelineSettings.calendar, timelineSettings.weekDay);
 
         timelineGranularityData.createGranularities(calendar, locale, localizationManager);
         timelineGranularityData.createLabels();
