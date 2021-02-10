@@ -27,7 +27,7 @@
 import { Selection } from "d3-selection";
 import powerbiVisualsApi from "powerbi-visuals-api";
 
-import { Calendar } from "../calendar";
+import { Calendar } from "../calendars/calendar";
 import { ITimelineLabel } from "../dataInterfaces";
 import { ITimelineDatePeriod } from "../datePeriod/datePeriod";
 import { Utils } from "../utils";
@@ -59,7 +59,7 @@ export class YearGranularity extends GranularityBase {
     }
 
     public splitDate(date: Date): (string | number)[] {
-        return [this.determineYear(date)];
+        return [this.calendar.determineYear(date)];
     }
 
     public sameLabel(firstDatePeriod: ITimelineDatePeriod, secondDatePeriod: ITimelineDatePeriod): boolean {

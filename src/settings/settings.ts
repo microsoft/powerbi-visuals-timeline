@@ -35,6 +35,7 @@ import { GranularitySettings } from "./granularitySettings";
 import { LabelsSettings } from "./labelsSettings";
 import { ScrollAutoAdjustment } from "./scrollAutoAdjustment";
 import { WeekDaySettings } from "./weekDaySettings";
+import { WeeksDetermintaionStandardsSettings } from "./weeksDetermintaionStandardsSettings";
 
 export class Settings extends dataViewObjectsParser.DataViewObjectsParser {
     public general: GeneralSettings = new GeneralSettings();
@@ -47,4 +48,5 @@ export class Settings extends dataViewObjectsParser.DataViewObjectsParser {
     public labels: LabelsSettings = new LabelsSettings();
     public scrollAutoAdjustment: ScrollAutoAdjustment = new ScrollAutoAdjustment();
     public cursor: CursorSettings = new CursorSettings();
+    public weeksDetermintaionStandards: WeeksDetermintaionStandardsSettings = new WeeksDetermintaionStandardsSettings();
 }

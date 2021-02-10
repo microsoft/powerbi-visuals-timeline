@@ -1,3 +1,6 @@
+## 2.3.0
+* A new option group "Weeks Determination Standards" containing a list of two items where the first one enables US weeks numbering (default) and the second one enables ISO 8601 weeks numbering
+
 ## 2.2.0
 * API was updated to 3.2.0
 * Packages update

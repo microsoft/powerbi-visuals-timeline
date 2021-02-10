@@ -36,7 +36,7 @@ import { QuarterGranularity } from "./quarterGranularity";
 import { WeekGranularity } from "./weekGranularity";
 import { YearGranularity } from "./yearGranularity";
 
-import { Calendar } from "../calendar";
+import { Calendar } from "../calendars/calendar";
 import { Utils } from "../utils";
 
 export class GranularityData {

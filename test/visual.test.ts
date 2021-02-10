@@ -32,7 +32,7 @@ import {
     assertColorsMatch, clickElement, d3Click, renderTimeout,
 } from "powerbi-visuals-utils-testutils";
 
-import { Calendar } from "../src/calendar";
+import { Calendar } from "../src/calendars/calendar";
 import { ITimelineCursorOverElement, ITimelineData } from "../src/dataInterfaces";
 import { ITimelineDatePeriod, ITimelineDatePeriodBase } from "../src/datePeriod/datePeriod";
 import { DatePeriodBase } from "../src/datePeriod/datePeriodBase";
@@ -52,6 +52,7 @@ import { GranularityMock } from "./granularityMock";
 import { areColorsEqual, getSolidColorStructuralObject } from "./helpers";
 import { VisualBuilder } from "./visualBuilder";
 import { VisualData } from "./visualData";
+import { CalendarISO8061 } from "../src/calendars/calendarISO8061";
 
 describe("Timeline", () => {
     let visualBuilder: VisualBuilder;
@@ -1130,7 +1131,7 @@ describe("Timeline - Granularity - 1 Jan (Regular Calendar)", () => {
         });
 
         it("should return zero adjustment for a year", () => {
-            const yearAdjustment = GranularityBase.GET_FISCAL_YEAR_ADJUSTMENT(calendar);
+            const yearAdjustment = calendar.getFiscalYearAjustment();
             expect(yearAdjustment).toEqual(0);
         });
     });
@@ -1206,21 +1207,153 @@ describe("Timeline - Granularity - 1 Apr (Fiscal Calendar)", () => {
         });
 
         it("should return [1] adjustment for a year", () => {
-            const yearAdjustment = GranularityBase.GET_FISCAL_YEAR_ADJUSTMENT(calendar);
+            const yearAdjustment = calendar.getFiscalYearAjustment();
             expect(yearAdjustment).toEqual(1);
         });
     });
 
     describe("weeks order", () => {
         it("order ascending", () => {
-            const week1: number[] = granularities[0].determineWeek(new Date(2016, 3, 1));
-            const week2: number[] = granularities[0].determineWeek(new Date(2016, 3, 8));
+            const week1: number[] = calendar.determineWeek(new Date(2016, 3, 1));
+            const week2: number[] = calendar.determineWeek(new Date(2016, 3, 8));
 
             expect(week1[0]).toEqual(1);
             expect(week2[0]).toEqual(2);
         });
     });
 });
+
+describe("Timeline - Granularity - ISO 8601 Week numbering", () => {
+    let calendar: Calendar;
+
+    beforeEach(() => {
+        calendar = new CalendarISO8061();
+    });
+
+    describe("ISO Calendar Methods", () => {
+        it("first date of 1999 is January 4, 1999", () => {
+            const dateOfFirstWeek = calendar.getDateOfFirstWeek(1999);
+            const expectedDate = new Date(1999, 0, 4);
+            expect(dateOfFirstWeek).toEqual(expectedDate);
+        });
+
+        it("first date of 2000 is January 3, 2000", () => {
+            const dateOfFirstWeek = calendar.getDateOfFirstWeek(2000);
+            const expectedDate = new Date(2000, 0, 3);
+            expect(dateOfFirstWeek).toEqual(expectedDate);
+        });
+
+        it("first date of 2001 is January 1, 2001", () => {
+            const dateOfFirstWeek = calendar.getDateOfFirstWeek(2001);
+            const expectedDate = new Date(2001, 0, 1);
+            expect(dateOfFirstWeek).toEqual(expectedDate);
+        });
+
+        it("first date of 2002 is December 31, 2001", () => {
+            const dateOfFirstWeek = calendar.getDateOfFirstWeek(2002);
+            const expectedDate = new Date(2001, 11, 31);
+            expect(dateOfFirstWeek).toEqual(expectedDate);
+        });
+
+        it("first date of 2003 is December 30, 2002", () => {
+            const dateOfFirstWeek = calendar.getDateOfFirstWeek(2003);
+            const expectedDate = new Date(2002, 11, 30);
+            expect(dateOfFirstWeek).toEqual(expectedDate);
+        });
+
+        it("first date of 2009 is December 29, 2008", () => {
+            const dateOfFirstWeek = calendar.getDateOfFirstWeek(2009);
+            const expectedDate = new Date(2008, 11, 29);
+            expect(dateOfFirstWeek).toEqual(expectedDate);
+        });
+
+        it("first date of 2017 is January 2, 2017", () => {
+            const dateOfFirstWeek = calendar.getDateOfFirstWeek(2017);
+            const expectedDate = new Date(2017, 0, 2);
+            expect(dateOfFirstWeek).toEqual(expectedDate);
+        });
+
+        it("first date of 2019 is December 31, 2018", () => {
+            const dateOfFirstWeek = calendar.getDateOfFirstWeek(2019);
+            const expectedDate = new Date(2018, 11, 31);
+            expect(dateOfFirstWeek).toEqual(expectedDate);
+        });
+
+        it("first date of 2020 is December 30, 2019", () => {
+            const dateOfFirstWeek = calendar.getDateOfFirstWeek(2020);
+            const expectedDate = new Date(2019, 11, 30);
+            expect(dateOfFirstWeek).toEqual(expectedDate);
+        });
+
+        it("first date of 2021 is January 4, 2021", () => {
+            const dateOfFirstWeek = calendar.getDateOfFirstWeek(2021);
+            const expectedDate = new Date(2021, 0, 4);
+            expect(dateOfFirstWeek).toEqual(expectedDate);
+        });
+
+        it("week of December 25, 2017 to Decamber 31 is 52", () => {
+            let week = calendar.determineWeek(new Date(2017, 11, 25))[0];
+            expect(week).toEqual(52);
+            week = calendar.determineWeek(new Date(2017, 11, 31))[0];
+            expect(week).toEqual(52);
+        });
+
+        it("week of May 1, 2017 to May 7, 2017 is 18", () => {
+            let week = calendar.determineWeek(new Date(2017, 4, 1))[0];
+            expect(week).toEqual(18);
+            week = calendar.determineWeek(new Date(2017, 4, 7))[0];
+            expect(week).toEqual(18);
+        });
+
+        it("week of December 28, 2020 to January 3, 2021 is 53", () => {
+            let week = calendar.determineWeek(new Date(2020, 11, 28))[0];
+            expect(week).toEqual(53);
+            week = calendar.determineWeek(new Date(2021, 0, 3))[0];
+            expect(week).toEqual(53);
+        });
+
+        it("week of January 4, 2021 to January 10, 2021 is 1", () => {
+            let week = calendar.determineWeek(new Date(2021, 0, 4))[0];
+            expect(week).toEqual(1);
+            week = calendar.determineWeek(new Date(2021, 0, 10))[0];
+            expect(week).toEqual(1);
+        });
+
+        it("first week and first full week must bethe same", () => {
+            expect(calendar.getDateOfFirstWeek(2007)).toEqual(calendar.getDateOfFirstFullWeek(2007));
+            expect(calendar.getDateOfFirstWeek(2019)).toEqual(calendar.getDateOfFirstFullWeek(2019));
+            expect(calendar.getDateOfFirstWeek(2020)).toEqual(calendar.getDateOfFirstFullWeek(2020));
+        });
+
+        it("fiscal year adjustment is 0", () => {
+            expect(calendar.getFiscalYearAjustment()).toEqual(0);
+        });
+
+        it("a year must be determine without relation to week numbers", () => {
+            expect(calendar.determineYear(new Date(2020, 11, 28))).toEqual(2020);
+            expect(calendar.determineYear(new Date(2021, 0, 2))).toEqual(2021);
+            expect(calendar.getYearPeriod(new Date(2021, 0, 2)).startDate).toEqual(new Date(2021, 0, 1));
+            expect(calendar.getYearPeriod(new Date(2021, 0, 2)).endDate).toEqual(new Date(2022, 0, 1));
+        });
+
+        it("a quarter must be determine without relation to week numbers", () => {
+            expect(calendar.getQuarterPeriod(new Date(2021, 0, 2)).startDate).toEqual(new Date(2021, 0, 1));
+            expect(calendar.getQuarterPeriod(new Date(2021, 0, 2)).endDate).toEqual(new Date(2021, 3, 1));
+            expect(calendar.getQuarterPeriod(new Date(2021, 3, 22)).startDate).toEqual(new Date(2021, 3, 1));
+            expect(calendar.getQuarterPeriod(new Date(2021, 3, 22)).endDate).toEqual(new Date(2021, 6, 1));
+            expect(calendar.getQuarterPeriod(new Date(2021, 7, 13)).startDate).toEqual(new Date(2021, 6, 1));
+            expect(calendar.getQuarterPeriod(new Date(2021, 7, 13)).endDate).toEqual(new Date(2021, 9, 1));
+            expect(calendar.getQuarterPeriod(new Date(2021, 10, 35)).startDate).toEqual(new Date(2021, 9, 1));
+            expect(calendar.getQuarterPeriod(new Date(2021, 10, 35)).endDate).toEqual(new Date(2022, 0, 1));
+        })
+
+        it("a month must be determine without relation to week numbers", () => {
+            expect(calendar.getMonthPeriod(new Date(2021, 0, 2)).startDate).toEqual(new Date(2021, 0, 1));
+            expect(calendar.getMonthPeriod(new Date(2021, 0, 2)).endDate).toEqual(new Date(2021, 1, 1));
+        })
+    });
+});
+
 
 describe("Timeline - TimelineUtils", () => {
     describe("getIndexByPosition", () => {

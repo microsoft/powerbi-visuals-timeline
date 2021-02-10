@@ -24,10 +24,12 @@
  *  THE SOFTWARE.
  */
 
-import { GranularityData } from "./granularity/granularityData";
-
-import { CalendarSettings } from "./settings/calendarSettings";
-import { WeekDaySettings } from "./settings/weekDaySettings";
+import { GranularityData } from "../granularity/granularityData";
+import { CalendarSettings } from "../settings/calendarSettings";
+import { WeekDaySettings } from "../settings/weekDaySettings";
+import { WeeksDetermintaionStandardsSettings } from "../settings/weeksDetermintaionStandardsSettings";
+import { Utils } from "../utils";
+import { WeekStandards } from "./weekStandards";
 
 interface IDateDictionary {
     [year: number]: Date;
@@ -41,18 +43,17 @@ export interface IPeriodDates {
 export class Calendar {
     private static QuarterFirstMonths: number[] = [0, 3, 6, 9];
 
-    private firstDayOfWeek: number;
-    private firstMonthOfYear: number;
-    private firstDayOfYear: number;
-    private dateOfFirstWeek: IDateDictionary;
-    private dateOfFirstFullWeek: IDateDictionary;
-    private quarterFirstMonths: number[];
-    private isDaySelection: boolean;
+    protected firstDayOfWeek: number;
+    protected firstMonthOfYear: number;
+    protected firstDayOfYear: number;
+    protected dateOfFirstWeek: IDateDictionary;
+    protected dateOfFirstFullWeek: IDateDictionary;
+    protected quarterFirstMonths: number[];
+    protected isDaySelection: boolean;
+    protected EmptyYearOffset: number = 0;
+    protected YearOffset: number = 1;
 
-    constructor(
-        calendarFormat: CalendarSettings,
-        weekDaySettings: WeekDaySettings) {
-
+    constructor(calendarFormat: CalendarSettings, weekDaySettings: WeekDaySettings) {
         this.isDaySelection = weekDaySettings.daySelection;
         this.firstDayOfWeek = weekDaySettings.day;
         this.firstMonthOfYear = calendarFormat.month;
@@ -64,6 +65,47 @@ export class Calendar {
         this.quarterFirstMonths = Calendar.QuarterFirstMonths.map((monthIndex: number) => {
             return monthIndex + this.firstMonthOfYear;
         });
+    }
+
+    public getFiscalYearAjustment(): number {
+        const firstMonthOfYear = this.getFirstMonthOfYear();
+        const firstDayOfYear = this.getFirstDayOfYear();
+
+        return ((firstMonthOfYear === 0 && firstDayOfYear === 1) ? 0 : 1);
+    }
+
+    public determineYear(date: Date): number {
+        const firstMonthOfYear = this.getFirstMonthOfYear();
+        const firstDayOfYear = this.getFirstDayOfYear();
+
+        const firstDate: Date = new Date(
+            date.getFullYear(),
+            firstMonthOfYear,
+            firstDayOfYear,
+        );
+
+        return date.getFullYear() + this.getFiscalYearAjustment() - ((firstDate <= date)
+            ? this.EmptyYearOffset
+            : this.YearOffset);
+    }
+
+    public determineWeek(date: Date): number[] {
+        // For fiscal calendar case that started not from the 1st January a year may be greater on 1.
+        // It's Ok until this year is used to calculate date of first week.
+        // So, here is some adjustment was applied.
+        const year: number = this.determineYear(date);
+        const fiscalYearAdjustment = this.getFiscalYearAjustment();
+
+        const dateOfFirstWeek: Date = this.getDateOfFirstWeek(year - fiscalYearAdjustment);
+        const dateOfFirstFullWeek: Date = this.getDateOfFirstFullWeek(year - fiscalYearAdjustment);
+        // But number of weeks must be calculated using original date.
+        const weeks: number = Utils.GET_NUMBER_OF_WEEKS_BETWEEN_DATES(dateOfFirstFullWeek, date);
+
+        if (date >= dateOfFirstFullWeek && dateOfFirstWeek < dateOfFirstFullWeek) {
+            return [weeks + 1, year];
+        }
+
+        return [weeks, year];
     }
 
     public getFirstDayOfWeek(): number {
@@ -149,11 +191,13 @@ export class Calendar {
 
     public isChanged(
         calendarSettings: CalendarSettings,
-        weekDaySettings: WeekDaySettings): boolean {
-
+        weekDaySettings: WeekDaySettings,
+        weeksDetermintaionStandardsSettings: WeeksDetermintaionStandardsSettings
+    ): boolean {
         return this.firstMonthOfYear !== calendarSettings.month
             || this.firstDayOfYear !== calendarSettings.day
-            || this.firstDayOfWeek !== weekDaySettings.day;
+            || this.firstDayOfWeek !== weekDaySettings.day
+            || weeksDetermintaionStandardsSettings.weekStandard !== WeekStandards.NotSet;
     }
 
     public getDateOfFirstWeek(year: number): Date {

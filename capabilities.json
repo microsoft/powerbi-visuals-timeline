@@ -1,27 +1,33 @@
 {
-    "dataRoles": [{
-        "name": "Time",
-        "kind": "Grouping",
-        "displayName": "Time",
-        "displayNameKey": "Role_Time"
-    }],
-    "dataViewMappings": [{
-        "conditions": [{
-            "Time": {
-                "max": 1
-            }
-        }],
-        "categorical": {
-            "categories": {
-                "for": {
-                    "in": "Time"
-                },
-                "dataReductionAlgorithm": {
-                    "sample": {}
+    "dataRoles": [
+        {
+            "name": "Time",
+            "kind": "Grouping",
+            "displayName": "Time",
+            "displayNameKey": "Role_Time"
+        }
+    ],
+    "dataViewMappings": [
+        {
+            "conditions": [
+                {
+                    "Time": {
+                        "max": 1
+                    }
+                }
+            ],
+            "categorical": {
+                "categories": {
+                    "for": {
+                        "in": "Time"
+                    },
+                    "dataReductionAlgorithm": {
+                        "sample": {}
+                    }
                 }
             }
         }
-    }],
+    ],
     "objects": {
         "general": {
             "displayName": "General",
@@ -59,6 +65,30 @@
                 }
             }
         },
+        "weeksDetermintaionStandards": {
+            "displayName": "Weeks Determination Standards",
+            "displayNameKey": "Visual_Weeks_Determination_Standards",
+            "properties": {
+                "weekStandard": {
+                    "displayName": "Standard",
+                    "displayNameKey": "Visual_Week_Standard",
+                    "type": {
+                        "enumeration": [
+                            {
+                                "value": "0",
+                                "displayName": "-- none --",
+                                "displayNameKey": "Visual_Week_Standard_None"
+                            },
+                            {
+                                "value": "1",
+                                "displayName": "ISO 8601",
+                                "displayNameKey": "Visual_Week_Standard_ISO8601"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
         "calendar": {
             "displayName": "Fiscal Year",
             "displayNameKey": "Visual_FiscalYear",
@@ -67,7 +97,8 @@
                     "displayName": "Month",
                     "displayNameKey": "Visual_Month",
                     "type": {
-                        "enumeration": [{
+                        "enumeration": [
+                            {
                                 "value": "0",
                                 "displayName": "January",
                                 "displayNameKey": "Visual_Month_January"
@@ -154,7 +185,8 @@
                     "displayName": "Day",
                     "displayNameKey": "Visual_Day",
                     "type": {
-                        "enumeration": [{
+                        "enumeration": [
+                            {
                                 "value": "0",
                                 "displayName": "Sunday",
                                 "displayNameKey": "Visual_Day_Sunday"
@@ -292,7 +324,8 @@
                     "displayName": "Granularity",
                     "displayNameKey": "Visual_Granularity",
                     "type": {
-                        "enumeration": [{
+                        "enumeration": [
+                            {
                                 "value": "0",
                                 "displayName": "Year",
                                 "displayNameKey": "Visual_Granularity_Year"
