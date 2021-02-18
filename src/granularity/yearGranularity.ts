@@ -93,6 +93,7 @@ export class YearGranularity extends GranularityBase {
         var year_string = "";
 
         if (isOlympus) {
+            year_number = year_number - 1;
             if (year_number <= 2020) {
                 year_number = year_number - 2020 + 153;
                 year_string = `${year_number}P`;
