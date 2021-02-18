@@ -1,17 +1,17 @@
 {
   "visual": {
     "name": "Olympus Timeline",
-    "displayName": "Olympus Timeline 2.3.0",
+    "displayName": "Olympus Timeline 2.4.0",
     "guid": "Timeline8887991079100",
     "visualClassName": "Timeline",
-    "version": "2.3.0",
+    "version": "2.4.0",
     "description": "Timeline slicer is a graphical date range selector used as a filtering component in the report canvas",
-    "supportUrl": "https://community.powerbi.com",
-    "gitHubUrl": "https://github.com/Microsoft/powerbi-visuals-timeline"
+    "supportUrl": "https://web.yammer.com/main/groups/eyJfdHlwZSI6Ikdyb3VwIiwiaWQiOiI4MDU3MzIzNTIifQ/all",
+    "gitHubUrl": "https://github.com/rjobidon/powerbi-olympus-timeline"
   },
   "author": {
-    "name": "Microsoft",
-    "email": "pbicvsupport@microsoft.com"
+    "name": "Olympus",
+    "email": "richard.ng-jobidon@olympus.com"
   },
   "assets": {
     "icon": "assets/icon.png"
