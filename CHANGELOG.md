@@ -1,3 +1,9 @@
+## 2.4.0
+* Assign a new GUID
+* Display Olympus fiscal years
+* Change default start month to April 
+* Change default cell color to Olympus yellow
+
 ## 2.3.0
 * A new option group "Weeks Determination Standards" containing a list of two items where the first one enables US weeks numbering (default) and the second one enables ISO 8601 weeks numbering
 
