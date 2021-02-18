@@ -1,3 +1,6 @@
+## 2.4.1
+* FIX: Year number was one year ahead
+
 ## 2.4.0
 * Assign a new GUID
 * Display Olympus fiscal years

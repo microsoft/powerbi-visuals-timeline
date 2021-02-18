@@ -1,10 +1,10 @@
 {
   "visual": {
     "name": "Olympus Timeline",
-    "displayName": "Olympus Timeline 2.4.0",
+    "displayName": "Olympus Timeline 2.4.1",
     "guid": "Timeline8887991079100",
     "visualClassName": "Timeline",
-    "version": "2.4.0",
+    "version": "2.4.1",
     "description": "Timeline slicer is a graphical date range selector used as a filtering component in the report canvas",
     "supportUrl": "https://web.yammer.com/main/groups/eyJfdHlwZSI6Ikdyb3VwIiwiaWQiOiI4MDU3MzIzNTIifQ/all",
     "gitHubUrl": "https://github.com/rjobidon/powerbi-olympus-timeline"
