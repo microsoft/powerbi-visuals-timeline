@@ -59,7 +59,22 @@ export class YearGranularity extends GranularityBase {
     }
 
     public splitDate(date: Date): (string | number)[] {
-        return [this.calendar.determineYear(date)];
+
+        const firstMonthOfYear = this.calendar.getFirstMonthOfYear();
+        const firstDayOfYear = this.calendar.getFirstDayOfYear();
+        const isOlympus = (firstMonthOfYear === 3 && firstDayOfYear === 1); 
+        var year_number = this.calendar.determineYear(date);
+        var year_string = "";
+        if (isOlympus) {
+            if (year_number <= 2020) {
+                year_number = year_number - 2020 + 153;
+                year_string = `${year_number}P`;
+            } else {
+                year_number = year_number + 1;
+                year_string = `FY${year_number}`;
+            }
+        }
+        return [isOlympus ? year_string : year_number];
     }
 
     public sameLabel(firstDatePeriod: ITimelineDatePeriod, secondDatePeriod: ITimelineDatePeriod): boolean {
@@ -71,10 +86,28 @@ export class YearGranularity extends GranularityBase {
             ? this.localizationManager.getDisplayName(this.localizationKey)
             : this.localizationKey;
 
+        const firstMonthOfYear = this.calendar.getFirstMonthOfYear();
+        const firstDayOfYear = this.calendar.getFirstDayOfYear();
+        const isOlympus = (firstMonthOfYear === 3 && firstDayOfYear === 1); 
+        var year_number = datePeriod.year;
+        var year_string = "";
+
+        if (isOlympus) {
+            if (year_number <= 2020) {
+                year_number = year_number - 2020 + 153;
+                year_string = `${year_number}P`;
+            } else {
+                year_number = year_number + 1;
+                year_string = `FY${year_number}`;
+            }
+        } else {
+            year_string = `${datePeriod.year}`;
+        }
+
         return {
             id: datePeriod.index,
-            text: `${datePeriod.year}`,
-            title: `${localizedYear} ${datePeriod.year}`,
+            text: year_string,
+            title: `${localizedYear} ${year_string}`,
         };
     }
 }

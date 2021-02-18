@@ -1,8 +1,8 @@
 {
   "visual": {
-    "name": "Timeline",
-    "displayName": "Timeline 2.3.0",
-    "guid": "Timeline1447991079100",
+    "name": "Olympus Timeline",
+    "displayName": "Olympus Timeline 2.3.0",
+    "guid": "Timeline8887991079100",
     "visualClassName": "Timeline",
     "version": "2.3.0",
     "description": "Timeline slicer is a graphical date range selector used as a filtering component in the report canvas",

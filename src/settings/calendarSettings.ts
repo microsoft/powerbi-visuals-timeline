@@ -25,6 +25,6 @@
  */
 
 export class CalendarSettings {
-    public month: number = 0;
+    public month: number = 3;
     public day: number = 1;
 }

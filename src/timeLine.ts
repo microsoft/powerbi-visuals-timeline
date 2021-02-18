@@ -1545,7 +1545,6 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
                         : Timeline.CellWidthNotLastFactor
                     ),
                 };
-
                 return dataLabelUtils.getLabelFormattedText(labelFormattedTextOptions);
             })
             .style("font-size", pixelConverter.fromPoint(this.settings.labels.textSize))
