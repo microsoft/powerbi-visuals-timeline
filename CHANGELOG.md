@@ -1,3 +1,6 @@
+## 2.4.2
+* Display Olympus fiscal years in quarter, month, week and day granularity (was on year granularity only)
+
 ## 2.4.1
 * FIX: Year number was one year ahead
 

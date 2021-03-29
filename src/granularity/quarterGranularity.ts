@@ -52,9 +52,24 @@ export class QuarterGranularity extends GranularityBase {
     }
 
     public splitDate(date: Date): (string | number)[] {
+        const firstMonthOfYear = this.calendar.getFirstMonthOfYear();
+        const firstDayOfYear = this.calendar.getFirstDayOfYear();
+        const isOlympus = (firstMonthOfYear === 3 && firstDayOfYear === 1); 
+        var year_number = this.calendar.determineYear(date);
+        var year_string = "";
+        if (isOlympus) {
+            year_number = year_number - 1;
+            if (year_number <= 2020) {
+                year_number = year_number - 2020 + 153;
+                year_string = `${year_number}P`;
+            } else {
+                year_number = year_number + 1;
+                year_string = `FY${year_number}`;
+            }
+        }
         return [
             this.quarterText(date),
-            this.calendar.determineYear(date),
+            isOlympus ? year_string : year_number,
         ];
     }
 
