@@ -52,7 +52,7 @@
     "karma-webpack": "^4.0.2",
     "less": "^3.12.2",
     "less-loader": "^7.0.1",
-    "lodash": "^4.17.20",
+    "lodash": "^4.17.21",
     "powerbi-visuals-api": "^3.5.1",
     "powerbi-visuals-tools": "^3.1.15",
     "powerbi-visuals-utils-testutils": "^2.3.2",
