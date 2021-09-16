@@ -70,7 +70,7 @@
     "@typescript-eslint/eslint-plugin": "^4.0.1",
     "@typescript-eslint/parser": "^4.0.1",
     "d3": "^5.16.0",
-    "eslint": "^7.8.1",
+    "eslint": "^7.16.0",
     "eslint-plugin-powerbi-visuals": "^0.8.1",
     "powerbi-models": "^1.4.0",
     "powerbi-visuals-utils-chartutils": "^2.5.0",
