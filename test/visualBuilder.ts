@@ -30,8 +30,6 @@ import {
     AdvancedFilter,
 } from "powerbi-models";
 
-import * as $ from "jquery";
-
 import {
     d3Click,
     VisualBuilderBase,
@@ -54,8 +52,7 @@ export class VisualBuilder extends VisualBuilderBase<Timeline> {
     private jsonFilters: powerbiVisualsApi.IFilter[] = [];
 
     constructor(width: number, height: number) {
-        super(width, height);
-
+        super();
         this.visualHost.applyJsonFilter = () => {
             // No need to implement it
         };
@@ -65,50 +62,45 @@ export class VisualBuilder extends VisualBuilderBase<Timeline> {
         return this.visual;
     }
 
-    public get rootElement(): JQuery {
-        return $(this.element).find(".timeline-component");
+    public get rootElement(): HTMLElement {
+        return this.element.querySelector(".timeline-component");
     }
 
-    public get mainElement(): JQuery {
-        return $(this.element).find("svg.timeline");
+    public get mainElement(): HTMLElement {
+        return this.element.querySelector("svg.timeline");
     }
 
-    public get headerElement(): JQuery {
-        return $(this.element).children("div")
-            .children("div")
-            .children("svg");
+    public get headerElement(): HTMLElement {
+        return this.element.querySelector("div > div > svg")
     }
 
-    public get cellRects(): JQuery {
-        return this.mainArea
-            .children(".cellsArea")
-            .children(".cellRect");
+    public get cellRects(): HTMLElement[] {
+        return Array.from(this.mainArea
+            .querySelectorAll(".cellsArea > .cellRect"));
     }
 
-    public get mainArea() {
+    public get mainArea(): HTMLElement {
         return this.mainElement
-            .children("g.mainArea");
+            .querySelector("g.mainArea");
     }
 
-    public get allLabels() {
-        return this.mainArea
-            .children("g")
-            .children("text.label");
+    public get allLabels(): HTMLElement[] {
+        return Array.from(this.mainArea
+            .querySelectorAll("g > text.label"));
     }
 
-    public get rangeHeaderText() {
+    public get rangeHeaderText(): HTMLElement {
         return this.headerElement
-            .children("g.rangeTextArea")
-            .children("text.selectionRangeContainer");
+            .querySelector("g.rangeTextArea > text.selectionRangeContainer");
     }
 
-    public get timelineSlicer() {
+    public get timelineSlicer(): HTMLElement {
         return this.headerElement
-            .children("g.timelineSlicer");
+            .querySelector("g.timelineSlicer");
     }
 
     public selectTheLatestCell(): void {
-        d3Click(this.mainElement.find(".cellRect").last(), 0, 0);
+        d3Click((<HTMLElement>(<any>this.mainElement.querySelectorAll(".cellRect")[-1])), 0, 0);
     }
 
     public setFilter(startDate: Date, endDate: Date): void {

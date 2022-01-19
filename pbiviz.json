@@ -9,7 +9,7 @@
     "supportUrl": "https://community.powerbi.com",
     "gitHubUrl": "https://github.com/Microsoft/powerbi-visuals-timeline"
   },
-  "apiVersion": "3.5.0",
+  "apiVersion": "3.5.1",
   "author": {
     "name": "Microsoft",
     "email": "pbicvsupport@microsoft.com"
