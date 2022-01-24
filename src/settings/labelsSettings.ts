@@ -29,4 +29,9 @@ export class LabelsSettings {
     public displayAll: boolean = true;
     public fontColor: string = "#777777";
     public textSize: number = 9;
+    public yearVisibility: boolean = true;
+    public quarterVisibility: boolean = true;
+    public monthVisibility: boolean = true;
+    public weekVisibility: boolean = true;
+    public dayVisibility: boolean = true;
 }

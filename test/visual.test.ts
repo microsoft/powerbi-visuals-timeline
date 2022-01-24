@@ -1014,6 +1014,7 @@ describe("Timeline", () => {
         describe("Labels", () => {
             beforeEach(() => {
                 dataView.metadata.objects = {
+                    granularity: {},
                     labels: {
                         displayAll: true,
                         show: true,
@@ -1035,17 +1036,111 @@ describe("Timeline", () => {
 
                 visualBuilder.updateFlushAllD3Transitions(dataView);
 
-                visualBuilder.allLabels.forEach(element => expect(document.contains(element)).toBe(false))
+                visualBuilder.allLabels.forEach(element => expect(document.contains(element)).toBe(false));
             });
 
             it("shows only selected granularity label if displayAll is set to false", () => {
                 visualBuilder.updateFlushAllD3Transitions(dataView);
                 // All labels should be visible
                 expect(visualBuilder.allLabels.map(el => el.children).flat().length).toBeGreaterThan(1);
+
                 dataView.metadata.objects.labels.displayAll = false;
                 visualBuilder.updateFlushAllD3Transitions(dataView);
+
                 // Only one label should be visible
                 expect(visualBuilder.allLabels.map(el => el.children).flat().length).toBe(1);
+            });
+
+            it("shows all labels except of year if yearVisibility is false", () => {
+                dataView.metadata.objects.granularity.granularity = GranularityType.day;
+                visualBuilder.updateFlushAllD3Transitions(dataView);
+
+                // All labels should be visible
+                const oldLabels = visualBuilder.allLabels.length;
+                expect(oldLabels).toBeGreaterThan(1);
+
+                dataView.metadata.objects.labels.yearVisibility = false;
+                visualBuilder.updateFlushAllD3Transitions(dataView);
+
+                // Only one label should be hidden
+                expect(oldLabels - visualBuilder.allLabels.length).toBe(1);
+            });
+
+            it("shows all labels except of quarter if quarterVisibility is false", () => {
+                dataView.metadata.objects.granularity.granularity = GranularityType.day;
+
+                visualBuilder.updateFlushAllD3Transitions(dataView);
+                // All labels should be visible
+                const oldLabels = visualBuilder.allLabels.length;
+                expect(oldLabels).toBeGreaterThan(1);
+
+                dataView.metadata.objects.labels.quarterVisibility = false;
+                visualBuilder.updateFlushAllD3Transitions(dataView);
+
+                // Only one label should be hidden
+                expect(oldLabels - visualBuilder.allLabels.length).toBe(1);
+            });
+
+            it("shows all labels except of month if monthVisibility is false", () => {
+                dataView.metadata.objects.granularity.granularity = GranularityType.day;
+                visualBuilder.updateFlushAllD3Transitions(dataView);
+                
+                // All labels should be visible
+                const oldLabels = visualBuilder.allLabels.length;
+                expect(oldLabels).toBeGreaterThan(1);
+
+                dataView.metadata.objects.labels.monthVisibility = false;
+                visualBuilder.updateFlushAllD3Transitions(dataView);
+
+                // Only one label should be hidden
+                expect(oldLabels - visualBuilder.allLabels.length).toBe(1);
+            });
+            
+            it("shows all labels except of week if weekVisibility is false", () => {
+                dataView.metadata.objects.granularity.granularity = GranularityType.day;
+                visualBuilder.updateFlushAllD3Transitions(dataView);
+
+                // All labels should be visible
+                const oldLabels = visualBuilder.allLabels.length;
+                expect(oldLabels).toBeGreaterThan(1);
+
+                dataView.metadata.objects.labels.weekVisibility = false;
+                visualBuilder.updateFlushAllD3Transitions(dataView);
+
+                // Only one label should be hidden
+                expect(oldLabels - visualBuilder.allLabels.length).toBe(2);
+            });
+
+            it("shows all labels except of day if dayVisibility is false", () => {
+                dataView.metadata.objects.granularity.granularity = GranularityType.day;
+                visualBuilder.updateFlushAllD3Transitions(dataView);
+
+                // All labels should be visible
+                const oldLabels = visualBuilder.allLabels.length;
+                expect(oldLabels).toBeGreaterThan(1);
+
+                dataView.metadata.objects.labels.dayVisibility = false;
+                visualBuilder.updateFlushAllD3Transitions(dataView);
+
+                // Only one label should be hidden
+                expect(oldLabels - visualBuilder.allLabels.length).toBe(9);
+            });
+
+            it("shows only quarter and day labels if others visibility are false", () => {
+                dataView.metadata.objects.granularity.granularity = GranularityType.day;
+                visualBuilder.updateFlushAllD3Transitions(dataView);
+
+                // All labels should be visible
+                const oldLabels = visualBuilder.allLabels.length;
+                expect(oldLabels).toBeGreaterThan(1);
+
+                dataView.metadata.objects.labels.yearVisibility = false;
+                dataView.metadata.objects.labels.monthVisibility = false;
+                dataView.metadata.objects.labels.weekVisibility = false;
+                visualBuilder.updateFlushAllD3Transitions(dataView);
+
+                // Only quarter and day labels should be visible
+                expect(oldLabels - visualBuilder.allLabels.length).toBe(4);
             });
 
             it("font color", () => {

@@ -45,7 +45,7 @@ export class VisualData extends testDataViewBuilder.TestDataViewBuilder {
     }
 
     public getDataView(columnNames?: string[]): powerbiVisualsApi.DataView {
-        const vis = this.createCategoricalDataViewBuilder([
+        return this.createCategoricalDataViewBuilder([
             {
                 source: {
                     displayName: VisualData.ColumnCategory,
@@ -55,9 +55,7 @@ export class VisualData extends testDataViewBuilder.TestDataViewBuilder {
                 values: this.valuesCategory,
             },
 
-        ], null, columnNames)
-        debugger
-        return vis.build();
+        ], null, columnNames).build();
     }
 
     public getUnWorkableDataView(): powerbiVisualsApi.DataView {

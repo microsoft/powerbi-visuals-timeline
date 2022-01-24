@@ -52,7 +52,7 @@ export class VisualBuilder extends VisualBuilderBase<Timeline> {
     private jsonFilters: powerbiVisualsApi.IFilter[] = [];
 
     constructor(width: number, height: number) {
-        super();
+        super(width, height);
         this.visualHost.applyJsonFilter = () => {
             // No need to implement it
         };
