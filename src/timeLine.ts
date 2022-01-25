@@ -26,8 +26,6 @@
 
 import "../style/visual.less";
 
-import "core-js/stable";
-
 import {
     select as d3Select,
     selectAll as d3SelectAll,
