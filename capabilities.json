@@ -409,6 +409,41 @@
                         "bool": true
                     }
                 },
+                "yearVisibility": {
+                    "displayName": "Year visibility",
+                    "displayNameKey": "Visual_YearVisibility",
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "quarterVisibility": {
+                    "displayName": "Quarter visibility",
+                    "displayNameKey": "Visual_QuarterVisibility",
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "monthVisibility": {
+                    "displayName": "Month visibility",
+                    "displayNameKey": "Visual_MonthVisibility",
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "weekVisibility": {
+                    "displayName": "Week visibility",
+                    "displayNameKey": "Visual_WeekVisibility",
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "dayVisibility": {
+                    "displayName": "Day visibility",
+                    "displayNameKey": "Visual_DayVisibility",
+                    "type": {
+                        "bool": true
+                    }
+                },
                 "fontColor": {
                     "displayName": "Font color",
                     "displayNameKey": "Visual_FontColor",
