@@ -55,7 +55,7 @@
     "lodash": "^4.17.20",
     "powerbi-visuals-api": "^3.5.1",
     "powerbi-visuals-tools": "^3.1.15",
-    "powerbi-visuals-utils-testutils": "^2.3.2",
+    "powerbi-visuals-utils-testutils": "^2.6.0",
     "puppeteer": "^5.2.1",
     "style-loader": "^1.2.1",
     "ts-loader": "^8.0.3",
