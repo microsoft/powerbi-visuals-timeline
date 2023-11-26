@@ -24,8 +24,8 @@
  *  THE SOFTWARE.
  */
 
-import { WeekStandards } from "../calendars/weekStandards";
+import { WeekStandard } from "../calendars/weekStandard";
 
 export class WeeksDetermintaionStandardsSettings {
-    public weekStandard: number = WeekStandards.NotSet;
+    public weekStandard: number = WeekStandard.NotSet;
 }

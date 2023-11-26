@@ -28,45 +28,27 @@ import "../style/visual.less";
 
 import "core-js/stable";
 
-import {
-    select as d3Select,
-    selectAll as d3SelectAll,
-    Selection as D3Selection,
-} from "d3-selection";
+import {select as d3Select, selectAll as d3SelectAll, Selection as D3Selection} from "d3-selection";
 
-import {
-    drag as d3Drag,
-} from "d3-drag";
+import {drag as d3Drag} from "d3-drag";
 
-import {
-    arc as d3Arc,
-} from "d3-shape";
+import {arc as d3Arc} from "d3-shape";
 
 import powerbiVisualsApi from "powerbi-visuals-api";
+import powerbi from "powerbi-visuals-api";
 
-import ISelectionManager = powerbiVisualsApi.extensibility.ISelectionManager;
+import {AdvancedFilter, IFilterColumnTarget} from "powerbi-models";
 
-import {
-    AdvancedFilter,
-    IFilterColumnTarget,
-} from "powerbi-models";
+import {CssConstants, manipulation as svgManipulation} from "powerbi-visuals-utils-svgutils";
 
-import {
-    CssConstants,
-    manipulation as svgManipulation,
-} from "powerbi-visuals-utils-svgutils";
+import {pixelConverter} from "powerbi-visuals-utils-typeutils";
 
-import { pixelConverter } from "powerbi-visuals-utils-typeutils";
+import {interfaces as formattingInterfaces, textMeasurementService} from "powerbi-visuals-utils-formattingutils";
+import {FormattingSettingsService} from "powerbi-visuals-utils-formattingmodel";
 
-import { textMeasurementService, interfaces as formattingInterfaces } from "powerbi-visuals-utils-formattingutils";
+import {interactivityFilterService} from "powerbi-visuals-utils-interactivityutils";
 
-import { interactivityFilterService } from "powerbi-visuals-utils-interactivityutils";
-import extractFilterColumnTarget = interactivityFilterService.extractFilterColumnTarget;
-
-import {
-    dataLabelInterfaces,
-    dataLabelUtils,
-} from "powerbi-visuals-utils-chartutils";
+import {dataLabelInterfaces, dataLabelUtils,} from "powerbi-visuals-utils-chartutils";
 
 import {
     ICursorDataPoint,
@@ -79,27 +61,28 @@ import {
     ITimelineSelectors,
 } from "./dataInterfaces";
 
-import { CalendarSettings } from "./settings/calendarSettings";
-import { CellsSettings } from "./settings/cellsSettings";
-import { LabelsSettings } from "./settings/labelsSettings";
-import { Settings } from "./settings/settings";
+import {CalendarSettings} from "./settings/calendarSettings";
+import {CellsSettings} from "./settings/cellsSettings";
+import {LabelsSettings} from "./settings/labelsSettings";
+import {Settings} from "./settings/settings";
 
-import { GranularityData } from "./granularity/granularityData";
-import { GranularityNames } from "./granularity/granularityNames";
-import { GranularityType } from "./granularity/granularityType";
+import {GranularityData} from "./granularity/granularityData";
+import {GranularityNames} from "./granularity/granularityNames";
+import {GranularityType} from "./granularity/granularityType";
 
-import {
-    ITimelineDatePeriod,
-    ITimelineDatePeriodBase,
-} from "./datePeriod/datePeriod";
+import {ITimelineDatePeriod, ITimelineDatePeriodBase,} from "./datePeriod/datePeriod";
 
-import { DatePeriodBase } from "./datePeriod/datePeriodBase";
+import {DatePeriodBase} from "./datePeriod/datePeriodBase";
 
-import { Calendar } from "./calendars/calendar";
-import { Utils } from "./utils";
-import { CalendarISO8061 } from "./calendars/calendarISO8061";
-import { WeekStandards } from "./calendars/weekStandards";
-import { CalendarFactory } from "./calendars/calendarFactory";
+import {Calendar, CalendarFormat, WeekDayFormat} from "./calendars/calendar";
+import {Utils} from "./utils";
+import {WeekStandard} from "./calendars/weekStandard";
+import {CalendarFactory} from "./calendars/calendarFactory";
+import {TimeLineSettingsModel} from "./timeLineSettingsModel";
+import ISelectionManager = powerbiVisualsApi.extensibility.ISelectionManager;
+import extractFilterColumnTarget = interactivityFilterService.extractFilterColumnTarget;
+import {Day} from "./calendars/day";
+import {Month} from "./calendars/month";
 
 interface IAdjustedFilterDatePeriod {
     period: DatePeriodBase;
@@ -151,16 +134,16 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
                 x: Timeline.DefaultCursorDatapointX,
                 y: Timeline.DefaultCursorDatapointY,
             },
-            {
-                cursorIndex: 1,
-                selectionIndex: Timeline.DefaultSelectionStartIndex,
-                x: Timeline.DefaultCursorDatapointX,
-                y: Timeline.DefaultCursorDatapointY,
-            }];
+                {
+                    cursorIndex: 1,
+                    selectionIndex: Timeline.DefaultSelectionStartIndex,
+                    x: Timeline.DefaultCursorDatapointX,
+                    y: Timeline.DefaultCursorDatapointY,
+                }];
         }
 
         const isCalendarChanged: boolean = previousCalendar
-            && previousCalendar.isChanged(timelineSettings.calendar, timelineSettings.weekDay, timelineSettings.weeksDetermintaionStandards);
+            && previousCalendar.isChanged(timelineSettings.calendar, timelineSettings.weekDay, timelineSettings.weeksDetermintaionStandards.weekStandard);
 
         if (timelineData && timelineData.currentGranularity) {
             startDate = Utils.GET_START_SELECTION_DATE(timelineData);
@@ -168,7 +151,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
         }
 
         if (!initialized || isCalendarChanged) {
-            calendar = new CalendarFactory().create(timelineSettings.weeksDetermintaionStandards, timelineSettings.calendar, timelineSettings.weekDay);
+            calendar = new CalendarFactory().create(timelineSettings.weeksDetermintaionStandards.weekStandard, timelineSettings.calendar, timelineSettings.weekDay);
             timelineData.currentGranularity = timelineGranularityData.getGranularity(
                 timelineSettings.granularity.granularity);
         } else {
@@ -240,16 +223,16 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
                 endDate = calendar.getNextDate(periodDate);
                 break;
             case GranularityType.week:
-                ({ startDate, endDate } = calendar.getWeekPeriod(periodDate));
+                ({startDate, endDate} = calendar.getWeekPeriod(periodDate));
                 break;
             case GranularityType.month:
-                ({ startDate, endDate } = calendar.getMonthPeriod(periodDate));
+                ({startDate, endDate} = calendar.getMonthPeriod(periodDate));
                 break;
             case GranularityType.quarter:
-                ({ startDate, endDate } = calendar.getQuarterPeriod(periodDate));
+                ({startDate, endDate} = calendar.getQuarterPeriod(periodDate));
                 break;
             case GranularityType.year:
-                ({ startDate, endDate } = calendar.getYearPeriod(periodDate));
+                ({startDate, endDate} = calendar.getYearPeriod(periodDate));
                 break;
         }
 
@@ -272,7 +255,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
             }
         }
 
-        return { startDate, endDate };
+        return {startDate, endDate};
     }
 
     public static ARE_VISUAL_UPDATE_OPTIONS_VALID(options: powerbiVisualsApi.extensibility.visual.VisualUpdateOptions): boolean {
@@ -523,6 +506,8 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
     public calendar: Calendar;
 
     private settings: Settings;
+    private formattingSettings: TimeLineSettingsModel;
+    private formattingSettingsService: FormattingSettingsService;
 
     private timelineProperties: ITimelineProperties;
 
@@ -594,6 +579,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
         this.locale = this.host.locale;
 
         this.localizationManager = this.host.createLocalizationManager();
+        this.formattingSettingsService = new FormattingSettingsService(this.localizationManager);
 
         this.timelineProperties = {
             bottomMargin: Timeline.TimelineMargins.BottomMargin,
@@ -685,6 +671,8 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
                 this.host.colorPalette,
             );
 
+            this.formattingSettings = this.formattingSettingsService.populateFormattingSettingsModel(TimeLineSettingsModel, this.dataView);
+
             if (!this.initialized) {
                 this.timelineData = {
                     cursorDataPoints: [],
@@ -697,7 +685,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
             this.timelineGranularityData = new GranularityData(this.datePeriod.startDate, this.datePeriod.endDate);
 
             this.createTimelineData(
-                this.settings,
+                this.formattingSettings,
                 this.datePeriod.startDate,
                 this.datePeriod.endDate,
                 this.timelineGranularityData,
@@ -714,7 +702,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
             const isLatestAvailableDateSelected: boolean = !this.isForceSelectionReset && this.settings.forceSelection.latestAvailableDate;
             const isForceSelected: boolean = !this.isForceSelectionReset && (isCurrentPeriodSelected || isLatestAvailableDateSelected);
             this.isForceSelectionReset = false; // Reset it to default state to allow re-enabling Force Selection
-            let currentForceSelectionResult = { startDate: null, endDate: null };
+            let currentForceSelectionResult = {startDate: null, endDate: null};
 
             if (isCurrentPeriodSelected) {
                 currentForceSelectionResult = ({
@@ -949,9 +937,9 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
 
     public getFilterAction(startDate: Date, endDate: Date): powerbiVisualsApi.FilterAction {
         return startDate !== undefined
-            && endDate !== undefined
-            && startDate !== null
-            && endDate !== null
+        && endDate !== undefined
+        && startDate !== null
+        && endDate !== null
             ? powerbiVisualsApi.FilterAction.merge
             : powerbiVisualsApi.FilterAction.remove;
     }
@@ -1027,7 +1015,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
 
         // This options have no sense if ISO standard was picked
         if ((options.objectName === "weekDay" || options.objectName === "calendar")
-            && settings.weeksDetermintaionStandards.weekStandard !== WeekStandards.NotSet) {
+            && settings.weeksDetermintaionStandards.weekStandard !== WeekStandard.NotSet) {
             return null;
         }
 
@@ -1042,7 +1030,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
         this.host.persistProperties({
             merge: [{
                 objectName: "granularity",
-                properties: { granularity: granularityType },
+                properties: {granularity: granularityType},
                 selector: null,
             }],
         });
@@ -1163,10 +1151,10 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
 
     private adjustHeightOfElements(viewportWidth: number): void {
         this.timelineProperties.legendHeight = 0;
-        if (this.settings.rangeHeader.show) {
+        if (this.formattingSettings.rangeHeader.show.value) {
             this.timelineProperties.legendHeight = Timeline.TimelineMargins.LegendHeightRange;
         }
-        if (this.settings.granularity.show) {
+        if (this.formattingSettings.granularity.show.value) {
             this.timelineProperties.legendHeight = Timeline.TimelineMargins.LegendHeight;
         }
 
@@ -1191,7 +1179,9 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
 
             this.timelineGranularityData.renderGranularities({
                 granularSettings: this.settings.granularity,
-                selectPeriodCallback: (granularityType: GranularityType) => { this.selectPeriod(granularityType); },
+                selectPeriodCallback: (granularityType: GranularityType) => {
+                    this.selectPeriod(granularityType);
+                },
                 selection: this.selectorSelection,
             });
 
@@ -1213,8 +1203,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
 
             const emptySelection = {
                 "measures": [],
-                "dataMap": {
-                }
+                "dataMap": {}
             };
 
             this.selectionManager.showContextMenu(emptySelection, {
@@ -1258,14 +1247,27 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
     }
 
     private createTimelineData(
-        timelineSettings: Settings,
+        formattingSettings: TimeLineSettingsModel,
         startDate: Date,
         endDate: Date,
         timelineGranularityData: GranularityData,
         locale: string,
         localizationManager: powerbiVisualsApi.extensibility.ILocalizationManager,
     ) {
-        const calendar: Calendar = this.calendarFactory.create(timelineSettings.weeksDetermintaionStandards, timelineSettings.calendar, timelineSettings.weekDay);
+
+        const weekStandardFormat: WeekStandard = WeekStandard[formattingSettings.weeksDeterminationStandards.weekStandard.value.value];
+
+        const calendarFormat: CalendarFormat = {
+            month: Month[formattingSettings.fiscalYearCalendar.month.value.value],
+            day: formattingSettings.fiscalYearCalendar.day.value,
+        }
+
+        const weekDayFormat: WeekDayFormat = {
+            daySelection: formattingSettings.weekDay.daySelection.value,
+            day: Day[formattingSettings.weekDay.day.value.value],
+        }
+
+        const calendar: Calendar = this.calendarFactory.create(weekStandardFormat, calendarFormat, weekDayFormat);
 
         timelineGranularityData.createGranularities(calendar, locale, localizationManager);
         timelineGranularityData.createLabels();
@@ -1541,8 +1543,8 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
                     fontSize: this.settings.labels.textSize,
                     label: label.text,
                     maxWidth: this.timelineProperties.cellWidth * (isLast
-                        ? Timeline.CellWidthLastFactor
-                        : Timeline.CellWidthNotLastFactor
+                            ? Timeline.CellWidthLastFactor
+                            : Timeline.CellWidthNotLastFactor
                     ),
                 };
 
@@ -1597,8 +1599,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
             if (this.timelineData.selectionEndIndex < index) {
                 cursorDataPoints[1].selectionIndex = dataPoint.datePeriod.index + dataPoint.datePeriod.fraction;
                 timelineData.selectionEndIndex = index;
-            }
-            else {
+            } else {
                 cursorDataPoints[0].selectionIndex = dataPoint.datePeriod.index;
                 timelineData.selectionStartIndex = index;
             }
@@ -1654,5 +1655,9 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
         });
 
         this.isForceSelectionReset = true;
+    }
+
+    public getFormattingModel(): powerbi.visuals.FormattingModel {
+        return this.formattingSettingsService.buildFormattingModel(this.formattingSettings);
     }
 }

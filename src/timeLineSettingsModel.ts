@@ -1,18 +1,18 @@
 import powerbi from "powerbi-visuals-api";
-import { formattingSettings } from "powerbi-visuals-utils-formattingmodel";
+import {formattingSettings} from "powerbi-visuals-utils-formattingmodel";
+import {WeekStandard} from "./calendars/weekStandard";
+import {Month} from "./calendars/month";
+import {Day} from "./calendars/day";
+import {GranularityType} from "./granularity/granularityType";
 
 import Model = formattingSettings.Model;
 import Card = formattingSettings.SimpleCard;
 import IEnumMember = powerbi.IEnumMember;
-import {WeekStandards} from "./calendars/weekStandards";
-import { Month} from "./calendars/month";
-import {Day} from "./calendars/day";
-import {GranularityType} from "./granularity/granularityType";
 import ILocalizationManager = powerbi.extensibility.ILocalizationManager;
 
 const weeksDeterminationStandardsOptions: IEnumMember[] = [
-    { value: WeekStandards[WeekStandards.NotSet], displayName: "Visual_Week_Standard_None" },
-    { value: WeekStandards[WeekStandards.ISO8061], displayName: "Visual_Week_Standard_ISO8601" },
+    { value: WeekStandard[WeekStandard.NotSet], displayName: "Visual_Week_Standard_None" },
+    { value: WeekStandard[WeekStandard.ISO8061], displayName: "Visual_Week_Standard_ISO8601" },
 ];
 
 const fiscalYearOptions: IEnumMember[] = [

@@ -32,20 +32,17 @@ import {
     assertColorsMatch, clickElement, d3Click, renderTimeout,
 } from "powerbi-visuals-utils-testutils";
 
-import { Calendar } from "../src/calendars/calendar";
+import {Calendar, CalendarFormat, WeekDayFormat} from "../src/calendars/calendar";
 import { ITimelineCursorOverElement, ITimelineData } from "../src/dataInterfaces";
 import { ITimelineDatePeriod, ITimelineDatePeriodBase } from "../src/datePeriod/datePeriod";
 import { DatePeriodBase } from "../src/datePeriod/datePeriodBase";
 import { DayGranularity } from "../src/granularity/dayGranularity";
 import { IGranularity } from "../src/granularity/granularity";
-import { GranularityBase } from "../src/granularity/granularityBase";
 import { GranularityType } from "../src/granularity/granularityType";
 import { MonthGranularity } from "../src/granularity/monthGranularity";
 import { QuarterGranularity } from "../src/granularity/quarterGranularity";
 import { WeekGranularity } from "../src/granularity/weekGranularity";
 import { YearGranularity } from "../src/granularity/yearGranularity";
-import { CalendarSettings } from "../src/settings/calendarSettings";
-import { WeekDaySettings } from "../src/settings/weekDaySettings";
 import { Utils } from "../src/utils";
 import { Timeline } from "../src/timeLine";
 import { GranularityMock } from "./granularityMock";
@@ -164,7 +161,7 @@ describe("Timeline", () => {
                 expect(textRangeText).toContain("2016");
 
                 done();
-            });
+            }, 0);
         });
 
         it("range text cut off with small screen size", (done) => {
@@ -433,7 +430,7 @@ describe("Timeline", () => {
         });
 
         function checkCalendarSettings(day: number, month: number, expectedDay: number): void {
-            const calendarSettings: CalendarSettings = { day, month };
+            const calendarSettings: CalendarFormat = { day, month };
 
             Timeline.SET_VALID_CALENDAR_SETTINGS(calendarSettings);
 
@@ -702,7 +699,7 @@ describe("Timeline", () => {
                 dataView.metadata.objects = {
                     granularity: {},
                     weekDay: {
-                        day: dayOfWeekSundayNumber,
+                        day: { value: { value: dayOfWeekSundayNumber } },
                         daySelection,
                     },
                 };
@@ -716,7 +713,7 @@ describe("Timeline", () => {
                 dataView.metadata.objects = {
                     granularity: {},
                     weekDay: {
-                        day: dayOfWeekThursdayNumber,
+                        day: { value: { value: dayOfWeekThursdayNumber }},
                         daySelection,
                     },
                 };
@@ -724,7 +721,7 @@ describe("Timeline", () => {
                 checkSelectedElement(GranularityType.week, 2);
             });
 
-            it("check calendar getWeekperiod function with day of week option off", () => {
+            it("check calendar getWeekPeriod function with day of week option off", () => {
                 dataView.metadata.objects = {
                     granularity: {},
                     weekDay: {
@@ -1795,12 +1792,12 @@ function createCalendar(
     dayOfWeekSelectionOn: boolean = false,
 ): Calendar {
 
-    const calendarSettings: CalendarSettings = {
+    const calendarSettings: CalendarFormat = {
         day,
         month,
     };
 
-    const weekDaySettings: WeekDaySettings = {
+    const weekDaySettings: WeekDayFormat = {
         day: week,
         daySelection: dayOfWeekSelectionOn,
     };
