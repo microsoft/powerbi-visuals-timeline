@@ -9,6 +9,7 @@ import Model = formattingSettings.Model;
 import Card = formattingSettings.SimpleCard;
 import IEnumMember = powerbi.IEnumMember;
 import ILocalizationManager = powerbi.extensibility.ILocalizationManager;
+import {DatePeriodBase} from "./datePeriod/datePeriodBase";
 
 const weeksDeterminationStandardsOptions: IEnumMember[] = [
     { value: WeekStandard[WeekStandard.NotSet], displayName: "Visual_Week_Standard_None" },
@@ -47,6 +48,14 @@ const granularityOptions: IEnumMember[] = [
     { value: GranularityType[GranularityType.week], displayName: "Visual_Granularity_Week" },
     { value: GranularityType[GranularityType.day], displayName: "Visual_Granularity_Day" },
 ];
+
+export class GeneralSettings {
+    public datePeriod: DatePeriodBase | string = DatePeriodBase.CREATEEMPTY();
+}
+
+export class CursorSettings {
+    public color: string = "#808080";
+}
 
 class TextSizeSettings {
     public static readonly DefaultTextSize: number = 9;
@@ -91,6 +100,9 @@ export class WeeksDeterminationStandardsSettingsCard extends Card {
 }
 
 export class FiscalYearCalendarSettingsCard extends Card {
+    public static readonly DefaultMonth: number = 0;
+    public static readonly DefaultDay: number = 1;
+
     month = new formattingSettings.ItemDropdown({
         name: "month",
         displayName: "Month",
@@ -145,8 +157,6 @@ export class RangeHeaderSettingsCard extends Card {
         displayName: "Show",
         displayNameKey: "Visual_Show",
         value: true,
-        // TODO: make top-level switch
-        visible: true,
     });
 
     fontColor = new formattingSettings.ColorPicker({
@@ -185,7 +195,7 @@ export class CellsSettingsCard extends Card {
         name: "fillUnselected",
         displayName: "Unselected cell color",
         displayNameKey: "Visual_Cell_UnselectedColor",
-        value: { value: "#ADD8E6" },
+        value: { value: "" },
     });
 
     strokeColor = new formattingSettings.ColorPicker({
@@ -344,6 +354,9 @@ export class ScrollAutoAdjustment extends Card {
 }
 
 export class TimeLineSettingsModel extends Model {
+    general = new GeneralSettings();
+    cursor = new CursorSettings();
+
     forceSelection = new ForceSelectionSettingsCard();
     weeksDeterminationStandards = new WeeksDeterminationStandardsSettingsCard();
     fiscalYearCalendar = new FiscalYearCalendarSettingsCard();

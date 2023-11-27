@@ -35,7 +35,6 @@ import { pixelConverter } from "powerbi-visuals-utils-typeutils";
 
 import { Calendar } from "../calendars/calendar";
 import { ITimelineDatePeriod } from "../datePeriod/datePeriod";
-import { GranularitySettings } from "../settings/granularitySettings";
 import { Utils } from "../utils";
 import { IGranularity } from "./granularity";
 import { IGranularityName } from "./granularityName";
@@ -45,6 +44,8 @@ import {
     IExtendedLabel,
     ITimelineLabel,
 } from "../dataInterfaces";
+import {GranularitySettingsCard} from "../timeLineSettingsModel";
+import {GranularityType} from "./granularityType";
 
 export class GranularityBase implements IGranularity {
     private static DefaultFraction: number = 1;
@@ -118,7 +119,7 @@ export class GranularityBase implements IGranularity {
             .attr("dx", this.textLabelDx);
 
         // render slider
-        if (props.granularSettings.granularity === this.granularityProps.granularityType) {
+        if (GranularityType[props.granularSettings.granularity.value.value] === this.granularityProps.granularityType) {
             this.renderSlider(
                 granularitySelection,
                 props.granularSettings,
@@ -152,7 +153,7 @@ export class GranularityBase implements IGranularity {
                 );
             });
 
-        granularitySelection.attr("fill", props.granularSettings.scaleColor);
+        granularitySelection.attr("fill", props.granularSettings.scaleColor.value.value);
 
         return granularitySelection;
     }
@@ -292,17 +293,17 @@ export class GranularityBase implements IGranularity {
 
     private renderSlider(
         selection: Selection<any, any, any, any>,
-        granularSettings: GranularitySettings,
+        granularSettings: GranularitySettingsCard,
     ): void {
         selection
             .append("rect")
             .classed("periodSlicerRect", true)
-            .style("stroke", granularSettings.sliderColor)
+            .style("stroke", granularSettings.sliderColor.value.value)
             .attr("x", pixelConverter.toString(0 - this.sliderXOffset))
             .attr("y", pixelConverter.toString(0 - this.sliderYOffset))
             .attr("rx", pixelConverter.toString(this.sliderRx))
             .attr("width", pixelConverter.toString(this.sliderWidth))
             .attr("height", pixelConverter.toString(this.sliderHeight))
-            .data([granularSettings.granularity]);
+            .data([GranularityType[granularSettings.granularity.value.value]]);
     }
 }

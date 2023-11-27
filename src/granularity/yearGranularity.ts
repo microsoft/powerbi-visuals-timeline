@@ -51,7 +51,7 @@ export class YearGranularity extends GranularityBase {
     }
 
     public render(props: IGranularityRenderProps, isFirst: boolean): Selection<any, any, any, any> {
-        if (!props.granularSettings.granularityYearVisibility) {
+        if (!props.granularSettings.granularityYearVisibility.value) {
             return null;
         }
 

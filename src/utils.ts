@@ -37,7 +37,6 @@ import {
 import { IGranularityName } from "./granularity/granularityName";
 import { GranularityNames } from "./granularity/granularityNames";
 import { GranularityType } from "./granularity/granularityType";
-import { CellsSettings } from "./settings/cellsSettings";
 
 export class Utils {
     public static DefaultCellColor: string = "transparent";
@@ -212,26 +211,6 @@ export class Utils {
         return timelineData.currentGranularity.getDatePeriods()[timelineData.selectionEndIndex];
     }
 
-    /**
-     * Returns the color of a cell, depending on whether its date period is between the selected date periods.
-     * CellRects should be transparent filled by default if there isn't any color sets.
-     * @param d The TimelineDataPoint of the cell
-     * @param timelineData The TimelineData with the selected date periods
-     * @param timelineFormat The TimelineFormat with the chosen colors
-     */
-    public static GET_CELL_COLOR(
-        dataPoint: ITimelineDataPoint,
-        timelineData: ITimelineData,
-        cellSettings: CellsSettings): string {
-
-        const inSelectedPeriods: boolean = dataPoint.datePeriod.startDate >= Utils.GET_START_SELECTION_DATE(timelineData)
-            && dataPoint.datePeriod.endDate <= Utils.GET_END_SELECTION_DATE(timelineData);
-
-        return inSelectedPeriods
-            ? cellSettings.fillSelected
-            : (cellSettings.fillUnselected || Utils.DefaultCellColor);
-    }
-
     public static IS_GRANULE_SELECTED(dataPoint: ITimelineDataPoint, timelineData: ITimelineData): boolean {
         return dataPoint.datePeriod.startDate >= Utils.GET_START_SELECTION_DATE(timelineData)
             && dataPoint.datePeriod.endDate <= Utils.GET_END_SELECTION_DATE(timelineData);
@@ -259,7 +238,7 @@ export class Utils {
 
     /**
      * Returns the name of the granularity type
-     * @param granularity The type of granularity
+     * @param granularityType The type of granularity
      */
     public static GET_GRANULARITY_NAME_KEY(granularityType: GranularityType): string {
         const index: number = Utils.FIND_INDEX(GranularityNames, (granularity: IGranularityName) => {

@@ -47,7 +47,7 @@ export class WeekGranularity extends GranularityBase {
     }
 
     public render(props: IGranularityRenderProps, isFirst: boolean): Selection<any, any, any, any> {
-        if (!props.granularSettings.granularityWeekVisibility) {
+        if (!props.granularSettings.granularityWeekVisibility.value) {
             return null;
         }
 

@@ -239,6 +239,7 @@
             }
         }
     },
+    "privileges": [],
     "supportsHighlight": true,
     "supportsSynchronizingFilterState": true
 }

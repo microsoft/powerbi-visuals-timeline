@@ -50,6 +50,7 @@ import { areColorsEqual, getSolidColorStructuralObject } from "./helpers";
 import { VisualBuilder } from "./visualBuilder";
 import { VisualData } from "./visualData";
 import { CalendarISO8061 } from "../src/calendars/calendarISO8061";
+import {Day} from "../src/calendars/day";
 
 describe("Timeline", () => {
     let visualBuilder: VisualBuilder;
@@ -69,7 +70,7 @@ describe("Timeline", () => {
         it("basic update", (done) => {
             dataView.metadata.objects = {
                 granularity: {
-                    granularity: GranularityType.day,
+                    granularity: GranularityType[GranularityType.day],
                 },
             };
 
@@ -119,7 +120,7 @@ describe("Timeline", () => {
         it("apply blank row data", (done) => {
             dataView.metadata.objects = {
                 granularity: {
-                    granularity: GranularityType.day,
+                    granularity: GranularityType[GranularityType.day],
                 },
             };
 
@@ -143,16 +144,16 @@ describe("Timeline", () => {
             });
         });
 
-        it("basic update", (done) => {
+        it("basic update - selectionRangeContainer", (done) => {
             dataView.metadata.objects = {
                 granularity: {
-                    granularity: GranularityType.year,
+                    granularity: GranularityType[GranularityType.year],
                 },
             };
 
             visualBuilder.update(dataView);
 
-            setTimeout(() => {
+            renderTimeout(() => {
                 // TimeRangeText check visibility when visual is small
                 const textRangeText: string = $(".selectionRangeContainer")
                     .first()
@@ -161,7 +162,7 @@ describe("Timeline", () => {
                 expect(textRangeText).toContain("2016");
 
                 done();
-            }, 0);
+            })
         });
 
         it("range text cut off with small screen size", (done) => {
@@ -169,7 +170,7 @@ describe("Timeline", () => {
 
             dataView.metadata.objects = {
                 granularity: {
-                    granularity: GranularityType.month,
+                    granularity: GranularityType[GranularityType.month],
                 },
             };
 
@@ -192,7 +193,7 @@ describe("Timeline", () => {
             beforeEach(() => {
                 dataView.metadata.objects = {
                     granularity: {
-                        granularity: GranularityType.day,
+                        granularity: GranularityType[GranularityType.day],
                     },
                 };
 
@@ -218,7 +219,7 @@ describe("Timeline", () => {
             beforeEach((done) => {
                 dataView.metadata.objects = {
                     granularity: {
-                        granularity: GranularityType.month,
+                        granularity: GranularityType[GranularityType.month]
                     },
                 };
 
@@ -243,7 +244,7 @@ describe("Timeline", () => {
             it("settings - event", () => {
                 dataView.metadata.objects = {
                     granularity: {
-                        granularity: GranularityType.day,
+                        granularity: GranularityType[GranularityType.day]
                     },
                 };
 
@@ -442,7 +443,7 @@ describe("Timeline", () => {
         beforeEach((done) => {
             dataView.metadata.objects = {
                 granularity: {
-                    granularity: GranularityType.day,
+                    granularity: GranularityType[GranularityType.day],
                 },
             };
 
@@ -616,7 +617,7 @@ describe("Timeline", () => {
                         fillUnselected: getSolidColorStructuralObject(color),
                     },
                     granularity: {
-                        granularity: GranularityType.day,
+                        granularity: GranularityType[GranularityType.day],
                     },
                 };
 
@@ -694,31 +695,27 @@ describe("Timeline", () => {
             });
 
             it("check calendar with default day of week - Sunday", () => {
-                const dayOfWeekSundayNumber = 0;
-
                 dataView.metadata.objects = {
                     granularity: {},
                     weekDay: {
-                        day: { value: { value: dayOfWeekSundayNumber } },
+                        day: Day[Day.Sunday],
                         daySelection,
                     },
                 };
 
-                checkSelectedElement(GranularityType.week, 2);
+                checkSelectedElement(GranularityType[GranularityType.week], 2);
             });
 
             it("check calendar with setted day of week - Tuesday", () => {
-                const dayOfWeekThursdayNumber = 2;
-
                 dataView.metadata.objects = {
                     granularity: {},
                     weekDay: {
-                        day: { value: { value: dayOfWeekThursdayNumber }},
+                        day: Day[Day.Tuesday],
                         daySelection,
                     },
                 };
 
-                checkSelectedElement(GranularityType.week, 2);
+                checkSelectedElement(GranularityType[GranularityType.week], 2);
             });
 
             it("check calendar getWeekPeriod function with day of week option off", () => {
@@ -767,7 +764,7 @@ describe("Timeline", () => {
 
                 dataView.metadata.objects = {
                     granularity: {
-                        granularity: GranularityType[granularity],
+                        granularity: granularity,
                     },
                     weekDay: {
                         daySelection: !daySelection,
@@ -918,7 +915,7 @@ describe("Timeline", () => {
                             granularity: {},
                         };
 
-                        checkSelectedElement(GranularityType.week, 1);
+                        checkSelectedElement(GranularityType[GranularityType.week], 1);
                     }
                 }
             });
@@ -976,7 +973,7 @@ describe("Timeline", () => {
                                 break;
                         }
 
-                        checkSelectedElement(GranularityType[granularity], Math.ceil(expectedElementsAmount));
+                        checkSelectedElement(granularity, Math.ceil(expectedElementsAmount));
                     }
                 }
             });
@@ -997,7 +994,7 @@ describe("Timeline", () => {
                             granularity: {},
                         };
 
-                        checkSelectedElementIsLatestAvailable(GranularityType[granularity]);
+                        checkSelectedElementIsLatestAvailable(granularity);
                     }
                 }
             });
@@ -1020,7 +1017,7 @@ describe("Timeline", () => {
                             granularity: {},
                         };
 
-                        checkSelectedElementIsLatestAvailable(GranularityType[granularity]);
+                        checkSelectedElementIsLatestAvailable(granularity);
                     }
                 }
             });
