@@ -26,7 +26,6 @@
 
 "use strict";
 
-process.env.CHROME_BIN = require("puppeteer").executablePath();
 
 const path = require("path");
 
@@ -34,6 +33,8 @@ const webpackConfig = require("./test.webpack.config.js");
 const tsconfig = require("./tsconfig.json");
 const testRecursivePath = "test/*.test.ts";
 const coverageFolder = "coverage";
+
+process.env.CHROME_BIN = require("playwright-chromium").chromium.executablePath();
 
 module.exports = (config) => {
     config.set({
