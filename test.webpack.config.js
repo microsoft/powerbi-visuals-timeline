@@ -12,16 +12,6 @@ module.exports = {
                 exclude: /(node_modules|dist|coverage|karma.conf.ts)/
             },
             {
-                test: /\.ts$/i,
-                enforce: 'post',
-                include: /(src)/,
-                exclude: /(specs|node_modules|resources\/js\/vendor)/,
-                loader: 'istanbul-instrumenter-loader',
-                options: {
-                    esModules: true
-                }
-            },
-            {
                 test: /\.less$/,
                 use: [{
                     loader: 'style-loader'

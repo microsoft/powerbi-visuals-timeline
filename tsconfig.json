@@ -14,11 +14,7 @@
       "dom"
     ]
   },
-  "include": [
-    "src/**/*.ts",
-    "test/**/*.ts"
-  ],
-  "exclude": [
-    "node_modules"
+  "files": [
+    "src/timeLine.ts"
   ]
 }

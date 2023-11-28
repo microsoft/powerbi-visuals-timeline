@@ -30,10 +30,7 @@ import {
     AdvancedFilter,
 } from "powerbi-models";
 
-import * as $ from "jquery";
-
 import {
-    d3Click,
     VisualBuilderBase,
 } from "powerbi-visuals-utils-testutils";
 
@@ -65,50 +62,41 @@ export class VisualBuilder extends VisualBuilderBase<Timeline> {
         return this.visual;
     }
 
-    public get rootElement(): JQuery {
-        return $(this.element).find(".timeline-component");
+    public get rootElement(): HTMLElement {
+        return this.element.querySelector<HTMLElement>(".timeline-component");
     }
 
-    public get mainElement(): JQuery {
-        return $(this.element).find("svg.timeline");
+    public get mainElement(): SVGElement {
+        return this.element.querySelector<SVGElement>("svg.timeline");
     }
 
-    public get headerElement(): JQuery {
-        return $(this.element).children("div")
-            .children("div")
-            .children("svg");
+    public get headerElement(): SVGElement {
+        return this.element.querySelector<SVGElement>("div > div > svg");
     }
 
-    public get cellRects(): JQuery {
-        return this.mainArea
-            .children(".cellsArea")
-            .children(".cellRect");
+    public get mainArea(): HTMLElement {
+        return this.mainElement.querySelector<HTMLElement>("g.mainArea");
     }
 
-    public get mainArea() {
-        return this.mainElement
-            .children("g.mainArea");
+    public get cellRects() {
+        return this.mainArea.querySelectorAll(".cellsArea > .cellRect");
     }
 
-    public get allLabels() {
-        return this.mainArea
-            .children("g")
-            .children("text.label");
+    public get lastCellRect() {
+        const cells = this.cellRects;
+        return cells[cells.length - 1];
     }
 
-    public get rangeHeaderText() {
-        return this.headerElement
-            .children("g.rangeTextArea")
-            .children("text.selectionRangeContainer");
+    public get allLabels(): NodeListOf<HTMLElement> {
+        return this.mainArea.querySelectorAll("g > text.label");
     }
 
-    public get timelineSlicer() {
-        return this.headerElement
-            .children("g.timelineSlicer");
+    public get rangeHeaderText(): HTMLElement {
+        return this.headerElement.querySelector<HTMLElement>("g.rangeTextArea > text.selectionRangeContainer");
     }
 
-    public selectTheLatestCell(): void {
-        d3Click(this.mainElement.find(".cellRect").last(), 0, 0);
+    public get timelineSlicer(): HTMLElement {
+        return this.headerElement.querySelector<HTMLElement>("g.timelineSlicer");
     }
 
     public setFilter(startDate: Date, endDate: Date): void {
