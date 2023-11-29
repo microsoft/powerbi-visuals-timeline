@@ -30,8 +30,7 @@ import "core-js/stable";
 
 import {select as d3Select, selectAll as d3SelectAll, Selection as D3Selection} from "d3-selection";
 
-import {drag as d3Drag} from "d3-drag";
-
+import {D3DragEvent, drag as d3Drag} from "d3-drag";
 import {arc as d3Arc} from "d3-shape";
 
 import powerbiVisualsApi from "powerbi-visuals-api";
@@ -74,13 +73,15 @@ import {Utils} from "./utils";
 import {WeekStandard} from "./calendars/weekStandard";
 import {CalendarFactory} from "./calendars/calendarFactory";
 import {
-    CellsSettingsCard, FiscalYearCalendarSettingsCard,
+    CellsSettingsCard,
+    FiscalYearCalendarSettingsCard,
     LabelsSettingsCard,
     RangeHeaderSettingsCard,
     TimeLineSettingsModel
 } from "./timeLineSettingsModel";
 import {Day} from "./calendars/day";
 import {Month} from "./calendars/month";
+
 import ISelectionManager = powerbiVisualsApi.extensibility.ISelectionManager;
 import extractFilterColumnTarget = interactivityFilterService.extractFilterColumnTarget;
 
@@ -576,10 +577,12 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
     private selectionManager: ISelectionManager;
 
     private cursorDragBehavior = d3Drag<any, ICursorDataPoint>()
-        .subject((cursorDataPoint: ICursorDataPoint) => {
-            cursorDataPoint.x = cursorDataPoint.selectionIndex * this.timelineProperties.cellWidth;
+        .subject((_: D3DragEvent<any, ICursorDataPoint, ICursorDataPoint>, cursorDataPoint: ICursorDataPoint) => {
+            const cursorCopy = Object.assign({}, cursorDataPoint);
 
-            return cursorDataPoint;
+            cursorCopy.x = cursorCopy.selectionIndex * this.timelineProperties.cellWidth;
+
+            return cursorCopy;
         })
         .on("drag", null)
         .on("end", null)
@@ -1027,8 +1030,9 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
         this.formattingSettings.granularity.granularity.value = selectedGranularity;
     }
 
-    public onCursorDrag(currentCursor: ICursorDataPoint): void {
-        const cursorOverElement: ITimelineCursorOverElement = this.findCursorOverElement((<MouseEvent>(require("d3").event)).x);
+    public onCursorDrag(event: D3DragEvent<any, ICursorDataPoint, ICursorDataPoint>, currentCursor: ICursorDataPoint): void {
+        const mouseEvent: MouseEvent = event.sourceEvent;
+        const cursorOverElement: ITimelineCursorOverElement = this.findCursorOverElement(mouseEvent.x);
 
         if (!cursorOverElement) {
             return;
@@ -1187,28 +1191,24 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
 
     private handleContextMenu(): void {
         // handle context menu
-        this.rootSelection.on('contextmenu', () => {
-            const mouseEvent: MouseEvent = <MouseEvent>(require("d3").event);
-
+        this.rootSelection.on('contextmenu', (pointerEvent: PointerEvent) => {
             const emptySelection = {
                 "measures": [],
                 "dataMap": {}
             };
 
             this.selectionManager.showContextMenu(emptySelection, {
-                x: mouseEvent.clientX,
-                y: mouseEvent.clientY
+                x: pointerEvent.clientX,
+                y: pointerEvent.clientY
             });
-            mouseEvent.preventDefault();
+            pointerEvent.preventDefault();
         });
     }
 
-    private handleClick(dataPoint: ITimelineDataPoint, index: number): void {
-        const event: MouseEvent = <MouseEvent>(require("d3").event);
-
+    private handleClick(event: PointerEvent, dataPoint: ITimelineDataPoint): void {
         event.stopPropagation();
 
-        this.onCellClickHandler(dataPoint, index, event.altKey || event.shiftKey);
+        this.onCellClickHandler(dataPoint, dataPoint.index, event.altKey || event.shiftKey);
     }
 
     private addElements(): void {
