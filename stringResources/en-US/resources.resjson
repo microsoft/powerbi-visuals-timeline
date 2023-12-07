@@ -55,5 +55,7 @@
 	"Visual_GranularityWeekVisibility": "Week visibility",
 	"Visual_GranularityDayVisibility": "Day visibility",
 	"Visual_Weeks_Determination_Standards": "Weeks Determination Standards",
-	"Visual_Week_Standard": "Standard"
+	"Visual_Week_Standard": "Standard",
+	"Visual_Week_Standard_None": "-- none --",
+	"Visual_Week_Standard_ISO8601": "ISO 8601"
 }

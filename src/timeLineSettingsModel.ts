@@ -10,43 +10,44 @@ import Card = formattingSettings.SimpleCard;
 import IEnumMember = powerbi.IEnumMember;
 import ILocalizationManager = powerbi.extensibility.ILocalizationManager;
 import {DatePeriodBase} from "./datePeriod/datePeriodBase";
+import {SimpleSlice} from "powerbi-visuals-utils-formattingmodel/lib/FormattingSettingsComponents";
 
 const weeksDeterminationStandardsOptions: IEnumMember[] = [
-    { value: WeekStandard[WeekStandard.NotSet], displayName: "Visual_Week_Standard_None" },
-    { value: WeekStandard[WeekStandard.ISO8061], displayName: "Visual_Week_Standard_ISO8601" },
+    {value: WeekStandard[WeekStandard.NotSet], displayName: "Visual_Week_Standard_None"},
+    {value: WeekStandard[WeekStandard.ISO8061], displayName: "Visual_Week_Standard_ISO8601"},
 ];
 
 const fiscalYearOptions: IEnumMember[] = [
-    { value: Month[Month.January], displayName: "Visual_Month_January" },
-    { value: Month[Month.February], displayName: "Visual_Month_February" },
-    { value: Month[Month.March], displayName: "Visual_Month_March" },
-    { value: Month[Month.April], displayName: "Visual_Month_April" },
-    { value: Month[Month.May], displayName: "Visual_Month_May" },
-    { value: Month[Month.June], displayName: "Visual_Month_June" },
-    { value: Month[Month.July], displayName: "Visual_Month_July" },
-    { value: Month[Month.August], displayName: "Visual_Month_August" },
-    { value: Month[Month.September], displayName: "Visual_Month_September" },
-    { value: Month[Month.October], displayName: "Visual_Month_October" },
-    { value: Month[Month.November], displayName: "Visual_Month_November" },
-    { value: Month[Month.December], displayName: "Visual_Month_December" },
+    {value: Month[Month.January], displayName: "Visual_Month_January"},
+    {value: Month[Month.February], displayName: "Visual_Month_February"},
+    {value: Month[Month.March], displayName: "Visual_Month_March"},
+    {value: Month[Month.April], displayName: "Visual_Month_April"},
+    {value: Month[Month.May], displayName: "Visual_Month_May"},
+    {value: Month[Month.June], displayName: "Visual_Month_June"},
+    {value: Month[Month.July], displayName: "Visual_Month_July"},
+    {value: Month[Month.August], displayName: "Visual_Month_August"},
+    {value: Month[Month.September], displayName: "Visual_Month_September"},
+    {value: Month[Month.October], displayName: "Visual_Month_October"},
+    {value: Month[Month.November], displayName: "Visual_Month_November"},
+    {value: Month[Month.December], displayName: "Visual_Month_December"},
 ];
 
 const dayOptions: IEnumMember[] = [
-    { value: Day[Day.Sunday], displayName: "Visual_Day_Sunday" },
-    { value: Day[Day.Monday], displayName: "Visual_Day_Monday" },
-    { value: Day[Day.Tuesday], displayName: "Visual_Day_Tuesday" },
-    { value: Day[Day.Wednesday], displayName: "Visual_Day_Wednesday" },
-    { value: Day[Day.Thursday], displayName: "Visual_Day_Thursday" },
-    { value: Day[Day.Friday], displayName: "Visual_Day_Friday" },
-    { value: Day[Day.Saturday], displayName: "Visual_Day_Saturday" },
+    {value: Day[Day.Sunday], displayName: "Visual_Day_Sunday"},
+    {value: Day[Day.Monday], displayName: "Visual_Day_Monday"},
+    {value: Day[Day.Tuesday], displayName: "Visual_Day_Tuesday"},
+    {value: Day[Day.Wednesday], displayName: "Visual_Day_Wednesday"},
+    {value: Day[Day.Thursday], displayName: "Visual_Day_Thursday"},
+    {value: Day[Day.Friday], displayName: "Visual_Day_Friday"},
+    {value: Day[Day.Saturday], displayName: "Visual_Day_Saturday"},
 ];
 
 const granularityOptions: IEnumMember[] = [
-    { value: GranularityType[GranularityType.year], displayName: "Visual_Granularity_Year" },
-    { value: GranularityType[GranularityType.quarter], displayName: "Visual_Granularity_Quarter" },
-    { value: GranularityType[GranularityType.month], displayName: "Visual_Granularity_Month" },
-    { value: GranularityType[GranularityType.week], displayName: "Visual_Granularity_Week" },
-    { value: GranularityType[GranularityType.day], displayName: "Visual_Granularity_Day" },
+    {value: GranularityType[GranularityType.year], displayName: "Visual_Granularity_Year"},
+    {value: GranularityType[GranularityType.quarter], displayName: "Visual_Granularity_Quarter"},
+    {value: GranularityType[GranularityType.month], displayName: "Visual_Granularity_Month"},
+    {value: GranularityType[GranularityType.week], displayName: "Visual_Granularity_Week"},
+    {value: GranularityType[GranularityType.day], displayName: "Visual_Granularity_Day"},
 ];
 
 export class GeneralSettings {
@@ -117,8 +118,8 @@ export class FiscalYearCalendarSettingsCard extends Card {
         displayNameKey: "Visual_Day",
         value: 1,
         options: {
-            minValue: { value: 1, type: powerbi.visuals.ValidatorType.Min },
-            maxValue: { value: 31, type: powerbi.visuals.ValidatorType.Max },
+            minValue: {value: 1, type: powerbi.visuals.ValidatorType.Min},
+            maxValue: {value: 31, type: powerbi.visuals.ValidatorType.Max},
         }
     });
 
@@ -152,7 +153,7 @@ export class WeekDaySettingsCard extends Card {
 }
 
 export class RangeHeaderSettingsCard extends Card {
-    show = new formattingSettings.ToggleSwitch({
+    topLevelSlice: SimpleSlice<boolean> = new formattingSettings.ToggleSwitch({
         name: "show",
         displayName: "Show",
         displayNameKey: "Visual_Show",
@@ -163,7 +164,7 @@ export class RangeHeaderSettingsCard extends Card {
         name: "fontColor",
         displayName: "Font Color",
         displayNameKey: "Visual_FontColor",
-        value: { value: "#777777" },
+        value: {value: "#777777"},
     });
 
     textSize = new formattingSettings.NumUpDown({
@@ -172,15 +173,15 @@ export class RangeHeaderSettingsCard extends Card {
         displayNameKey: "Visual_TextSize",
         value: TextSizeSettings.DefaultTextSize,
         options: {
-            minValue: { value: TextSizeSettings.Min, type: powerbi.visuals.ValidatorType.Min },
-            maxValue: { value: TextSizeSettings.Max, type: powerbi.visuals.ValidatorType.Max },
+            minValue: {value: TextSizeSettings.Min, type: powerbi.visuals.ValidatorType.Min},
+            maxValue: {value: TextSizeSettings.Max, type: powerbi.visuals.ValidatorType.Max},
         }
     });
 
     name: string = "rangeHeader";
     displayName: string = "Range Header";
     displayNameKey: string = "Visual_RangeHeader";
-    slices = [this.show, this.fontColor, this.textSize];
+    slices = [this.fontColor, this.textSize];
 }
 
 export class CellsSettingsCard extends Card {
@@ -215,11 +216,17 @@ export class CellsSettingsCard extends Card {
     name: string = "cells";
     displayName: string = "Cells";
     displayNameKey: string = "Visual_Cells";
-    slices = [this.fillSelected, this.fillUnselected, this.strokeColor, this.selectedStrokeColor];
+    slices = [
+        this.fillSelected,
+        this.fillUnselected,
+        this.strokeColor,
+        this.selectedStrokeColor,
+        this.strokeWidth,
+    ];
 }
 
 export class GranularitySettingsCard extends Card {
-    show = new formattingSettings.ToggleSwitch({
+    topLevelSlice: SimpleSlice<boolean> = new formattingSettings.ToggleSwitch({
         name: "show",
         displayName: "Show",
         displayNameKey: "Visual_Show",
@@ -230,14 +237,14 @@ export class GranularitySettingsCard extends Card {
         name: "scaleColor",
         displayName: "Scale color",
         displayNameKey: "Visual_ScaleColor",
-        value: { value: "#000000" },
+        value: {value: "#000000"},
     });
 
     sliderColor = new formattingSettings.ColorPicker({
         name: "sliderColor",
         displayName: "Slider color",
         displayNameKey: "Visual_SliderColor",
-        value: { value: "#AAAAAA" },
+        value: {value: "#AAAAAA"},
     });
 
     granularity = new formattingSettings.ItemDropdown({
@@ -288,7 +295,6 @@ export class GranularitySettingsCard extends Card {
     displayName: string = "Granularity";
     displayNameKey: string = "Visual_Granularity";
     slices = [
-        this.show,
         this.scaleColor,
         this.sliderColor,
         this.granularity,
@@ -301,7 +307,7 @@ export class GranularitySettingsCard extends Card {
 }
 
 export class LabelsSettingsCard extends Card {
-    show = new formattingSettings.ToggleSwitch({
+    topLevelSlice: SimpleSlice<boolean> = new formattingSettings.ToggleSwitch({
         name: "show",
         displayName: "Show",
         displayNameKey: "Visual_Show",
@@ -311,7 +317,7 @@ export class LabelsSettingsCard extends Card {
     displayAll = new formattingSettings.ToggleSwitch({
         name: "displayAll",
         displayName: "Display all",
-        displayNameKey: "Visual_Display all",
+        displayNameKey: "Visual_DisplayAll",
         value: true,
     });
 
@@ -319,7 +325,7 @@ export class LabelsSettingsCard extends Card {
         name: "fontColor",
         displayName: "Font Color",
         displayNameKey: "Visual_FontColor",
-        value: { value: "#777777" },
+        value: {value: "#777777"},
     });
 
     textSize = new formattingSettings.NumUpDown({
@@ -328,19 +334,19 @@ export class LabelsSettingsCard extends Card {
         displayNameKey: "Visual_TextSize",
         value: TextSizeSettings.DefaultTextSize,
         options: {
-            minValue: { value: TextSizeSettings.Min, type: powerbi.visuals.ValidatorType.Min },
-            maxValue: { value: TextSizeSettings.Max, type: powerbi.visuals.ValidatorType.Max },
+            minValue: {value: TextSizeSettings.Min, type: powerbi.visuals.ValidatorType.Min},
+            maxValue: {value: TextSizeSettings.Max, type: powerbi.visuals.ValidatorType.Max},
         }
     });
 
     name: string = "labels";
     displayName: string = "Labels";
     displayNameKey: string = "Visual_Labels";
-    slices = [this.show, this.displayAll, this.fontColor, this.textSize];
+    slices = [this.displayAll, this.fontColor, this.textSize];
 }
 
 export class ScrollAutoAdjustment extends Card {
-    show = new formattingSettings.ToggleSwitch({
+    topLevelSlice: SimpleSlice<boolean> = new formattingSettings.ToggleSwitch({
         name: "show",
         displayName: "Show",
         displayNameKey: "Visual_Show",
@@ -350,7 +356,6 @@ export class ScrollAutoAdjustment extends Card {
     name: string = "scrollAutoAdjustment";
     displayName: string = "Scroll Auto Adjustment";
     displayNameKey: string = "Visual_ScrollAutoAdjustment";
-    slices = [this.show];
 }
 
 export class TimeLineSettingsModel extends Model {

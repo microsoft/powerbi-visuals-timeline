@@ -442,7 +442,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
 
         const labelSize: number = pixelConverter.fromPointToPixel(labelsSettings.textSize.value);
 
-        if (labelsSettings.show.value) {
+        if (labelsSettings.topLevelSlice.value) {
             const granularityOffset: number = labelsSettings.displayAll.value ? granularityType + 1 : 1;
 
             timelineProperties.cellsYPosition += labelSize
@@ -511,6 +511,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
 
             settings.cells.fillSelected.value.value = foreground.value;
             settings.cells.fillUnselected.value.value = background.value;
+
             settings.cells.strokeColor.value.value = foreground.value;
             settings.cells.selectedStrokeColor.value.value = background.value;
 
@@ -700,7 +701,6 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
                 };
             }
 
-            // Setting parsing was moved here from createTimelineData because settings values may be modified before the function is called.
             Timeline.applyFilters(
                 this.formattingSettings,
                 <AdvancedFilter[]>(this.options.jsonFilters),
@@ -796,7 +796,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
             .attr("fill", (dataPoint: ITimelineDataPoint, index: number) => {
                 const isSelected: boolean = Utils.IS_GRANULE_SELECTED(dataPoint, this.timelineData);
 
-                if (visSettings.scrollAutoAdjustment.show.value && isSelected && !singleCaseDone) {
+                if (visSettings.scrollAutoAdjustment.topLevelSlice.value && isSelected && !singleCaseDone) {
                     const selectedGranulaPos: number = (<any>(cellSelection.nodes()[index])).x.baseVal.value;
                     this.selectedGranulaPos = selectedGranulaPos;
                     singleCaseDone = true;
@@ -905,7 +905,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
 
         d3SelectAll("g." + Timeline.TimelineSelectors.RangeTextArea.className).remove();
 
-        if (rangeHeaderSettings.show.value && maxWidth > 0) {
+        if (rangeHeaderSettings.topLevelSlice.value && maxWidth > 0) {
             this.rangeTextSelection = this.headerSelection
                 .append("g")
                 .classed(Timeline.TimelineSelectors.RangeTextArea.className, true)
@@ -1144,10 +1144,10 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
 
     private adjustHeightOfElements(viewportWidth: number): void {
         this.timelineProperties.legendHeight = 0;
-        if (this.formattingSettings.rangeHeader.show.value) {
+        if (this.formattingSettings.rangeHeader.topLevelSlice.value) {
             this.timelineProperties.legendHeight = Timeline.TimelineMargins.LegendHeightRange;
         }
-        if (this.formattingSettings.granularity.show.value) {
+        if (this.formattingSettings.granularity.topLevelSlice.value) {
             this.timelineProperties.legendHeight = Timeline.TimelineMargins.LegendHeight;
         }
 
@@ -1162,7 +1162,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
     private renderGranularityFrame(granularity: GranularityType): void {
         d3SelectAll("g." + Timeline.TimelineSelectors.TimelineSlicer.className).remove();
 
-        if (this.formattingSettings.granularity.show.value) {
+        if (this.formattingSettings.granularity.topLevelSlice.value) {
             const startXpoint: number = this.timelineProperties.startXpoint;
             const elementWidth: number = this.timelineProperties.elementWidth;
 
@@ -1404,7 +1404,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
         const yDiff: number = Timeline.DefaultYDiff;
         let yPos: number = 0;
 
-        if (timelineSettings.labels.show.value) {
+        if (timelineSettings.labels.topLevelSlice.value) {
             if (timelineSettings.labels.displayAll.value || granularityType === GranularityType.year) {
                 this.renderLabels(
                     extendedLabels.yearLabels,
@@ -1467,7 +1467,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
     }
 
     private calculateYOffset(index: number): number {
-        if (!this.formattingSettings.labels.show.value) {
+        if (!this.formattingSettings.labels.topLevelSlice.value) {
             return this.timelineProperties.textYPosition;
         }
 
@@ -1484,7 +1484,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
         const labelTextSelection: D3Selection<any, ITimelineLabel, any, any> = labelsElement
             .selectAll(Timeline.TimelineSelectors.TextLabel.selectorName);
 
-        if (!this.formattingSettings.labels.show.value) {
+        if (!this.formattingSettings.labels.topLevelSlice.value) {
             labelTextSelection.remove();
             return;
         }
