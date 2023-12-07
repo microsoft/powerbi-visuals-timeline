@@ -344,7 +344,7 @@ export class ScrollAutoAdjustment extends Card {
         name: "show",
         displayName: "Show",
         displayNameKey: "Visual_Show",
-        value: true,
+        value: false,
     });
 
     name: string = "scrollAutoAdjustment";
