@@ -185,18 +185,21 @@ export class RangeHeaderSettingsCard extends Card {
 }
 
 export class CellsSettingsCard extends Card {
+    public static readonly FillSelectedDefaultColor: string = "#ADD8E6";
+    public static readonly FillUnselectedDefaultColor: string = "#FFFFFF";
+
     fillSelected = new formattingSettings.ColorPicker({
         name: "fillSelected",
         displayName: "Selected cell color",
         displayNameKey: "Visual_Cell_SelectedColor",
-        value: { value: "#ADD8E6" },
+        value: { value: CellsSettingsCard.FillSelectedDefaultColor },
     });
 
     fillUnselected = new formattingSettings.ColorPicker({
         name: "fillUnselected",
         displayName: "Unselected cell color",
         displayNameKey: "Visual_Cell_UnselectedColor",
-        value: { value: "" },
+        value: { value: CellsSettingsCard.FillUnselectedDefaultColor },
     });
 
     strokeColor = new formattingSettings.ColorPicker({
@@ -211,6 +214,17 @@ export class CellsSettingsCard extends Card {
         displayName: "Selected stroke color",
         displayNameKey: "Visual_Cell_SelectedStrokeColor",
         value: { value: "#333444" },
+    });
+
+    strokeWidth = new formattingSettings.NumUpDown({
+        name: "strokeWidth",
+        displayName: "Stroke width",
+        displayNameKey: "Visual_Cell_StrokeWidth",
+        value: 1,
+        options: {
+            minValue: { value: 0, type: powerbi.visuals.ValidatorType.Min },
+            maxValue: { value: 30, type: powerbi.visuals.ValidatorType.Max },
+        }
     });
 
     name: string = "cells";

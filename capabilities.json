@@ -140,6 +140,29 @@
                             }
                         }
                     }
+                },
+                "strokeColor": {
+                    "type": {
+                        "fill": {
+                            "solid": {
+                              "color": true
+                            }
+                        }
+                    }
+                },
+                "selectedStrokeColor": {
+                    "type": {
+                        "fill": {
+                            "solid": {
+                              "color": true
+                            }
+                        }
+                    }
+                },
+                "strokeWidth": {
+                    "type": {
+                        "numeric": true
+                    }
                 }
             }
         },

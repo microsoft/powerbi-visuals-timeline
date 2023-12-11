@@ -49,6 +49,7 @@ import { VisualBuilder } from "./visualBuilder";
 import { VisualData } from "./visualData";
 import { CalendarISO8061 } from "../src/calendars/calendarISO8061";
 import {Day} from "../src/calendars/day";
+import {CellsSettingsCard} from "../src/timeLineSettingsModel";
 
 describe("Timeline", () => {
     let visualBuilder: VisualBuilder;
@@ -453,7 +454,16 @@ describe("Timeline", () => {
             visualBuilder.cellRects
                 .forEach((element: Element) => {
                     const fill: string = getComputedStyle(element).fill;
-                    if (fill !== "rgba(0, 0, 0, 0)" && fill !== "transparent") {
+
+                    const fillColorParsed = parseColorString(fill);
+                    const unselectedFillColor = parseColorString(CellsSettingsCard.FillUnselectedDefaultColor);
+
+                    if (fill !== "rgba(0, 0, 0, 0)" &&
+                        fill !== Utils.DefaultCellColor &&
+                        fillColorParsed.R !== unselectedFillColor.R &&
+                        fillColorParsed.G !== unselectedFillColor.G &&
+                        fillColorParsed.B !== unselectedFillColor.B
+                    ) {
                         selectedElements.push(element);
                     }
                 });
@@ -472,10 +482,18 @@ describe("Timeline", () => {
             const cells = visualBuilder.cellRects;
             const lastElement = cells[cells.length - 1];
 
-            visualBuilder.cellRects
+            cells
                 .forEach((element: Element) => {
                     const fill: string = getComputedStyle(element).fill;
-                    if (fill !== "rgba(0, 0, 0, 0)" && fill !== "transparent") {
+
+                    const fillColorParsed = parseColorString(fill);
+                    const unselectedFillColor = parseColorString(CellsSettingsCard.FillUnselectedDefaultColor);
+
+                    if (fill !== "rgba(0, 0, 0, 0)" &&
+                        fill !== Utils.DefaultCellColor &&
+                        fillColorParsed.R !== unselectedFillColor.R &&
+                        fillColorParsed.G !== unselectedFillColor.G &&
+                        fillColorParsed.B !== unselectedFillColor.B) {
                         selectedElements.push(element);
                     }
                 });

@@ -812,7 +812,8 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
                 return isSelected
                     ? cellsSettings.selectedStrokeColor.value.value
                     : cellsSettings.strokeColor.value.value;
-            });
+            })
+            .style("stroke-width", cellsSettings.strokeWidth.value + "px");
     }
 
     public renderCells(timelineData: ITimelineData, timelineProperties: ITimelineProperties, yPos: number): void {
@@ -1191,21 +1192,21 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
 
     private handleContextMenu(): void {
         // handle context menu
-        this.rootSelection.on('contextmenu', (pointerEvent: PointerEvent) => {
+        this.rootSelection.on('contextmenu', (event: MouseEvent) => {
             const emptySelection = {
                 "measures": [],
                 "dataMap": {}
             };
 
             this.selectionManager.showContextMenu(emptySelection, {
-                x: pointerEvent.clientX,
-                y: pointerEvent.clientY
+                x: event.clientX,
+                y: event.clientY
             });
-            pointerEvent.preventDefault();
+            event.preventDefault();
         });
     }
 
-    private handleClick(event: PointerEvent, dataPoint: ITimelineDataPoint): void {
+    private handleClick(event: MouseEvent, dataPoint: ITimelineDataPoint): void {
         event.stopPropagation();
 
         this.onCellClickHandler(dataPoint, dataPoint.index, event.altKey || event.shiftKey);
