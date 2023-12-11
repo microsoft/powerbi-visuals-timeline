@@ -6,6 +6,8 @@
 * Remove lodash, jquery, tslint, ts-node, istanbul-reporter
 * Update dependencies
 * Add missing localization keys
+* Add cursor color settings
+* Add stroke color settings
 
 ## 2.3.0
 * A new option group "Weeks Determination Standards" containing a list of two items where the first one enables US weeks numbering (default) and the second one enables ISO 8601 weeks numbering

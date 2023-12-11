@@ -520,7 +520,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
 
             settings.labels.fontColor.value.value = foreground.value;
 
-            settings.cursor.color = foreground.value;
+            settings.cursor.color.value.value = foreground.value;
         }
     }
 
@@ -891,7 +891,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
                     return cursorDataPoint.cursorIndex * Math.PI + 2 * Math.PI;
                 }),
             )
-            .style("fill", this.formattingSettings.cursor.color)
+            .style("fill", this.formattingSettings.cursor.show.value ? this.formattingSettings.cursor.color.value.value : "transparent")
             .call(this.cursorDragBehavior);
     }
 

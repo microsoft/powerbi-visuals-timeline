@@ -50,18 +50,36 @@ const granularityOptions: IEnumMember[] = [
     {value: GranularityType[GranularityType.day], displayName: "Visual_Granularity_Day"},
 ];
 
-export class GeneralSettings {
-    public datePeriod: DatePeriodBase | string = DatePeriodBase.CREATEEMPTY();
-}
-
-export class CursorSettings {
-    public color: string = "#808080";
-}
 
 class TextSizeSettings {
     public static readonly DefaultTextSize: number = 9;
     public static readonly Min: number = 8;
     public static readonly Max: number = 60;
+}
+
+export class GeneralSettings {
+    public datePeriod: DatePeriodBase | string = DatePeriodBase.CREATEEMPTY();
+}
+
+export class CursorSettingsCard extends Card {
+    show = new formattingSettings.ToggleSwitch({
+        name: "show",
+        displayName: "Show",
+        displayNameKey: "Visual_Show",
+        value: true,
+    });
+
+    color = new formattingSettings.ColorPicker({
+        name: "color",
+        displayName: "Cursor color",
+        displayNameKey: "Visual_CursorColor",
+        value: { value: "#808080" },
+    });
+
+    name: string = "cursor";
+    displayName: string = "Cursor";
+    displayNameKey: string = "Visual_Cursor";
+    slices = [this.show, this.color];
 }
 
 export class ForceSelectionSettingsCard extends Card {
@@ -374,7 +392,7 @@ export class ScrollAutoAdjustment extends Card {
 
 export class TimeLineSettingsModel extends Model {
     general = new GeneralSettings();
-    cursor = new CursorSettings();
+    cursor = new CursorSettingsCard();
 
     forceSelection = new ForceSelectionSettingsCard();
     weeksDeterminationStandards = new WeeksDeterminationStandardsSettingsCard();
@@ -387,6 +405,7 @@ export class TimeLineSettingsModel extends Model {
     scrollAutoAdjustment = new ScrollAutoAdjustment();
 
     cards = [
+        this.cursor,
         this.forceSelection,
         this.weeksDeterminationStandards,
         this.fiscalYearCalendar,

@@ -48,6 +48,8 @@
 	"Visual_ScaleSizeAdjustment": "Scale size auto adjustment",
 	"Visual_FirstDayOfWeek": "First Day of Week",
 	"Visual_DisplayAll": "Display all",
+	"Visual_Cursor": "Cursor",
+	"Visual_CursorColor": "Cursor color",
 	"Visual_ForceSelection": "Force selection",
 	"Visual_CurrentPeriod": "Current period",
 	"Visual_LatestAvailableDate": "Latest available period",

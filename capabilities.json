@@ -45,6 +45,24 @@
                 }
             }
         },
+        "cursor": {
+            "properties": {
+                "show": {
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "color": {
+                    "type": {
+                        "fill": {
+                            "solid": {
+                                "color": true
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "forceSelection": {
             "properties": {
                 "currentPeriod": {
