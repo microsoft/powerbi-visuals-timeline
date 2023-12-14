@@ -89,6 +89,22 @@ interface IAdjustedFilterDatePeriod {
     adaptedDataEndDate: Date;
 }
 
+function throttle(func, timeout = 100) {
+    let timer = null;
+
+    return function perform(...args) {
+        if (timer) {
+            return;
+        }
+
+        timer = setTimeout(() => {
+            func.apply(this, args);
+            clearTimeout(timer);
+            timer = null;
+        }, timeout);
+    }
+}
+
 export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual {
     public static SET_VALID_CALENDAR_SETTINGS(calendarSettings: CalendarFormat): void {
         const theLatestDayOfMonth: number = Utils.GET_THE_LATEST_DAY_OF_MONTH(calendarSettings.month);
@@ -842,6 +858,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
             .on("touchstart", null)
             .on("click", this.handleClick.bind(this))
             .on("touchstart", this.handleClick.bind(this))
+            .on("wheel", throttle(this.handleWheel.bind(this), 50))
             .merge(cellsSelection)
             .attr("x", (dataPoint: ITimelineDataPoint) => {
                 const position: number = totalX;
@@ -1214,6 +1231,45 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
         event.stopPropagation();
 
         this.onCellClickHandler(dataPoint, dataPoint.index, event.altKey || event.shiftKey);
+    }
+
+    private handleWheel(event: WheelEvent, dataPoint: ITimelineDataPoint): void {
+        event.stopPropagation();
+
+        const timelineData: ITimelineData = this.timelineData;
+        const cursorDataPoints: ICursorDataPoint[] = timelineData.cursorDataPoints;
+        const timelineProperties: ITimelineProperties = this.timelineProperties;
+
+        let startIndex: number;
+        let endIndex: number;
+
+        if (event.deltaY === 0) {
+            return;
+        } else if (event.deltaY < 0) { // scroll up
+            startIndex = Math.max(0, timelineData.selectionStartIndex - 1);
+            endIndex = Math.min(timelineData.timelineDataPoints.length - 1, timelineData.selectionEndIndex + 1);
+        } else if (event.deltaY > 0) { // scroll down
+            startIndex = Math.min(timelineData.selectionStartIndex + 1, dataPoint.index);
+            endIndex = Math.max(dataPoint.index, timelineData.selectionEndIndex - 1);
+        }
+
+        cursorDataPoints[0].selectionIndex = startIndex;
+        cursorDataPoints[1].selectionIndex = endIndex + dataPoint.datePeriod.fraction;
+
+        timelineData.selectionStartIndex = startIndex;
+        timelineData.selectionEndIndex = endIndex;
+
+        this.fillCells(this.formattingSettings);
+
+        this.renderCursors(
+            timelineData,
+            timelineProperties.cellHeight,
+            timelineProperties.cellsYPosition,
+        );
+
+        this.renderTimeRangeText(timelineData, this.formattingSettings.rangeHeader);
+        this.setSelection(timelineData);
+        this.toggleForceSelectionOptions();
     }
 
     private addElements(): void {
