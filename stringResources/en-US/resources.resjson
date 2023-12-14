@@ -36,6 +36,7 @@
 	"Visual_Cell_StrokeColor": "Stroke color",
 	"Visual_Cell_SelectedStrokeColor": "Selected stroke color",
 	"Visual_Cell_StrokeWidth": "Stroke width",
+	"Visual_Cell_GapWidth": "Gap width",
 	"Visual_Granularity": "Granularity",
 	"Visual_ScaleColor": "Scale color",
 	"Visual_SliderColor": "Slider color",

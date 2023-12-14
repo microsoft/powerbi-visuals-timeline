@@ -870,7 +870,9 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
             .attr("y", pixelConverter.toString(yPos))
             .attr("height", pixelConverter.toString(timelineProperties.cellHeight))
             .attr("width", (dataPoint: ITimelineDataPoint) => {
-                return pixelConverter.toString(dataPoint.datePeriod.fraction * timelineProperties.cellWidth);
+                return pixelConverter.toString(
+                    dataPoint.datePeriod.fraction * timelineProperties.cellWidth - this.formattingSettings.cells.gapWidth.value
+                );
             })
             .append("title")
             .text((dataPoint: ITimelineDataPoint) => timelineData.currentGranularity.generateLabel(dataPoint.datePeriod).title);
@@ -897,7 +899,13 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
             .classed(Timeline.TimelineSelectors.SelectionCursor.className, true)
             .merge(cursorSelection)
             .attr("transform", (cursorDataPoint: ICursorDataPoint) => {
-                const dx: number = cursorDataPoint.selectionIndex * this.timelineProperties.cellWidth;
+                let dx: number = cursorDataPoint.selectionIndex * this.timelineProperties.cellWidth;
+
+                // right cursor
+                if (cursorDataPoint.cursorIndex === 1) {
+                    dx -= this.formattingSettings.cells.gapWidth.value;
+                }
+
                 const dy: number = cellHeight / Timeline.CellHeightDivider + cellsYPosition;
 
                 return svgManipulation.translate(dx, dy);

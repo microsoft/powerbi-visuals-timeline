@@ -182,6 +182,11 @@
                         "numeric": true
                     }
                 },
+                "gapWidth": {
+                    "type": {
+                        "numeric": true
+                    }
+                },
                 "enableManualSizing": {
                     "type": {
                         "bool": true
