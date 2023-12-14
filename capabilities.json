@@ -181,6 +181,21 @@
                     "type": {
                         "numeric": true
                     }
+                },
+                "enableManualSizing": {
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "width": {
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "height": {
+                    "type": {
+                        "numeric": true
+                    }
                 }
             }
         },

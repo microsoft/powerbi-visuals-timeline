@@ -245,6 +245,33 @@ export class CellsSettingsCard extends Card {
         }
     });
 
+    enableManualSizing = new formattingSettings.ToggleSwitch({
+        name: "enableManualSizing",
+        displayName: "Enable manual sizing",
+        displayNameKey: "Visual_Cell_EnableManualSizing",
+        value: false,
+    });
+
+    width = new formattingSettings.NumUpDown({
+        name: "width",
+        displayName: "Cell Width",
+        displayNameKey: "Visual_Cell_Width",
+        value: 40,
+        options: {
+            minValue: { value: 10, type: powerbi.visuals.ValidatorType.Min },
+        },
+    });
+
+    height = new formattingSettings.NumUpDown({
+        name: "height",
+        displayName: "Cell height",
+        displayNameKey: "Visual_Cell_height",
+        value: 25,
+        options: {
+            minValue: { value: 10, type: powerbi.visuals.ValidatorType.Min },
+        },
+    });
+
     name: string = "cells";
     displayName: string = "Cells";
     displayNameKey: string = "Visual_Cells";
@@ -254,6 +281,9 @@ export class CellsSettingsCard extends Card {
         this.strokeColor,
         this.selectedStrokeColor,
         this.strokeWidth,
+        this.enableManualSizing,
+        this.width,
+        this.height,
     ];
 }
 
@@ -398,8 +428,8 @@ export class TimeLineSettingsModel extends Model {
     weeksDeterminationStandards = new WeeksDeterminationStandardsSettingsCard();
     fiscalYearCalendar = new FiscalYearCalendarSettingsCard();
     weekDay = new WeekDaySettingsCard();
-    rangeHeader = new RangeHeaderSettingsCard();
     cells = new CellsSettingsCard();
+    rangeHeader = new RangeHeaderSettingsCard();
     granularity = new GranularitySettingsCard();
     labels = new LabelsSettingsCard();
     scrollAutoAdjustment = new ScrollAutoAdjustment();
@@ -410,8 +440,8 @@ export class TimeLineSettingsModel extends Model {
         this.weeksDeterminationStandards,
         this.fiscalYearCalendar,
         this.weekDay,
-        this.rangeHeader,
         this.cells,
+        this.rangeHeader,
         this.granularity,
         this.labels,
         this.scrollAutoAdjustment,

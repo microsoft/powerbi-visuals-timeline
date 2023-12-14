@@ -75,7 +75,6 @@ import {CalendarFactory} from "./calendars/calendarFactory";
 import {
     CellsSettingsCard,
     FiscalYearCalendarSettingsCard,
-    LabelsSettingsCard,
     RangeHeaderSettingsCard,
     TimeLineSettingsModel
 } from "./timeLineSettingsModel";
@@ -219,7 +218,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
             .length;
 
         Timeline.setMeasures(
-            timelineSettings.labels,
+            timelineSettings,
             timelineData.currentGranularity.getType(),
             countFullCells,
             viewport,
@@ -430,7 +429,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
     }
 
     private static setMeasures(
-        labelsSettings: LabelsSettingsCard,
+        timelineSettings: TimeLineSettingsModel,
         granularityType: GranularityType,
         datePeriodsCount: number,
         viewport: powerbiVisualsApi.IViewport,
@@ -440,10 +439,10 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
 
         timelineProperties.cellsYPosition = timelineProperties.textYPosition;
 
-        const labelSize: number = pixelConverter.fromPointToPixel(labelsSettings.textSize.value);
+        const labelSize: number = pixelConverter.fromPointToPixel(timelineSettings.labels.textSize.value);
 
-        if (labelsSettings.topLevelSlice.value) {
-            const granularityOffset: number = labelsSettings.displayAll.value ? granularityType + 1 : 1;
+        if (timelineSettings.labels.topLevelSlice.value) {
+            const granularityOffset: number = timelineSettings.labels.displayAll.value ? granularityType + 1 : 1;
 
             timelineProperties.cellsYPosition += labelSize
                 * Timeline.LabelSizeFactor
@@ -452,23 +451,28 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
 
         const svgHeight: number = Math.max(0, viewport.height - timelineMargins.TopMargin);
 
-        const height: number = Math.max(timelineMargins.MinCellHeight,
-            Math.min(
-                timelineMargins.MaxCellHeight,
-                svgHeight
-                - timelineProperties.cellsYPosition
-                - Timeline.TimelinePropertiesHeightOffset
-                + (Timeline.TimelineMargins.LegendHeight - timelineProperties.legendHeight),
-            ));
+        if (timelineSettings.cells.enableManualSizing.value) {
+            timelineProperties.cellHeight = timelineSettings.cells.height.value;
+            timelineProperties.cellWidth = timelineSettings.cells.width.value;
+        } else {
+            const height: number = Math.max(timelineMargins.MinCellHeight,
+                Math.min(
+                    timelineMargins.MaxCellHeight,
+                    svgHeight
+                    - timelineProperties.cellsYPosition
+                    - Timeline.TimelinePropertiesHeightOffset
+                    + (Timeline.TimelineMargins.LegendHeight - timelineProperties.legendHeight),
+                ));
 
-        // Height is deducted here to take account of edge cursors width
-        // that in fact is half of cell height for each of them
-        const width: number = Math.max(
-            timelineMargins.MinCellWidth,
-            (viewport.width - height - Timeline.ViewportWidthAdjustment) / (datePeriodsCount));
+            // Height is deducted here to take account of edge cursors width
+            // that in fact is half of cell height for each of them
+            const width: number = Math.max(
+                timelineMargins.MinCellWidth,
+                (viewport.width - height - Timeline.ViewportWidthAdjustment) / (datePeriodsCount));
 
-        timelineProperties.cellHeight = height;
-        timelineProperties.cellWidth = width;
+            timelineProperties.cellHeight = height;
+            timelineProperties.cellWidth = width;
+        }
     }
 
     private static applyFilters(
