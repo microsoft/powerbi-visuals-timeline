@@ -245,16 +245,6 @@ export class CellsSettingsCard extends Card {
         }
     });
 
-    gapWidth = new formattingSettings.NumUpDown({
-        name: "gapWidth",
-        displayName: "Gap width",
-        displayNameKey: "Visual_Cell_GapWidth",
-        value: 0,
-        options: {
-            minValue: { value: 0, type: powerbi.visuals.ValidatorType.Min },
-            maxValue: { value: 30, type: powerbi.visuals.ValidatorType.Max },
-        }
-    });
     enableManualSizing = new formattingSettings.ToggleSwitch({
         name: "enableManualSizing",
         displayName: "Enable manual sizing",
@@ -280,6 +270,18 @@ export class CellsSettingsCard extends Card {
         options: {
             minValue: { value: 10, type: powerbi.visuals.ValidatorType.Min },
         },
+    });
+
+
+    gapWidth = new formattingSettings.NumUpDown({
+        name: "gapWidth",
+        displayName: "Gap width",
+        displayNameKey: "Visual_Cell_GapWidth",
+        value: 0,
+        options: {
+            minValue: { value: 0, type: powerbi.visuals.ValidatorType.Min },
+            maxValue: { value: 30, type: powerbi.visuals.ValidatorType.Max },
+        }
     });
 
     name: string = "cells";

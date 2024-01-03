@@ -329,7 +329,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
         LegendHeightRange: 20,
         MaxCellHeight: 60,
         MinCellHeight: 20,
-        MinCellWidth: 40,
+        MinCellWidth: 30,
         PeriodSlicerRectHeight: 23,
         PeriodSlicerRectWidth: 15,
         RightMargin: 15,
