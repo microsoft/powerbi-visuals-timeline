@@ -460,9 +460,9 @@ describe("Timeline", () => {
 
                     if (fill !== "rgba(0, 0, 0, 0)" &&
                         fill !== Utils.DefaultCellColor &&
-                        fillColorParsed.R !== unselectedFillColor.R &&
-                        fillColorParsed.G !== unselectedFillColor.G &&
-                        fillColorParsed.B !== unselectedFillColor.B
+                        (fillColorParsed.R !== unselectedFillColor.R ||
+                        fillColorParsed.G !== unselectedFillColor.G ||
+                        fillColorParsed.B !== unselectedFillColor.B )
                     ) {
                         selectedElements.push(element);
                     }

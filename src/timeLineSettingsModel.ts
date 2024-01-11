@@ -158,7 +158,7 @@ export class WeekDaySettingsCard extends Card {
     day = new formattingSettings.ItemDropdown({
         name: "day",
         displayName: "Day",
-        displayNameKey: "Visual_day",
+        displayNameKey: "Visual_Day",
         items: dayOptions,
         value: dayOptions[0],
     });
@@ -171,12 +171,14 @@ export class WeekDaySettingsCard extends Card {
 }
 
 export class RangeHeaderSettingsCard extends Card {
-    topLevelSlice: SimpleSlice<boolean> = new formattingSettings.ToggleSwitch({
+    show: SimpleSlice<boolean> = new formattingSettings.ToggleSwitch({
         name: "show",
         displayName: "Show",
         displayNameKey: "Visual_Show",
         value: true,
     });
+
+    topLevelSlice = this.show;
 
     fontColor = new formattingSettings.ColorPicker({
         name: "fontColor",
@@ -245,6 +247,17 @@ export class CellsSettingsCard extends Card {
         }
     });
 
+    gapWidth = new formattingSettings.NumUpDown({
+        name: "gapWidth",
+        displayName: "Gap width",
+        displayNameKey: "Visual_Cell_GapWidth",
+        value: 0,
+        options: {
+            minValue: { value: 0, type: powerbi.visuals.ValidatorType.Min },
+            maxValue: { value: 30, type: powerbi.visuals.ValidatorType.Max },
+        }
+    });
+
     enableManualSizing = new formattingSettings.ToggleSwitch({
         name: "enableManualSizing",
         displayName: "Enable manual sizing",
@@ -266,23 +279,12 @@ export class CellsSettingsCard extends Card {
         name: "height",
         displayName: "Cell height",
         displayNameKey: "Visual_Cell_height",
-        value: 25,
+        value: 60,
         options: {
             minValue: { value: 10, type: powerbi.visuals.ValidatorType.Min },
         },
     });
 
-
-    gapWidth = new formattingSettings.NumUpDown({
-        name: "gapWidth",
-        displayName: "Gap width",
-        displayNameKey: "Visual_Cell_GapWidth",
-        value: 0,
-        options: {
-            minValue: { value: 0, type: powerbi.visuals.ValidatorType.Min },
-            maxValue: { value: 30, type: powerbi.visuals.ValidatorType.Max },
-        }
-    });
 
     name: string = "cells";
     displayName: string = "Cells";
@@ -293,20 +295,22 @@ export class CellsSettingsCard extends Card {
         this.strokeColor,
         this.selectedStrokeColor,
         this.strokeWidth,
+        this.gapWidth,
         this.enableManualSizing,
         this.width,
         this.height,
-        this.gapWidth,
     ];
 }
 
 export class GranularitySettingsCard extends Card {
-    topLevelSlice: SimpleSlice<boolean> = new formattingSettings.ToggleSwitch({
+    show: SimpleSlice<boolean> = new formattingSettings.ToggleSwitch({
         name: "show",
         displayName: "Show",
         displayNameKey: "Visual_Show",
         value: true,
     });
+
+    topLevelSlice = this.show;
 
     scaleColor = new formattingSettings.ColorPicker({
         name: "scaleColor",
@@ -382,12 +386,14 @@ export class GranularitySettingsCard extends Card {
 }
 
 export class LabelsSettingsCard extends Card {
-    topLevelSlice: SimpleSlice<boolean> = new formattingSettings.ToggleSwitch({
+    show = new formattingSettings.ToggleSwitch({
         name: "show",
         displayName: "Show",
         displayNameKey: "Visual_Show",
         value: true,
     });
+
+    topLevelSlice = this.show;
 
     displayAll = new formattingSettings.ToggleSwitch({
         name: "displayAll",
@@ -421,12 +427,14 @@ export class LabelsSettingsCard extends Card {
 }
 
 export class ScrollAutoAdjustment extends Card {
-    topLevelSlice: SimpleSlice<boolean> = new formattingSettings.ToggleSwitch({
+    show: SimpleSlice<boolean> = new formattingSettings.ToggleSwitch({
         name: "show",
         displayName: "Show",
         displayNameKey: "Visual_Show",
         value: false,
     });
+
+    topLevelSlice = this.show;
 
     name: string = "scrollAutoAdjustment";
     displayName: string = "Scroll Auto Adjustment";
@@ -435,8 +443,8 @@ export class ScrollAutoAdjustment extends Card {
 
 export class TimeLineSettingsModel extends Model {
     general = new GeneralSettings();
-    cursor = new CursorSettingsCard();
 
+    cursor = new CursorSettingsCard();
     forceSelection = new ForceSelectionSettingsCard();
     weeksDeterminationStandards = new WeeksDeterminationStandardsSettingsCard();
     fiscalYearCalendar = new FiscalYearCalendarSettingsCard();
