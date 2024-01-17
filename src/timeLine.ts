@@ -881,7 +881,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
                 return pixelConverter.toString(position);
             })
             .attr("y", pixelConverter.toString(yPos))
-            .attr("height", pixelConverter.toString(timelineProperties.cellHeight))
+            .attr("height", pixelConverter.toString(timelineProperties.cellHeight - this.formattingSettings.cells.strokeWidth.value))
             .attr("width", (dataPoint: ITimelineDataPoint) => {
                 return pixelConverter.toString(
                     dataPoint.datePeriod.fraction * timelineProperties.cellWidth - this.formattingSettings.cells.gapWidth.value
@@ -919,13 +919,13 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
                     dx -= this.formattingSettings.cells.gapWidth.value;
                 }
 
-                const dy: number = cellHeight / Timeline.CellHeightDivider + cellsYPosition;
+                const dy: number = (cellHeight - this.formattingSettings.cells.strokeWidth.value) / Timeline.CellHeightDivider + cellsYPosition;
 
                 return svgManipulation.translate(dx, dy);
             })
             .attr("d", d3Arc<ICursorDataPoint>()
                 .innerRadius(0)
-                .outerRadius(cellHeight / Timeline.CellHeightDivider)
+                .outerRadius(cellHeight / Timeline.CellHeightDivider - this.formattingSettings.cells.strokeWidth.value)
                 .startAngle((cursorDataPoint: ICursorDataPoint) => {
                     return cursorDataPoint.cursorIndex * Math.PI + Math.PI;
                 })
