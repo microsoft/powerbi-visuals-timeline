@@ -243,7 +243,7 @@ export class CellsSettingsCard extends Card {
         value: 1,
         options: {
             minValue: { value: 0, type: powerbi.visuals.ValidatorType.Min },
-            maxValue: { value: 30, type: powerbi.visuals.ValidatorType.Max },
+            maxValue: { value: 10, type: powerbi.visuals.ValidatorType.Max },
         }
     });
 

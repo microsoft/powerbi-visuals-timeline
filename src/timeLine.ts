@@ -118,7 +118,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
         return this.SELECT_PERIOD(datePeriod, granularity, calendar, Utils.RESET_TIME(new Date()));
     }
 
-    public static CONVERTER(
+    public CONVERTER(
         timelineData: ITimelineData,
         timelineProperties: ITimelineProperties,
         timelineGranularityData: GranularityData,
@@ -127,6 +127,8 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
         timelineSettings: TimeLineSettingsModel,
         viewport: powerbiVisualsApi.IViewport,
         previousCalendar: Calendar,
+        oldEnableManualSizing: boolean,
+        newEnableManualSizing: boolean
     ): Calendar {
 
         if (Timeline.isDataViewValid(dataView)) {
@@ -217,13 +219,15 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
             })
             .length;
 
-        Timeline.setMeasures(
+        this.setMeasures(
             timelineSettings,
             timelineData.currentGranularity.getType(),
             countFullCells,
             viewport,
             timelineProperties,
             Timeline.TimelineMargins,
+            oldEnableManualSizing,
+            newEnableManualSizing,
         );
 
         Timeline.updateCursors(timelineData);
@@ -428,13 +432,15 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
         return false;
     }
 
-    private static setMeasures(
+    private setMeasures(
         timelineSettings: TimeLineSettingsModel,
         granularityType: GranularityType,
         datePeriodsCount: number,
         viewport: powerbiVisualsApi.IViewport,
         timelineProperties: ITimelineProperties,
         timelineMargins: ITimelineMargins,
+        oldEnableManualSizing: boolean,
+        newEnableManualSizing: boolean,
     ): void {
 
         timelineProperties.cellsYPosition = timelineProperties.textYPosition;
@@ -451,34 +457,49 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
 
         const svgHeight: number = Math.max(0, viewport.height - timelineMargins.TopMargin);
 
+        const height: number = Math.max(timelineMargins.MinCellHeight,
+            Math.min(
+                timelineMargins.MaxCellHeight,
+                svgHeight
+                - timelineProperties.cellsYPosition
+                - Timeline.TimelinePropertiesHeightOffset
+                + (Timeline.TimelineMargins.LegendHeight - timelineProperties.legendHeight),
+            ));
+
+        // Height is deducted here to take account of edge cursors width
+        // that in fact is half of cell height for each of them
+        const width: number = Math.max(
+            timelineMargins.MinCellWidth,
+            (viewport.width - height - Timeline.ViewportWidthAdjustment) / (datePeriodsCount));
+
         if (timelineSettings.cells.enableManualSizing.value) {
             timelineProperties.cellHeight = timelineSettings.cells.height.value;
             timelineProperties.cellWidth = timelineSettings.cells.width.value;
         } else {
-            const height: number = Math.max(timelineMargins.MinCellHeight,
-                Math.min(
-                    timelineMargins.MaxCellHeight,
-                    svgHeight
-                    - timelineProperties.cellsYPosition
-                    - Timeline.TimelinePropertiesHeightOffset
-                    + (Timeline.TimelineMargins.LegendHeight - timelineProperties.legendHeight),
-                ));
-
-            // Height is deducted here to take account of edge cursors width
-            // that in fact is half of cell height for each of them
-            const width: number = Math.max(
-                timelineMargins.MinCellWidth,
-                (viewport.width - height - Timeline.ViewportWidthAdjustment) / (datePeriodsCount));
-
             timelineProperties.cellHeight = height;
             timelineProperties.cellWidth = width;
 
-            // TODO: persist the values in dataview.metadata.objects
             // Set the height and width so when the user enables manual resizing, the height and width are not reset
-            // timelineSettings.cells.height.value = Math.round(height);
-            // timelineSettings.cells.width.value = Math.round(width);
+            timelineSettings.cells.height.value = Math.round(height);
+            timelineSettings.cells.width.value = Math.round(width);
+        }
+
+        // When enabling manual sizing, the height and width should be saved, otherwise they will be reset
+        // Caveat is that the following code triggers additional update, which causes the visual to change size twice
+        if (oldEnableManualSizing === false && newEnableManualSizing === true) {
+            this.host.persistProperties({
+                merge: [{
+                    objectName: "cells",
+                    properties: {
+                        height: height,
+                        width: width,
+                    },
+                    selector: null
+                }]
+            })
         }
     }
+
 
     private static applyFilters(
         settings: TimeLineSettingsModel,
@@ -700,8 +721,12 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
             this.datePeriod = this.createDatePeriod(this.dataView);
 
 
+            const oldEnableManualSizing = this.formattingSettings?.cells?.enableManualSizing?.value || false;
+
             this.formattingSettings = this.formattingSettingsService.populateFormattingSettingsModel(TimeLineSettingsModel, this.dataView);
             this.formattingSettings.setLocalizedOptions(this.localizationManager);
+
+            const newEnableManualSizing = this.formattingSettings?.cells?.enableManualSizing?.value || false;
 
             if (!this.initialized) {
                 this.timelineData = {
@@ -729,7 +754,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
                 this.localizationManager,
             );
 
-            this.updateCalendar(this.formattingSettings);
+            this.updateCalendar(this.formattingSettings, oldEnableManualSizing, newEnableManualSizing);
 
             const adjustedPeriod: IAdjustedFilterDatePeriod = this.adjustFilterDatePeriod();
             const datePeriod: ITimelineDatePeriodBase = this.datePeriod;
@@ -771,7 +796,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
             if (adjustedPeriod.period.startDate && adjustedPeriod.period.endDate) {
                 const granularityType = GranularityType[this.formattingSettings.granularity.granularity.value.value];
                 this.changeGranularity(granularityType, adjustedPeriod.period.startDate, adjustedPeriod.period.endDate);
-                this.updateCalendar(this.formattingSettings);
+                this.updateCalendar(this.formattingSettings, oldEnableManualSizing, newEnableManualSizing);
             }
 
             this.renderGranularityFrame(granularity);
@@ -1308,8 +1333,8 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
         }
     }
 
-    private updateCalendar(timeLineSettings: TimeLineSettingsModel): void {
-        this.calendar = Timeline.CONVERTER(
+    private updateCalendar(timeLineSettings: TimeLineSettingsModel, oldEnableManualSizing: boolean, newEnableManualSizing: boolean): void {
+        this.calendar = this.CONVERTER(
             this.timelineData,
             this.timelineProperties,
             this.timelineGranularityData,
@@ -1318,6 +1343,8 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
             timeLineSettings,
             this.options.viewport,
             this.calendar,
+            oldEnableManualSizing,
+            newEnableManualSizing,
         );
     }
 
@@ -1666,6 +1693,11 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
     }
 
     public getFormattingModel(): powerbi.visuals.FormattingModel {
+        if (!this.formattingSettings.cells.enableManualSizing.value) {
+            this.formattingSettings.cells.height.visible = false;
+            this.formattingSettings.cells.width.visible = false;
+        }
+
         return this.formattingSettingsService.buildFormattingModel(this.formattingSettings);
     }
 }

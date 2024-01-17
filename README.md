@@ -1,5 +1,5 @@
 # Timeline Slicer
-![build status](https://github.com/microsoft/powerbi-visuals-timeline/actions/workflows/build.yml/badge.svg)
+[![build status](https://github.com/microsoft/powerbi-visuals-timeline/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/microsoft/powerbi-visuals-timeline/actions/workflows/build.yml)
 
 > Graphical date range selector to use for filtering dates
 
