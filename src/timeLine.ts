@@ -925,7 +925,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
             })
             .attr("d", d3Arc<ICursorDataPoint>()
                 .innerRadius(0)
-                .outerRadius(cellHeight / Timeline.CellHeightDivider - this.formattingSettings.cells.strokeWidth.value)
+                .outerRadius(cellHeight / Timeline.CellHeightDivider)
                 .startAngle((cursorDataPoint: ICursorDataPoint) => {
                     return cursorDataPoint.cursorIndex * Math.PI + Math.PI;
                 })
