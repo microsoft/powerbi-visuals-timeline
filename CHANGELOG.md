@@ -1,5 +1,5 @@
 ## 2.5.0
-* powerbi-visuals-api was updated to 5.4.0
+* powerbi-visuals-api was updated to 5.7.0
 * Updated to new formatting model api provided
 * Migrate from puppeteer to playwright
 * Split d3 package into d3-selection, d3-shape, d3-drag, d3-array. Update d3 to v6
