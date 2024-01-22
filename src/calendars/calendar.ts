@@ -25,11 +25,8 @@
  */
 
 import { GranularityData } from "../granularity/granularityData";
-import { CalendarSettings } from "../settings/calendarSettings";
-import { WeekDaySettings } from "../settings/weekDaySettings";
-import { WeeksDetermintaionStandardsSettings } from "../settings/weeksDetermintaionStandardsSettings";
 import { Utils } from "../utils";
-import { WeekStandards } from "./weekStandards";
+import { WeekStandard } from "./weekStandard";
 
 interface IDateDictionary {
     [year: number]: Date;
@@ -38,6 +35,16 @@ interface IDateDictionary {
 export interface IPeriodDates {
     startDate: Date;
     endDate: Date;
+}
+
+export interface CalendarFormat {
+    month: number;
+    day: number;
+}
+
+export interface WeekDayFormat {
+    daySelection: boolean;
+    day: number;
 }
 
 export class Calendar {
@@ -53,7 +60,7 @@ export class Calendar {
     protected EmptyYearOffset: number = 0;
     protected YearOffset: number = 1;
 
-    constructor(calendarFormat: CalendarSettings, weekDaySettings: WeekDaySettings) {
+    constructor(calendarFormat: CalendarFormat, weekDaySettings: WeekDayFormat) {
         this.isDaySelection = weekDaySettings.daySelection;
         this.firstDayOfWeek = weekDaySettings.day;
         this.firstMonthOfYear = calendarFormat.month;
@@ -190,14 +197,14 @@ export class Calendar {
     }
 
     public isChanged(
-        calendarSettings: CalendarSettings,
-        weekDaySettings: WeekDaySettings,
-        weeksDetermintaionStandardsSettings: WeeksDetermintaionStandardsSettings
+        calendarSettings: CalendarFormat,
+        weekDaySettings: WeekDayFormat,
+        weekStandards: WeekStandard
     ): boolean {
         return this.firstMonthOfYear !== calendarSettings.month
             || this.firstDayOfYear !== calendarSettings.day
             || this.firstDayOfWeek !== weekDaySettings.day
-            || weeksDetermintaionStandardsSettings.weekStandard !== WeekStandards.NotSet;
+            || weekStandards !== WeekStandard.NotSet;
     }
 
     public getDateOfFirstWeek(year: number): Date {

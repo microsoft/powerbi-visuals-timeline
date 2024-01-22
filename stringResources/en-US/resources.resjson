@@ -33,6 +33,13 @@
 	"Visual_Cells": "Cells",
 	"Visual_Cell_SelectedColor": "Selected cell color",
 	"Visual_Cell_UnselectedColor": "Unselected cell color",
+	"Visual_Cell_StrokeColor": "Stroke color",
+	"Visual_Cell_SelectedStrokeColor": "Selected stroke color",
+	"Visual_Cell_StrokeWidth": "Stroke width",
+	"Visual_Cell_EnableManualSizing": "Enable manual sizing",
+	"Visual_Cell_Width": "Cell width",
+	"Visual_Cell_height": "Cell height",
+	"Visual_Cell_GapWidth": "Gap width",
 	"Visual_Granularity": "Granularity",
 	"Visual_ScaleColor": "Scale color",
 	"Visual_SliderColor": "Slider color",
@@ -45,6 +52,8 @@
 	"Visual_ScaleSizeAdjustment": "Scale size auto adjustment",
 	"Visual_FirstDayOfWeek": "First Day of Week",
 	"Visual_DisplayAll": "Display all",
+	"Visual_Cursor": "Cursor",
+	"Visual_CursorColor": "Cursor color",
 	"Visual_ForceSelection": "Force selection",
 	"Visual_CurrentPeriod": "Current period",
 	"Visual_LatestAvailableDate": "Latest available period",
@@ -53,5 +62,9 @@
 	"Visual_GranularityQuarterVisibility": "Quarter visibility",
 	"Visual_GranularityMonthVisibility": "Month visibility",
 	"Visual_GranularityWeekVisibility": "Week visibility",
-	"Visual_GranularityDayVisibility": "Day visibility"
+	"Visual_GranularityDayVisibility": "Day visibility",
+	"Visual_Weeks_Determination_Standards": "Weeks Determination Standards",
+	"Visual_Week_Standard": "Standard",
+	"Visual_Week_Standard_None": "-- none --",
+	"Visual_Week_Standard_ISO8601": "ISO 8601"
 }

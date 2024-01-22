@@ -40,7 +40,7 @@ export class QuarterGranularity extends GranularityBase {
     }
 
     public render(props: IGranularityRenderProps, isFirst: boolean): Selection<any, any, any, any> {
-        if (!props.granularSettings.granularityQuarterVisibility) {
+        if (!props.granularSettings.granularityQuarterVisibility.value) {
             return null;
         }
 

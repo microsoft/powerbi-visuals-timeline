@@ -26,7 +26,6 @@
 
 "use strict";
 
-process.env.CHROME_BIN = require("puppeteer").executablePath();
 
 const path = require("path");
 
@@ -35,22 +34,12 @@ const tsconfig = require("./tsconfig.json");
 const testRecursivePath = "test/*.test.ts";
 const coverageFolder = "coverage";
 
+process.env.CHROME_BIN = require("playwright-chromium").chromium.executablePath();
+
 module.exports = (config) => {
     config.set({
         browsers: ["ChromeHeadless"],
         colors: true,
-        coverageIstanbulReporter: {
-            "combineBrowserReports": true,
-            "dir": path.join(__dirname, coverageFolder),
-            "fixWebpackSourcePaths": true,
-            "report-config": {
-                html: {
-                    subdir: "html-report",
-                },
-            },
-            "reports": ["html", "lcovonly", "text-summary", "cobertura"],
-            "verbose": false,
-        },
         coverageReporter: {
             dir: path.join(__dirname, coverageFolder),
             reporters: [
@@ -76,7 +65,6 @@ module.exports = (config) => {
         reporters: [
             "progress",
             "junit",
-            "coverage-istanbul",
         ],
         preprocessors: {
             [testRecursivePath]: ["webpack", "sourcemap"],
