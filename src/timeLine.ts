@@ -26,8 +26,6 @@
 
 import "../style/visual.less";
 
-import "core-js/stable";
-
 import {select as d3Select, selectAll as d3SelectAll, Selection as D3Selection} from "d3-selection";
 
 import {D3DragEvent, drag as d3Drag} from "d3-drag";
