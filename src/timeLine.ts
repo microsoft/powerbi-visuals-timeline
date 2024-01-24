@@ -78,7 +78,6 @@ import {
 } from "./timeLineSettingsModel";
 import {Day} from "./calendars/day";
 import {Month} from "./calendars/month";
-
 import ISelectionManager = powerbiVisualsApi.extensibility.ISelectionManager;
 import extractFilterColumnTarget = interactivityFilterService.extractFilterColumnTarget;
 
@@ -161,7 +160,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
 
         const weekDayFormat: WeekDayFormat = {
             daySelection: timelineSettings.weekDay.daySelection.value,
-            day: Day[timelineSettings.weekDay.day.value.value],
+            day: timelineSettings.weekDay.day.value ? Day[timelineSettings.weekDay.day.value.value] : Day.Sunday,
         }
 
         const isCalendarChanged: boolean = previousCalendar
@@ -175,7 +174,10 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
         if (!initialized || isCalendarChanged) {
             calendar = new CalendarFactory().create(weekStandardFormat, calendarFormat, weekDayFormat);
             timelineData.currentGranularity = timelineGranularityData.getGranularity(
-                GranularityType[timelineSettings.granularity.granularity.value.value]);
+                timelineSettings.granularity.granularity.value
+                    ? GranularityType[timelineSettings.granularity.granularity.value.value]
+                    : GranularityType.month,
+            );
         } else {
             calendar = previousCalendar;
 
@@ -756,7 +758,10 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
 
             const adjustedPeriod: IAdjustedFilterDatePeriod = this.adjustFilterDatePeriod();
             const datePeriod: ITimelineDatePeriodBase = this.datePeriod;
-            const granularity: GranularityType = GranularityType[this.formattingSettings.granularity.granularity.value.value];
+            const granularity: GranularityType = this.formattingSettings.granularity.granularity.value
+                ? GranularityType[this.formattingSettings.granularity.granularity.value.value]
+                : GranularityType.month;
+
             const isCurrentPeriodSelected: boolean = !this.isForceSelectionReset && this.formattingSettings.forceSelection.currentPeriod.value;
             const isLatestAvailableDateSelected: boolean = !this.isForceSelectionReset && this.formattingSettings.forceSelection.latestAvailableDate.value;
             const isForceSelected: boolean = !this.isForceSelectionReset && (isCurrentPeriodSelected || isLatestAvailableDateSelected);
@@ -1294,7 +1299,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
 
         const weekDayFormat: WeekDayFormat = {
             daySelection: formattingSettings.weekDay.daySelection.value,
-            day: Day[formattingSettings.weekDay.day.value.value],
+            day: formattingSettings.weekDay.day.value ? Day[formattingSettings.weekDay.day.value.value] : Day.Sunday,
         }
 
         const calendar: Calendar = this.calendarFactory.create(weekStandardFormat, calendarFormat, weekDayFormat);
