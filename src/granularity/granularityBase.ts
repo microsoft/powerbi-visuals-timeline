@@ -44,7 +44,6 @@ import {
     IExtendedLabel,
     ITimelineLabel,
 } from "../dataInterfaces";
-import {GranularitySettingsCard} from "../timeLineSettingsModel";
 import {GranularityType} from "./granularityType";
 
 export class GranularityBase implements IGranularity {
