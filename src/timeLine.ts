@@ -151,17 +151,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
                 }];
         }
 
-        const weekStandardFormat: WeekStandard = WeekStandard[timelineSettings.weeksDeterminationStandards.weekStandard.value.value];
-
-        const calendarFormat: CalendarFormat = {
-            month: Month[timelineSettings.fiscalYearCalendar.month.value.value],
-            day: timelineSettings.fiscalYearCalendar.day.value,
-        }
-
-        const weekDayFormat: WeekDayFormat = {
-            daySelection: timelineSettings.weekDay.daySelection.value,
-            day: timelineSettings.weekDay.day.value ? Day[timelineSettings.weekDay.day.value.value] : Day.Sunday,
-        }
+        const {weekStandardFormat, calendarFormat, weekDayFormat} = Timeline.computeCalendarFormat(timelineSettings);
 
         const isCalendarChanged: boolean = previousCalendar
             && previousCalendar.isChanged(calendarFormat, weekDayFormat, weekStandardFormat);
@@ -233,6 +223,28 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
         Timeline.updateCursors(timelineData);
 
         return calendar;
+    }
+
+    private static computeCalendarFormat(timelineSettings: TimeLineSettingsModel) {
+        const weekStandardFormat: WeekStandard = timelineSettings.weeksDeterminationStandards.weekStandard.value
+            ? WeekStandard[timelineSettings.weeksDeterminationStandards.weekStandard.value.value]
+            : WeekStandard.NotSet;
+
+        const calendarFormat: CalendarFormat = {
+            month: timelineSettings.fiscalYearCalendar.month.value
+                ? Month[timelineSettings.fiscalYearCalendar.month.value.value]
+                : Month.January,
+            day: timelineSettings.fiscalYearCalendar.day.value,
+        }
+
+        const weekDayFormat: WeekDayFormat = {
+            daySelection: timelineSettings.weekDay.daySelection.value,
+            day: timelineSettings.weekDay.day.value
+                ? Day[timelineSettings.weekDay.day.value.value]
+                : Day.Sunday,
+        }
+
+        return {weekStandardFormat, calendarFormat, weekDayFormat};
     }
 
     public static SELECT_PERIOD(
@@ -507,7 +519,9 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
         colorPalette: powerbiVisualsApi.extensibility.ISandboxExtendedColorPalette,
     ): void {
         const calendarFormat: CalendarFormat = {
-            month: Month[settings.fiscalYearCalendar.month.value.value],
+            month: settings.fiscalYearCalendar.month.value
+                ? Month[settings.fiscalYearCalendar.month.value.value]
+                : Month.January,
             day: settings.fiscalYearCalendar.day.value,
         }
 
@@ -797,7 +811,9 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
             }
 
             if (adjustedPeriod.period.startDate && adjustedPeriod.period.endDate) {
-                const granularityType = GranularityType[this.formattingSettings.granularity.granularity.value.value];
+                const granularityType = this.formattingSettings.granularity.granularity.value
+                    ? GranularityType[this.formattingSettings.granularity.granularity.value.value]
+                    : GranularityType.month;
                 this.changeGranularity(granularityType, adjustedPeriod.period.startDate, adjustedPeriod.period.endDate);
                 this.updateCalendar(this.formattingSettings, oldEnableManualSizing, newEnableManualSizing);
             }
@@ -1290,16 +1306,22 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
         localizationManager: powerbiVisualsApi.extensibility.ILocalizationManager,
     ) {
 
-        const weekStandardFormat: WeekStandard = WeekStandard[formattingSettings.weeksDeterminationStandards.weekStandard.value.value];
+        const weekStandardFormat: WeekStandard = formattingSettings.weeksDeterminationStandards.weekStandard.value
+            ? WeekStandard[formattingSettings.weeksDeterminationStandards.weekStandard.value.value]
+            : WeekStandard.NotSet;
 
         const calendarFormat: CalendarFormat = {
-            month: Month[formattingSettings.fiscalYearCalendar.month.value.value],
+            month: formattingSettings.fiscalYearCalendar.month.value
+                ? Month[formattingSettings.fiscalYearCalendar.month.value.value]
+                : Month.January,
             day: formattingSettings.fiscalYearCalendar.day.value,
         }
 
         const weekDayFormat: WeekDayFormat = {
             daySelection: formattingSettings.weekDay.daySelection.value,
-            day: formattingSettings.weekDay.day.value ? Day[formattingSettings.weekDay.day.value.value] : Day.Sunday,
+            day: formattingSettings.weekDay.day.value
+                ? Day[formattingSettings.weekDay.day.value.value]
+                : Day.Sunday,
         }
 
         const calendar: Calendar = this.calendarFactory.create(weekStandardFormat, calendarFormat, weekDayFormat);
@@ -1324,7 +1346,9 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
                 actualEndDate.getTime() !== prevEndDate.getTime();
 
             if (!changedSelection) {
-                const granularityType = GranularityType[formattingSettings.granularity.granularity.value.value];
+                const granularityType = formattingSettings.granularity.granularity.value
+                    ? GranularityType[formattingSettings.granularity.granularity.value.value]
+                    : GranularityType.month;
                 this.changeGranularity(
                     granularityType,
                     startDate,
