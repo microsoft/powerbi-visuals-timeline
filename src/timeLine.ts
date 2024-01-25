@@ -814,7 +814,6 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
                 const granularityType = this.formattingSettings.granularity.granularity.value
                     ? GranularityType[this.formattingSettings.granularity.granularity.value.value]
                     : GranularityType.month;
-
                 this.changeGranularity(granularityType, adjustedPeriod.period.startDate, adjustedPeriod.period.endDate);
                 this.updateCalendar(this.formattingSettings, oldEnableManualSizing, newEnableManualSizing);
             }
@@ -1350,7 +1349,6 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
                 const granularityType = formattingSettings.granularity.granularity.value
                     ? GranularityType[formattingSettings.granularity.granularity.value.value]
                     : GranularityType.month;
-
                 this.changeGranularity(
                     granularityType,
                     startDate,
