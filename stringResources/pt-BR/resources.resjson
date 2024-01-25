@@ -2,6 +2,7 @@
   "Role_Time": "Hora",
   "Visual_General": "Geral",
   "Visual_FiscalYearStart": "Início do Ano Fiscal",
+  "Visual_FiscalYear": "Ano Fiscal",
   "Visual_Month": "Mês",
   "Visual_Month_January": "Janeiro",
   "Visual_Month_February": "Fevereiro",
@@ -52,7 +53,5 @@
   "Visual_GranularityQuarterVisibility": "Visibilidade do trimestre",
   "Visual_GranularityMonthVisibility": "Visibilidade do mês",
   "Visual_GranularityWeekVisibility": "Visibilidade da semana",
-  "Visual_GranularityDayVisibility": "Visibilidade do dia",
-  "Timeline_Short_Description": "Seletor de intervalo de data gráfico a ser usado para a filtragem de datas",
-  "Timeline_Long_Description": "O segmentador de linha do tempo é um seletor de intervalo de datas gráfico usado como um componente de filtragem no Power BI. Isso torna a filtragem de dados pela dimensão de data simples e divertida.\nCom que frequência você tem que filtrar os dados para um intervalo de datas ou em um nível superior, como no mês ou no trimestre? A cada vez. Certo? A filtragem é problemática quando você tem que clicar em um grande número de valores de data para selecionar o intervalo que você deseja. Alterar a granularidade do filtro de meses, trimestres e anos em tempo real é extremamente entediante. Bem, costumava ser entediante.\nO segmentador de linha do tempo tornará essa experiência muito fácil. Com esse controle deslizante simples para datas, tudo o que você precisa fazer é clicar e arrastar para o intervalo que você deseja. Você também pode alternar para um modo de exibição de Ano, Trimestre ou Mês para selecionar intervalos mesmo em um nível superior ao das datas.\nBasta clicar no segmentador e selecionar um único valor ou clicar na borda e arrastá-la para o intervalo que você deseja.\nVocê também pode alterar a cor de seleção e de tela de fundo, além de diversas outras opções de formatação para controlar a aparência e a funcionalidade. SHIFT + clique também funciona para selecionar um intervalo."
+  "Visual_GranularityDayVisibility": "Visibilidade do dia"
 }

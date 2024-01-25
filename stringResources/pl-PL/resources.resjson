@@ -2,6 +2,7 @@
   "Role_Time": "Godzina",
   "Visual_General": "Ogólne",
   "Visual_FiscalYearStart": "Początek roku obrachunkowego",
+  "Visual_FiscalYear": "Rok obrachunkowy",
   "Visual_Month": "Miesiąc",
   "Visual_Month_January": "styczeń",
   "Visual_Month_February": "Luty",
@@ -52,7 +53,5 @@
   "Visual_GranularityQuarterVisibility": "Widoczność kwartału",
   "Visual_GranularityMonthVisibility": "Widoczność miesiąca",
   "Visual_GranularityWeekVisibility": "Widoczność tygodnia",
-  "Visual_GranularityDayVisibility": "Widoczność dnia",
-  "Timeline_Short_Description": "Graficzny selektor zakresu dat używany do filtrowania dat",
-  "Timeline_Long_Description": "Fragmentator osi czasu to graficzny selektor zakresu dat używany jako składnik filtrowania w usłudze Power BI. Dzięki niemu filtrowanie danych według wymiaru daty jest łatwe i przyjemne.\nJak często musisz filtrować dane według zakresu dat lub wyższego poziomu, takiego jak miesiąc lub kwartał? Za każdym razem. Prawda? Filtrowanie jest czasochłonne, gdy w celu wybrania zakresu trzeba klikać wiele wartości dat. Zmienianie poziomu szczegółowości z miesięcy, kwartałów i lata na bieżąco jest bardzo niewygodne. Przynajmniej było takie do tej pory.\nFragmentator osi czasu bardzo ułatwi to zadanie. Dzięki tej prostej kontrolce suwaka dat wystarczy kliknąć i przeciągnąć do wybranego zakresu. Można również przełączyć się do widoku roku, kwartału lub miesiąca, aby wybierać zakresy nawet na poziomie wyższym niż daty.\nMożna po prostu kliknąć fragmentator, aby wybrać pojedynczą wartość, lub kliknąć krawędź i przeciągnąć ją do wybranego zakresu.\nMożna również zmienić tło i kolor zaznaczenia oraz inne opcje formatowania w celu kontrolowania wyglądu i sposobu działania. Zakres można również zaznaczyć przez naciśnięcie klawisza SHIFT+kliknięcie."
+  "Visual_GranularityDayVisibility": "Widoczność dnia"
 }

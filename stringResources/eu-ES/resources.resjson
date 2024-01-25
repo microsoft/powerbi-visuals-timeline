@@ -2,6 +2,7 @@
   "Role_Time": "Ordua",
   "Visual_General": "Orokorra",
   "Visual_FiscalYearStart": "Urte fiskalaren hasiera",
+  "Visual_FiscalYear": "Urte fiskala",
   "Visual_Month": "Hilabetea",
   "Visual_Month_January": "Urtarrila",
   "Visual_Month_February": "Otsaila",
@@ -52,7 +53,5 @@
   "Visual_GranularityQuarterVisibility": "Hiruhileko ikusgaitasuna",
   "Visual_GranularityMonthVisibility": "Hilabeteko ikusgaitasuna",
   "Visual_GranularityWeekVisibility": "Asteko ikusgaitasuna",
-  "Visual_GranularityDayVisibility": "Egunaren ikusgaitasuna",
-  "Timeline_Short_Description": "Data barrutien hautatzaile grafikoa, datak iragazteko",
-  "Timeline_Long_Description": "Kronologiako zatitzailea data tarte grafikoen hautatzaile bat da, Power BI-ko iragazketa-osagai gisa erabiltzen dena. Hura erabilita, oso erraza da datuak data-dimentsioen arabera iragaztea.\nZenbat aldiz iragazi behar dituzu datuak data tarte baten arabera edo azken hilabete edo hiruhilekoaren arabera? Beti, ezta? Datuak iragaztea nahiko gogaikarria izan daiteke behar duzun tartera iristeko aukera asko sakatu behar dituzunean. Iragazkiaren zehaztasuna hilabetetan, hiruhilekotan edo urtetan ezartzea oso aspergarria da... orain arte.\nKronologiako zatitzaileari esker, erraz asko iragazi ahalko dituzu datuak. Graduatzaile sinple bat duenez datak hautatzeko, behar duzun tartea sakatu eta arrastatu baino ez duzu. Urteko, hilabeteko edo hiruhileko ikuspegira ere alda zaitezke, data zehatzetakoa baino maila altuagoan ikusi nahi badituzu datuak.\nBesterik gabe, sakatu graduatzailea eta hautatu balio bakar bat edo sakatu ertza eta arrasta ezazu nahi duzun tartera.\nAtzeko planoa eta hautatutako kolorea ere alda ditzakezu. Formatu-aukera ugari dituzu itxura eta izaera kontrolatzeko. Maius+klik eginda ere hauta dezakezu tartea."
+  "Visual_GranularityDayVisibility": "Egunaren ikusgaitasuna"
 }

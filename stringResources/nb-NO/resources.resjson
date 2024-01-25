@@ -2,6 +2,7 @@
   "Role_Time": "Tid",
   "Visual_General": "Generelt",
   "Visual_FiscalYearStart": "Start på regnskapsåret",
+  "Visual_FiscalYear": "Regnskapsår",
   "Visual_Month": "Måned",
   "Visual_Month_January": "Januar",
   "Visual_Month_February": "Februar",
@@ -52,7 +53,5 @@
   "Visual_GranularityQuarterVisibility": "Kvartalsvisning",
   "Visual_GranularityMonthVisibility": "Månedsvisning",
   "Visual_GranularityWeekVisibility": "Ukesvisning",
-  "Visual_GranularityDayVisibility": "Dagsvisning",
-  "Timeline_Short_Description": "Grafisk valg av datointervall for datofiltrering",
-  "Timeline_Long_Description": "Tidslinje-sliceren er en grafisk datointervallvelger som brukes som en filtreringskomponent i Power BI. Dette gjør det enkelt og morsomt å filtrere data etter datodimensjonen.\nHvor ofte trenger du å filtrere dataene dine for et datointervall, eller for høyere nivåer som en måned eller kvartal? Hver eneste gang, eller hva? Filtrering er noe herk når du må klikke deg gjennom store volum med datoverdier for å velge det ønskede intervallet. Endring av filtreringsdetaljene fra måneder, kvartaler og år i én operasjon, er langtekkelig. Det vil si, det var langtekkelig.\nMed tidslinje-sliceren går det på et blunk. Med denne enkle skyvekontrollen for datoer trenger du bare å klikke og dra til intervallet du ønsker. Du kan også bytte til års-, kvartals- eller månedsvisning slik at du også kan velge intervaller på høyere nivå enn datoer.\nDu kan ganske enkelt klikke på sliceren for å velge en enkeltverdi, eller klikke på kanten og dra den til ønsket intervall.\nDu kan også endre bakgrunns- og valgfarge og flere andre formateringsalternativer for å endre utseendet. SKIFT+klikk kan også brukes til å velge et område."
+  "Visual_GranularityDayVisibility": "Dagsvisning"
 }

@@ -2,6 +2,7 @@
   "Role_Time": "時間",
   "Visual_General": "一般",
   "Visual_FiscalYearStart": "會計年度開始",
+  "Visual_FiscalYear": "會計年度",
   "Visual_Month": "月",
   "Visual_Month_January": "一月",
   "Visual_Month_February": "二月",
@@ -52,7 +53,5 @@
   "Visual_GranularityQuarterVisibility": "顯示到季",
   "Visual_GranularityMonthVisibility": "顯示到月",
   "Visual_GranularityWeekVisibility": "顯示到週",
-  "Visual_GranularityDayVisibility": "顯示到日",
-  "Timeline_Short_Description": "用於篩選日期的圖形日期範圍選取器",
-  "Timeline_Long_Description": "時間軸交叉分析篩選器是圖形日期範圍選取器，用途是 Power BI 中的篩選元件。這讓依據日期維度來篩選日期輕鬆又有趣。\n您多久會需要依日期範圍或更大的範圍 (例如月或季) 篩選一次資料? 每一次，對吧? 當您必須點選為數眾多的資料值，以選取想要的範圍時，篩選就是痛苦的過程。要即時從月、季和年變更篩選細微性，更是令人煩悶。不過，這都是過去式了。\n時間軸交叉分析篩選器會這個體驗變得豪不費力。透過這個適用於日期的簡易交叉分析篩選器控制項，您要做的就只是按一下並拖曳到想要的範圍。您也可以切換成年、季或月的檢視，以選取比日期大的範圍。\n您只要按一下交叉分析篩選器，就可以選取單一值，或按一下邊緣並將其拖曳到想要的範圍。\n您也可以變更背景和選取範圍的色彩，及其他格式設定選項的數字，以控制外觀及操作。SHIFT+按一下也能選取範圍。"
+  "Visual_GranularityDayVisibility": "顯示到日"
 }

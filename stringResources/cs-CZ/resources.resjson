@@ -2,6 +2,7 @@
   "Role_Time": "Čas",
   "Visual_General": "Obecné",
   "Visual_FiscalYearStart": "Začátek fiskálního roku",
+  "Visual_FiscalYear": "Fiskální rok",
   "Visual_Month": "Měsíc",
   "Visual_Month_January": "Leden",
   "Visual_Month_February": "Únor",
@@ -52,7 +53,5 @@
   "Visual_GranularityQuarterVisibility": "Viditelnost čtvrtletí",
   "Visual_GranularityMonthVisibility": "Viditelnost měsíce",
   "Visual_GranularityWeekVisibility": "Viditelnost týdne",
-  "Visual_GranularityDayVisibility": "Viditelnost dne",
-  "Timeline_Short_Description": "Grafický selektor rozsahu kalendářních dat k použití za účelem filtrování dat",
-  "Timeline_Long_Description": "Průřez časové osy je grafický selektor rozsahu kalendářních dat, který se v Power BI používá jako komponenta filtrování. Díky němu je filtrování dat podle jejich dimenze snadné a zábavné.\nJak často musíte filtrovat data za určité časové období nebo na vyšší úrovni, například měsíc nebo čtvrtletí? Pořád, že ano? Filtrování je náročné, zvlášť když musíte procházet velké množství hodnot dat, abyste vybrali rozsah, který chcete. Průběžné měnění podrobností filtru z měsíců, čtvrtletí a roků je velmi únavné. Vlastně, bývalo to únavné.\nPrůřez časové osy z toho udělá procházku růžovou zahradou. S tímto posuvným ovládacím prvkem pro výběr dat vám stačí kliknout a přetáhnutím označit rozsah, který chcete použít. Můžete také přepnout na zobrazení roku, čtvrtletí nebo měsíce, a vybrat tak rozsahy i na vyšší úrovni, než jsou kalendářní data.\nStačí kliknutím na průřez vybrat jednu hodnotu nebo kliknout na okraj a přetažením označit rozsah, který chcete použít.\nMůžete také změnit barvu pozadí a výběru a k tomu můžete ovládat vzhled pomocí bezpočtu dalších možností formátování. Pro výběr rozsahu také funguje stisknutí klávesy Shift a kliknutí."
+  "Visual_GranularityDayVisibility": "Viditelnost dne"
 }

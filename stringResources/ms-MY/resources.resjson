@@ -2,6 +2,7 @@
   "Role_Time": "Masa",
   "Visual_General": "Umum",
   "Visual_FiscalYearStart": "Permulaan Tahun Fiskal",
+  "Visual_FiscalYear": "Tahun Fiskal",
   "Visual_Month": "Bulan",
   "Visual_Month_January": "Januari",
   "Visual_Month_February": "Februari",
@@ -52,7 +53,5 @@
   "Visual_GranularityQuarterVisibility": "Kebolehlihatan suku",
   "Visual_GranularityMonthVisibility": "Kebolehlihatan bulan",
   "Visual_GranularityWeekVisibility": "Kebolehlihatan minggu",
-  "Visual_GranularityDayVisibility": "Kebolehlihatan hari",
-  "Timeline_Short_Description": "Pemilih julat tarikh grafik untuk digunakan untuk tarikh penapisan",
-  "Timeline_Long_Description": "Slicer garis masa adalah pemilih jarak tarikh grafik yang digunakan sebagai komponen penapisan di Power BI. Ini menjadikan data penapisan mengikut dimensi tarikh mudah dan menyeronokkan.\nBerapa kerap anda perlu menapis data anda untuk julat tarikh atau pada tahap yang lebih tinggi seperti bulan atau suku? Setiap masa. Betul kan? Penapisan adalah kesakitan apabila anda perlu mengklik melalui sejumlah besar nilai tarikh untuk memilih julat yang anda inginkan. Menukar granulariti penapis dari bulan, kuarters dan tahun dengan cepat adalah sangat membosankan. Nah, ia digunakan untuk menjadi sangat membosankan.\nThe slicer Timeline akan membuat pengalaman ini mudah. Dengan kawalan gelangsar mudah ini untuk tarikh, semua yang perlu anda lakukan, hanya klik dan seret ke julat yang anda inginkan. Anda juga boleh beralih ke paparan Tahun, Suku atau Bulan untuk memilih julat walaupun pada tahap yang lebih tinggi berbanding tarikh.\nAnda boleh klik pada slicer untuk memilih satu nilai atau klik tepi dan seret ke julat yang anda mahu.\nAnda juga boleh menukar warna latar belakang & pilihan dan bilangan pilihan pemformatan lain untuk mengawal rasa n nampak. SHIFT+Klik juga berfungsi untuk memilih julat."
+  "Visual_GranularityDayVisibility": "Kebolehlihatan hari"
 }

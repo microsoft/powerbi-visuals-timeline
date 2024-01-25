@@ -2,6 +2,7 @@
   "Role_Time": "Tijd",
   "Visual_General": "Algemeen",
   "Visual_FiscalYearStart": "Begin van het boekjaar",
+  "Visual_FiscalYear": "Boekjaar",
   "Visual_Month": "Maand",
   "Visual_Month_January": "Januari",
   "Visual_Month_February": "Februari",
@@ -52,7 +53,5 @@
   "Visual_GranularityQuarterVisibility": "Weergeven per kwartaal",
   "Visual_GranularityMonthVisibility": "Weergeven per maand",
   "Visual_GranularityWeekVisibility": "Weergeven per week",
-  "Visual_GranularityDayVisibility": "Weergeven per dag",
-  "Timeline_Short_Description": "Grafische selector voor datumbereiken waarmee datums kunnen worden gefilterd",
-  "Timeline_Long_Description": "De tijdlijnslicer is een grafische selector voor datumbereiken die in Power BI wordt gebruikt als een onderdeel voor filteren. Hierdoor wordt het filteren van gegevens op datumdimensie eenvoudig en leuk.\nHoe vaak hebt u uw gegevens moeten filteren voor een datumbereik of op een hoger niveau, zoals maand of kwartaal? Telkens weer. Toch? Filteren kan vervelend zijn wanneer u door een groot aantal datumwaarden moet klikken om het gewenste bereik te selecteren. De filterinstelling veranderen van maanden in kwartalen en jaren kan erg vervelend zijn. Nou ja, kon erg vervelend zijn.\nMet de tijdlijnslicer is dat alles een fluitje van een cent. Met dit eenvoudige slicerbesturingselement voor datums hoeft u alleen maar te klikken en naar het gewenste bereik te slepen. U kunt ook overschakelen naar de weergave voor een jaar, kwartaal of maand om bereiken te selecteren die op een hoger niveau liggen dan datums.\nU kunt gewoon op de slicer klikken om één waarde te selecteren of op de rand klikken en deze naar het gewenste bereik slepen.\nU kunt ook de achtergrond en selectiekleur wijzigen en met een aantal andere opmaakopties het uiterlijk van het diagram aanpassen. Met SHIFT + klikken kunt u ook een bereik selecteren."
+  "Visual_GranularityDayVisibility": "Weergeven per dag"
 }

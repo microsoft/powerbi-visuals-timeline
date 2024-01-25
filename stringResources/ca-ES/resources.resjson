@@ -2,6 +2,7 @@
   "Role_Time": "Hora",
   "Visual_General": "General",
   "Visual_FiscalYearStart": "Inici de l'any fiscal",
+  "Visual_FiscalYear": "Any fiscal",
   "Visual_Month": "Mes",
   "Visual_Month_January": "Gener",
   "Visual_Month_February": "Febrer",
@@ -52,7 +53,5 @@
   "Visual_GranularityQuarterVisibility": "Visualització per trimestre",
   "Visual_GranularityMonthVisibility": "Visualització per mes",
   "Visual_GranularityWeekVisibility": "Visualització per setmana",
-  "Visual_GranularityDayVisibility": "Visualització per dia",
-  "Timeline_Short_Description": "Selector gràfic del rang de dates per filtrar les dates.",
-  "Timeline_Long_Description": "L’afinador Cronologia és un selector d’intervals gràfics de dades que es fa servir com a component de filtratge al Power BI. Això fa que el filtratge de dades per la dimensió de dates sigui fàcil i divertit.\nAmb quina freqüència heu de filtrar les dades per un interval de dates o un nivell encara més alt, com en el cas dels mesos o els trimestres? Sempre, oi? Quan heu de fer clic en grans quantitats de valors de dates per seleccionar l’interval adequat, el filtratge és una tasca esgotadora. De la mateixa manera que el fet de canviar la granularitat del filtre per fer servir mesos, trimestres i anys cada vegada també és molt feixuc. Bé, era molt feixuc.\nL’afinador Cronologia fa que aquesta experiència sigui bufar i fer ampolles. Gràcies a aquest senzill afinador de les dates, només heu de fer clic i arrossegar els elements a l’interval que vulgueu. També podeu canviar a la visualització anual, trimestral o mensual per seleccionar intervals en un nivell superior a les dates.\nNomés heu de fer clic a l’afinador per seleccionar un únic valor, o bé a la vora i arrossegar-la fins a l’interval que vulgueu.\nTambé podeu canviar el color de fons i de selecció, i moltes altres opcions de format per aconseguir l’aspecte que vulgueu. La combinació de Maj i clic també permet seleccionar un interval."
+  "Visual_GranularityDayVisibility": "Visualització per dia"
 }

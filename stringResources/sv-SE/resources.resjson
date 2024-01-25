@@ -2,6 +2,7 @@
   "Role_Time": "Tid",
   "Visual_General": "Allmänt",
   "Visual_FiscalYearStart": "Räkenskapsårets början",
+  "Visual_FiscalYear": "Räkenskapsår",
   "Visual_Month": "Månad",
   "Visual_Month_January": "Januari",
   "Visual_Month_February": "Februari",
@@ -52,7 +53,5 @@
   "Visual_GranularityQuarterVisibility": "Kvartalssynlighet",
   "Visual_GranularityMonthVisibility": "Månadssynlighet",
   "Visual_GranularityWeekVisibility": "Veckosynlighet",
-  "Visual_GranularityDayVisibility": "Dagsynlighet",
-  "Timeline_Short_Description": "Grafisk datumintervallväljare för att filtrera datum",
-  "Timeline_Long_Description": "Tidslinje-utsnitt är en väljare för grafiska datumintervall som används som en filtreringskomponent i Power BI. Den gör det enkelt och roligt att filtrera data efter datumdimension.\nHur ofta måste du filtrera dina data för ett datumintervall eller på högre nivå, till exempel månadsvis eller kvartalsvis? Varenda gång, eller hur? Filtrering kan vara jobbigt när du måste klicka dig igenom stora mängder datumvärden för att välja det intervall du är ute efter. Att ändra detaljnivån på filtret från månader, till kvartal och år när du är på språng är superjobbigt. Det brukade vara det i alla fall.\nTidslinje-utsnitt låter dig göra det lekande lätt. Med ett enkelt skjutreglage för datum, är allt du behöver göra att klicka och dra till det intervall som du vill. Du kan också växla till ett år, kvartal eller månad om du vill markera intervall även på högre nivå än datum.\nDu klickar bara på utsnitt för att markera ett enskilt värde eller klicka på kanten och dra det till det intervall du vill.\nDu kan också ändra bakgrund och markeringsfärg och många andra formateringsalternativ som styr utseendet. Skift + klicka fungerar även för att markera ett intervall."
+  "Visual_GranularityDayVisibility": "Dagsynlighet"
 }

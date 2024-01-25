@@ -2,6 +2,7 @@
   "Role_Time": "Ora",
   "Visual_General": "General",
   "Visual_FiscalYearStart": "Început an financiar",
+  "Visual_FiscalYear": "An fiscal",
   "Visual_Month": "Lună",
   "Visual_Month_January": "Ianuarie",
   "Visual_Month_February": "Februarie",
@@ -52,7 +53,5 @@
   "Visual_GranularityQuarterVisibility": "Vizibilitate trimestru",
   "Visual_GranularityMonthVisibility": "Vizibilitate lună",
   "Visual_GranularityWeekVisibility": "Vizibilitate săptămână",
-  "Visual_GranularityDayVisibility": "Vizibilitate zi",
-  "Timeline_Short_Description": "Selectorul de interval de date grafice de utilizat pentru filtrarea datelor",
-  "Timeline_Long_Description": "Slicerul Cronologie este un selector de interval de date grafic utilizat pe post de componentă de filtrare în Power BI. Acest lucru face simplă și distractivă filtrarea datelor după dimensiune.\nCât de des trebuie să vă filtrați datele după un interval de date sau după un nivel superior, cum ar fi o lună sau un trimestru? De fiecare dată. Nu-i așa? Filtrarea este un chin atunci când trebuie să faceți clic prin multe valori dată calendaristică pentru a selecta intervalul dorit. Modificarea rapidă a granularității de filtrare în luni, trimestre și ani poate fi extrem de dificilă. Ei bine, acest lucru este de domeniul trecutului.\nSlicerul Cronologie va simplifica semnificativ această experiență. Cu acest control simplu de cursor pentru date, nu trebuie decât să faceți clic și să glisați la intervalul pe care îl doriți. De asemenea, puteți comuta la o vizualizare An, Trimestru sau Lună, pentru a selecta intervale la un nivel și mai mare decât datele.\nFaceți clic pur și simplu pe slicer pentru a selecta o singură valoare sau faceți clic pe margine și glisați-o la intervalul dorit.\nDe asemenea, puteți modifica fundalul și culoarea selecției, precum și alte opțiuni de formatare, pentru a controla aspectul și stilul. SHIFT+clic funcționează și pentru a selecta un interval."
+  "Visual_GranularityDayVisibility": "Vizibilitate zi"
 }

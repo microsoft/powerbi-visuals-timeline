@@ -2,6 +2,7 @@
   "Role_Time": "Ura",
   "Visual_General": "Splošno",
   "Visual_FiscalYearStart": "Začetek poslovnega leta",
+  "Visual_FiscalYear": "Poslovno leto",
   "Visual_Month": "Mesec",
   "Visual_Month_January": "Januar",
   "Visual_Month_February": "Februar",
@@ -52,7 +53,5 @@
   "Visual_GranularityQuarterVisibility": "Vidljivost četrtletja",
   "Visual_GranularityMonthVisibility": "Vidljivost meseca",
   "Visual_GranularityWeekVisibility": "Vidljivost tedna",
-  "Visual_GranularityDayVisibility": "Vidljivost dneva",
-  "Timeline_Short_Description": "Izbirnik grafičnega prikaza datumskega obsega za filtriranje datumov",
-  "Timeline_Long_Description": "Razčlenjevalnik časovnice je izbirnik grafičnega prikaza datumskega obsega, ki se uporablja za filtriranje komponente v storitvi Power BI. S tem postane filtriranje podatkov po časovni dimenziji preprosto in zabavno.\nKako pogosto morate filtrirati podatke po datumskem obsegu ali po mesecu oz. četrtletju? Vedno znova? Filtriranje je lahko zamudno, ko morate klikati številne datumske vrednosti, da izberete želeni datumski obseg. Sprotno spreminjanje zrnatosti filtra za mesece, četrtletja in leta je lahko izjemno utrujajoče. No, vsaj bilo je utrujajoče.\nRazčlenjevalnik časovnice bo to izkušnjo povsem poenostavil. S tem preprostim kontrolnikom drsnika za datume morate samo klikniti in povleči v želeni obseg. Preklopite lahko tudi na leto, četrtletje ali mesec, tako da izberete obsege, ki so večji od datumov.\nPreprosto kliknite razčlenjevalnik, da izberete eno vrednost, ali pa kliknite rok in ga povlecite v želeni obseg.\nSpremenite lahko tudi barvo ozadja in izbora ter številne druge možnosti oblikovanja, s katerimi nadzirate videz in delovanje. Obseg lahko izberete tudi s tipko SHIFT+klikom."
+  "Visual_GranularityDayVisibility": "Vidljivost dneva"
 }

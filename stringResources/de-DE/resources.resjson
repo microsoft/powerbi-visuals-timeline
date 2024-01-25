@@ -2,6 +2,7 @@
   "Role_Time": "Zeitraum",
   "Visual_General": "Allgemein",
   "Visual_FiscalYearStart": "Beginn des Geschäftsjahrs",
+  "Visual_FiscalYear": "Geschäftsjahr",
   "Visual_Month": "Monat",
   "Visual_Month_January": "Januar",
   "Visual_Month_February": "Februar",
@@ -52,7 +53,5 @@
   "Visual_GranularityQuarterVisibility": "Ansichtszeitraum: Quartal",
   "Visual_GranularityMonthVisibility": "Ansichtszeitraum: Monat",
   "Visual_GranularityWeekVisibility": "Ansichtszeitraum: Woche",
-  "Visual_GranularityDayVisibility": "Ansichtszeitraum: Tag",
-  "Timeline_Short_Description": "Grafische Auswahl von Datumsbereichen zum Filtern von Daten.",
-  "Timeline_Long_Description": "Der Zeitachsen-Slicer dient zur grafischen Auswahl von Datumsbereichen und wird in Power BI als Filterkomponente verwendet. So lassen sich Datumswerte ganz leicht anhand von Datumsdimensionen filtern.\nWie oft müssen Sie Ihre Daten nach Datumsbereichen oder auf höherer Ebene z. B. nach Monat oder Quartal filtern? Jedes einzelne Mal. Richtig? Filtern ist sehr mühsam, wenn Sie sich durch große Mengen an Datumswerten klicken müssen, um den gewünschten Bereich auszuwählen. Das Ändern der Filtergranularität von Monaten zu Quartalen oder Jahren ist ebenfalls eine mühselige Angelegenheit. Zumindest war es das einmal.\nDer Zeitachsen-Slicer bietet einen einfachen Schieberegler, mit dem diese Aufgabe im Handumdrehen erledigt ist: Sie müssen einfach nur klicken und den Regler zu dem Bereich ziehen, den Sie anzeigen möchten. Sie können auch zu den Ansichten für Jahr, Quartal oder Monat wechseln, um größere Datumsbereiche auszuwählen.\nSie können einfach auf den Slicer klicken, um einen einzelnen Wert auszuwählen, oder Sie klicken auf den Rand und ziehen den Slicer auf den gewünschten Bereich.\nSie können außerdem Hintergrund- und Auswahlfarbe ändern sowie eine Reihe weiterer Formatierungsoptionen festlegen, um das Erscheinungsbild Ihrer Datendarstellung zu steuern. Zur Auswahl eines Bereichs können Sie auch bei gedrückter UMSCHALTTASTE klicken."
+  "Visual_GranularityDayVisibility": "Ansichtszeitraum: Tag"
 }
