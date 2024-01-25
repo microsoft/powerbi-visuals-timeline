@@ -2,6 +2,7 @@
   "Role_Time": "Laiks",
   "Visual_General": "Vispārīgi",
   "Visual_FiscalYearStart": "Finanšu gada sākums",
+  "Visual_FiscalYear": "Finanšu gads",
   "Visual_Month": "Mēnesis",
   "Visual_Month_January": "janvārī",
   "Visual_Month_February": "februārī",
@@ -52,7 +53,5 @@
   "Visual_GranularityQuarterVisibility": "Ceturkšņa redzamība",
   "Visual_GranularityMonthVisibility": "Mēneša redzamība",
   "Visual_GranularityWeekVisibility": "Nedēļas redzamība",
-  "Visual_GranularityDayVisibility": "Dienas redzamība",
-  "Timeline_Short_Description": "Grafisks datumu diapazonu atlasītājs datumu filtrēšanai.",
-  "Timeline_Long_Description": "Timeline Slicer ir grafisks datumu diapazonu atlasītājs, ko pakalpojumā Power BI izmanto kā filtrēšanas komponentu. Pateicoties tam, datu filtrēšana pa datumu dimensijām ir vienkārša un aizraujoša.\nCik bieži jums ir jāfiltrē datumu diapazona vai augstāka līmeņa, piemēram, mēneša vai ceturkšņa, dati? Katru reizi. Vai ne? Filtrēšana ir apgrūtinoša, kad ir jānoklikšķina uz liela skaita datumu vērtībām, lai atlasītu vajadzīgo diapazonu. Filtrēšanas granularitātes mainīšana no mēnešiem, ceturkšņiem un gadiem ir ļoti garlaicīga. Tāda tā bija.\nTimeline Slicer datu griezums šo darbību padarīs pavisam ātru un vieglu. Izmantojot šo vienkāršo slīdņa datumu vadīklu, jums ir tikai jānoklikšķina uz vajadzīgā diapazona un jāvelk tas. Varat arī pārslēgties uz skatu Gads, Ceturksnis vai Mēnesis, lai atlasītu par datumiem augstākā līmenī esošus diapazonus.\nVarat vienkārši noklikšķināt uz datu griezuma, lai atlasītu vienu vērtību, vai noklikšķināt uz malas un vilkt to uz vajadzīgo diapazonu.\nVarat arī mainīt fonu un atlases krāsu, kā arī daudzas citas formatēšanas opcijas, lai kontrolētu izskatu un lietošanu. Diapazona atlasei var arī izmantot taustiņu kombināciju SHIFT+klikšķis."
+  "Visual_GranularityDayVisibility": "Dienas redzamība"
 }

@@ -2,6 +2,7 @@
   "Role_Time": "Saat",
   "Visual_General": "Genel",
   "Visual_FiscalYearStart": "Mali Yıl Başlangıcı",
+  "Visual_FiscalYear": "Mali Yıl",
   "Visual_Month": "Ay",
   "Visual_Month_January": "Ocak",
   "Visual_Month_February": "Şubat",
@@ -52,7 +53,5 @@
   "Visual_GranularityQuarterVisibility": "Üç aylık dönem görünürlüğü",
   "Visual_GranularityMonthVisibility": "Ay görünürlüğü",
   "Visual_GranularityWeekVisibility": "Hafta görünürlüğü",
-  "Visual_GranularityDayVisibility": "Gün görünürlüğü",
-  "Timeline_Short_Description": "Tarihleri filtrelemek için kullanılacak grafik tarih aralığı seçicisi",
-  "Timeline_Long_Description": "Zaman Çizgisi dilimleyicisi, Power BI'da filtreleme bileşeni olarak kullanılan grafik bir tarih aralığı seçicisidir. Bu, verileri tarih boyutuna göre filtrelemeyi kolay ve eğlenceli hale getirir.\nVerilerinizi hangi sıklıkla bir tarih aralığına göre veya ay ya da üç aylık dönem gibi daha üst düzeyde filtrelemeniz gerekiyor? Her zaman, değil mi? Filtreleme işlemi, istediğiniz aralığı seçmek için çok sayıda tarih değerine tıklamanız gerektiğinde çok zahmetli olur. Filtrenin hassasiyetini ay yerine üç aya ya da yıla çevirmek çok daha zahmetli. Daha doğrusu zahmetliydi.\nZaman Çizgisi dilimleyicisi bunu artık çocuk oyuncağına çevirecek. Bu basit tarih kaydıracı denetimiyle tüm yapmanız gereken tıklayıp istediğiniz aralığa sürüklemek. Ayrıca tarihten daha üst bir düzeyde aralık seçmek için Yıl, Üç Ay ya da Ay görünümüne geçebilirsiniz.\nTek bir değer seçmek için dilimleyiciye tıklayabilir veya kenarına tıklayıp dilimleyiciyi istediğiniz aralığa sürükleyebilirsiniz.\nAyrıcı görünüm ve hissi denetlemek için arka planı ve seçme rengini ve bir dizi başka biçimlendirme seçeneğini değiştirebilirsiniz. Aralık seçmek için Shift+Tıklama da kullanılabilir."
+  "Visual_GranularityDayVisibility": "Gün görünürlüğü"
 }

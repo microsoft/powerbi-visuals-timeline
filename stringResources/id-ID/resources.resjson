@@ -2,6 +2,7 @@
   "Role_Time": "Waktu",
   "Visual_General": "Umum",
   "Visual_FiscalYearStart": "Awal Tahun Fiskal",
+  "Visual_FiscalYear": "Tahun Fiskal",
   "Visual_Month": "Bulan",
   "Visual_Month_January": "Januari",
   "Visual_Month_February": "Februari",
@@ -52,7 +53,5 @@
   "Visual_GranularityQuarterVisibility": "Visibilitas kuartal",
   "Visual_GranularityMonthVisibility": "Visibilitas bulan",
   "Visual_GranularityWeekVisibility": "Visibilitas minggu",
-  "Visual_GranularityDayVisibility": "Visibilitas hari",
-  "Timeline_Short_Description": "Pemilih rentang tanggal grafis akan digunakan untuk memfilter tanggal",
-  "Timeline_Long_Description": "Timeline slicer adalah pemilih rentang tanggal grafis yang digunakan sebagai komponen pemfilteran dalam Power BI. Komponen ini membuat pemfilteran data berdasarkan dimensi tanggal menjadi mudah dan menyenangkan.\nSeberapa sering Anda harus memfilter data untuk rentang tanggal atau pada tingkat yang lebih tinggi seperti bulan atau kuartal? Setiap saat, bukan? Pemfilteran menjadi rumit ketika Anda harus mengklik banyak nilai tanggal untuk memilih rentang yang diinginkan. Mengubah granularitas filter dari bulan, kuartal, dan tahun akan sangat membosankan. Sekarang tidak lagi.\nTimeline slicer akan membuat proses ini menjadi sangat mudah. Dengan kontrol penggeser sederhana untuk tanggal, Anda cukup mengklik dan menyeret ke rentang yang diinginkan. Anda juga dapat beralih ke tampilan Tahun, Kuartal atau Bulan untuk memilih rentang pada tingkat yang lebih tinggi dibandingkan tanggal.\nAnda dapat dengan mudah mengklik pemotong untuk memilih satu nilai atau mengklik pada tepinya lalu menyeretnya ke rentang yang diinginkan.\nAnda juga dapat mengubah warna latar belakang & pilihan serta sejumlah opsi pemformatan lain untuk mengontrol tampilan dan nuansanya. SHIFT + Klik juga berfungsi untuk memilih rentang."
+  "Visual_GranularityDayVisibility": "Visibilitas hari"
 }

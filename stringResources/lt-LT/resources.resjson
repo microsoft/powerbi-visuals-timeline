@@ -2,6 +2,7 @@
   "Role_Time": "Laikas",
   "Visual_General": "Bendra",
   "Visual_FiscalYearStart": "Finansinių metų pradžia",
+  "Visual_FiscalYear": "Finansiniai metai",
   "Visual_Month": "Mėnuo",
   "Visual_Month_January": "Sausis",
   "Visual_Month_February": "Vasaris",
@@ -52,7 +53,5 @@
   "Visual_GranularityQuarterVisibility": "Ketvirčio matomumas",
   "Visual_GranularityMonthVisibility": "Mėnesio matomumas",
   "Visual_GranularityWeekVisibility": "Savaitės matomumas",
-  "Visual_GranularityDayVisibility": "Dienos matomumas",
-  "Timeline_Short_Description": "Grafinis datų intervalo išrinkiklis, skirtas naudoti filtruojant datas",
-  "Timeline_Long_Description": "Laiko planavimo juostos pjūvis yra grafinis datų intervalo išrinkiklis, tarnyboje „Power BI“ naudojamas kaip filtravimo komponentas. Jį naudojant duomenis lengva ir smagu filtruoti pagal datos dimensiją.\nKaip dažnai turite filtruoti duomenų intervalo ar aukštesnio lygmens, pvz., mėnesio ar ketvirčio, duomenis? Kiekvieną kartą. Tiesa? Kai, norint pasirinkti norimą intervalą, reikia spustelėti daugybę datų reikšmių, filtravimas yra kančia. Tuo pačiu metu keisti filtrų detalumą (mėnesių, ketvirčių ir metų) yra itin varginantis procesas. Na, tai būdavo labai varginantis procesas.\nLaiko planavimo juostos pjūvis šią operaciją labai supaprastins. Naudojant šį paprastą datų slankiklio valdiklį, tereikia tik spustelėti ir nuvilkti norimą intervalą. Taip pat galite įjungti metų, ketvirčių ar mėnesių rodinį, kad būtų galima pasirinkti aukštesnių nei datos lygmenų intervalus.\nGalite tiesiog spustelėti pjūvį, jei norite pasirinkti vieną reikšmę, arba spustelėti kraštą ir jį nuvilkti iki norimo intervalo.\nTaip pat galite keisti fono ir pasirinkimo spalvą ir daug kitų formatavimo parinkčių bei taip valdyti elemento išvaizdą. Pasirinkti intervalą taip pat galima jį spustelėjant nuspaudus SHIFT."
+  "Visual_GranularityDayVisibility": "Dienos matomumas"
 }

@@ -2,6 +2,7 @@
   "Role_Time": "Vrijeme",
   "Visual_General": "Općenito",
   "Visual_FiscalYearStart": "Početak fiskalne godine",
+  "Visual_FiscalYear": "Poslovna godina",
   "Visual_Month": "Mjesec",
   "Visual_Month_January": "siječnja",
   "Visual_Month_February": "veljače",
@@ -52,7 +53,5 @@
   "Visual_GranularityQuarterVisibility": "Vidljivost tromjesečja",
   "Visual_GranularityMonthVisibility": "Vidljivost mjeseca",
   "Visual_GranularityWeekVisibility": "Vidljivost tjedna",
-  "Visual_GranularityDayVisibility": "Vidljivost dana",
-  "Timeline_Short_Description": "Grafički alat za odabir raspona datuma koji služi za filtriranje datuma",
-  "Timeline_Long_Description": "Rezač vremenske crte grafički je alat za odabir raspona datuma koji sa koristi kao komponenta za filtriranje u dodatku Power BI. Time se filtriranje podatka po dimenziji datuma čini jednostavnim i zabavnim.\nKoliko često morate filtrirati podatke za određeni raspon datuma ili na višoj razini, npr. mjesečnoj ili tromjesečnoj? Svaki put. Je li tako? Filtriranje je nezgodno kada morate klikati po velikoj količini datumskih vrijednosti da biste odabrali željeni raspon. Promjena granularnosti filtra iz mjeseci, tromjesečja i godina u hodi vrlo je dugotrajno. Doduše, bilo je vrlo dugotrajno.\nUz rezač vremenske crte to ćete učiniti začas. Pomoću te jednostavne kontrole klizača za datume dovoljno je kliknuti i povući do željenog raspona. Možete se i prebacit i na prikaz godine, tromjesečja ili mjeseca da biste odabrali raspone i na više razini od datuma.\nMožete jednostavno kliknuti rezač da biste odabrali jednu vrijednost ili kliknuti rub i povući ga na željeni raspon.\nMožete i promijeniti boju pozadine i odabira te brojne druge mogućnosti oblikovanja da biste upravljali izgledom. Raspon je moguće odabrati i klikanjem uz pritisnutu tipku SHIFT."
+  "Visual_GranularityDayVisibility": "Vidljivost dana"
 }

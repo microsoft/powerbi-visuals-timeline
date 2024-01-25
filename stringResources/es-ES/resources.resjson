@@ -2,6 +2,7 @@
   "Role_Time": "Hora",
   "Visual_General": "General",
   "Visual_FiscalYearStart": "Inicio del año fiscal",
+  "Visual_FiscalYear": "Año fiscal",
   "Visual_Month": "Mes",
   "Visual_Month_January": "Enero",
   "Visual_Month_February": "Febrero",
@@ -52,7 +53,5 @@
   "Visual_GranularityQuarterVisibility": "Visibilidad de trimestre",
   "Visual_GranularityMonthVisibility": "Visibilidad de mes",
   "Visual_GranularityWeekVisibility": "Visibilidad de semana",
-  "Visual_GranularityDayVisibility": "Visibilidad de día",
-  "Timeline_Short_Description": "Selector gráfico de intervalo de fechas para filtrar fechas",
-  "Timeline_Long_Description": "La segmentación de escala de tiempo es un selector gráfico de intervalo de fechas usado como un componente de filtrado en Power BI. Este selector permite filtrar datos por dimensión de fechas de forma fácil y divertida.\n¿Con qué frecuencia tiene que filtrar los datos para un intervalo de fechas o en un nivel superior, como meses o trimestres? Siempre. Es así, ¿no? Filtrar es una molestia cuando hay que hacer clic en números grandes de valores de fechas para seleccionar un rango. Cambiar la granularidad de filtrado de meses, trimestres y años al instante es muy complicado. Bueno, solía ser muy complicado.\nLa segmentación de escala de tiempo hará que esta experiencia sea realmente sencilla. Con este sencillo control deslizante de fechas, solo necesita hacer clic y arrastrar hasta el rango que prefiera. También puede cambiar a la vista de año, trimestre o mes para seleccionar rangos con un nivel incluso mayor que las fechas.\nPuede hacer simplemente clic en la segmentación para seleccionar un solo valor, o bien puede hacer clic en el borde y arrastrarlo hasta el intervalo que prefiera.\nTambién puede cambiar el color de la selección y el fondo, así como el número de opciones de formato para controlar la apariencia. También puede usar MAYÚS+clic para seleccionar un rango."
+  "Visual_GranularityDayVisibility": "Visibilidad de día"
 }

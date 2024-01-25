@@ -2,6 +2,7 @@
   "Role_Time": "时间",
   "Visual_General": "常规",
   "Visual_FiscalYearStart": "会计年度开始时间",
+  "Visual_FiscalYear": "会计年度",
   "Visual_Month": "月",
   "Visual_Month_January": "一月",
   "Visual_Month_February": "二月",
@@ -52,7 +53,5 @@
   "Visual_GranularityQuarterVisibility": "季度可见性",
   "Visual_GranularityMonthVisibility": "月可见性",
   "Visual_GranularityWeekVisibility": "周可见性",
-  "Visual_GranularityDayVisibility": "日可见性",
-  "Timeline_Short_Description": "用于筛选日期的图形化日期范围选择器",
-  "Timeline_Long_Description": "时间线切片器是一个图形化的日期范围选择器，用作 Power BI 中的筛选组件。这使得按日期维度筛选数据变得轻松而有趣。\n你需要按日期范围或更高级别(如按月或季度)筛选数据的情况有多频繁? 每一次都需要。对吗? 当你必须单击大量日期值来选择所需范围时，筛选过程会非常痛苦。匆忙地将筛选器粒度在月、季度和年之间更改是非常繁琐的。对了，这曾经是超级繁琐的。\n时间线切片器将使这一体验变得轻而易举。使用这个用于选择日期的简单滑块控件，只需单击并拖动到所需的范围即可。还可以切换到年、季度或月视图以选择范围，甚至可以选择比日期更高的范围级别。\n只需单击切片器以选择单个值，或单击边缘并将其拖动到所需的范围。\n此外，还可以更改背景和选择内容的颜色以及其他格式选项的数量以控制外观。也可以按住 SHIFT 并单击来选择范围。"
+  "Visual_GranularityDayVisibility": "日可见性"
 }

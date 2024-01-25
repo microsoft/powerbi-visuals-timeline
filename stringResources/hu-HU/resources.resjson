@@ -2,6 +2,7 @@
   "Role_Time": "Időpont",
   "Visual_General": "Általános",
   "Visual_FiscalYearStart": "Pénzügyi év kezdete",
+  "Visual_FiscalYear": "Pénzügyi év",
   "Visual_Month": "Hónap",
   "Visual_Month_January": "Január",
   "Visual_Month_February": "Február",
@@ -52,7 +53,5 @@
   "Visual_GranularityQuarterVisibility": "Negyedévekre lebontott láthatóság",
   "Visual_GranularityMonthVisibility": "Hónapokra lebontott láthatóság",
   "Visual_GranularityWeekVisibility": "Hetekre lebontott láthatóság",
-  "Visual_GranularityDayVisibility": "Napokra lebontott láthatóság",
-  "Timeline_Short_Description": "Grafikus dátumtartomány-választó a dátumok szűréséhez",
-  "Timeline_Long_Description": "Az Idővonal-szeletelő egy grafikus dátumtartomány-választó, amelyet a Power BI szűrőként használ. Ez az eszköz egyszerűvé és élvezetessé teszi a dátumdimenzió szerinti adatszűrést.\nMilyen gyakran kell dátumtartomány vagy magasabb szintű időintervallum, például hónap vagy negyedév szerint szűrnie az adatait? Minden egyes alkalommal, igaz? A szűrés nehézkes feladat, amikor mindig nagy mennyiségű dátumértéken kell átkattintania, mire megtalálja a kívánt tartományt. És menet közben állítgatni a szűrés részletességét a hónapok, negyedévek és évek között rendkívül idegőrlő. Vagy legalábbis az volt, eddig.\nAz Idővonal-szeletelő egyszerűvé teszi a szűrést. Az eszközzel mindössze annyit kell tennie, hogy elhúzza a dátumokhoz való csúszkát a kívánt tartományra. Emellett válthat az évre, negyedévre vagy hónapra lebontott nézetek között is, ha a dátumoknál magasabb szintű tartományokat szeretne kijelölni.\nA szeletelőre kattintva egyszerűen kiválaszthat egy értéket, vagy a szélét a kívánt tartományra húzhatja.\nMegváltoztathatja továbbá a háttér és a kijelölés színét is, és használhat további formázási beállításokat a külső és a hangulat testreszabására. A tartományok kijelöléséhez működik a SHIFT+kattintás is."
+  "Visual_GranularityDayVisibility": "Napokra lebontott láthatóság"
 }

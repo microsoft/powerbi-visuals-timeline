@@ -2,6 +2,7 @@
   "Role_Time": "Heure",
   "Visual_General": "Général",
   "Visual_FiscalYearStart": "Début de l'année fiscale",
+  "Visual_FiscalYear": "Année fiscale",
   "Visual_Month": "Mois",
   "Visual_Month_January": "Janvier",
   "Visual_Month_February": "Février",
@@ -52,7 +53,5 @@
   "Visual_GranularityQuarterVisibility": "Visibilité par trimestre",
   "Visual_GranularityMonthVisibility": "Visibilité par mois",
   "Visual_GranularityWeekVisibility": "Visibilité par semaine",
-  "Visual_GranularityDayVisibility": "Visibilité par jour",
-  "Timeline_Short_Description": "Sélecteur de plage de dates graphique à utiliser pour le filtrage de dates",
-  "Timeline_Long_Description": "Le segment Chronologie est un sélecteur de plage de dates graphique utilisé comme composant de filtrage dans Power BI. Ce segment rend le filtrage des données par date facile et ludique.\nQuand devez-vous filtrer vos données selon une plage de dates ou un niveau plus élevé (mois ou trimestre) ? Tout le temps, n'est-ce pas ? Le filtrage est une opération fastidieuse quand vous devez parcourir un grand nombre de valeurs de date pour sélectionner la plage souhaitée. Le changement à la volée de la granularité du filtre (mois, trimestre et année) est particulièrement douloureux. Eh bien, ce n'est plus le cas.\nGrâce au segment Chronologie, le filtrage est un jeu d'enfant. Doté de simples curseurs de sélection des dates, il vous suffit de cliquer sur l'un d'eux et de le faire glisser jusqu'à la plage désirée. Vous pouvez également passer à une vue Année, Trimestre ou Mois pour sélectionner des plages d'un niveau supérieur à celui des dates.\nVous pouvez simplement cliquer sur le segment pour sélectionner une seule valeur ou cliquer sur la bordure et la faire glisser sur la plage souhaitée.\nVous pouvez également modifier la couleur et la sélection d'arrière-plan ainsi que d'autres options de mise en forme pour contrôler l'apparence. La combinaison de touches Maj+clic permet également de sélectionner une plage."
+  "Visual_GranularityDayVisibility": "Visibilité par jour"
 }

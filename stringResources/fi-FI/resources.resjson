@@ -2,6 +2,7 @@
   "Role_Time": "Aika",
   "Visual_General": "Yleinen",
   "Visual_FiscalYearStart": "Tilivuoden alku",
+  "Visual_FiscalYear": "Tilivuosi",
   "Visual_Month": "Kuukausi",
   "Visual_Month_January": "tammikuu",
   "Visual_Month_February": "helmikuu",
@@ -52,7 +53,5 @@
   "Visual_GranularityQuarterVisibility": "Vuosineljänneksen näkyvyys",
   "Visual_GranularityMonthVisibility": "Kuukauden näkyvyys",
   "Visual_GranularityWeekVisibility": "Viikon näkyvyys",
-  "Visual_GranularityDayVisibility": "Päivän näkyvyys",
-  "Timeline_Short_Description": "Graafinen päivämääräalueen valitsin päivämäärien suodattamista varten",
-  "Timeline_Long_Description": "Timeline-osittaja on graafinen päivämäärävälin valitsin, jota käytetään suodatuskomponenttina Power BI:ssä. Tämä tekee tietojen suodattamisesta päivämäärädimension mukaan helppoa ja hauskaa.\nMiten usein sinun on suodatettava tietosi päivämäärävälille tai korkeammalla tasolla, kuten kuukautena tai vuosineljänneksenä? Joka ainoa kerta. Eikö vain? Suodattaminen on tuskallista, kun on napsauteltava suuria määriä päivämääräarvoja, jotta voidaan valita haluttu väli. Suodattimen yksityiskohtaisuuden muuttaminen kuukausista, vuosineljänneksistä ja vuosista lennossa on erittäin tylsää. Tai no, se oli aiemmin sitä.\nTimeline-osittaja tekee tästä vaivatonta. Tämän yksinkertaisen päivämäärien osittajaohjausobjektin avulla sinun tarvitsee vain napsauttaa ja vetää haluamaasi väliin.\nVoit osittajaa napsauttamalla valita yksittäisen arvon tai napsauttaa reunaa ja vetää se haluamaasi väliin.\nVoit myös muuttaa taustan ja valinnan väriä ja useita muita muotoiluasetuksia, jotta voit hallita ulkoasua ja käyttötuntumaa. Myös VAIHTO+napsautus toimii välin valitsemiseen."
+  "Visual_GranularityDayVisibility": "Päivän näkyvyys"
 }

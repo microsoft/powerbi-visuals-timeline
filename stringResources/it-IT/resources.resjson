@@ -2,6 +2,7 @@
   "Role_Time": "Ora",
   "Visual_General": "Generale",
   "Visual_FiscalYearStart": "Inizio anno fiscale",
+  "Visual_FiscalYear": "Anno fiscale",
   "Visual_Month": "Mese",
   "Visual_Month_January": "Gennaio",
   "Visual_Month_February": "Febbraio",
@@ -52,7 +53,5 @@
   "Visual_GranularityQuarterVisibility": "Visibilità del trimestre",
   "Visual_GranularityMonthVisibility": "Visibilità del mese",
   "Visual_GranularityWeekVisibility": "Visibilità della settimana",
-  "Visual_GranularityDayVisibility": "Visibilità del giorno",
-  "Timeline_Short_Description": "Selettore grafico dell'intervallo di date da usare per filtrare le date",
-  "Timeline_Long_Description": "Il filtro dei dati della sequenza temporale è un selettore grafico dell'intervallo di date usato come componente di filtro in Power BI. Grazie a questo oggetto è possibile filtrare i dati in base alla data in modo semplice e divertente.\nCon quale frequenza è necessario filtrare i dati per un intervallo di date o a un livello superiore, ad esempio mese o trimestre? Ogni volta. Giusto? Il filtraggio dei dati è un'operazione complessa quando si deve fare clic su un gran numero di valori di data per selezionare l'intervallo desiderato. Cambiare al volo la granularità del filtro da mesi, trimestri e anni al volo è davvero noioso, o meglio era davvero noioso.\nIl filtro dei dati della sequenza temporale semplifica notevolmente questa esperienza. Con questo semplice controllo a scorrimento per le date, è sufficiente fare clic e trascinare sull'intervallo che si desidera. È anche possibile passare a una visualizzazione per anno, trimestre o mese per selezionare intervalli anche a un livello superiore rispetto alle date.\nÈ sufficiente fare clic sul filtro dei dati per selezionare un singolo valore oppure fare clic sul bordo e trascinarlo sull'intervallo desiderato.\nÈ anche possibile modificare il colore di sfondo e di selezione, nonché numerose altre opzioni di formattazione per controllare l'aspetto. La combinazione MAIUSC+clic funziona anche per la selezione di un intervallo."
+  "Visual_GranularityDayVisibility": "Visibilità del giorno"
 }

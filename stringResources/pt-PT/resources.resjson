@@ -2,6 +2,7 @@
   "Role_Time": "Hora",
   "Visual_General": "Geral",
   "Visual_FiscalYearStart": "Início do Ano Fiscal",
+  "Visual_FiscalYear": "Ano Fiscal",
   "Visual_Month": "Mês",
   "Visual_Month_January": "Janeiro",
   "Visual_Month_February": "Fevereiro",
@@ -52,7 +53,5 @@
   "Visual_GranularityQuarterVisibility": "Visibilidade de trimestre",
   "Visual_GranularityMonthVisibility": "Visibilidade de mês",
   "Visual_GranularityWeekVisibility": "Visibilidade de semana",
-  "Visual_GranularityDayVisibility": "Visibilidade de dias",
-  "Timeline_Short_Description": "Seletor gráfico de intervalo de datas utilizado para filtragem de datas",
-  "Timeline_Long_Description": "A segmentação de dados de Linha Cronológica é um seletor de intervalo de datas gráfico utilizado como um componente de filtragem no Power BI. Isto faz com que filtrar dados pela dimensão de data seja mais fácil e divertido.\nQuantas vezes tem de filtrar os seus dados por um intervalo de datas ou num nível superior, como mês ou trimestre? Sempre, não é? A filtragem é difícil quando tem de clicar em grandes números de valores de dados para selecionar o intervalo pretendido. A alteração da granularidade do filtro de meses, trimestres e anos instantaneamente é bastante aborrecida. Ou melhor, era.\nA segmentação de dados de Linha Cronológica vai tornar esta experiência muito mais fácil. Com este controlo de deslize simples para datas, basta clicar e arrastar para o intervalo que pretende. Também pode mudar para uma vista de Ano, Trimestre ou Mês para selecionar intervalos num nível superior às datas.\nBasta clicar na segmentação de dados para selecionar um valor único ou clicar na extremidade e arrastá-la para o intervalo que pretende obter.\nTambém pode alterar o fundo e a cor da seleção e o número de outras opções de formatação para controlar o aspeto e sensação. O comando SHIFT + Clique também serve para selecionar um intervalo."
+  "Visual_GranularityDayVisibility": "Visibilidade de dias"
 }
