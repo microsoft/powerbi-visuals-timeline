@@ -333,7 +333,7 @@ describe("Timeline", () => {
 
             dataView.metadata.objects = {
                 granularity: {
-                    granularity: GranularityType.day,
+                    granularity: GranularityType[GranularityType.day],
                 },
             };
 
@@ -349,7 +349,7 @@ describe("Timeline", () => {
             for (let i: number = 0; i < cellRects.length; i++) {
                 const fillColor: string = d3Select(cellRects[i]).attr("fill");
 
-                assertColorsMatch(fillColor, "transparent", i === 0);
+                assertColorsMatch(fillColor, CellsSettingsCard.FillUnselectedDefaultColor, i === 0);
             }
         });
     });
