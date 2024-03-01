@@ -17,7 +17,7 @@ const weeksDeterminationStandardsOptions: IEnumMember[] = [
     {value: WeekStandard[WeekStandard.ISO8061], displayName: "Visual_Week_Standard_ISO8601"},
 ];
 
-const fiscalYearOptions: IEnumMember[] = [
+const monthOptions: IEnumMember[] = [
     {value: Month[Month.January], displayName: "Visual_Month_January"},
     {value: Month[Month.February], displayName: "Visual_Month_February"},
     {value: Month[Month.March], displayName: "Visual_Month_March"},
@@ -127,8 +127,8 @@ export class FiscalYearCalendarSettingsCard extends Card {
         name: "month",
         displayName: "Month",
         displayNameKey: "Visual_Month",
-        items: fiscalYearOptions,
-        value: fiscalYearOptions[0],
+        items: monthOptions,
+        value: monthOptions[0],
     });
 
     day = new formattingSettings.NumUpDown({
@@ -472,7 +472,7 @@ export class TimeLineSettingsModel extends Model {
 
     setLocalizedOptions(localizationManager: ILocalizationManager) {
         this.setLocalizedDisplayName(weeksDeterminationStandardsOptions, localizationManager);
-        this.setLocalizedDisplayName(fiscalYearOptions, localizationManager);
+        this.setLocalizedDisplayName(monthOptions, localizationManager);
         this.setLocalizedDisplayName(dayOptions, localizationManager);
         this.setLocalizedDisplayName(granularityOptions, localizationManager);
     }

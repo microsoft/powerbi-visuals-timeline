@@ -77,11 +77,14 @@
                 }
             }
         },
-        "weeksDeterminationStandards": {
+        "weeksDetermintaionStandards": {
             "properties": {
                 "weekStandard": {
                     "type": {
-                        "text": true
+                        "enumeration": [
+                            { "value": "0" },
+                            { "value": "1" }
+                        ]
                     }
                 }
             }
@@ -90,7 +93,20 @@
             "properties": {
                 "month": {
                     "type": {
-                        "text": true
+                        "enumeration": [
+                            { "value": "0" },
+                            { "value": "1" },
+                            { "value": "2" },
+                            { "value": "3" },
+                            { "value": "4" },
+                            { "value": "5" },
+                            { "value": "6" },
+                            { "value": "7" },
+                            { "value": "8" },
+                            { "value": "9" },
+                            { "value": "10" },
+                            { "value": "11" }
+                        ]
                     }
                 },
                 "day": {
@@ -109,7 +125,15 @@
                 },
                 "day": {
                     "type": {
-                        "text": true
+                        "enumeration": [
+                            { "value": "0" },
+                            { "value": "1" },
+                            { "value": "2" },
+                            { "value": "3" },
+                            { "value": "4" },
+                            { "value": "5" },
+                            { "value": "6" }
+                        ]
                     }
                 }
             }
@@ -231,7 +255,13 @@
                 },
                 "granularity": {
                     "type": {
-                        "text": true
+                        "enumeration": [
+                            { "value": "0" },
+                            { "value": "1" },
+                            { "value": "2" },
+                            { "value": "3" },
+                            { "value": "4" }
+                        ]
                     },
                     "filterState": true
                 },
