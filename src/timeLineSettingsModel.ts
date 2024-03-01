@@ -68,6 +68,7 @@ export class CursorSettingsCard extends Card {
         displayNameKey: "Visual_Show",
         value: true,
     });
+    topLevelSlice = this.show;
 
     color = new formattingSettings.ColorPicker({
         name: "color",
@@ -79,7 +80,7 @@ export class CursorSettingsCard extends Card {
     name: string = "cursor";
     displayName: string = "Cursor";
     displayNameKey: string = "Visual_Cursor";
-    slices = [this.show, this.color];
+    slices = [this.color];
 }
 
 export class ForceSelectionSettingsCard extends Card {
@@ -155,6 +156,8 @@ export class WeekDaySettingsCard extends Card {
         value: true,
     });
 
+    topLevelSlice = this.daySelection;
+
     day = new formattingSettings.ItemDropdown({
         name: "day",
         displayName: "Day",
@@ -163,11 +166,10 @@ export class WeekDaySettingsCard extends Card {
         value: dayOptions[0],
     });
 
-
     name: string = "weekDay";
     displayName: string = "First Day of Week";
     displayNameKey: string = "Visual_FirstDayOfWeek";
-    slices = [this.daySelection, this.day];
+    slices = [this.day];
 }
 
 export class RangeHeaderSettingsCard extends Card {
