@@ -52,9 +52,9 @@ const granularityOptions: IEnumMember[] = [
 
 
 class TextSizeSettings {
-    public static readonly DefaultTextSize: number = 9;
-    public static readonly Min: number = 8;
-    public static readonly Max: number = 60;
+    public static readonly DefaultTextSize: number = 10;
+    public static readonly Min: number = 7;
+    public static readonly Max: number = 40;
 }
 
 export class GeneralSettings {
@@ -415,7 +415,7 @@ export class LabelsSettingsCard extends Card {
         name: "textSize",
         displayName: "Text Size",
         displayNameKey: "Visual_TextSize",
-        value: TextSizeSettings.DefaultTextSize,
+        value: 9,
         options: {
             minValue: {value: TextSizeSettings.Min, type: powerbi.visuals.ValidatorType.Min},
             maxValue: {value: TextSizeSettings.Max, type: powerbi.visuals.ValidatorType.Max},
