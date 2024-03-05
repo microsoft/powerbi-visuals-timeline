@@ -1,4 +1,8 @@
 ## 2.5.0
+* Packages update
+* API was updated to 5.8.0
+* Remove jquery
+* GitHub actions now use node 18, 20
 
 ## 2.3.0
 * A new option group "Weeks Determination Standards" containing a list of two items where the first one enables US weeks numbering (default) and the second one enables ISO 8601 weeks numbering
