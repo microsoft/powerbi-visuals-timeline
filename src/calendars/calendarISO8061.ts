@@ -1,12 +1,20 @@
-import {Calendar, CalendarFormat, WeekDayFormat} from "./calendar";
-import { WeekStandard } from "./weekStandard";
+import {Calendar, CalendarFormat, WeekdayFormat} from "./calendar";
+import { WeeksDetermintaionStandardsSettings } from "../settings/weeksDetermintaionStandardsSettings";
+import { WeekStandards } from "./weekStandards";
 import { Utils } from "../utils";
 
 export class CalendarISO8061 extends Calendar {
 
     constructor() {
-        const isoCalendarSettings: CalendarFormat = {month: 0, day: 1 };
-        const isoWeekDaySettings: WeekDayFormat = { daySelection: true, day: 1 };
+        const isoCalendarSettings: CalendarFormat = {
+            month: 0,
+            day: 1,
+        };
+
+        const isoWeekDaySettings: WeekdayFormat = {
+            daySelection: true,
+            day: 1,
+        };
 
         super(isoCalendarSettings, isoWeekDaySettings);
 
@@ -60,7 +68,7 @@ export class CalendarISO8061 extends Calendar {
         const dayOfFirstJanWeek = dateOfFirstJan.getDay();
         const firstJanDig = 1;
 
-        const dateOfFirstWeek = dateOfFirstJan;
+        let dateOfFirstWeek = dateOfFirstJan;
         // The first week regarding ISO has to contain Thursday (4th day in the week)
         if (dayOfFirstJanWeek <= 4) {
             // If 1st January is Monday, Tuesday, Wednesday or Thursday => the first week date should be adjusted to left up to Monday
@@ -96,9 +104,9 @@ export class CalendarISO8061 extends Calendar {
 
     public isChanged(
         calendarSettings: CalendarFormat,
-        weekDaySettings: WeekDayFormat,
-        weekStandards: WeekStandard
+        weekDaySettings: WeekdayFormat,
+        weeksDeterminationStandardsSettings: WeeksDetermintaionStandardsSettings
     ): boolean {
-        return weekStandards !== WeekStandard.ISO8061
+        return weeksDeterminationStandardsSettings.weekStandard !== WeekStandards.ISO8061
     }
 }

@@ -29,7 +29,7 @@ import {
     assertColorsMatch, d3Click, renderTimeout,
 } from "powerbi-visuals-utils-testutils";
 
-import { Calendar } from "../src/calendars/calendar";
+import {Calendar, CalendarFormat, WeekdayFormat} from "../src/calendars/calendar";
 import { ITimelineCursorOverElement, ITimelineData } from "../src/dataInterfaces";
 import { ITimelineDatePeriod, ITimelineDatePeriodBase } from "../src/datePeriod/datePeriod";
 import { DatePeriodBase } from "../src/datePeriod/datePeriodBase";
@@ -40,8 +40,6 @@ import { MonthGranularity } from "../src/granularity/monthGranularity";
 import { QuarterGranularity } from "../src/granularity/quarterGranularity";
 import { WeekGranularity } from "../src/granularity/weekGranularity";
 import { YearGranularity } from "../src/granularity/yearGranularity";
-import { CalendarSettings } from "../src/settings/calendarSettings";
-import { WeekDaySettings } from "../src/settings/weekDaySettings";
 import { Utils } from "../src/utils";
 import { Timeline } from "../src/timeLine";
 import { GranularityMock } from "./granularityMock";
@@ -49,7 +47,6 @@ import { areColorsEqual, getSolidColorStructuralObject } from "./helpers";
 import { VisualBuilder } from "./visualBuilder";
 import { VisualData } from "./visualData";
 import { CalendarISO8061 } from "../src/calendars/calendarISO8061";
-import {validateCustomPageSize} from "powerbi-models";
 
 function selectElement(cell: HTMLElement | SVGElement) {
     d3Click(cell, 0, 0);
@@ -411,7 +408,7 @@ describe("Timeline", () => {
         });
 
         function checkCalendarSettings(day: number, month: number, expectedDay: number): void {
-            const calendarSettings: CalendarSettings = { day, month };
+            const calendarSettings: CalendarFormat = { day, month };
 
             Timeline.SET_VALID_CALENDAR_SETTINGS(calendarSettings);
 
@@ -1115,7 +1112,7 @@ describe("Timeline - Granularity - 1 Jan (Regular Calendar)", () => {
         });
 
         it("should return zero adjustment for a year", () => {
-            const yearAdjustment = calendar.getFiscalYearAjustment();
+            const yearAdjustment = calendar.getFiscalYearAdjustment();
             expect(yearAdjustment).toEqual(0);
         });
     });
@@ -1191,7 +1188,7 @@ describe("Timeline - Granularity - 1 Apr (Fiscal Calendar)", () => {
         });
 
         it("should return [1] adjustment for a year", () => {
-            const yearAdjustment = calendar.getFiscalYearAjustment();
+            const yearAdjustment = calendar.getFiscalYearAdjustment();
             expect(yearAdjustment).toEqual(1);
         });
     });
@@ -1310,7 +1307,7 @@ describe("Timeline - Granularity - ISO 8601 Week numbering", () => {
         });
 
         it("fiscal year adjustment is 0", () => {
-            expect(calendar.getFiscalYearAjustment()).toEqual(0);
+            expect(calendar.getFiscalYearAdjustment()).toEqual(0);
         });
 
         it("a year must be determine without relation to week numbers", () => {
@@ -1779,12 +1776,12 @@ function createCalendar(
     dayOfWeekSelectionOn: boolean = false,
 ): Calendar {
 
-    const calendarSettings: CalendarSettings = {
+    const calendarSettings: CalendarFormat = {
         day,
         month,
     };
 
-    const weekDaySettings: WeekDaySettings = {
+    const weekDaySettings: WeekdayFormat = {
         day: week,
         daySelection: dayOfWeekSelectionOn,
     };

@@ -1,17 +1,18 @@
-import {Calendar, CalendarFormat, WeekDayFormat} from "./calendar";
-import { WeekStandard } from "./weekStandard";
+import { WeeksDetermintaionStandardsSettings } from "../settings/weeksDetermintaionStandardsSettings";
+import {Calendar, CalendarFormat, WeekdayFormat} from "./calendar";
+import { WeekStandards } from "./weekStandards";
 import { CalendarISO8061 } from "./calendarISO8061";
 
 export class CalendarFactory {
     public create(
-        weekStandard: WeekStandard,
+        weeksDeterminationStandardsSettings: WeeksDetermintaionStandardsSettings,
         calendarSettings: CalendarFormat,
-        weekDaySettings: WeekDayFormat) : Calendar {
+        weekDaySettings: WeekdayFormat) : Calendar {
 
         let calendar: Calendar = null;
 
-        switch (weekStandard) {
-            case WeekStandard.ISO8061:
+        switch (weeksDeterminationStandardsSettings.weekStandard) {
+            case WeekStandards.ISO8061:
                 calendar = new CalendarISO8061();
                 break;
             default:
