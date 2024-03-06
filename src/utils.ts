@@ -37,6 +37,7 @@ import {
 import { IGranularityName } from "./granularity/granularityName";
 import { GranularityNames } from "./granularity/granularityNames";
 import { GranularityType } from "./granularity/granularityType";
+import {CellsSettingsCard} from "./timeLineSettingsModel";
 
 export class Utils {
     public static DefaultCellColor: string = "transparent";
@@ -209,6 +210,26 @@ export class Utils {
      */
     public static GET_END_SELECTION_PERIOD(timelineData: ITimelineData): ITimelineDatePeriod {
         return timelineData.currentGranularity.getDatePeriods()[timelineData.selectionEndIndex];
+    }
+
+    /**
+     * Returns the color of a cell, depending on whether its date period is between the selected date periods.
+     * CellRects should be transparent filled by default if there isn't any color sets.
+     * @param d The TimelineDataPoint of the cell
+     * @param timelineData The TimelineData with the selected date periods
+     * @param timelineFormat The TimelineFormat with the chosen colors
+     */
+    public static GET_CELL_COLOR(
+        dataPoint: ITimelineDataPoint,
+        timelineData: ITimelineData,
+        cellSettings: CellsSettingsCard): string {
+
+        const inSelectedPeriods: boolean = dataPoint.datePeriod.startDate >= Utils.GET_START_SELECTION_DATE(timelineData)
+            && dataPoint.datePeriod.endDate <= Utils.GET_END_SELECTION_DATE(timelineData);
+
+        return inSelectedPeriods
+            ? cellSettings.fillSelected.value.value
+            : (cellSettings.fillUnselected.value.value || Utils.DefaultCellColor);
     }
 
     public static IS_GRANULE_SELECTED(dataPoint: ITimelineDataPoint, timelineData: ITimelineData): boolean {

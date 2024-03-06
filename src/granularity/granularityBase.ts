@@ -117,16 +117,16 @@ export class GranularityBase implements IGranularity {
             .attr("y", pixelConverter.toString(0 - this.textLabelYOffset))
             .attr("dx", this.textLabelDx);
 
-        const propsGranularity: GranularityType = props.granularSettings.granularity.value
+        // render slider
+        const granularityType: GranularityType = props.granularSettings.granularity.value
             ? GranularityType[props.granularSettings.granularity.value.value]
             : GranularityType.month;
 
-        // render slider
-        if (propsGranularity === this.granularityProps.granularityType) {
+        if (granularityType === this.granularityProps.granularityType) {
             this.renderSlider(
                 granularitySelection,
                 props.granularSettings.sliderColor.value.value,
-                propsGranularity
+                granularityType
             );
         }
 
@@ -138,10 +138,10 @@ export class GranularityBase implements IGranularity {
             .attr("width", pixelConverter.toString(this.clickableRectWidth))
             .attr("height", pixelConverter.toString(this.clickableRectHeight))
             .on("click", null)
-            .on("click", (event) => {
-                const mouseEvent: MouseEvent = <MouseEvent>(event);
+            .on("click", () => {
+                const event: MouseEvent = <MouseEvent>(require("d3").event);
 
-                mouseEvent.stopPropagation();
+                event.stopPropagation();
 
                 props.selectPeriodCallback(this.granularityProps.granularityType);
 
@@ -153,9 +153,8 @@ export class GranularityBase implements IGranularity {
 
                 this.renderSlider(
                     granularitySelection,
-                    // props.granularSettings,
                     props.granularSettings.sliderColor.value.value,
-                    propsGranularity
+                    granularityType
                 );
             });
 

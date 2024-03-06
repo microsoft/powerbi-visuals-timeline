@@ -25,9 +25,8 @@
  */
 
 import { GranularityData } from "../granularity/granularityData";
-import { WeeksDetermintaionStandardsSettings } from "../settings/weeksDetermintaionStandardsSettings";
 import { Utils } from "../utils";
-import { WeekStandards } from "./weekStandards";
+import { WeekStandard } from "./weekStandard";
 
 interface IDateDictionary {
     [year: number]: Date;
@@ -200,12 +199,12 @@ export class Calendar {
     public isChanged(
         calendarSettings: CalendarFormat,
         weekDaySettings: WeekdayFormat,
-        weeksDeterminationStandardsSettings: WeeksDetermintaionStandardsSettings
+        weekStandard: WeekStandard
     ): boolean {
         return this.firstMonthOfYear !== calendarSettings.month
             || this.firstDayOfYear !== calendarSettings.day
             || this.firstDayOfWeek !== weekDaySettings.day
-            || weeksDeterminationStandardsSettings.weekStandard !== WeekStandards.NotSet;
+            || weekStandard !== WeekStandard.NotSet;
     }
 
     public getDateOfFirstWeek(year: number): Date {

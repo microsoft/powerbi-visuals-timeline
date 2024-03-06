@@ -1,7 +1,7 @@
 import powerbi from "powerbi-visuals-api";
 
 import {formattingSettings} from "powerbi-visuals-utils-formattingmodel";
-import {WeekStandards} from "./calendars/weekStandards";
+import {WeekStandard} from "./calendars/weekStandard";
 import {Month} from "./calendars/month";
 import Card = formattingSettings.SimpleCard;
 import CompositeCard = formattingSettings.CompositeCard;
@@ -11,16 +11,11 @@ import ValidatorType = powerbi.visuals.ValidatorType;
 import {Weekday} from "./calendars/weekday";
 import {GranularityType} from "./granularity/granularityType";
 import ILocalizationManager = powerbi.extensibility.ILocalizationManager;
-
-class TextSizeDefaults {
-    public static readonly Default: number = 9;
-    public static readonly Min: number = 7;
-    public static readonly Max: number = 24;
-}
+import {DatePeriodBase} from "./datePeriod/datePeriodBase";
 
 const weekStandardOptions: IEnumMember[] = [
-    { value: WeekStandards[WeekStandards.NotSet], displayName: "Visual_Week_Standard_None" },
-    { value: WeekStandards[WeekStandards.ISO8061], displayName: "Visual_Week_Standard_ISO8601" },
+    { value: WeekStandard[WeekStandard.NotSet], displayName: "Visual_Week_Standard_None" },
+    { value: WeekStandard[WeekStandard.ISO8061], displayName: "Visual_Week_Standard_ISO8601" },
 ];
 
 const monthOptions: IEnumMember[] = [
@@ -56,6 +51,40 @@ const granularityOptions: IEnumMember[] = [
     { value: GranularityType[GranularityType.day], displayName: "Visual_Granularity_Day" },
 ];
 
+class TextSizeDefaults {
+    public static readonly Default: number = 9;
+    public static readonly Min: number = 7;
+    public static readonly Max: number = 24;
+}
+
+
+class GeneralSettings {
+    public datePeriod: DatePeriodBase | string = DatePeriodBase.CREATEEMPTY();
+}
+
+
+class CursorSettingsCard extends Card {
+    show = new formattingSettings.ToggleSwitch({
+        name: "show",
+        displayName: "Show",
+        displayNameKey: "Visual_Show",
+        value: true,
+    });
+
+    color = new formattingSettings.ColorPicker({
+        name: "color",
+        displayName: "Cursor color",
+        displayNameKey: "Visual_CursorColor",
+        value: { value: "#808080" },
+    });
+
+    topLevelSlice = this.show;
+    name: string = "cursor";
+    displayName: string = "Cursor";
+    displayNameKey: string = "Visual_Cursor";
+    slices = [this.color];
+}
+
 class ForceSelectionSettingsCard extends Card {
     currentPeriod = new formattingSettings.ToggleSwitch({
         name: "currentPeriod",
@@ -77,7 +106,7 @@ class ForceSelectionSettingsCard extends Card {
     slices = [this.currentPeriod, this.latestAvailableDate];
 }
 
-class WeeksDeterminationStandardsSettingsCard extends Card {
+export class WeeksDeterminationStandardsSettingsCard extends Card {
     weekStandard = new formattingSettings.ItemDropdown({
         name: "weekStandard",
         displayName: "Standard",
@@ -92,7 +121,10 @@ class WeeksDeterminationStandardsSettingsCard extends Card {
     slices = [this.weekStandard];
 }
 
-class CalendarSettingsCard extends Card {
+export class CalendarSettingsCard extends Card {
+    public static readonly DefaultMonth: number = 0;
+    public static readonly DefaultDay: number = 1;
+
     month = new formattingSettings.ItemDropdown({
         name: "month",
         displayName: "Month",
@@ -118,7 +150,7 @@ class CalendarSettingsCard extends Card {
     slices = [this.month, this.day];
 }
 
-class WeekDayCardSettings extends Card {
+class WeekDaySettingsCard extends Card {
     daySelection = new formattingSettings.ToggleSwitch({
         name: "daySelection",
         displayName: "Day Selection",
@@ -141,7 +173,7 @@ class WeekDayCardSettings extends Card {
     slices = [this.day];
 }
 
-class RangeHeaderSettingsCard extends Card {
+export class RangeHeaderSettingsCard extends Card {
     show = new formattingSettings.ToggleSwitch({
         name: "show",
         displayName: "Show",
@@ -174,7 +206,7 @@ class RangeHeaderSettingsCard extends Card {
     slices = [this.fontColor, this.textSize];
 }
 
-class CellsSettingsCard extends Card {
+export class CellsSettingsCard extends Card {
     public static readonly FillSelectedDefaultColor: string = "#ADD8E6";
     public static readonly FillUnselectedDefaultColor: string = "#FFFFFF";
 
@@ -212,7 +244,7 @@ class CellsSettingsCard extends Card {
     slices = [this.fillSelected, this.strokeSelected, this.fillUnselected, this.strokeUnselected];
 }
 
-class GranularitySettingsCard extends Card {
+export class GranularitySettingsCard extends Card {
     show = new formattingSettings.ToggleSwitch({
         name: "show",
         displayName: "Show",
@@ -293,7 +325,7 @@ class GranularitySettingsCard extends Card {
     ];
 }
 
-class LabelsSettingsCard extends Card {
+export class LabelsSettingsCard extends Card {
     show = new formattingSettings.ToggleSwitch({
         name: "show",
         displayName: "Show",
@@ -349,7 +381,11 @@ class ScrollAutoAdjustmentSettingsCard extends Card {
 
 
 export class TimeLineSettingsModel extends Model {
+    general = new GeneralSettings();
+
+    cursor = new CursorSettingsCard();
     forceSelection = new ForceSelectionSettingsCard();
+    weekDay = new WeekDaySettingsCard();
     weeksDeterminationStandards = new WeeksDeterminationStandardsSettingsCard();
     calendar = new CalendarSettingsCard();
     rangeHeader = new RangeHeaderSettingsCard();
@@ -359,9 +395,11 @@ export class TimeLineSettingsModel extends Model {
     scrollAutoAdjustment = new ScrollAutoAdjustmentSettingsCard();
 
     cards: Array<Card | CompositeCard> = [
+        this.cursor,
         this.forceSelection,
         this.weeksDeterminationStandards,
         this.calendar,
+        this.weekDay,
         this.rangeHeader,
         this.cells,
         this.granularity,
@@ -369,14 +407,14 @@ export class TimeLineSettingsModel extends Model {
         this.scrollAutoAdjustment,
     ];
 
-    setLocalizedOptions(localizationManager: ILocalizationManager) {
+    public setLocalizedOptions(localizationManager: ILocalizationManager) {
         this.setLocalizedDisplayName(weekStandardOptions, localizationManager);
         this.setLocalizedDisplayName(monthOptions, localizationManager);
         this.setLocalizedDisplayName(weekdayOptions, localizationManager);
         this.setLocalizedDisplayName(granularityOptions, localizationManager);
     }
 
-    public setLocalizedDisplayName(options: IEnumMember[], localizationManager: ILocalizationManager) {
+    private setLocalizedDisplayName(options: IEnumMember[], localizationManager: ILocalizationManager) {
         options.forEach(option => {
             option.displayName = localizationManager.getDisplayName(option.displayName.toString())
         });

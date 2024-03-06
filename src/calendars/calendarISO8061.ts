@@ -1,6 +1,5 @@
 import {Calendar, CalendarFormat, WeekdayFormat} from "./calendar";
-import { WeeksDetermintaionStandardsSettings } from "../settings/weeksDetermintaionStandardsSettings";
-import { WeekStandards } from "./weekStandards";
+import { WeekStandard } from "./weekStandard";
 import { Utils } from "../utils";
 
 export class CalendarISO8061 extends Calendar {
@@ -105,8 +104,8 @@ export class CalendarISO8061 extends Calendar {
     public isChanged(
         calendarSettings: CalendarFormat,
         weekDaySettings: WeekdayFormat,
-        weeksDeterminationStandardsSettings: WeeksDetermintaionStandardsSettings
+        weekStandard: WeekStandard
     ): boolean {
-        return weeksDeterminationStandardsSettings.weekStandard !== WeekStandards.ISO8061
+        return weekStandard !== WeekStandard.ISO8061
     }
 }
