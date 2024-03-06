@@ -1,13 +1,14 @@
 import {Calendar, CalendarFormat, WeekdayFormat} from "./calendar";
 import { WeekStandard } from "./weekStandard";
 import { Utils } from "../utils";
+import {CalendarSettingsCard} from "../timeLineSettingsModel";
 
 export class CalendarISO8061 extends Calendar {
 
     constructor() {
         const isoCalendarSettings: CalendarFormat = {
-            month: 0,
-            day: 1,
+            month: CalendarSettingsCard.DefaultMonth,
+            day: CalendarSettingsCard.DefaultDay,
         };
 
         const isoWeekDaySettings: WeekdayFormat = {
