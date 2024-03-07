@@ -14,41 +14,41 @@ import ILocalizationManager = powerbi.extensibility.ILocalizationManager;
 import {DatePeriodBase} from "./datePeriod/datePeriodBase";
 
 const weekStandardOptions: IEnumMember[] = [
-    { value: WeekStandard[WeekStandard.NotSet], displayName: "Visual_Week_Standard_None" },
-    { value: WeekStandard[WeekStandard.ISO8061], displayName: "Visual_Week_Standard_ISO8601" },
+    { value: WeekStandard.NotSet, displayName: "Visual_Week_Standard_None" },
+    { value: WeekStandard.ISO8061, displayName: "Visual_Week_Standard_ISO8601" },
 ];
 
 const monthOptions: IEnumMember[] = [
-    { value: Month[Month.January], displayName: "Visual_Month_January" },
-    { value: Month[Month.February], displayName: "Visual_Month_February" },
-    { value: Month[Month.March], displayName: "Visual_Month_March" },
-    { value: Month[Month.April], displayName: "Visual_Month_April" },
-    { value: Month[Month.May], displayName: "Visual_Month_May" },
-    { value: Month[Month.June], displayName: "Visual_Month_June" },
-    { value: Month[Month.July], displayName: "Visual_Month_July" },
-    { value: Month[Month.August], displayName: "Visual_Month_August" },
-    { value: Month[Month.September], displayName: "Visual_Month_September" },
-    { value: Month[Month.October], displayName: "Visual_Month_October" },
-    { value: Month[Month.November], displayName: "Visual_Month_November" },
-    { value: Month[Month.December], displayName: "Visual_Month_December" },
+    { value: Month.January, displayName: "Visual_Month_January" },
+    { value: Month.February, displayName: "Visual_Month_February" },
+    { value: Month.March, displayName: "Visual_Month_March" },
+    { value: Month.April, displayName: "Visual_Month_April" },
+    { value: Month.May, displayName: "Visual_Month_May" },
+    { value: Month.June, displayName: "Visual_Month_June" },
+    { value: Month.July, displayName: "Visual_Month_July" },
+    { value: Month.August, displayName: "Visual_Month_August" },
+    { value: Month.September, displayName: "Visual_Month_September" },
+    { value: Month.October, displayName: "Visual_Month_October" },
+    { value: Month.November, displayName: "Visual_Month_November" },
+    { value: Month.December, displayName: "Visual_Month_December" },
 ];
 
 const weekdayOptions: IEnumMember[] = [
-    { value: Weekday[Weekday.Sunday], displayName: "Visual_Day_Sunday" },
-    { value: Weekday[Weekday.Monday], displayName: "Visual_Day_Monday" },
-    { value: Weekday[Weekday.Tuesday], displayName: "Visual_Day_Tuesday" },
-    { value: Weekday[Weekday.Wednesday], displayName: "Visual_Day_Wednesday" },
-    { value: Weekday[Weekday.Thursday], displayName: "Visual_Day_Thursday" },
-    { value: Weekday[Weekday.Friday], displayName: "Visual_Day_Friday" },
-    { value: Weekday[Weekday.Saturday], displayName: "Visual_Day_Saturday" },
+    { value: Weekday.Sunday, displayName: "Visual_Day_Sunday" },
+    { value: Weekday.Monday, displayName: "Visual_Day_Monday" },
+    { value: Weekday.Tuesday, displayName: "Visual_Day_Tuesday" },
+    { value: Weekday.Wednesday, displayName: "Visual_Day_Wednesday" },
+    { value: Weekday.Thursday, displayName: "Visual_Day_Thursday" },
+    { value: Weekday.Friday, displayName: "Visual_Day_Friday" },
+    { value: Weekday.Saturday, displayName: "Visual_Day_Saturday" },
 ];
 
 const granularityOptions: IEnumMember[] = [
-    { value: GranularityType[GranularityType.year], displayName: "Visual_Granularity_Year" },
-    { value: GranularityType[GranularityType.quarter], displayName: "Visual_Granularity_Quarter" },
-    { value: GranularityType[GranularityType.month], displayName: "Visual_Granularity_Month" },
-    { value: GranularityType[GranularityType.week], displayName: "Visual_Granularity_Week" },
-    { value: GranularityType[GranularityType.day], displayName: "Visual_Granularity_Day" },
+    { value: GranularityType.year, displayName: "Visual_Granularity_Year" },
+    { value: GranularityType.quarter, displayName: "Visual_Granularity_Quarter" },
+    { value: GranularityType.month, displayName: "Visual_Granularity_Month" },
+    { value: GranularityType.week, displayName: "Visual_Granularity_Week" },
+    { value: GranularityType.day, displayName: "Visual_Granularity_Day" },
 ];
 
 class TextSizeDefaults {

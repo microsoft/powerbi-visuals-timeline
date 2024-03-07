@@ -23,32 +23,33 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
  */
-import { select as d3Select } from "d3-selection";
+import {select as d3Select} from "d3-selection";
 import powerbiVisualsApi from "powerbi-visuals-api";
-import {
-    assertColorsMatch, d3Click, parseColorString, renderTimeout,
-} from "powerbi-visuals-utils-testutils";
+import {assertColorsMatch, d3Click, parseColorString, renderTimeout,} from "powerbi-visuals-utils-testutils";
 
 import {Calendar, CalendarFormat, WeekdayFormat} from "../src/calendars/calendar";
-import { ITimelineCursorOverElement, ITimelineData } from "../src/dataInterfaces";
-import { ITimelineDatePeriod, ITimelineDatePeriodBase } from "../src/datePeriod/datePeriod";
-import { DatePeriodBase } from "../src/datePeriod/datePeriodBase";
-import { DayGranularity } from "../src/granularity/dayGranularity";
-import { IGranularity } from "../src/granularity/granularity";
-import { GranularityType } from "../src/granularity/granularityType";
-import { MonthGranularity } from "../src/granularity/monthGranularity";
-import { QuarterGranularity } from "../src/granularity/quarterGranularity";
-import { WeekGranularity } from "../src/granularity/weekGranularity";
-import { YearGranularity } from "../src/granularity/yearGranularity";
-import { Utils } from "../src/utils";
-import { Timeline } from "../src/timeLine";
-import { GranularityMock } from "./granularityMock";
-import { areColorsEqual, getSolidColorStructuralObject } from "./helpers";
-import { VisualBuilder } from "./visualBuilder";
-import { VisualData } from "./visualData";
-import { CalendarISO8061 } from "../src/calendars/calendarISO8061";
+import {ITimelineCursorOverElement, ITimelineData} from "../src/dataInterfaces";
+import {ITimelineDatePeriod, ITimelineDatePeriodBase} from "../src/datePeriod/datePeriod";
+import {DatePeriodBase} from "../src/datePeriod/datePeriodBase";
+import {CalendarISO8061} from "../src/calendars/calendarISO8061";
 import {Weekday} from "../src/calendars/weekday";
+
+import {DayGranularity} from "../src/granularity/dayGranularity";
+import {IGranularity} from "../src/granularity/granularity";
+import {GranularityType} from "../src/granularity/granularityType";
+import {MonthGranularity} from "../src/granularity/monthGranularity";
+import {QuarterGranularity} from "../src/granularity/quarterGranularity";
+import {WeekGranularity} from "../src/granularity/weekGranularity";
+import {YearGranularity} from "../src/granularity/yearGranularity";
+
+import {Utils} from "../src/utils";
+import {areColorsEqual, getSolidColorStructuralObject} from "./helpers";
+import {Timeline} from "../src/timeLine";
 import {CellsSettingsCard} from "../src/timeLineSettingsModel";
+import {GranularityMock} from "./granularityMock";
+import {VisualBuilder} from "./visualBuilder";
+import {VisualData} from "./visualData";
+
 
 describe("Timeline", () => {
     let visualBuilder: VisualBuilder;
@@ -68,7 +69,7 @@ describe("Timeline", () => {
         it("test granularity update", (done) => {
             dataView.metadata.objects = {
                 granularity: {
-                    granularity: GranularityType[GranularityType.day],
+                    granularity: GranularityType.day,
                 },
             };
 
@@ -112,7 +113,7 @@ describe("Timeline", () => {
         it("apply blank row data", (done) => {
             dataView.metadata.objects = {
                 granularity: {
-                    granularity: GranularityType[GranularityType.day],
+                    granularity: GranularityType.day,
                 },
             };
 
@@ -136,7 +137,7 @@ describe("Timeline", () => {
         it("range header to contain 2016", (done) => {
             dataView.metadata.objects = {
                 granularity: {
-                    granularity: GranularityType[GranularityType.year],
+                    granularity: GranularityType.year,
                 },
             };
 
@@ -157,7 +158,7 @@ describe("Timeline", () => {
 
             dataView.metadata.objects = {
                 granularity: {
-                    granularity: GranularityType[GranularityType.month],
+                    granularity: GranularityType.month,
                 },
             };
 
@@ -180,7 +181,7 @@ describe("Timeline", () => {
             beforeEach(() => {
                 dataView.metadata.objects = {
                     granularity: {
-                        granularity: GranularityType[GranularityType.day],
+                        granularity: GranularityType.day,
                     },
                 };
 
@@ -204,7 +205,7 @@ describe("Timeline", () => {
             beforeEach((done) => {
                 dataView.metadata.objects = {
                     granularity: {
-                        granularity: GranularityType[GranularityType.month]
+                        granularity: GranularityType.month
                     },
                 };
 
@@ -227,7 +228,7 @@ describe("Timeline", () => {
             it("settings - event", () => {
                 dataView.metadata.objects = {
                     granularity: {
-                        granularity: GranularityType[GranularityType.day],
+                        granularity: GranularityType.day,
                     },
                 };
 
@@ -322,7 +323,7 @@ describe("Timeline", () => {
 
             dataView.metadata.objects = {
                 granularity: {
-                    granularity: GranularityType[GranularityType.day],
+                    granularity: GranularityType.day,
                 },
             };
 
@@ -369,7 +370,7 @@ describe("Timeline", () => {
         beforeEach((done) => {
             dataView.metadata.objects = {
                 granularity: {
-                    granularity: GranularityType[GranularityType.day],
+                    granularity: GranularityType.day,
                 },
             };
 
@@ -561,7 +562,7 @@ describe("Timeline", () => {
                         fillUnselected: getSolidColorStructuralObject(color),
                     },
                     granularity: {
-                        granularity: GranularityType[GranularityType.day],
+                        granularity: GranularityType.day,
                     },
                 };
 
@@ -637,24 +638,24 @@ describe("Timeline", () => {
                 dataView.metadata.objects = {
                     granularity: {},
                     weekDay: {
-                        day: Weekday[Weekday.Sunday],
+                        day: Weekday.Sunday,
                         daySelection,
                     },
                 };
 
-                checkSelectedElement(GranularityType[GranularityType.week], 2);
+                checkSelectedElement(GranularityType.week, 2);
             });
 
             it("check calendar with setted day of week - Tuesday", () => {
                 dataView.metadata.objects = {
                     granularity: {},
                     weekDay: {
-                        day: Weekday[Weekday.Tuesday],
+                        day: Weekday.Tuesday,
                         daySelection,
                     },
                 };
 
-                checkSelectedElement(GranularityType[GranularityType.week], 2);
+                checkSelectedElement(GranularityType.week, 2);
             });
 
             it("check calendar getWeekPeriod function with day of week option off", () => {
@@ -703,7 +704,7 @@ describe("Timeline", () => {
 
                 dataView.metadata.objects = {
                     granularity: {
-                        granularity: GranularityType[GranularityType.week],
+                        granularity: GranularityType.week,
                     },
                     weekDay: {
                         daySelection: !daySelection,
@@ -851,14 +852,16 @@ describe("Timeline", () => {
                             granularity: {},
                         };
 
-                        checkSelectedElement(GranularityType[GranularityType.week], 1);
+                        checkSelectedElement(GranularityType.week, 1);
                     }
                 }
             });
 
             it(`current period out of data set for granularity`, () => {
                 for (const granularity of Object.keys(GranularityType)) {
-                    if (isNaN(+granularity)) {
+                    const granularityValue = +granularity;
+
+                    if (!isNaN(granularityValue)) {
                         const startDateRange: Date = new Date(2010, 0, 1);
                         const endDateRange: Date = new Date(2011, 11, 31);
 
@@ -872,7 +875,7 @@ describe("Timeline", () => {
                                 currentPeriod: true,
                             },
                             granularity: {
-                                granularity,
+                                granularity: granularityValue,
                             },
                         };
 
@@ -891,20 +894,20 @@ describe("Timeline", () => {
                         const amountOfMonths: number = amountOfMonthsInYearsDiff + amountOfMonthsThisYear;
 
                         let expectedElementsAmount: number;
-                        switch (granularity) {
-                            case GranularityType[GranularityType.year]:
+                        switch (granularityValue) {
+                            case GranularityType.year:
                                 expectedElementsAmount = amountOfYears;
                                 break;
-                            case GranularityType[GranularityType.quarter]:
+                            case GranularityType.quarter:
                                 expectedElementsAmount = amountOfMonths / 3;
                                 break;
-                            case GranularityType[GranularityType.month]:
+                            case GranularityType.month:
                                 expectedElementsAmount = amountOfMonths;
                                 break;
-                            case GranularityType[GranularityType.week]:
+                            case GranularityType.week:
                                 expectedElementsAmount = Math.ceil((amountOfDays - amountOfDaysFromStart) / 7) + 1;
                                 break;
-                            case GranularityType[GranularityType.day]:
+                            case GranularityType.day:
                                 expectedElementsAmount = amountOfDays - amountOfDaysFromStart;
                                 break;
                         }

@@ -163,7 +163,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
         if (!initialized || isCalendarChanged) {
             calendar = new CalendarFactory().create(weekStandard, calendarFormat, weekDayFormat);
             const granularity: GranularityType = settings.granularity.granularity.value
-                    ? GranularityType[settings.granularity.granularity.value.value]
+                    ? <GranularityType>settings.granularity.granularity.value.value
                     : GranularityType.month;
 
                 timelineData.currentGranularity = timelineGranularityData.getGranularity(granularity);
@@ -224,12 +224,12 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
 
     private static computeCalendarFormat(timelineSettings: TimeLineSettingsModel) {
         const weekStandard: WeekStandard = timelineSettings.weeksDeterminationStandards.weekStandard.value
-            ? WeekStandard[timelineSettings.weeksDeterminationStandards.weekStandard.value.value]
+            ? <WeekStandard>timelineSettings.weeksDeterminationStandards.weekStandard.value.value
             : WeekStandard.NotSet;
 
         const calendarFormat: CalendarFormat = {
             month: timelineSettings.calendar.month.value
-                ? Month[timelineSettings.calendar.month.value.value]
+                ? <Month>timelineSettings.calendar.month.value.value
                 : Month.January,
             day: timelineSettings.calendar.day.value,
         }
@@ -237,7 +237,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
         const weekDayFormat: WeekdayFormat = {
             daySelection: timelineSettings.weekDay.daySelection.value,
             day: timelineSettings.weekDay.day.value
-                ? Weekday[timelineSettings.weekDay.day.value.value]
+                ? <Weekday>timelineSettings.weekDay.day.value.value
                 : Weekday.Sunday,
         }
 
@@ -730,7 +730,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
             const adjustedPeriod: IAdjustedFilterDatePeriod = this.adjustFilterDatePeriod();
             const datePeriod: ITimelineDatePeriodBase = this.datePeriod;
             const granularity: GranularityType = this.visualSettings.granularity.granularity.value
-                ? GranularityType[this.visualSettings.granularity.granularity.value.value]
+                ? <GranularityType>this.visualSettings.granularity.granularity.value.value
                 : GranularityType.month;
 
             const isCurrentPeriodSelected: boolean = !this.isForceSelectionReset && this.visualSettings.forceSelection.currentPeriod.value;
@@ -1069,12 +1069,12 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
         this.host.persistProperties({
             merge: [{
                 objectName: "granularity",
-                properties: { granularity: GranularityType[granularityType] },
+                properties: { granularity: granularityType },
                 selector: null,
             }],
         });
 
-        const selectedGranularity = this.visualSettings.granularity.granularity.items.find(granularityOption => granularityOption.value === GranularityType[granularityType])
+        const selectedGranularity = this.visualSettings.granularity.granularity.items.find(granularityOption => granularityOption.value === granularityType)
         this.visualSettings.granularity.granularity.value = selectedGranularity;
     }
 
@@ -1317,7 +1317,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
                 actualEndDate.getTime() !== prevEndDate.getTime();
 
             const granularityType: GranularityType = timelineSettings.granularity.granularity.value
-                ? GranularityType[timelineSettings.granularity.granularity.value.value]
+                ? <GranularityType>timelineSettings.granularity.granularity.value.value
                 : GranularityType.month;
 
             if (!changedSelection) {

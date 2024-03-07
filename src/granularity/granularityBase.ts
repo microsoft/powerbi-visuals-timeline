@@ -119,7 +119,7 @@ export class GranularityBase implements IGranularity {
 
         // render slider
         const granularityType: GranularityType = props.granularSettings.granularity.value
-            ? GranularityType[props.granularSettings.granularity.value.value]
+            ? <GranularityType>props.granularSettings.granularity.value.value
             : GranularityType.month;
 
         if (granularityType === this.granularityProps.granularityType) {
