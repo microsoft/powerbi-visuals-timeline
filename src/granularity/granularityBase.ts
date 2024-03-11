@@ -138,11 +138,8 @@ export class GranularityBase implements IGranularity {
             .attr("width", pixelConverter.toString(this.clickableRectWidth))
             .attr("height", pixelConverter.toString(this.clickableRectHeight))
             .on("click", null)
-            .on("click", () => {
-                const event: MouseEvent = <MouseEvent>(require("d3").event);
-
+            .on("click", (event: MouseEvent) => {
                 event.stopPropagation();
-
                 props.selectPeriodCallback(this.granularityProps.granularityType);
 
                 const sliderSelection = selectAll("rect.periodSlicerRect");

@@ -28,9 +28,9 @@ import "../style/visual.less";
 
 import {select as d3Select, selectAll as d3SelectAll, Selection as D3Selection,} from "d3-selection";
 
-import {drag as d3Drag,} from "d3-drag";
+import {drag as d3Drag, D3DragEvent} from "d3-drag";
 
-import {arc as d3Arc,} from "d3-shape";
+import {arc as d3Arc} from "d3-shape";
 
 import powerbiVisualsApi from "powerbi-visuals-api";
 import powerbi from "powerbi-visuals-api";
@@ -593,7 +593,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
     private selectionManager: ISelectionManager;
 
     private cursorDragBehavior = d3Drag<any, ICursorDataPoint>()
-        .subject((cursorDataPoint: ICursorDataPoint) => {
+        .subject((_: D3DragEvent<any, ICursorDataPoint, ICursorDataPoint>,cursorDataPoint: ICursorDataPoint) => {
             cursorDataPoint.x = cursorDataPoint.selectionIndex * this.timelineProperties.cellWidth;
 
             return cursorDataPoint;
@@ -1055,8 +1055,9 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
         this.visualSettings.granularity.granularity.value = selectedGranularity;
     }
 
-    public onCursorDrag(currentCursor: ICursorDataPoint): void {
-        const cursorOverElement: ITimelineCursorOverElement = this.findCursorOverElement((<MouseEvent>(require("d3").event)).x);
+    public onCursorDrag(event: D3DragEvent<any, ICursorDataPoint, ICursorDataPoint>, currentCursor: ICursorDataPoint): void {
+        const mouseEvent: MouseEvent = event.sourceEvent;
+        const cursorOverElement: ITimelineCursorOverElement = this.findCursorOverElement(mouseEvent.x);
 
         if (!cursorOverElement) {
             return;
@@ -1213,9 +1214,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
 
     private handleContextMenu(): void {
         // handle context menu
-        this.rootSelection.on('contextmenu', () => {
-            const mouseEvent: MouseEvent = <MouseEvent>(require("d3").event);
-
+        this.rootSelection.on('contextmenu', (mouseEvent: MouseEvent) => {
             const emptySelection = {
                 "measures": [],
                 "dataMap": {
@@ -1230,12 +1229,10 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
         });
     }
 
-    private handleClick(dataPoint: ITimelineDataPoint, index: number): void {
-        const event: MouseEvent = <MouseEvent>(require("d3").event);
-
+    private handleClick(event: MouseEvent, dataPoint: ITimelineDataPoint): void {
         event.stopPropagation();
 
-        this.onCellClickHandler(dataPoint, index, event.altKey || event.shiftKey);
+        this.onCellClickHandler(dataPoint, dataPoint.index, event.altKey || event.shiftKey);
     }
 
     private addElements(): void {
