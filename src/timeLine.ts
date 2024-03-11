@@ -73,7 +73,6 @@ import {CalendarFactory} from "./calendars/calendarFactory";
 import {
     CalendarSettingsCard,
     CellsSettingsCard,
-    LabelsSettingsCard,
     RangeHeaderSettingsCard,
     TimeLineSettingsModel,
 } from "./timeLineSettingsModel";
@@ -209,7 +208,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
             .length;
 
         Timeline.setMeasures(
-            settings.labels,
+            settings,
             timelineData.currentGranularity.getType(),
             countFullCells,
             viewport,
@@ -442,7 +441,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
     }
 
     private static setMeasures(
-        labelsSettings: LabelsSettingsCard,
+        settings: TimeLineSettingsModel,
         granularityType: GranularityType,
         datePeriodsCount: number,
         viewport: powerbiVisualsApi.IViewport,
@@ -452,10 +451,10 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
 
         timelineProperties.cellsYPosition = timelineProperties.textYPosition;
 
-        const labelSize: number = pixelConverter.fromPointToPixel(labelsSettings.textSize.value);
+        const labelSize: number = pixelConverter.fromPointToPixel(settings.labels.textSize.value);
 
-        if (labelsSettings.show.value) {
-            const granularityOffset: number = labelsSettings.displayAll.value ? granularityType + 1 : 1;
+        if (settings.labels.show.value) {
+            const granularityOffset: number = settings.labels.displayAll.value ? granularityType + 1 : 1;
 
             timelineProperties.cellsYPosition += labelSize
                 * Timeline.LabelSizeFactor
@@ -479,8 +478,16 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
             timelineMargins.MinCellWidth,
             (viewport.width - height - Timeline.ViewportWidthAdjustment) / (datePeriodsCount));
 
-        timelineProperties.cellHeight = height;
-        timelineProperties.cellWidth = width;
+        if (settings.cells.enableManualSizing.value) {
+            timelineProperties.cellHeight = settings.cells.height.value;
+            timelineProperties.cellWidth = settings.cells.width.value;
+        } else {
+            timelineProperties.cellHeight = height;
+            timelineProperties.cellWidth = width;
+
+            settings.cells.height.value = Math.round(height);
+            settings.cells.width.value = Math.round(width);
+        }
     }
 
     private static applyJsonFilters(
@@ -1030,45 +1037,6 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
     public getFormattingModel(): powerbi.visuals.FormattingModel {
         return this.formattingSettingsService.buildFormattingModel(this.visualSettings);
     }
-
-    /**
-     * This function returns the values to be displayed in the property pane for each object.
-     * Usually it is a bind pass of what the property pane gave you, but sometimes you may want to do
-     * validation and return other values/defaults.
-     */
-    // public enumerateObjectInstances(options: powerbiVisualsApi.EnumerateVisualObjectInstancesOptions): powerbiVisualsApi.VisualObjectInstanceEnumeration {
-    //     if (options.objectName === "general") {
-    //         return [];
-    //     }
-    //
-    //     const settings: Settings = <Settings>(Settings.getDefault());
-    //
-    //     const instancesEnumerator: powerbiVisualsApi.VisualObjectInstanceEnumeration = Settings.enumerateObjectInstances(
-    //         settings,
-    //         options,
-    //     );
-    //
-    //     const instances = (<powerbiVisualsApi.VisualObjectInstanceEnumerationObject>instancesEnumerator).instances
-    //         ? (<powerbiVisualsApi.VisualObjectInstanceEnumerationObject>instancesEnumerator).instances
-    //         : instancesEnumerator;
-    //
-    //     if (options.objectName === "weekDay"
-    //         && !settings.weekDay.daySelection
-    //         && instances
-    //         && instances[0]
-    //         && instances[0].properties
-    //     ) {
-    //         delete instances[0].properties.day;
-    //     }
-    //
-    //     // This options have no sense if ISO standard was picked
-    //     if ((options.objectName === "weekDay" || options.objectName === "calendar")
-    //         && settings.weeksDetermintaionStandards.weekStandard !== WeekStandards.NotSet) {
-    //         return null;
-    //     }
-    //
-    //     return instances;
-    // }
 
     public selectPeriod(granularityType: GranularityType): void {
         if (this.timelineData.currentGranularity.getType() === granularityType) {

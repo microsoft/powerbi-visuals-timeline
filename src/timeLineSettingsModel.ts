@@ -6,6 +6,7 @@ import {Month} from "./calendars/month";
 import Card = formattingSettings.SimpleCard;
 import CompositeCard = formattingSettings.CompositeCard;
 import Model = formattingSettings.Model;
+import Group = formattingSettings.Group;
 import IEnumMember = powerbi.IEnumMember;
 import ValidatorType = powerbi.visuals.ValidatorType;
 import {Weekday} from "./calendars/weekday";
@@ -260,10 +261,47 @@ export class CellsSettingsCard extends Card {
         }
     });
 
+    enableManualSizing = new formattingSettings.ToggleSwitch({
+        name: "enableManualSizing",
+        displayName: "Enable manual sizing",
+        displayNameKey: "Visual_Cell_EnableManualSizing",
+        value: false,
+    });
+
+    width = new formattingSettings.NumUpDown({
+        name: "width",
+        displayName: "Cell width",
+        displayNameKey: "Visual_Cell_Width",
+        value: 40,
+        options: {
+            minValue: { value: 10, type: powerbi.visuals.ValidatorType.Min },
+        },
+    });
+
+    height = new formattingSettings.NumUpDown({
+        name: "height",
+        displayName: "Cell height",
+        displayNameKey: "Visual_Cell_Height",
+        value: 60,
+        options: {
+            minValue: { value: 10, type: powerbi.visuals.ValidatorType.Min },
+        },
+    });
+
     name: string = "cells";
     displayName: string = "Cells";
     displayNameKey: string = "Visual_Cells";
-    slices = [this.fillSelected, this.strokeSelected, this.fillUnselected, this.strokeUnselected, this.strokeWidth, this.gapWidth];
+    slices = [
+        this.fillSelected,
+        this.strokeSelected,
+        this.fillUnselected,
+        this.strokeUnselected,
+        this.strokeWidth,
+        this.gapWidth,
+        this.enableManualSizing,
+        this.width,
+        this.height,
+    ];
 }
 
 export class GranularitySettingsCard extends Card {
