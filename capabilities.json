@@ -286,6 +286,16 @@
                             }
                         }
                     }
+                },
+                "strokeWidth": {
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "gapWidth": {
+                    "type": {
+                        "numeric": true
+                    }
                 }
             }
         },

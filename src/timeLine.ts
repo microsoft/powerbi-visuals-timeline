@@ -819,7 +819,8 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
                 return isSelected
                     ? cellsSettings.strokeSelected.value.value
                     : cellsSettings.strokeUnselected.value.value;
-            });
+            })
+            .style("stroke-width", cellsSettings.strokeWidth.value + "px");
     }
 
     public renderCells(timelineData: ITimelineData, timelineProperties: ITimelineProperties, yPos: number): void {
@@ -853,9 +854,11 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
                 return pixelConverter.toString(position);
             })
             .attr("y", pixelConverter.toString(yPos))
-            .attr("height", pixelConverter.toString(timelineProperties.cellHeight))
+            .attr("height", pixelConverter.toString(timelineProperties.cellHeight - this.visualSettings.cells.strokeWidth.value))
             .attr("width", (dataPoint: ITimelineDataPoint) => {
-                return pixelConverter.toString(dataPoint.datePeriod.fraction * timelineProperties.cellWidth);
+                return pixelConverter.toString(
+                    dataPoint.datePeriod.fraction * timelineProperties.cellWidth - this.visualSettings.cells.gapWidth.value
+                );
             })
             .append("title")
             .text((dataPoint: ITimelineDataPoint) => timelineData.currentGranularity.generateLabel(dataPoint.datePeriod).title);
@@ -882,8 +885,14 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
             .classed(Timeline.TimelineSelectors.SelectionCursor.className, true)
             .merge(cursorSelection)
             .attr("transform", (cursorDataPoint: ICursorDataPoint) => {
-                const dx: number = cursorDataPoint.selectionIndex * this.timelineProperties.cellWidth;
-                const dy: number = cellHeight / Timeline.CellHeightDivider + cellsYPosition;
+                let dx: number = cursorDataPoint.selectionIndex * this.timelineProperties.cellWidth;
+
+                // right cursor
+                if (cursorDataPoint.cursorIndex === 1) {
+                    dx -= this.visualSettings.cells.gapWidth.value;
+                }
+
+                const dy: number = (cellHeight - this.visualSettings.cells.strokeWidth.value) / Timeline.CellHeightDivider + cellsYPosition;
 
                 return svgManipulation.translate(dx, dy);
             })

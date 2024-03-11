@@ -1,8 +1,22 @@
-## 2.5.0
+## 2.5.2
+* Fix backwards compatibility
+
+## 2.5.1
+* powerbi-visuals-api was updated to 5.8.0
 * Packages update
-* API was updated to 5.8.0
-* Remove jquery
-* GitHub actions now use node 18, 20
+
+
+## 2.5.0
+* powerbi-visuals-api was updated to 5.7.0
+* Updated to new formatting model api provided
+* Migrate from puppeteer to playwright
+* Split d3 package into d3-selection, d3-shape, d3-drag, d3-array. Update d3 to v6
+* Remove lodash, jquery, tslint, ts-node, istanbul-reporter
+* Update dependencies
+* Add missing localization keys
+* Add cursor color settings
+* Add stroke color settings
+* Update build.yml to use node 18, 20
 
 ## 2.3.0
 * A new option group "Weeks Determination Standards" containing a list of two items where the first one enables US weeks numbering (default) and the second one enables ISO 8601 weeks numbering

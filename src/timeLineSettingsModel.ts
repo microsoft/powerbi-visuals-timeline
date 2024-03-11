@@ -238,10 +238,32 @@ export class CellsSettingsCard extends Card {
         value: { value: "#333444" },
     });
 
+    strokeWidth = new formattingSettings.NumUpDown({
+        name: "strokeWidth",
+        displayName: "Stroke width",
+        displayNameKey: "Visual_Cell_StrokeWidth",
+        value: 1,
+        options: {
+            minValue: { value: 0, type: powerbi.visuals.ValidatorType.Min },
+            maxValue: { value: 10, type: powerbi.visuals.ValidatorType.Max },
+        }
+    });
+
+    gapWidth = new formattingSettings.NumUpDown({
+        name: "gapWidth",
+        displayName: "Gap width",
+        displayNameKey: "Visual_Cell_GapWidth",
+        value: 0,
+        options: {
+            minValue: { value: 0, type: powerbi.visuals.ValidatorType.Min },
+            maxValue: { value: 30, type: powerbi.visuals.ValidatorType.Max },
+        }
+    });
+
     name: string = "cells";
     displayName: string = "Cells";
     displayNameKey: string = "Visual_Cells";
-    slices = [this.fillSelected, this.strokeSelected, this.fillUnselected, this.strokeUnselected];
+    slices = [this.fillSelected, this.strokeSelected, this.fillUnselected, this.strokeUnselected, this.strokeWidth, this.gapWidth];
 }
 
 export class GranularitySettingsCard extends Card {
