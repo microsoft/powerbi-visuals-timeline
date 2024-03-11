@@ -897,7 +897,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
                     return cursorDataPoint.cursorIndex * Math.PI + 2 * Math.PI;
                 }),
             )
-            .style("fill", this.visualSettings.cursor.color.value.value)
+            .style("fill", this.visualSettings.cursor.show.value ? this.visualSettings.cursor.color.value.value : "transparent")
             .call(this.cursorDragBehavior);
     }
 

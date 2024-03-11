@@ -47,6 +47,11 @@
         },
         "cursor": {
             "properties": {
+                "show": {
+                    "type": {
+                        "bool": true
+                    }
+                },
                 "color": {
                     "type": {
                         "fill": {
