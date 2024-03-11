@@ -1,5 +1,6 @@
 ## 2.5.2
-* Fix backwards compatibility
+* Fix backwards compatibility with 2.4.0
+* Packages update
 
 ## 2.5.1
 * powerbi-visuals-api was updated to 5.8.0

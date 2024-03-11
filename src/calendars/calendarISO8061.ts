@@ -68,7 +68,7 @@ export class CalendarISO8061 extends Calendar {
         const dayOfFirstJanWeek = dateOfFirstJan.getDay();
         const firstJanDig = 1;
 
-        let dateOfFirstWeek = dateOfFirstJan;
+        const dateOfFirstWeek = dateOfFirstJan;
         // The first week regarding ISO has to contain Thursday (4th day in the week)
         if (dayOfFirstJanWeek <= 4) {
             // If 1st January is Monday, Tuesday, Wednesday or Thursday => the first week date should be adjusted to left up to Monday

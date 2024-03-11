@@ -87,13 +87,6 @@ interface IAdjustedFilterDatePeriod {
     adaptedDataEndDate: Date;
 }
 
-function parseIntOrString(value: number | string): number {
-    if (typeof value === "number") {
-        return value;
-    }
-
-    return parseInt(value);
-}
 
 export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual {
     public static ADJUST_CALENDAR_DAY_SETTINGS(calendarSettings: CalendarFormat): number {

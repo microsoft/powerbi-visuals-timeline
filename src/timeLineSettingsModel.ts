@@ -6,7 +6,6 @@ import {Month} from "./calendars/month";
 import Card = formattingSettings.SimpleCard;
 import CompositeCard = formattingSettings.CompositeCard;
 import Model = formattingSettings.Model;
-import Group = formattingSettings.Group;
 import IEnumMember = powerbi.IEnumMember;
 import ValidatorType = powerbi.visuals.ValidatorType;
 import {Weekday} from "./calendars/weekday";
