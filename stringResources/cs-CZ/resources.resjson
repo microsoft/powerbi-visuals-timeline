@@ -1,6 +1,8 @@
 {
   "Role_Time": "Čas",
   "Visual_General": "Obecné",
+  "Visual_Short_Description": "Graphical date range selector to use for filtering dates",
+  "Visual_Long_Description": "The Timeline slicer is a graphical date range selector used as a filtering component in Power BI. This makes filtering data by date dimension easy and fun.\nHow often do you have to filter your data for a date range or at higher level such as month or quarter? Every single time. Right? Filtering is pain when you have to click through large numbers of date values to select the range you want. Changing the filter granularity from months, the quarters and years on the fly is super tedious. Well, it used to be super tedious.\nThe Timeline slicer is going to make this experience a breeze. With this simple slider control for dates, all you need to do, is just click and drag to the range that you want. You can also switch to a Year, Quarter or Month view to select ranges even at a higher level than dates.\nYou can simply click on the slicer to select a single value or click the edge and drag it to the range that you want.\nYou can also change the background & selection color and number of other formatting options to control the look-n-feel. SHIFT+Click also works for selecting a range.",
   "Visual_FiscalYearStart": "Začátek fiskálního roku",
   "Visual_FiscalYear": "Fiskální rok",
   "Visual_Month": "Měsíc",
@@ -33,6 +35,13 @@
   "Visual_Cells": "Buňky",
   "Visual_Cell_SelectedColor": "Barva vybrané buňky",
   "Visual_Cell_UnselectedColor": "Barva nevybrané buňky",
+  "Visual_Cell_StrokeColor": "Stroke color",
+  "Visual_Cell_SelectedStrokeColor": "Selected stroke color",
+  "Visual_Cell_StrokeWidth": "Stroke width",
+  "Visual_Cell_EnableManualSizing": "Enable manual sizing",
+  "Visual_Cell_Width": "Cell width",
+  "Visual_Cell_height": "Cell height",
+  "Visual_Cell_GapWidth": "Gap width",
   "Visual_Granularity": "Úroveň podrobností",
   "Visual_ScaleColor": "Barva měřítka",
   "Visual_SliderColor": "Barva jezdce",
@@ -45,6 +54,8 @@
   "Visual_ScaleSizeAdjustment": "Automatická úprava měřítka velikosti",
   "Visual_FirstDayOfWeek": "První den v týdnu",
   "Visual_DisplayAll": "Zobrazit vše",
+  "Visual_Cursor": "Cursor",
+  "Visual_CursorColor": "Cursor color",
   "Visual_ForceSelection": "Vynutit výběr",
   "Visual_CurrentPeriod": "Aktuální období",
   "Visual_LatestAvailableDate": "Nejnovější dostupné období",
@@ -53,5 +64,9 @@
   "Visual_GranularityQuarterVisibility": "Viditelnost čtvrtletí",
   "Visual_GranularityMonthVisibility": "Viditelnost měsíce",
   "Visual_GranularityWeekVisibility": "Viditelnost týdne",
-  "Visual_GranularityDayVisibility": "Viditelnost dne"
+  "Visual_GranularityDayVisibility": "Viditelnost dne",
+  "Visual_Weeks_Determination_Standards": "Weeks Determination Standards",
+  "Visual_Week_Standard": "Standard",
+  "Visual_Week_Standard_None": "-- none --",
+  "Visual_Week_Standard_ISO8601": "ISO 8601"
 }

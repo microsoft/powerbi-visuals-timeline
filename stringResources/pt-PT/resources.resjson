@@ -1,6 +1,8 @@
 {
   "Role_Time": "Hora",
   "Visual_General": "Geral",
+  "Visual_Short_Description": "Graphical date range selector to use for filtering dates",
+  "Visual_Long_Description": "The Timeline slicer is a graphical date range selector used as a filtering component in Power BI. This makes filtering data by date dimension easy and fun.\nHow often do you have to filter your data for a date range or at higher level such as month or quarter? Every single time. Right? Filtering is pain when you have to click through large numbers of date values to select the range you want. Changing the filter granularity from months, the quarters and years on the fly is super tedious. Well, it used to be super tedious.\nThe Timeline slicer is going to make this experience a breeze. With this simple slider control for dates, all you need to do, is just click and drag to the range that you want. You can also switch to a Year, Quarter or Month view to select ranges even at a higher level than dates.\nYou can simply click on the slicer to select a single value or click the edge and drag it to the range that you want.\nYou can also change the background & selection color and number of other formatting options to control the look-n-feel. SHIFT+Click also works for selecting a range.",
   "Visual_FiscalYearStart": "Início do Ano Fiscal",
   "Visual_FiscalYear": "Ano Fiscal",
   "Visual_Month": "Mês",
@@ -33,6 +35,13 @@
   "Visual_Cells": "Células",
   "Visual_Cell_SelectedColor": "Cor da célula selecionada",
   "Visual_Cell_UnselectedColor": "Cor da célula não selecionada",
+  "Visual_Cell_StrokeColor": "Stroke color",
+  "Visual_Cell_SelectedStrokeColor": "Selected stroke color",
+  "Visual_Cell_StrokeWidth": "Stroke width",
+  "Visual_Cell_EnableManualSizing": "Enable manual sizing",
+  "Visual_Cell_Width": "Cell width",
+  "Visual_Cell_height": "Cell height",
+  "Visual_Cell_GapWidth": "Gap width",
   "Visual_Granularity": "Granularidade",
   "Visual_ScaleColor": "Cor da escala",
   "Visual_SliderColor": "Cor do controlo de deslize",
@@ -45,6 +54,8 @@
   "Visual_ScaleSizeAdjustment": "Ajuste automático de tamanho da escala ",
   "Visual_FirstDayOfWeek": "Primeiro Dia da Semana",
   "Visual_DisplayAll": "Mostrar todos",
+  "Visual_Cursor": "Cursor",
+  "Visual_CursorColor": "Cursor color",
   "Visual_ForceSelection": "Forçar seleção",
   "Visual_CurrentPeriod": "Período atual",
   "Visual_LatestAvailableDate": "Período mais recente disponível",
@@ -53,5 +64,9 @@
   "Visual_GranularityQuarterVisibility": "Visibilidade de trimestre",
   "Visual_GranularityMonthVisibility": "Visibilidade de mês",
   "Visual_GranularityWeekVisibility": "Visibilidade de semana",
-  "Visual_GranularityDayVisibility": "Visibilidade de dias"
+  "Visual_GranularityDayVisibility": "Visibilidade de dias",
+  "Visual_Weeks_Determination_Standards": "Weeks Determination Standards",
+  "Visual_Week_Standard": "Standard",
+  "Visual_Week_Standard_None": "-- none --",
+  "Visual_Week_Standard_ISO8601": "ISO 8601"
 }

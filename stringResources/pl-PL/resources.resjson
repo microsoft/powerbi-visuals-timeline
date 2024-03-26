@@ -1,6 +1,8 @@
 {
   "Role_Time": "Godzina",
   "Visual_General": "Ogólne",
+  "Visual_Short_Description": "Graphical date range selector to use for filtering dates",
+  "Visual_Long_Description": "The Timeline slicer is a graphical date range selector used as a filtering component in Power BI. This makes filtering data by date dimension easy and fun.\nHow often do you have to filter your data for a date range or at higher level such as month or quarter? Every single time. Right? Filtering is pain when you have to click through large numbers of date values to select the range you want. Changing the filter granularity from months, the quarters and years on the fly is super tedious. Well, it used to be super tedious.\nThe Timeline slicer is going to make this experience a breeze. With this simple slider control for dates, all you need to do, is just click and drag to the range that you want. You can also switch to a Year, Quarter or Month view to select ranges even at a higher level than dates.\nYou can simply click on the slicer to select a single value or click the edge and drag it to the range that you want.\nYou can also change the background & selection color and number of other formatting options to control the look-n-feel. SHIFT+Click also works for selecting a range.",
   "Visual_FiscalYearStart": "Początek roku obrachunkowego",
   "Visual_FiscalYear": "Rok obrachunkowy",
   "Visual_Month": "Miesiąc",
@@ -33,6 +35,13 @@
   "Visual_Cells": "Komórki",
   "Visual_Cell_SelectedColor": "Kolor zaznaczonej komórki",
   "Visual_Cell_UnselectedColor": "Kolor niezaznaczonej komórki",
+  "Visual_Cell_StrokeColor": "Stroke color",
+  "Visual_Cell_SelectedStrokeColor": "Selected stroke color",
+  "Visual_Cell_StrokeWidth": "Stroke width",
+  "Visual_Cell_EnableManualSizing": "Enable manual sizing",
+  "Visual_Cell_Width": "Cell width",
+  "Visual_Cell_height": "Cell height",
+  "Visual_Cell_GapWidth": "Gap width",
   "Visual_Granularity": "Stopień szczegółowości",
   "Visual_ScaleColor": "Kolor skali",
   "Visual_SliderColor": "Kolor suwaka",
@@ -45,6 +54,8 @@
   "Visual_ScaleSizeAdjustment": "Automatyczne dopasowanie rozmiaru skali",
   "Visual_FirstDayOfWeek": "Pierwszy dzień tygodnia",
   "Visual_DisplayAll": "Wyświetl wszystko",
+  "Visual_Cursor": "Cursor",
+  "Visual_CursorColor": "Cursor color",
   "Visual_ForceSelection": "Wymuś wybór",
   "Visual_CurrentPeriod": "Bieżący okres",
   "Visual_LatestAvailableDate": "Najnowszy dostępny okres",
@@ -53,5 +64,9 @@
   "Visual_GranularityQuarterVisibility": "Widoczność kwartału",
   "Visual_GranularityMonthVisibility": "Widoczność miesiąca",
   "Visual_GranularityWeekVisibility": "Widoczność tygodnia",
-  "Visual_GranularityDayVisibility": "Widoczność dnia"
+  "Visual_GranularityDayVisibility": "Widoczność dnia",
+  "Visual_Weeks_Determination_Standards": "Weeks Determination Standards",
+  "Visual_Week_Standard": "Standard",
+  "Visual_Week_Standard_None": "-- none --",
+  "Visual_Week_Standard_ISO8601": "ISO 8601"
 }
