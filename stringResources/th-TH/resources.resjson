@@ -1,6 +1,8 @@
 {
   "Role_Time": "เวลา",
   "Visual_General": "ทั่วไป",
+  "Visual_Short_Description": "Graphical date range selector to use for filtering dates",
+  "Visual_Long_Description": "The Timeline slicer is a graphical date range selector used as a filtering component in Power BI. This makes filtering data by date dimension easy and fun.\nHow often do you have to filter your data for a date range or at higher level such as month or quarter? Every single time. Right? Filtering is pain when you have to click through large numbers of date values to select the range you want. Changing the filter granularity from months, the quarters and years on the fly is super tedious. Well, it used to be super tedious.\nThe Timeline slicer is going to make this experience a breeze. With this simple slider control for dates, all you need to do, is just click and drag to the range that you want. You can also switch to a Year, Quarter or Month view to select ranges even at a higher level than dates.\nYou can simply click on the slicer to select a single value or click the edge and drag it to the range that you want.\nYou can also change the background & selection color and number of other formatting options to control the look-n-feel. SHIFT+Click also works for selecting a range.",
   "Visual_FiscalYearStart": "การเริ่มต้นปีงบประมาณ",
   "Visual_FiscalYear": "ปีงบประมาณ",
   "Visual_Month": "เดือน",
@@ -33,6 +35,13 @@
   "Visual_Cells": "เซลล์",
   "Visual_Cell_SelectedColor": "สีของเซลล์ที่เลือก",
   "Visual_Cell_UnselectedColor": "สีของเซลล์ที่ไม่ได้เลือก",
+  "Visual_Cell_StrokeColor": "Stroke color",
+  "Visual_Cell_SelectedStrokeColor": "Selected stroke color",
+  "Visual_Cell_StrokeWidth": "Stroke width",
+  "Visual_Cell_EnableManualSizing": "Enable manual sizing",
+  "Visual_Cell_Width": "Cell width",
+  "Visual_Cell_height": "Cell height",
+  "Visual_Cell_GapWidth": "Gap width",
   "Visual_Granularity": "การแตกเป็นส่วนย่อย",
   "Visual_ScaleColor": "สีมาตราส่วน",
   "Visual_SliderColor": "สีแถบเลื่อน",
@@ -45,6 +54,8 @@
   "Visual_ScaleSizeAdjustment": "การปรับขนาดมาตราส่วนอัตโนมัติ",
   "Visual_FirstDayOfWeek": "วันแรกของสัปดาห์",
   "Visual_DisplayAll": "แสดงทั้งหมด",
+  "Visual_Cursor": "Cursor",
+  "Visual_CursorColor": "Cursor color",
   "Visual_ForceSelection": "บังคับเลือก",
   "Visual_CurrentPeriod": "รอบระยะเวลาปัจจุบัน",
   "Visual_LatestAvailableDate": "ช่วงเวลาที่พร้อมใช้งานล่าสุด",
@@ -53,5 +64,9 @@
   "Visual_GranularityQuarterVisibility": "การมองเห็นไตรมาส",
   "Visual_GranularityMonthVisibility": "การมองเห็นเดือน",
   "Visual_GranularityWeekVisibility": "การมองเห็นสัปดาห์",
-  "Visual_GranularityDayVisibility": "การมองเห็นวัน"
+  "Visual_GranularityDayVisibility": "การมองเห็นวัน",
+  "Visual_Weeks_Determination_Standards": "Weeks Determination Standards",
+  "Visual_Week_Standard": "Standard",
+  "Visual_Week_Standard_None": "-- none --",
+  "Visual_Week_Standard_ISO8601": "ISO 8601"
 }

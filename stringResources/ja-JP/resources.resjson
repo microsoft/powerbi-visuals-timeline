@@ -1,6 +1,8 @@
 {
   "Role_Time": "時間",
   "Visual_General": "全般",
+  "Visual_Short_Description": "Graphical date range selector to use for filtering dates",
+  "Visual_Long_Description": "The Timeline slicer is a graphical date range selector used as a filtering component in Power BI. This makes filtering data by date dimension easy and fun.\nHow often do you have to filter your data for a date range or at higher level such as month or quarter? Every single time. Right? Filtering is pain when you have to click through large numbers of date values to select the range you want. Changing the filter granularity from months, the quarters and years on the fly is super tedious. Well, it used to be super tedious.\nThe Timeline slicer is going to make this experience a breeze. With this simple slider control for dates, all you need to do, is just click and drag to the range that you want. You can also switch to a Year, Quarter or Month view to select ranges even at a higher level than dates.\nYou can simply click on the slicer to select a single value or click the edge and drag it to the range that you want.\nYou can also change the background & selection color and number of other formatting options to control the look-n-feel. SHIFT+Click also works for selecting a range.",
   "Visual_FiscalYearStart": "会計年度の開始",
   "Visual_FiscalYear": "会計年度",
   "Visual_Month": "月",
@@ -33,6 +35,13 @@
   "Visual_Cells": "セル",
   "Visual_Cell_SelectedColor": "選択したセルの色",
   "Visual_Cell_UnselectedColor": "選択されていないセルの色",
+  "Visual_Cell_StrokeColor": "Stroke color",
+  "Visual_Cell_SelectedStrokeColor": "Selected stroke color",
+  "Visual_Cell_StrokeWidth": "Stroke width",
+  "Visual_Cell_EnableManualSizing": "Enable manual sizing",
+  "Visual_Cell_Width": "Cell width",
+  "Visual_Cell_height": "Cell height",
+  "Visual_Cell_GapWidth": "Gap width",
   "Visual_Granularity": "細分性",
   "Visual_ScaleColor": "スケールの色",
   "Visual_SliderColor": "スライダーの色",
@@ -45,6 +54,8 @@
   "Visual_ScaleSizeAdjustment": "スケール サイズの自動調整",
   "Visual_FirstDayOfWeek": "週の最初の曜日",
   "Visual_DisplayAll": "すべて表示",
+  "Visual_Cursor": "Cursor",
+  "Visual_CursorColor": "Cursor color",
   "Visual_ForceSelection": "選択を必須にする",
   "Visual_CurrentPeriod": "現在の期間",
   "Visual_LatestAvailableDate": "使用可能な最新の期間",
@@ -53,5 +64,9 @@
   "Visual_GranularityQuarterVisibility": "四半期を表示",
   "Visual_GranularityMonthVisibility": "月を表示",
   "Visual_GranularityWeekVisibility": "週を表示",
-  "Visual_GranularityDayVisibility": "日付の表示"
+  "Visual_GranularityDayVisibility": "日付の表示",
+  "Visual_Weeks_Determination_Standards": "Weeks Determination Standards",
+  "Visual_Week_Standard": "Standard",
+  "Visual_Week_Standard_None": "-- none --",
+  "Visual_Week_Standard_ISO8601": "ISO 8601"
 }
