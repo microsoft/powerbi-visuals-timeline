@@ -1,12 +1,20 @@
-import {Calendar, CalendarFormat, WeekDayFormat} from "./calendar";
+import {Calendar, CalendarFormat, WeekdayFormat} from "./calendar";
 import { WeekStandard } from "./weekStandard";
 import { Utils } from "../utils";
+import {CalendarSettingsCard} from "../timeLineSettingsModel";
 
 export class CalendarISO8061 extends Calendar {
 
     constructor() {
-        const isoCalendarSettings: CalendarFormat = {month: 0, day: 1 };
-        const isoWeekDaySettings: WeekDayFormat = { daySelection: true, day: 1 };
+        const isoCalendarSettings: CalendarFormat = {
+            month: CalendarSettingsCard.DefaultMonth,
+            day: CalendarSettingsCard.DefaultDay,
+        };
+
+        const isoWeekDaySettings: WeekdayFormat = {
+            daySelection: true,
+            day: 1,
+        };
 
         super(isoCalendarSettings, isoWeekDaySettings);
 
@@ -96,9 +104,9 @@ export class CalendarISO8061 extends Calendar {
 
     public isChanged(
         calendarSettings: CalendarFormat,
-        weekDaySettings: WeekDayFormat,
-        weekStandards: WeekStandard
+        weekDaySettings: WeekdayFormat,
+        weekStandard: WeekStandard
     ): boolean {
-        return weekStandards !== WeekStandard.ISO8061
+        return weekStandard !== WeekStandard.ISO8061
     }
 }

@@ -1,3 +1,12 @@
+## 2.5.2
+* Fix backwards compatibility with 2.4.0
+* Packages update
+
+## 2.5.1
+* powerbi-visuals-api was updated to 5.8.0
+* Packages update
+
+
 ## 2.5.0
 * powerbi-visuals-api was updated to 5.7.0
 * Updated to new formatting model api provided

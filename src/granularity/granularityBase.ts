@@ -117,16 +117,16 @@ export class GranularityBase implements IGranularity {
             .attr("y", pixelConverter.toString(0 - this.textLabelYOffset))
             .attr("dx", this.textLabelDx);
 
-        const propsGranularity: GranularityType = props.granularSettings.granularity.value
-            ? GranularityType[props.granularSettings.granularity.value.value]
+        // render slider
+        const granularityType: GranularityType = props.granularSettings.granularity.value
+            ? <GranularityType>props.granularSettings.granularity.value.value
             : GranularityType.month;
 
-        // render slider
-        if (propsGranularity === this.granularityProps.granularityType) {
+        if (granularityType === this.granularityProps.granularityType) {
             this.renderSlider(
                 granularitySelection,
                 props.granularSettings.sliderColor.value.value,
-                propsGranularity
+                granularityType
             );
         }
 
@@ -138,11 +138,8 @@ export class GranularityBase implements IGranularity {
             .attr("width", pixelConverter.toString(this.clickableRectWidth))
             .attr("height", pixelConverter.toString(this.clickableRectHeight))
             .on("click", null)
-            .on("click", (event) => {
-                const mouseEvent: MouseEvent = <MouseEvent>(event);
-
-                mouseEvent.stopPropagation();
-
+            .on("click", (event: MouseEvent) => {
+                event.stopPropagation();
                 props.selectPeriodCallback(this.granularityProps.granularityType);
 
                 const sliderSelection = selectAll("rect.periodSlicerRect");
@@ -153,9 +150,8 @@ export class GranularityBase implements IGranularity {
 
                 this.renderSlider(
                     granularitySelection,
-                    // props.granularSettings,
                     props.granularSettings.sliderColor.value.value,
-                    propsGranularity
+                    granularityType
                 );
             });
 

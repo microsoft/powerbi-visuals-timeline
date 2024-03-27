@@ -1,4 +1,4 @@
-export enum Day {
+export enum Weekday {
     Sunday = 0,
     Monday = 1,
     Tuesday = 2,

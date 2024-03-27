@@ -1,4 +1,4 @@
-import {Calendar, CalendarFormat, WeekDayFormat} from "./calendar";
+import {Calendar, CalendarFormat, WeekdayFormat} from "./calendar";
 import { WeekStandard } from "./weekStandard";
 import { CalendarISO8061 } from "./calendarISO8061";
 
@@ -6,9 +6,9 @@ export class CalendarFactory {
     public create(
         weekStandard: WeekStandard,
         calendarSettings: CalendarFormat,
-        weekDaySettings: WeekDayFormat) : Calendar {
+        weekDaySettings: WeekdayFormat) : Calendar {
 
-        let calendar: Calendar = null;
+        let calendar: Calendar;
 
         switch (weekStandard) {
             case WeekStandard.ISO8061:
