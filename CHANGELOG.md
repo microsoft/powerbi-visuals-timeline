@@ -1,3 +1,8 @@
+## 2.5.3
+* Update API to 5.9.0
+* Fix npm vulnerabilities
+* Refactor code
+
 ## 2.5.2
 * Fix backwards compatibility with 2.4.0
 * Packages update

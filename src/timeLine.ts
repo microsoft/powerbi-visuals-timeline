@@ -108,18 +108,14 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
         return this.SELECT_PERIOD(datePeriod, granularity, calendar, Utils.RESET_TIME(new Date()));
     }
 
-    public static CONVERTER(
-        timelineData: ITimelineData,
-        timelineProperties: ITimelineProperties,
-        timelineGranularityData: GranularityData,
+    public CONVERTER(
         dataView: powerbiVisualsApi.DataView,
         initialized: boolean,
-        settings: TimeLineSettingsModel,
         viewport: powerbiVisualsApi.IViewport,
         previousCalendar: Calendar,
     ): Calendar {
 
-        if (this.isDataViewValid(dataView)) {
+        if (Timeline.isDataViewValid(dataView)) {
             return null;
         }
 
@@ -128,7 +124,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
         let endDate: Date;
 
         if (!initialized) {
-            timelineData.cursorDataPoints = [{
+            this.timelineData.cursorDataPoints = [{
                 cursorIndex: 0,
                 selectionIndex: Timeline.DefaultSelectionStartIndex,
                 x: Timeline.DefaultCursorDatapointX,
@@ -142,47 +138,47 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
             }];
         }
 
-        const {weekStandard, calendarFormat, weekDayFormat} = Timeline.computeCalendarFormat(settings);
+        const {weekStandard, calendarFormat, weekDayFormat} = Timeline.computeCalendarFormat(this.visualSettings);
 
         const isCalendarChanged: boolean = previousCalendar
             && previousCalendar.isChanged(calendarFormat, weekDayFormat, weekStandard);
 
-        if (timelineData && timelineData.currentGranularity) {
-            startDate = Utils.GET_START_SELECTION_DATE(timelineData);
-            endDate = Utils.GET_END_SELECTION_DATE(timelineData);
+        if (this.timelineData && this.timelineData.currentGranularity) {
+            startDate = Utils.GET_START_SELECTION_DATE(this.timelineData);
+            endDate = Utils.GET_END_SELECTION_DATE(this.timelineData);
         }
 
         if (!initialized || isCalendarChanged) {
             calendar = new CalendarFactory().create(weekStandard, calendarFormat, weekDayFormat);
-            const granularity: GranularityType = settings.granularity.granularity.value
-                    ? <GranularityType>settings.granularity.granularity.value.value
+            const granularity: GranularityType = this.visualSettings.granularity.granularity.value
+                    ? <GranularityType>this.visualSettings.granularity.granularity.value.value
                     : GranularityType.month;
 
-                timelineData.currentGranularity = timelineGranularityData.getGranularity(granularity);
+                this.timelineData.currentGranularity = this.timelineGranularityData.getGranularity(granularity);
         } else {
             calendar = previousCalendar;
 
         }
         if (!initialized) {
-            timelineData.selectionStartIndex = 0;
-            timelineData.selectionEndIndex = timelineData.currentGranularity.getDatePeriods().length - 1;
+            this.timelineData.selectionStartIndex = 0;
+            this.timelineData.selectionEndIndex = this.timelineData.currentGranularity.getDatePeriods().length - 1;
         }
 
         const category: powerbiVisualsApi.DataViewCategoryColumn = dataView.categorical.categories[0];
-        timelineData.filterColumnTarget = extractFilterColumnTarget(category);
+        this.timelineData.filterColumnTarget = extractFilterColumnTarget(category);
 
         if (category.source.type.numeric) {
-            (<any>(timelineData.filterColumnTarget)).ref = "Date";
+            (<any>(this.timelineData.filterColumnTarget)).ref = "Date";
         }
 
         if (isCalendarChanged && startDate && endDate) {
-            Utils.UNSEPARATE_SELECTION(timelineData.currentGranularity.getDatePeriods());
-            Utils.SEPARATE_SELECTION(timelineData, startDate, endDate);
+            Utils.UNSEPARATE_SELECTION(this.timelineData.currentGranularity.getDatePeriods());
+            Utils.SEPARATE_SELECTION(this.timelineData, startDate, endDate);
         }
 
-        const timelineElements: ITimelineDatePeriod[] = timelineData.currentGranularity.getDatePeriods();
+        const timelineElements: ITimelineDatePeriod[] = this.timelineData.currentGranularity.getDatePeriods();
 
-        timelineData.timelineDataPoints = [];
+        this.timelineData.timelineDataPoints = [];
 
         for (const currentTimePeriod of timelineElements) {
             const datapoint: ITimelineDataPoint = {
@@ -190,26 +186,24 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
                 index: currentTimePeriod.index,
             };
 
-            timelineData.timelineDataPoints.push(datapoint);
+            this.timelineData.timelineDataPoints.push(datapoint);
         }
 
-        const countFullCells: number = timelineData.currentGranularity
+        const countFullCells: number = this.timelineData.currentGranularity
             .getDatePeriods()
             .filter((datePeriod: ITimelineDatePeriod) => {
                 return datePeriod.index % 1 === 0;
             })
             .length;
 
-        Timeline.setMeasures(
-            settings,
-            timelineData.currentGranularity.getType(),
+        this.setMeasures(
+            this.timelineData.currentGranularity.getType(),
             countFullCells,
             viewport,
-            timelineProperties,
             Timeline.TimelineMargins,
         );
 
-        Timeline.updateCursors(timelineData);
+        this.updateCursors(this.timelineData);
 
         return calendar;
     }
@@ -410,7 +404,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
         UpperTextCell: CssConstants.createClassAndSelector("upperTextCell"),
     };
 
-    private static updateCursors(timelineData: ITimelineData): void {
+    private updateCursors(timelineData: ITimelineData): void {
         const startDate: ITimelineDatePeriod = timelineData.timelineDataPoints[timelineData.selectionStartIndex].datePeriod;
         const endDate: ITimelineDatePeriod = timelineData.timelineDataPoints[timelineData.selectionEndIndex].datePeriod;
 
@@ -433,23 +427,21 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
         return false;
     }
 
-    private static setMeasures(
-        settings: TimeLineSettingsModel,
+    private setMeasures(
         granularityType: GranularityType,
         datePeriodsCount: number,
         viewport: powerbiVisualsApi.IViewport,
-        timelineProperties: ITimelineProperties,
         timelineMargins: ITimelineMargins,
     ): void {
 
-        timelineProperties.cellsYPosition = timelineProperties.textYPosition;
+        this.timelineProperties.cellsYPosition = this.timelineProperties.textYPosition;
 
-        const labelSize: number = pixelConverter.fromPointToPixel(settings.labels.textSize.value);
+        const labelSize: number = pixelConverter.fromPointToPixel(this.visualSettings.labels.textSize.value);
 
-        if (settings.labels.show.value) {
-            const granularityOffset: number = settings.labels.displayAll.value ? granularityType + 1 : 1;
+        if (this.visualSettings.labels.show.value) {
+            const granularityOffset: number = this.visualSettings.labels.displayAll.value ? granularityType + 1 : 1;
 
-            timelineProperties.cellsYPosition += labelSize
+            this.timelineProperties.cellsYPosition += labelSize
                 * Timeline.LabelSizeFactor
                 * granularityOffset;
         }
@@ -460,9 +452,9 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
             Math.min(
                 timelineMargins.MaxCellHeight,
                 svgHeight
-                - timelineProperties.cellsYPosition
+                - this.timelineProperties.cellsYPosition
                 - Timeline.TimelinePropertiesHeightOffset
-                + (Timeline.TimelineMargins.LegendHeight - timelineProperties.legendHeight),
+                + (Timeline.TimelineMargins.LegendHeight - this.timelineProperties.legendHeight),
             ));
 
         // Height is deducted here to take account of edge cursors width
@@ -471,22 +463,21 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
             timelineMargins.MinCellWidth,
             (viewport.width - height - Timeline.ViewportWidthAdjustment) / (datePeriodsCount));
 
-        if (settings.cells.enableManualSizing.value) {
-            timelineProperties.cellHeight = settings.cells.height.value;
-            timelineProperties.cellWidth = settings.cells.width.value;
+        if (this.visualSettings.cells.enableManualSizing.value) {
+            this.timelineProperties.cellHeight = this.visualSettings.cells.height.value;
+            this.timelineProperties.cellWidth = this.visualSettings.cells.width.value;
         } else {
-            timelineProperties.cellHeight = height;
-            timelineProperties.cellWidth = width;
+            this.timelineProperties.cellHeight = height;
+            this.timelineProperties.cellWidth = width;
 
-            settings.cells.height.value = Math.round(height);
-            settings.cells.width.value = Math.round(width);
+            this.visualSettings.cells.height.value = Math.round(height);
+            this.visualSettings.cells.width.value = Math.round(width);
         }
     }
 
-    private static applyJsonFilters(
+    private parseJsonFilters(
         settings: TimeLineSettingsModel,
         jsonFilters: AdvancedFilter[],
-        colorPalette: powerbiVisualsApi.extensibility.ISandboxExtendedColorPalette,
     ): void {
         const { calendarFormat } = Timeline.computeCalendarFormat(settings);
         settings.calendar.day.value = Timeline.ADJUST_CALENDAR_DAY_SETTINGS(calendarFormat);
@@ -501,34 +492,36 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
             const endDate: Date = new Date(`${jsonFilters[0].conditions[1].value}`);
 
             if (!isNaN(startDate.getTime()) && !isNaN(endDate.getTime())) {
-                settings.general.datePeriod = DatePeriodBase.CREATE(startDate, endDate);
+                this.filterDatePeriod = DatePeriodBase.CREATE(startDate, endDate);
             } else {
-                settings.general.datePeriod = DatePeriodBase.CREATEEMPTY();
+                this.filterDatePeriod = DatePeriodBase.CREATEEMPTY();
             }
         } else {
-            settings.general.datePeriod = DatePeriodBase.CREATEEMPTY();
+            this.filterDatePeriod = DatePeriodBase.CREATEEMPTY();
         }
+    }
 
-        if (colorPalette.isHighContrast) {
+    private setHighContrastColors() {
+        if (this.host.colorPalette.isHighContrast) {
             const {
                 foreground,
                 background,
-            } = colorPalette;
+            } = this.host.colorPalette;
 
-            settings.rangeHeader.fontColor.value.value = foreground.value;
+            this.visualSettings.rangeHeader.fontColor.value.value = foreground.value;
 
-            settings.cells.fillSelected.value.value = foreground.value;
-            settings.cells.fillUnselected.value.value = background.value;
+            this.visualSettings.cells.fillSelected.value.value = foreground.value;
+            this.visualSettings.cells.fillUnselected.value.value = background.value;
 
-            settings.cells.strokeUnselected.value.value = foreground.value;
-            settings.cells.strokeSelected.value.value = background.value;
+            this.visualSettings.cells.strokeUnselected.value.value = foreground.value;
+            this.visualSettings.cells.strokeSelected.value.value = background.value;
 
-            settings.granularity.scaleColor.value.value = foreground.value;
-            settings.granularity.sliderColor.value.value = foreground.value;
+            this.visualSettings.granularity.scaleColor.value.value = foreground.value;
+            this.visualSettings.granularity.sliderColor.value.value = foreground.value;
 
-            settings.labels.fontColor.value.value = foreground.value;
+            this.visualSettings.labels.fontColor.value.value = foreground.value;
 
-            settings.cursor.color.value.value = foreground.value;
+            this.visualSettings.cursor.color.value.value = foreground.value;
         }
     }
 
@@ -568,6 +561,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
     private svgWidth: number;
 
     private datePeriod: ITimelineDatePeriodBase;
+    private filterDatePeriod: DatePeriodBase | string = DatePeriodBase.CREATEEMPTY();
     private prevFilteredStartDate: Date | null = null;
     private prevFilteredEndDate: Date | null = null;
 
@@ -706,11 +700,8 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
                 };
             }
 
-            Timeline.applyJsonFilters(
-                this.visualSettings,
-                <AdvancedFilter[]>(this.options.jsonFilters),
-                this.host.colorPalette,
-            );
+            this.parseJsonFilters(this.visualSettings, <AdvancedFilter[]>(this.options.jsonFilters));
+            this.setHighContrastColors();
 
             this.adjustHeightOfElements(options.viewport.width);
 
@@ -725,7 +716,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
                 this.localizationManager,
             );
 
-            this.updateCalendar(this.visualSettings);
+            this.updateCalendar();
 
             const adjustedPeriod: IAdjustedFilterDatePeriod = this.adjustFilterDatePeriod();
             const datePeriod: ITimelineDatePeriodBase = this.datePeriod;
@@ -769,7 +760,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
 
             if (adjustedPeriod.period.startDate && adjustedPeriod.period.endDate) {
                 this.changeGranularity(granularity, adjustedPeriod.period.startDate, adjustedPeriod.period.endDate);
-                this.updateCalendar(this.visualSettings);
+                this.updateCalendar();
             }
 
             this.renderGranularityFrame(granularity);
@@ -1131,7 +1122,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
     private adjustFilterDatePeriod(): IAdjustedFilterDatePeriod {
         // It contains date boundaties that was taken from current slicer filter (filter range).
         // If nothing is selected in slicer the boundaries will be null.
-        const filterDatePeriod: DatePeriodBase = <DatePeriodBase>(this.visualSettings.general.datePeriod);
+        const filterDatePeriod: DatePeriodBase = <DatePeriodBase>(this.filterDatePeriod);
 
         // There may be the case when date boundaries that taken from data view are less than slicer filter dates.
         // The case may happen if there is another timeline slicer that works with the same data and already applied a filter.
@@ -1299,14 +1290,10 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
         }
     }
 
-    private updateCalendar(settings: TimeLineSettingsModel): void {
-        this.calendar = Timeline.CONVERTER(
-            this.timelineData,
-            this.timelineProperties,
-            this.timelineGranularityData,
+    private updateCalendar(): void {
+        this.calendar = this.CONVERTER(
             this.options.dataViews[0],
             this.initialized,
-            settings,
             this.options.viewport,
             this.calendar,
         );

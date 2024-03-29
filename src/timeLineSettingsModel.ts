@@ -11,7 +11,6 @@ import ValidatorType = powerbi.visuals.ValidatorType;
 import {Weekday} from "./calendars/weekday";
 import {GranularityType} from "./granularity/granularityType";
 import ILocalizationManager = powerbi.extensibility.ILocalizationManager;
-import {DatePeriodBase} from "./datePeriod/datePeriodBase";
 
 const weekStandardOptions: IEnumMember[] = [
     { value: WeekStandard.NotSet, displayName: "Visual_Week_Standard_None" },
@@ -56,12 +55,6 @@ class TextSizeDefaults {
     public static readonly Min: number = 7;
     public static readonly Max: number = 24;
 }
-
-
-class GeneralSettings {
-    public datePeriod: DatePeriodBase | string = DatePeriodBase.CREATEEMPTY();
-}
-
 
 class CursorSettingsCard extends Card {
     show = new formattingSettings.ToggleSwitch({
@@ -440,8 +433,6 @@ class ScrollAutoAdjustmentSettingsCard extends Card {
 
 
 export class TimeLineSettingsModel extends Model {
-    general = new GeneralSettings();
-
     cursor = new CursorSettingsCard();
     forceSelection = new ForceSelectionSettingsCard();
     weekDay = new WeekDaySettingsCard();
