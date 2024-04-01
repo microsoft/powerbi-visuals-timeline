@@ -178,7 +178,7 @@ describe("Timeline", () => {
         });
 
         describe("selection should be cleared if user clicks to root element", () => {
-            beforeEach(() => {
+            it("click clears selection", (done) => {
                 dataView.metadata.objects = {
                     granularity: {
                         granularity: GranularityType.day,
@@ -186,18 +186,15 @@ describe("Timeline", () => {
                 };
 
                 visualBuilder.update(dataView);
-
                 spyOn(visualBuilder.visualObject, "clearUserSelection");
-            });
 
-            it("click - event", (done) => {
                 d3Click(visualBuilder.rootElement, 0, 0);
 
                 renderTimeout(() => {
                     expect(visualBuilder.visualObject.clearUserSelection).toHaveBeenCalled();
 
                     done();
-                });
+                })
             });
         });
 

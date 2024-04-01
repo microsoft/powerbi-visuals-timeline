@@ -28,7 +28,7 @@ import "../style/visual.less";
 
 import {select as d3Select, selectAll as d3SelectAll, Selection as D3Selection,} from "d3-selection";
 
-import {drag as d3Drag, D3DragEvent} from "d3-drag";
+import {D3DragEvent} from "d3-drag";
 
 import {arc as d3Arc} from "d3-shape";
 
@@ -81,6 +81,7 @@ import ISelectionManager = powerbiVisualsApi.extensibility.ISelectionManager;
 import extractFilterColumnTarget = interactivityFilterService.extractFilterColumnTarget;
 import {Month} from "./calendars/month";
 import {Weekday} from "./calendars/weekday";
+import {Behavior} from "./behavior";
 
 interface IAdjustedFilterDatePeriod {
     period: DatePeriodBase;
@@ -533,6 +534,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
 
     private visualSettings: TimeLineSettingsModel;
     private formattingSettingsService: FormattingSettingsService;
+    private behavior: Behavior;
 
     private timelineProperties: ITimelineProperties;
 
@@ -578,18 +580,6 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
     private isForceSelectionReset: boolean = false;
 
     private selectionManager: ISelectionManager;
-
-    private cursorDragBehavior = d3Drag<any, ICursorDataPoint>()
-        .subject((_: D3DragEvent<any, ICursorDataPoint, ICursorDataPoint>,cursorDataPoint: ICursorDataPoint) => {
-            cursorDataPoint.x = cursorDataPoint.selectionIndex * this.timelineProperties.cellWidth;
-
-            return cursorDataPoint;
-        })
-        .on("drag", null)
-        .on("end", null)
-        .on("drag", this.onCursorDrag.bind(this))
-        .on("end", this.onCursorDragEnd.bind(this));
-
     private calendarFactory: CalendarFactory = null;
 
     constructor(options: powerbiVisualsApi.extensibility.visual.VisualConstructorOptions) {
@@ -606,6 +596,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
 
         this.localizationManager = this.host.createLocalizationManager();
         this.formattingSettingsService = new FormattingSettingsService(this.localizationManager);
+        this.behavior = new Behavior();
 
         this.timelineProperties = {
             bottomMargin: Timeline.TimelineMargins.BottomMargin,
@@ -624,9 +615,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
 
         this.rootSelection = d3Select(element)
             .append("div")
-            .classed("timeline-component", true)
-            .on("click", null)
-            .on("click", () => this.clearUserSelection());
+            .classed("timeline-component", true);
 
         this.headerWrapperSelection = this.rootSelection
             .append("div");
@@ -772,7 +761,22 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
                 options,
             );
 
-            this.handleContextMenu();
+            this.behavior.bindEvents({
+                selectionManager: this.selectionManager,
+                cells: {
+                    selection: this.mainGroupSelection.selectAll(Timeline.TimelineSelectors.CellRect.selectorName),
+                    callback: this.onCellClickHandler.bind(this),
+                    cellWidth: this.timelineProperties.cellWidth,
+                },
+                cursors: {
+                    selection: this.cursorGroupSelection.selectAll(Timeline.TimelineSelectors.SelectionCursor.selectorName),
+                    onDrag: this.onCursorDrag.bind(this),
+                    onEnd: this.onCursorDragEnd.bind(this),
+                },
+                clearCatcher: this.rootSelection,
+                clearSelectionHandler: () => { this.clearUserSelection() },
+            });
+
         } catch (ex) {
             this.host.eventService.renderingFailed(options, JSON.stringify(ex));
         }
@@ -832,10 +836,6 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
             .enter()
             .append("rect")
             .classed(Timeline.TimelineSelectors.CellRect.className, true)
-            .on("click", null)
-            .on("touchstart", null)
-            .on("click", this.handleClick.bind(this))
-            .on("touchstart", this.handleClick.bind(this))
             .merge(cellsSelection)
             .attr("x", (dataPoint: ITimelineDataPoint) => {
                 const position: number = totalX;
@@ -898,7 +898,6 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
                 }),
             )
             .style("fill", this.visualSettings.cursor.show.value ? this.visualSettings.cursor.color.value.value : "transparent")
-            .call(this.cursorDragBehavior);
     }
 
     public renderTimeRangeText(timelineData: ITimelineData, rangeHeaderSettings: RangeHeaderSettingsCard): void {
@@ -1194,29 +1193,6 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
                 .attr("x", pixelConverter.toString(startXPoint + Timeline.SelectedTextSelectionFactor * elementWidth))
                 .attr("y", pixelConverter.toString(Timeline.SelectedTextSelectionYOffset));
         }
-    }
-
-    private handleContextMenu(): void {
-        // handle context menu
-        this.rootSelection.on('contextmenu', (mouseEvent: MouseEvent) => {
-            const emptySelection = {
-                "measures": [],
-                "dataMap": {
-                }
-            };
-
-            this.selectionManager.showContextMenu(emptySelection, {
-                x: mouseEvent.clientX,
-                y: mouseEvent.clientY
-            });
-            mouseEvent.preventDefault();
-        });
-    }
-
-    private handleClick(event: MouseEvent, dataPoint: ITimelineDataPoint): void {
-        event.stopPropagation();
-
-        this.onCellClickHandler(dataPoint, dataPoint.index, event.altKey || event.shiftKey);
     }
 
     private addElements(): void {
