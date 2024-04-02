@@ -23,13 +23,13 @@ export interface BehaviorOptions {
 }
 
 export class Behavior {
-    public bindEvents(options: BehaviorOptions) {
-        this.handleCellsClick(options);
-        this.handleCursorsDrag(options);
-        this.clearCatcher(options);
+    public static bindEvents(options: BehaviorOptions) {
+        Behavior.handleCellsClick(options);
+        Behavior.handleCursorsDrag(options);
+        Behavior.clearCatcher(options);
     }
 
-    private handleCursorsDrag(options: BehaviorOptions) {
+    private static handleCursorsDrag(options: BehaviorOptions) {
         const dragBehavior = d3Drag<any, ICursorDataPoint>()
             .subject((_: D3DragEvent<any, ICursorDataPoint, ICursorDataPoint>, cursorDataPoint: ICursorDataPoint) => {
                 cursorDataPoint.x = cursorDataPoint.selectionIndex * options.cells.cellWidth;
@@ -44,7 +44,7 @@ export class Behavior {
         options.cursors.selection.call(dragBehavior);
     }
 
-    private handleCellsClick(options: BehaviorOptions) {
+    private static handleCellsClick(options: BehaviorOptions) {
         const clickHandler = (event: MouseEvent, dataPoint: ITimelineDataPoint) => {
             event.stopPropagation();
             options.cells.callback(dataPoint, dataPoint.index, event.ctrlKey || event.metaKey || event.altKey || event.shiftKey);
@@ -57,7 +57,7 @@ export class Behavior {
             .on("touchstart", clickHandler);
     }
 
-    private clearCatcher(options: BehaviorOptions) {
+    private static clearCatcher(options: BehaviorOptions) {
         options.clearCatcher
             .on("click", null)
             .on("click", options.clearSelectionHandler);

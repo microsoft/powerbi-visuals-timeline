@@ -534,7 +534,6 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
 
     private visualSettings: TimeLineSettingsModel;
     private formattingSettingsService: FormattingSettingsService;
-    private behavior: Behavior;
 
     private timelineProperties: ITimelineProperties;
 
@@ -596,7 +595,6 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
 
         this.localizationManager = this.host.createLocalizationManager();
         this.formattingSettingsService = new FormattingSettingsService(this.localizationManager);
-        this.behavior = new Behavior();
 
         this.timelineProperties = {
             bottomMargin: Timeline.TimelineMargins.BottomMargin,
@@ -761,7 +759,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
                 options,
             );
 
-            this.behavior.bindEvents({
+            Behavior.bindEvents({
                 selectionManager: this.selectionManager,
                 cells: {
                     selection: this.mainGroupSelection.selectAll(Timeline.TimelineSelectors.CellRect.selectorName),
@@ -774,6 +772,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
                     onEnd: this.onCursorDragEnd.bind(this),
                 },
                 clearCatcher: this.rootSelection,
+                // spyOn changes clearUserSelection, anonymous function is used to have link to spied function
                 clearSelectionHandler: () => { this.clearUserSelection() },
             });
 
