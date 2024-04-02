@@ -42,7 +42,7 @@ export interface CalendarFormat {
     day: number;
 }
 
-export interface WeekDayFormat {
+export interface WeekdayFormat {
     daySelection: boolean;
     day: number;
 }
@@ -60,7 +60,7 @@ export class Calendar {
     protected EmptyYearOffset: number = 0;
     protected YearOffset: number = 1;
 
-    constructor(calendarFormat: CalendarFormat, weekDaySettings: WeekDayFormat) {
+    constructor(calendarFormat: CalendarFormat, weekDaySettings: WeekdayFormat) {
         this.isDaySelection = weekDaySettings.daySelection;
         this.firstDayOfWeek = weekDaySettings.day;
         this.firstMonthOfYear = calendarFormat.month;
@@ -74,7 +74,7 @@ export class Calendar {
         });
     }
 
-    public getFiscalYearAjustment(): number {
+    public getFiscalYearAdjustment(): number {
         const firstMonthOfYear = this.getFirstMonthOfYear();
         const firstDayOfYear = this.getFirstDayOfYear();
 
@@ -91,7 +91,7 @@ export class Calendar {
             firstDayOfYear,
         );
 
-        return date.getFullYear() + this.getFiscalYearAjustment() - ((firstDate <= date)
+        return date.getFullYear() + this.getFiscalYearAdjustment() - ((firstDate <= date)
             ? this.EmptyYearOffset
             : this.YearOffset);
     }
@@ -101,7 +101,7 @@ export class Calendar {
         // It's Ok until this year is used to calculate date of first week.
         // So, here is some adjustment was applied.
         const year: number = this.determineYear(date);
-        const fiscalYearAdjustment = this.getFiscalYearAjustment();
+        const fiscalYearAdjustment = this.getFiscalYearAdjustment();
 
         const dateOfFirstWeek: Date = this.getDateOfFirstWeek(year - fiscalYearAdjustment);
         const dateOfFirstFullWeek: Date = this.getDateOfFirstFullWeek(year - fiscalYearAdjustment);
@@ -198,13 +198,13 @@ export class Calendar {
 
     public isChanged(
         calendarSettings: CalendarFormat,
-        weekDaySettings: WeekDayFormat,
-        weekStandards: WeekStandard
+        weekDaySettings: WeekdayFormat,
+        weekStandard: WeekStandard
     ): boolean {
         return this.firstMonthOfYear !== calendarSettings.month
             || this.firstDayOfYear !== calendarSettings.day
             || this.firstDayOfWeek !== weekDaySettings.day
-            || weekStandards !== WeekStandard.NotSet;
+            || weekStandard !== WeekStandard.NotSet;
     }
 
     public getDateOfFirstWeek(year: number): Date {

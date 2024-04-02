@@ -71,32 +71,62 @@ export class VisualBuilder extends VisualBuilderBase<Timeline> {
     }
 
     public get headerElement(): SVGElement {
-        return this.element.querySelector<SVGElement>("div > div > svg");
+        return this.element
+            .querySelector("div.timeline-component")
+            .querySelector("div")
+            .querySelector<SVGElement>("svg");
     }
 
-    public get mainArea(): HTMLElement {
-        return this.mainElement.querySelector<HTMLElement>("g.mainArea");
+
+    public get mainArea(): SVGGElement {
+        return this.mainElement.querySelector<SVGGElement>("g.mainArea");
     }
 
-    public get cellRects() {
-        return this.mainArea.querySelectorAll(".cellsArea > .cellRect");
+    public get allLabels(): NodeListOf<SVGTextElement> {
+        return this.mainArea.querySelectorAll<SVGTextElement>("text.label");
     }
 
-    public get lastCellRect() {
+    public get rangeHeaderText(): SVGTextElement | undefined {
+        return this.headerElement
+            .querySelector("g.rangeTextArea")
+            .querySelector<SVGTextElement>("text.selectionRangeContainer");
+    }
+
+    public getRangeHeader(): SVGTextElement | null {
+        const rangeTextArea = this.headerElement.querySelector("g.rangeTextArea");
+        const rangeHeader = rangeTextArea?.querySelector<SVGTextElement>("text.selectionRangeContainer");
+        if (!rangeHeader) {
+            return null;
+        }
+
+        return rangeHeader;
+    }
+
+    public get timelineSlicer(): SVGGElement {
+        return this.headerElement.querySelector<SVGGElement>("g.timelineSlicer");
+    }
+
+    public get periodSlicer(): SVGRectElement {
+        return this.timelineSlicer.querySelector("rect.periodSlicerRect");
+    }
+
+    public get periodSlicerSelectionRects(): NodeListOf<SVGRectElement> {
+        return this.timelineSlicer.querySelectorAll<SVGRectElement>("rect.periodSlicerSelectionRect");
+    }
+
+    public get cellRects(): NodeListOf<SVGRectElement> {
+        return this.mainArea
+            .querySelector("g.cellsArea")
+            .querySelectorAll<SVGRectElement>("rect.cellRect");
+    }
+
+    public get lastCellRect(): SVGRectElement {
         const cells = this.cellRects;
+        if (!cells || cells.length === 0) {
+            return undefined;
+        }
+
         return cells[cells.length - 1];
-    }
-
-    public get allLabels(): NodeListOf<HTMLElement> {
-        return this.mainArea.querySelectorAll("g > text.label");
-    }
-
-    public get rangeHeaderText(): HTMLElement {
-        return this.headerElement.querySelector<HTMLElement>("g.rangeTextArea > text.selectionRangeContainer");
-    }
-
-    public get timelineSlicer(): HTMLElement {
-        return this.headerElement.querySelector<HTMLElement>("g.timelineSlicer");
     }
 
     public setFilter(startDate: Date, endDate: Date): void {
@@ -119,7 +149,7 @@ export class VisualBuilder extends VisualBuilderBase<Timeline> {
         this.jsonFilters = [filter];
     }
 
-    public update(dataView) {
+    public update(dataView: powerbiVisualsApi.DataView) {
         this.visual.update({
             dataViews: [].concat(dataView),
             jsonFilters: this.jsonFilters,

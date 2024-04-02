@@ -39,6 +39,12 @@ process.env.CHROME_BIN = require("playwright-chromium").chromium.executablePath(
 module.exports = (config) => {
     config.set({
         browsers: ["ChromeHeadless"],
+        customLaunchers: {
+            ChromeDebugging: {
+                base: "ChromeHeadless",
+                flags: ["--remote-debugging-port=9333"]
+            }
+        },
         colors: true,
         coverageReporter: {
             dir: path.join(__dirname, coverageFolder),
