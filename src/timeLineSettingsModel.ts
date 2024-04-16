@@ -140,6 +140,7 @@ export class CalendarSettingsCard extends Card {
     name: string = "calendar";
     displayName: string = "Fiscal Year";
     displayNameKey: string = "Visual_FiscalYear";
+    descriptionKey: string = "Visual_FiscalYear_Description";
     slices = [this.month, this.day];
 }
 
@@ -163,6 +164,7 @@ class WeekDaySettingsCard extends Card {
     name: string = "weekDay";
     displayName: string = "First Day of Week";
     displayNameKey: string = "Visual_FirstDayOfWeek";
+    descriptionKey: string = "Visual_FirstDayOfWeek_Description";
     slices = [this.day];
 }
 

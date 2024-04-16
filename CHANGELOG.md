@@ -1,3 +1,6 @@
+## 2.5.4
+* Disable "Calendar" and "First day of week" settings when WeekStandard is set to IS0 860
+
 ## 2.5.3
 * Update API to 5.9.0
 * Fix npm vulnerabilities
