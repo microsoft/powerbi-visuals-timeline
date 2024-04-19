@@ -1135,7 +1135,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
             && this.datePeriod.startDate
             && filterDatePeriod.startDate.getTime() < this.datePeriod.startDate.getTime()
         ) {
-            filterDatePeriod.startDate = null;
+            filterDatePeriod.startDate = this.datePeriod.startDate;
         }
         // End date from data is always less than date from slicer filter.
         // This means that we need to correct it before check.
