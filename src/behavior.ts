@@ -1,5 +1,5 @@
 
-import { Selection as d3Selection } from "d3-selection";
+import { Selection as d3Selection, local as d3local } from "d3-selection";
 import {ICursorDataPoint, ITimelineDataPoint} from "./dataInterfaces";
 import ISelectionManager = powerbi.extensibility.ISelectionManager;
 import {D3DragEvent, drag as d3Drag} from "d3-drag";
@@ -36,8 +36,7 @@ export class Behavior {
 
                 return cursorDataPoint;
             })
-            .on("drag", null)
-            .on("end", null)
+            .on("drag end", null)
             .on("drag", options.cursors.onDrag)
             .on("end", options.cursors.onEnd);
 
@@ -45,16 +44,20 @@ export class Behavior {
     }
 
     private static handleCellsClick(options: BehaviorOptions) {
-        const clickHandler = (event: MouseEvent, dataPoint: ITimelineDataPoint) => {
-            event.stopPropagation();
-            options.cells.callback(dataPoint, dataPoint.index, event.ctrlKey || event.metaKey || event.altKey || event.shiftKey);
-        };
+        const local = d3local<number>();
+        let index = 0;
 
         options.cells.selection
-            .on("click", null)
-            .on("touchstart", null)
-            .on("click", clickHandler)
-            .on("touchstart", clickHandler);
+            .each(function () {
+                local.set(this, index);
+                index += 1;
+            })
+            .on("click touchstart", null)
+            .on("click touchstart", function (event: MouseEvent, dataPoint: ITimelineDataPoint) {
+                event.stopPropagation();
+                const index: number = local.get(this);
+                options.cells.callback(dataPoint, index, event.ctrlKey || event.metaKey || event.altKey || event.shiftKey);
+            })
     }
 
     private static clearCatcher(options: BehaviorOptions) {
