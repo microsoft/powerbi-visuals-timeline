@@ -53,7 +53,7 @@ const granularityOptions: IEnumMember[] = [
 class TextSizeDefaults {
     public static readonly Default: number = 9;
     public static readonly Min: number = 7;
-    public static readonly Max: number = 24;
+    public static readonly Max: number = 40;
 }
 
 class CursorSettingsCard extends Card {
@@ -408,7 +408,7 @@ export class LabelsSettingsCard extends Card {
         value: TextSizeDefaults.Default,
         options: {
             minValue: { value: TextSizeDefaults.Min, type: ValidatorType.Min },
-            maxValue: { value: TextSizeDefaults.Max, type: ValidatorType.Max },
+            maxValue: { value: 24, type: ValidatorType.Max },
         }
     });
 
