@@ -53,7 +53,7 @@ const granularityOptions: IEnumMember[] = [
 class TextSizeDefaults {
     public static readonly Default: number = 9;
     public static readonly Min: number = 7;
-    public static readonly Max: number = 24;
+    public static readonly Max: number = 40;
 }
 
 class CursorSettingsCard extends Card {
@@ -140,6 +140,7 @@ export class CalendarSettingsCard extends Card {
     name: string = "calendar";
     displayName: string = "Fiscal Year";
     displayNameKey: string = "Visual_FiscalYear";
+    descriptionKey: string = "Visual_FiscalYear_Description";
     slices = [this.month, this.day];
 }
 
@@ -163,6 +164,7 @@ class WeekDaySettingsCard extends Card {
     name: string = "weekDay";
     displayName: string = "First Day of Week";
     displayNameKey: string = "Visual_FirstDayOfWeek";
+    descriptionKey: string = "Visual_FirstDayOfWeek_Description";
     slices = [this.day];
 }
 
@@ -406,7 +408,7 @@ export class LabelsSettingsCard extends Card {
         value: TextSizeDefaults.Default,
         options: {
             minValue: { value: TextSizeDefaults.Min, type: ValidatorType.Min },
-            maxValue: { value: TextSizeDefaults.Max, type: ValidatorType.Max },
+            maxValue: { value: 24, type: ValidatorType.Max },
         }
     });
 

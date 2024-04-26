@@ -1017,6 +1017,12 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
     }
 
     public getFormattingModel(): powerbi.visuals.FormattingModel {
+        // These options have no sense if ISO standard was picked
+        if (<WeekStandard>this.visualSettings.weeksDeterminationStandards.weekStandard.value.value === WeekStandard.ISO8061) {
+            this.visualSettings.weekDay.disabled = true;
+            this.visualSettings.calendar.disabled = true;
+        }
+
         return this.formattingSettingsService.buildFormattingModel(this.visualSettings);
     }
 
@@ -1129,7 +1135,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
             && this.datePeriod.startDate
             && filterDatePeriod.startDate.getTime() < this.datePeriod.startDate.getTime()
         ) {
-            filterDatePeriod.startDate = null;
+            filterDatePeriod.startDate = this.datePeriod.startDate;
         }
         // End date from data is always less than date from slicer filter.
         // This means that we need to correct it before check.

@@ -1,6 +1,6 @@
 {
   "name": "powerbi-visuals-timeline",
-  "version": "2.5.3.0",
+  "version": "2.5.4.0",
   "description": "Timeline slicer is a graphical date range selector used as a filtering component in the report canvas",
   "repository": {
     "type": "git",
@@ -34,8 +34,8 @@
     "@types/d3-shape": "^3.1.6",
     "@types/jasmine": "^5.1.4",
     "@types/karma": "^6.3.8",
-    "@types/node": "^20.11.30",
-    "css-loader": "^6.10.0",
+    "@types/node": "^20.12.7",
+    "css-loader": "^7.1.1",
     "jasmine": "^5.1.0",
     "karma": "^6.4.3",
     "karma-chrome-launcher": "^3.2.0",
@@ -46,18 +46,18 @@
     "karma-webpack": "^5.0.1",
     "less": "^4.2.0",
     "less-loader": "^12.2.0",
-    "playwright-chromium": "^1.42.1",
-    "powerbi-visuals-api": "~5.8.0",
-    "powerbi-visuals-tools": "^5.4.2",
-    "powerbi-visuals-utils-testutils": "^6.1.0",
-    "style-loader": "^3.3.4",
+    "playwright-chromium": "^1.43.1",
+    "powerbi-visuals-api": "~5.9.0",
+    "powerbi-visuals-tools": "^5.4.3",
+    "powerbi-visuals-utils-testutils": "^6.1.1",
+    "style-loader": "^4.0.0",
     "ts-loader": "^9.5.1",
-    "typescript": "^5.4.3",
+    "typescript": "^5.4.5",
     "webpack": "^5.91.0"
   },
   "dependencies": {
-    "@typescript-eslint/eslint-plugin": "^7.4.0",
-    "@typescript-eslint/parser": "^7.4.0",
+    "@typescript-eslint/eslint-plugin": "^7.7.1",
+    "@typescript-eslint/parser": "^7.7.1",
     "d3-array": "^3.2.4",
     "d3-drag": "^3.0.0",
     "d3-selection": "^3.0.0",
@@ -65,11 +65,11 @@
     "eslint": "^8.57.0",
     "eslint-plugin-powerbi-visuals": "^0.8.1",
     "powerbi-models": "^1.15.2",
-    "powerbi-visuals-utils-chartutils": "^6.0.3",
-    "powerbi-visuals-utils-formattingmodel": "^6.0.1",
-    "powerbi-visuals-utils-formattingutils": "^6.1.0",
-    "powerbi-visuals-utils-interactivityutils": "^6.0.3",
-    "powerbi-visuals-utils-svgutils": "^6.0.3",
-    "powerbi-visuals-utils-typeutils": "^6.0.2"
+    "powerbi-visuals-utils-chartutils": "^6.0.4",
+    "powerbi-visuals-utils-formattingmodel": "^6.0.2",
+    "powerbi-visuals-utils-formattingutils": "^6.1.1",
+    "powerbi-visuals-utils-interactivityutils": "^6.0.4",
+    "powerbi-visuals-utils-svgutils": "^6.0.4",
+    "powerbi-visuals-utils-typeutils": "^6.0.3"
   }
 }
