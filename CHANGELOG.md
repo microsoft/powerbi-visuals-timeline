@@ -1,5 +1,7 @@
 ## 2.5.4
 * Disable "Calendar" and "First day of week" settings when WeekStandard is set to IS0 860
+* Fix uninitialized start date when date from filters is less than date from DataView
+* Fix cell click handler (passed invalid selected index)
 
 ## 2.5.3
 * Update API to 5.9.0
