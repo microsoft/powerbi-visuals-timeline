@@ -23,10 +23,8 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
  */
-import "jasmine-jquery";
 
 import { select as d3Select } from "d3-selection";
-import * as $ from "jquery";
 import powerbiVisualsApi from "powerbi-visuals-api";
 import {
     assertColorsMatch, clickElement, d3Click, renderTimeout,
@@ -38,7 +36,6 @@ import { ITimelineDatePeriod, ITimelineDatePeriodBase } from "../src/datePeriod/
 import { DatePeriodBase } from "../src/datePeriod/datePeriodBase";
 import { DayGranularity } from "../src/granularity/dayGranularity";
 import { IGranularity } from "../src/granularity/granularity";
-import { GranularityBase } from "../src/granularity/granularityBase";
 import { GranularityType } from "../src/granularity/granularityType";
 import { MonthGranularity } from "../src/granularity/monthGranularity";
 import { QuarterGranularity } from "../src/granularity/quarterGranularity";
@@ -67,7 +64,7 @@ describe("Timeline", () => {
     });
 
     describe("DOM tests", () => {
-        it("svg element created", () => expect(visualBuilder.mainElement[0]).toBeInDOM());
+        it("svg element created", () => expect(document.contains(visualBuilder.mainElement)).toBe(true));
 
         it("basic update", (done) => {
             dataView.metadata.objects = {
@@ -81,33 +78,29 @@ describe("Timeline", () => {
             renderTimeout(() => {
                 const countOfDays: number = visualBuilder
                     .mainElement
-                    .children("g.mainArea")
-                    .children(".cellsArea")
-                    .children(".cellRect")
+                    .querySelectorAll("g.mainArea > .cellsArea > .cellRect")
                     .length;
 
-                const countOfTextItems: number = visualBuilder
-                    .mainElement
-                    .children("g.mainArea")
-                    .children("g")
-                    .eq(4)
-                    .children(".label")
-                    .children()
+                const countOfTextItems: number = Array.from(
+                        visualBuilder
+                        .mainElement
+                        .querySelectorAll("g.mainArea > g")[4]
+                        .querySelectorAll(".label")
+                    ).map(el => el.children).flat()
                     .length;
 
                 expect(countOfDays).toBe(dataView.categorical.categories[0].values.length);
                 expect(countOfTextItems).toBe(dataView.categorical.categories[0].values.length);
 
-                const cellRects: JQuery = visualBuilder.mainElement.find(".cellRect");
+                const cellRects: HTMLElement[] = Array.from(visualBuilder.mainElement.querySelectorAll(".cellRect"));
 
-                d3Click(cellRects.last(), 0, 0);
+                d3Click(cellRects[cellRects.length - 1], 0, 0);
 
-                const unselectedCellRect: JQuery = visualBuilder
+                const unselectedCellRect: Element = visualBuilder
                     .mainElement
-                    .find(".cellRect")
-                    .first();
+                    .querySelectorAll(".cellRect")[0]
 
-                assertColorsMatch(unselectedCellRect.attr("fill"), "transparent");
+                assertColorsMatch(d3Select(unselectedCellRect).attr("fill"), "transparent");
 
                 const cellHeightStr: string = cellRects[0].attributes.getNamedItem("height").value;
                 const cellHeight: number = parseInt(cellHeightStr.replace("px", ""), 10);
@@ -134,9 +127,7 @@ describe("Timeline", () => {
                 visualBuilder.updateRenderTimeout(dataView, () => {
                     const countOfDays: number = visualBuilder
                         .mainElement
-                        .children("g.mainArea")
-                        .children(".cellsArea")
-                        .children(".cellRect")
+                        .querySelectorAll("g.mainArea > .cellsArea > .cellRect")
                         .length;
 
                     expect(countOfDays).toBe(dataView.categorical.categories[0].values.length - 1);
@@ -157,9 +148,8 @@ describe("Timeline", () => {
 
             setTimeout(() => {
                 // TimeRangeText check visibility when visual is small
-                const textRangeText: string = $(".selectionRangeContainer")
-                    .first()
-                    .text();
+                const textRangeText: string = document.querySelectorAll(".selectionRangeContainer")[0]
+                    .textContent;
 
                 expect(textRangeText).toContain("2016");
 
@@ -181,7 +171,7 @@ describe("Timeline", () => {
             renderTimeout(() => {
                 builder.updateRenderTimeout(dataView, () => {
                     const indexOfDots: number = builder.rangeHeaderText
-                        .text()
+                        .textContent
                         .indexOf("...");
 
                     expect(indexOfDots !== -1).toBeTruthy();
@@ -216,7 +206,7 @@ describe("Timeline", () => {
         });
 
         describe("granularity", () => {
-            let periodSlicerSelectionRectElements: JQuery;
+            let periodSlicerSelectionRectElements: HTMLElement[];
 
             beforeEach((done) => {
                 dataView.metadata.objects = {
@@ -231,15 +221,15 @@ describe("Timeline", () => {
                 spyOn(visualBuilder.visualObject, "selectPeriod");
 
                 renderTimeout(() => {
-                    periodSlicerSelectionRectElements = $(visualBuilder.element)
-                        .find(".periodSlicerSelectionRect");
+                    periodSlicerSelectionRectElements = Array.from(visualBuilder.element
+                        .querySelectorAll(".periodSlicerSelectionRect"));
 
                     done();
                 });
             });
 
             it("click - event", () => {
-                d3Click($(periodSlicerSelectionRectElements[0]), 0, 0);
+                d3Click(periodSlicerSelectionRectElements[0], 0, 0);
                 expectToCallSelectPeriod(GranularityType.year);
             });
 
@@ -262,11 +252,11 @@ describe("Timeline", () => {
                 };
 
                 visualBuilder.update(dataView);
-                const $periodSlicerSelectionRectElements = $(visualBuilder.element).find(".periodSlicerSelectionRect");
+                periodSlicerSelectionRectElements = Array.from(visualBuilder.element.querySelectorAll(".periodSlicerSelectionRect"));
 
-                d3Click($($periodSlicerSelectionRectElements[0]), 0, 0);
+                d3Click(periodSlicerSelectionRectElements[0], 0, 0);
 
-                expect($periodSlicerSelectionRectElements.length).toEqual(4);
+                expect(periodSlicerSelectionRectElements.length).toEqual(4);
                 expectToCallSelectPeriod(GranularityType.quarter);
             });
 
@@ -278,11 +268,11 @@ describe("Timeline", () => {
                 };
 
                 visualBuilder.update(dataView);
-                const $periodSlicerSelectionRectElements = $(visualBuilder.element).find(".periodSlicerSelectionRect");
+                const periodSlicerSelectionRectElements: HTMLElement[] = Array.from(visualBuilder.element.querySelectorAll(".periodSlicerSelectionRect"));
 
-                d3Click($($periodSlicerSelectionRectElements[1]), 0, 0);
+                d3Click(periodSlicerSelectionRectElements[1], 0, 0);
 
-                expect($periodSlicerSelectionRectElements.length).toEqual(4);
+                expect(periodSlicerSelectionRectElements.length).toEqual(4);
                 expectToCallSelectPeriod(GranularityType.month);
             });
 
@@ -297,11 +287,11 @@ describe("Timeline", () => {
 
                 visualBuilder.update(dataView);
 
-                const $periodSlicerSelectionRectElements = $(visualBuilder.element).find(".periodSlicerSelectionRect");
+                const periodSlicerSelectionRectElements: HTMLElement[] = Array.from(visualBuilder.element.querySelectorAll(".periodSlicerSelectionRect"));
 
-                d3Click($($periodSlicerSelectionRectElements[1]), 0, 0);
+                d3Click(periodSlicerSelectionRectElements[1], 0, 0);
 
-                expect($periodSlicerSelectionRectElements.length).toEqual(2);
+                expect(periodSlicerSelectionRectElements.length).toEqual(2);
                 expectToCallSelectPeriod(GranularityType.day);
             });
 
@@ -318,9 +308,9 @@ describe("Timeline", () => {
 
                 visualBuilder.update(dataView);
 
-                const $periodSlicerSelectionRectElements = $(visualBuilder.element).find(".periodSlicerSelectionRect");
+                const periodSlicerSelectionRectElements = Array.from(visualBuilder.element.querySelectorAll(".periodSlicerSelectionRect"));
 
-                expect($periodSlicerSelectionRectElements.length).toEqual(0);
+                expect(periodSlicerSelectionRectElements.length).toEqual(0);
             });
 
             function expectToCallChangeGranularity(granularity: GranularityType): void {
@@ -354,7 +344,7 @@ describe("Timeline", () => {
 
             visualBuilder.updateFlushAllD3Transitions(dataView);
 
-            const cellRects: JQuery = visualBuilder.cellRects;
+            const cellRects = visualBuilder.cellRects;
 
             for (let i: number = 0; i < cellRects.length; i++) {
                 const fillColor: string = d3Select(cellRects[i]).attr("fill");
@@ -380,7 +370,7 @@ describe("Timeline", () => {
 
             const countOfMonth: number = builder
                 .mainElement
-                .find(".cellRect")
+                .querySelectorAll(".cellRect")
                 .length;
 
             (<any>(dataViewObject.metadata.objects)).granularity.granularity = GranularityType.day;
@@ -409,7 +399,7 @@ describe("Timeline", () => {
 
                 const countMonthOfSelectedDays: number = builder
                     .mainElement
-                    .find(".cellRect")
+                    .querySelectorAll(".cellRect")
                     .length;
 
                 expect(countMonthOfSelectedDays).toEqual(countOfMonth + 1);
@@ -517,9 +507,8 @@ describe("Timeline", () => {
             const selectedElements: Element[] = [];
 
             visualBuilder.cellRects
-                .toArray()
                 .forEach((element: Element) => {
-                    const fill: string = $(element).attr("fill");
+                    const fill: string = d3Select(element).attr("fill");
                     if (fill !== "rgba(0, 0, 0, 0)" && fill !== "transparent") {
                         selectedElements.push(element);
                     }
@@ -536,19 +525,18 @@ describe("Timeline", () => {
             visualBuilder.updateFlushAllD3Transitions(dataView);
 
             const selectedElements: Element[] = [];
-            const lastElement = visualBuilder.cellRects.last();
+            const lastElement = visualBuilder.cellRects[visualBuilder.cellRects.length - 1];
 
             visualBuilder.cellRects
-                .toArray()
                 .forEach((element: Element) => {
-                    const fill: string = $(element).attr("fill");
+                    const fill: string = window.getComputedStyle(element).getPropertyValue("fill");
                     if (fill !== "rgba(0, 0, 0, 0)" && fill !== "transparent") {
                         selectedElements.push(element);
                     }
                 });
 
             expect(selectedElements.length).toEqual(1);
-            expect(selectedElements[0]).toEqual(lastElement[0]);
+            expect(selectedElements[0]).toEqual(lastElement);
         }
 
         describe("Range header", () => {
@@ -563,12 +551,12 @@ describe("Timeline", () => {
             it("show", () => {
                 visualBuilder.updateFlushAllD3Transitions(dataView);
 
-                expect(visualBuilder.rangeHeaderText.text()).not.toBe("");
+                expect(visualBuilder.rangeHeaderText.textContent).not.toBe("");
 
                 (<any>(dataView.metadata.objects)).rangeHeader.show = false;
                 visualBuilder.updateFlushAllD3Transitions(dataView);
 
-                expect(visualBuilder.rangeHeaderText.text()).toBe("");
+                expect(visualBuilder.rangeHeaderText).toBe(null);
             });
 
             it("font color", () => {
@@ -578,7 +566,7 @@ describe("Timeline", () => {
 
                 visualBuilder.updateFlushAllD3Transitions(dataView);
 
-                assertColorsMatch(visualBuilder.rangeHeaderText.css("fill"), color);
+                assertColorsMatch(window.getComputedStyle(visualBuilder.rangeHeaderText).getPropertyValue("fill"), color);
             });
 
             it("font size", () => {
@@ -588,7 +576,7 @@ describe("Timeline", () => {
                 (<any>(dataView.metadata.objects)).rangeHeader.textSize = fontSize;
                 visualBuilder.updateFlushAllD3Transitions(dataView);
 
-                expect(visualBuilder.rangeHeaderText.css("font-size")).toBe(expectedFontSize);
+                expect(window.getComputedStyle(visualBuilder.rangeHeaderText).getPropertyValue("font-size")).toBe(expectedFontSize);
             });
         });
 
@@ -605,9 +593,8 @@ describe("Timeline", () => {
                 visualBuilder.updateFlushAllD3Transitions(dataView);
 
                 visualBuilder.cellRects
-                    .toArray()
                     .forEach((element: Element) => {
-                        assertColorsMatch($(element).css("fill"), color);
+                        assertColorsMatch(window.getComputedStyle(element).getPropertyValue("fill"), color);
                     });
             });
 
@@ -625,19 +612,15 @@ describe("Timeline", () => {
 
                 visualBuilder.updateFlushAllD3Transitions(dataView);
 
-                const lastCell: JQuery = visualBuilder.cellRects.last();
+                const lastCell = visualBuilder.cellRects[visualBuilder.cellRects.length - 1];
 
                 clickElement(lastCell);
-
                 visualBuilder.cellRects
-                    .toArray()
                     .forEach((element: Element) => {
-                        const $element = $(element);
-
                         assertColorsMatch(
-                            $element.css("fill"),
+                            window.getComputedStyle(element).getPropertyValue("fill"),
                             color,
-                            $element.is(lastCell));
+                            element === lastCell);
                     });
             });
         });
@@ -654,11 +637,10 @@ describe("Timeline", () => {
 
                 visualBuilder.updateFlushAllD3Transitions(dataView);
 
-                visualBuilder.timelineSlicer
-                    .children("rect.timelineVertLine, text.periodSlicerGranularities, text.periodSlicerSelection")
-                    .toArray()
+                Array.from(visualBuilder.timelineSlicer
+                    .querySelectorAll("rect.timelineVertLine, text.periodSlicerGranularities, text.periodSlicerSelection"))
                     .forEach((element: Element) => {
-                        assertColorsMatch($(element).css("fill"), color);
+                        assertColorsMatch( window.getComputedStyle(element).getPropertyValue("fill"), color);
                     });
             });
 
@@ -673,11 +655,10 @@ describe("Timeline", () => {
 
                 visualBuilder.updateFlushAllD3Transitions(dataView);
 
-                const strokeColor: string = visualBuilder.timelineSlicer
-                    .find("rect.periodSlicerRect")
-                    .css("stroke");
+                const element: HTMLElement = visualBuilder.timelineSlicer
+                    .querySelector("rect.periodSlicerRect")
 
-                assertColorsMatch(strokeColor, color);
+                assertColorsMatch(window.getComputedStyle(element).getPropertyValue("stroke"), color);
             });
         });
 
@@ -814,13 +795,14 @@ describe("Timeline", () => {
 
                         visualBuilder.updateFlushAllD3Transitions(dataView);
 
-                        const lastCell: JQuery = visualBuilder.cellRects.last();
+                        const lastCell = visualBuilder.cellRects[visualBuilder.cellRects.length - 1];
 
                         clickElement(lastCell);
 
                         assertColorsMatch(
-                            lastCell.css("fill"),
-                            colorSel);
+                            window.getComputedStyle(lastCell).getPropertyValue("fill"),
+                            colorSel
+                        );
                     }
                 }
             });
@@ -853,12 +835,12 @@ describe("Timeline", () => {
 
                         visualBuilder.updateFlushAllD3Transitions(dataView);
 
-                        const lastCell: JQuery = visualBuilder.cellRects.last();
+                        const lastCell = visualBuilder.cellRects[visualBuilder.cellRects.length - 1];
 
                         clickElement(lastCell);
 
                         assertColorsMatch(
-                            lastCell.css("fill"),
+                            window.getComputedStyle(lastCell).getPropertyValue("fill"),
                             selectedColor,
                         );
                     }
@@ -892,12 +874,12 @@ describe("Timeline", () => {
 
                         visualBuilder.updateFlushAllD3Transitions(dataView);
 
-                        const firstCell: JQuery = visualBuilder.cellRects.first();
+                        const firstCell = visualBuilder.cellRects[0];
 
                         clickElement(firstCell);
 
                         assertColorsMatch(
-                            firstCell.css("fill"),
+                            window.getComputedStyle(firstCell).getPropertyValue("fill"),
                             selectedColor,
                         );
                     }
@@ -1032,45 +1014,145 @@ describe("Timeline", () => {
         describe("Labels", () => {
             beforeEach(() => {
                 dataView.metadata.objects = {
+                    granularity: {},
                     labels: {
                         displayAll: true,
                         show: true,
+                        yearVisibility: true,
+                        quarterVisibility: true,
+                        monthVisibility: true,
+                        weekVisibility: true,
+                        dayVisibility: true,
                     },
                 };
             });
 
             it("show", () => {
                 visualBuilder.updateFlushAllD3Transitions(dataView);
-                expect(visualBuilder.allLabels).toBeInDOM();
+                visualBuilder.allLabels.forEach(element => expect(document.contains(element)).toBe(true));
+                
 
-                (<any>(dataView.metadata.objects)).labels.show = false;
+                dataView.metadata.objects.labels.show = false;
 
                 visualBuilder.updateFlushAllD3Transitions(dataView);
 
-                expect(visualBuilder.allLabels).not.toBeInDOM();
+                visualBuilder.allLabels.forEach(element => expect(document.contains(element)).toBe(false));
             });
 
             it("shows only selected granularity label if displayAll is set to false", () => {
                 visualBuilder.updateFlushAllD3Transitions(dataView);
                 // All labels should be visible
-                expect(visualBuilder.allLabels.children().length).toBeGreaterThan(1);
-                (<any>(dataView.metadata.objects)).labels.displayAll = false;
+                expect(visualBuilder.allLabels.map(el => el.children).flat().length).toBeGreaterThan(1);
+
+                dataView.metadata.objects.labels.displayAll = false;
                 visualBuilder.updateFlushAllD3Transitions(dataView);
+
                 // Only one label should be visible
-                expect(visualBuilder.allLabels.children().length).toBe(1);
+                expect(visualBuilder.allLabels.map(el => el.children).flat().length).toBe(1);
+            });
+
+            it("shows all labels except of year if yearVisibility is false", () => {
+                dataView.metadata.objects.granularity.granularity = GranularityType.day;
+                visualBuilder.updateFlushAllD3Transitions(dataView);
+
+                // All labels should be visible
+                const oldLabels = visualBuilder.allLabels.length;
+                expect(oldLabels).toBeGreaterThan(1);
+
+                dataView.metadata.objects.labels.yearVisibility = false;
+                visualBuilder.updateFlushAllD3Transitions(dataView);
+
+                // Only one label should be hidden
+                expect(oldLabels - visualBuilder.allLabels.length).toBe(1);
+            });
+
+            it("shows all labels except of quarter if quarterVisibility is false", () => {
+                dataView.metadata.objects.granularity.granularity = GranularityType.day;
+
+                visualBuilder.updateFlushAllD3Transitions(dataView);
+                // All labels should be visible
+                const oldLabels = visualBuilder.allLabels.length;
+                expect(oldLabels).toBeGreaterThan(1);
+
+                dataView.metadata.objects.labels.quarterVisibility = false;
+                visualBuilder.updateFlushAllD3Transitions(dataView);
+
+                // Only one label should be hidden
+                expect(oldLabels - visualBuilder.allLabels.length).toBe(1);
+            });
+
+            it("shows all labels except of month if monthVisibility is false", () => {
+                dataView.metadata.objects.granularity.granularity = GranularityType.day;
+                visualBuilder.updateFlushAllD3Transitions(dataView);
+                
+                // All labels should be visible
+                const oldLabels = visualBuilder.allLabels.length;
+                expect(oldLabels).toBeGreaterThan(1);
+
+                dataView.metadata.objects.labels.monthVisibility = false;
+                visualBuilder.updateFlushAllD3Transitions(dataView);
+
+                // Only one label should be hidden
+                expect(oldLabels - visualBuilder.allLabels.length).toBe(1);
+            });
+            
+            it("shows all labels except of week if weekVisibility is false", () => {
+                dataView.metadata.objects.granularity.granularity = GranularityType.day;
+                visualBuilder.updateFlushAllD3Transitions(dataView);
+
+                // All labels should be visible
+                const oldLabels = visualBuilder.allLabels.length;
+                expect(oldLabels).toBeGreaterThan(1);
+
+                dataView.metadata.objects.labels.weekVisibility = false;
+                visualBuilder.updateFlushAllD3Transitions(dataView);
+
+                // Only one label should be hidden
+                expect(oldLabels - visualBuilder.allLabels.length).toBe(2);
+            });
+
+            it("shows all labels except of day if dayVisibility is false", () => {
+                dataView.metadata.objects.granularity.granularity = GranularityType.day;
+                visualBuilder.updateFlushAllD3Transitions(dataView);
+
+                // All labels should be visible
+                const oldLabels = visualBuilder.allLabels.length;
+                expect(oldLabels).toBeGreaterThan(1);
+
+                dataView.metadata.objects.labels.dayVisibility = false;
+                visualBuilder.updateFlushAllD3Transitions(dataView);
+
+                // Only one label should be hidden
+                expect(oldLabels - visualBuilder.allLabels.length).toBe(9);
+            });
+
+            it("shows only quarter and day labels if others visibility are false", () => {
+                dataView.metadata.objects.granularity.granularity = GranularityType.day;
+                visualBuilder.updateFlushAllD3Transitions(dataView);
+
+                // All labels should be visible
+                const oldLabels = visualBuilder.allLabels.length;
+                expect(oldLabels).toBeGreaterThan(1);
+
+                dataView.metadata.objects.labels.yearVisibility = false;
+                dataView.metadata.objects.labels.monthVisibility = false;
+                dataView.metadata.objects.labels.weekVisibility = false;
+                visualBuilder.updateFlushAllD3Transitions(dataView);
+
+                // Only quarter and day labels should be visible
+                expect(oldLabels - visualBuilder.allLabels.length).toBe(4);
             });
 
             it("font color", () => {
                 const color: string = "#ABCDEF";
 
-                (<any>(dataView.metadata.objects)).labels.fontColor = getSolidColorStructuralObject(color);
+                dataView.metadata.objects.labels.fontColor = getSolidColorStructuralObject(color);
 
                 visualBuilder.updateFlushAllD3Transitions(dataView);
 
                 visualBuilder.allLabels
-                    .toArray()
                     .forEach((element: Element) => {
-                        assertColorsMatch($(element).css("fill"), color);
+                        assertColorsMatch(window.getComputedStyle(element).getPropertyValue("fill"), color);
                     });
             });
 
@@ -1078,13 +1160,12 @@ describe("Timeline", () => {
                 const fontSize: number = 22;
                 const expectedFontSize: string = "29.3333px";
 
-                (<any>(dataView.metadata.objects)).labels.textSize = fontSize;
+                dataView.metadata.objects.labels.textSize = fontSize;
 
                 visualBuilder.updateFlushAllD3Transitions(dataView);
                 visualBuilder.allLabels
-                    .toArray()
                     .forEach((element: Element) => {
-                        expect($(element).css("font-size")).toBe(expectedFontSize);
+                        expect(window.getComputedStyle(element).getPropertyValue("font-size")).toBe(expectedFontSize);
                     });
             });
         });
@@ -1762,7 +1843,7 @@ describe("Accessibility", () => {
 
         it("should use proper stroke color from color palette", (done) => {
             visualBuilder.updateRenderTimeout(dataView, () => {
-                const layers = visualBuilder.cellRects.toArray().map($);
+                const layers = visualBuilder.cellRects;
 
                 expect(isColorAppliedToElements(layers, foregroundColor, "stroke"));
 
@@ -1771,12 +1852,12 @@ describe("Accessibility", () => {
         });
 
         function isColorAppliedToElements(
-            elements: JQuery<any>[],
+            elements: HTMLElement[],
             color?: string,
             colorStyleName: string = "fill",
         ): boolean {
-            return elements.some((element: JQuery) => {
-                const currentColor: string = element.css(colorStyleName);
+            return elements.some((element: HTMLElement) => {
+                const currentColor: string = window.getComputedStyle(element).getPropertyValue(colorStyleName);
 
                 if (!currentColor || !color) {
                     return currentColor === color;

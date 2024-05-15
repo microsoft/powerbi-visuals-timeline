@@ -66,7 +66,8 @@ module.exports = {
     },
     plugins: [
         new webpack.ProvidePlugin({
-            'powerbi-visuals-api': null
+            'powerbi-visuals-api': null,
+             process: "process/browser"
         }),
     ],
 };

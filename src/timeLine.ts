@@ -26,8 +26,6 @@
 
 import "../style/visual.less";
 
-import "core-js/stable";
-
 import {
     select as d3Select,
     selectAll as d3SelectAll,
@@ -97,7 +95,6 @@ import { DatePeriodBase } from "./datePeriod/datePeriodBase";
 
 import { Calendar } from "./calendars/calendar";
 import { Utils } from "./utils";
-import { CalendarISO8061 } from "./calendars/calendarISO8061";
 import { WeekStandards } from "./calendars/weekStandards";
 import { CalendarFactory } from "./calendars/calendarFactory";
 
@@ -569,7 +566,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
     private selectionManager: ISelectionManager;
 
     private cursorDragBehavior = d3Drag<any, ICursorDataPoint>()
-        .subject((cursorDataPoint: ICursorDataPoint) => {
+        .subject((event: MouseEvent, cursorDataPoint: ICursorDataPoint) => {
             cursorDataPoint.x = cursorDataPoint.selectionIndex * this.timelineProperties.cellWidth;
 
             return cursorDataPoint;
@@ -1050,8 +1047,8 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
         this.settings.granularity.granularity = granularityType;
     }
 
-    public onCursorDrag(currentCursor: ICursorDataPoint): void {
-        const cursorOverElement: ITimelineCursorOverElement = this.findCursorOverElement((<MouseEvent>(require("d3").event)).x);
+    public onCursorDrag(event: MouseEvent, currentCursor: ICursorDataPoint): void {
+        const cursorOverElement: ITimelineCursorOverElement = this.findCursorOverElement(event.x);
 
         if (!cursorOverElement) {
             return;
@@ -1208,8 +1205,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
 
     private handleContextMenu(): void {
         // handle context menu
-        this.rootSelection.on('contextmenu', () => {
-            const mouseEvent: MouseEvent = <MouseEvent>(require("d3").event);
+        this.rootSelection.on('contextmenu', (event) => {
 
             const emptySelection = {
                 "measures": [],
@@ -1218,19 +1214,17 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
             };
 
             this.selectionManager.showContextMenu(emptySelection, {
-                x: mouseEvent.clientX,
-                y: mouseEvent.clientY
+                x: event.clientX,
+                y: event.clientY
             });
-            mouseEvent.preventDefault();
+            event.preventDefault();
         });
     }
 
-    private handleClick(dataPoint: ITimelineDataPoint, index: number): void {
-        const event: MouseEvent = <MouseEvent>(require("d3").event);
-
+    private handleClick(event: any, dataPoint: ITimelineDataPoint): void {
         event.stopPropagation();
 
-        this.onCellClickHandler(dataPoint, index, event.altKey || event.shiftKey);
+        this.onCellClickHandler(dataPoint, dataPoint.index, event.altKey || event.shiftKey);
     }
 
     private addElements(): void {
@@ -1413,7 +1407,10 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
         let yPos: number = 0;
 
         if (timelineSettings.labels.show) {
-            if (timelineSettings.labels.displayAll || granularityType === GranularityType.year) {
+            if (
+                timelineSettings.labels.displayAll && timelineSettings.labels.yearVisibility ||
+                !timelineSettings.labels.displayAll && granularityType === GranularityType.year
+            ) {
                 this.renderLabels(
                     extendedLabels.yearLabels,
                     this.yearLabelsSelection,
@@ -1424,7 +1421,10 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
                 }
             }
 
-            if (timelineSettings.labels.displayAll || granularityType === GranularityType.quarter) {
+            if (
+                timelineSettings.labels.displayAll && timelineSettings.labels.quarterVisibility ||
+                !timelineSettings.labels.displayAll && granularityType === GranularityType.quarter
+            ) {
                 this.renderLabels(
                     extendedLabels.quarterLabels,
                     this.quarterLabelsSelection,
@@ -1435,7 +1435,10 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
                 }
             }
 
-            if (timelineSettings.labels.displayAll || granularityType === GranularityType.month) {
+            if (
+                timelineSettings.labels.displayAll && timelineSettings.labels.monthVisibility ||
+                !timelineSettings.labels.displayAll && granularityType === GranularityType.month
+            ) {
                 this.renderLabels(
                     extendedLabels.monthLabels,
                     this.monthLabelsSelection,
@@ -1446,7 +1449,10 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
                 }
             }
 
-            if (timelineSettings.labels.displayAll || granularityType === GranularityType.week) {
+            if (
+                timelineSettings.labels.displayAll && timelineSettings.labels.weekVisibility ||
+                !timelineSettings.labels.displayAll && granularityType === GranularityType.week
+            ) {
                 this.renderLabels(
                     extendedLabels.weekLabels,
                     this.weekLabelsSelection,
@@ -1457,7 +1463,10 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
                 }
             }
 
-            if (timelineSettings.labels.displayAll || granularityType === GranularityType.day) {
+            if (
+                timelineSettings.labels.displayAll && timelineSettings.labels.dayVisibility || 
+                !timelineSettings.labels.displayAll && granularityType === GranularityType.day
+            ) {
                 this.renderLabels(
                     extendedLabels.dayLabels,
                     this.dayLabelsSelection,
