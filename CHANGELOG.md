@@ -1,3 +1,6 @@
+## 2.5.5
+* Add toggle 'Treat as end of fiscal year'
+
 ## 2.5.4
 * Disable "Calendar" and "First day of week" settings when WeekStandard is set to IS0 860
 * Fix uninitialized start date when date from filters is less than date from DataView

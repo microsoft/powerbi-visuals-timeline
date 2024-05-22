@@ -6,6 +6,7 @@
 	"Visual_FiscalYearStart": "Fiscal Year Start",
 	"Visual_FiscalYear": "Fiscal Year",
 	"Visual_FiscalYear_Description": "This option have no sense if ISO 8601 standard was picked",
+	"Visual_TreatAsEndOfFiscalYear": "Treat as end of fiscal year",
 	"Visual_Month": "Month",
 	"Visual_Month_January": "January",
 	"Visual_Month_February": "February",
