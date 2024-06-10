@@ -1,19 +1,20 @@
-import { Calendar } from "./calendar";
-import { CalendarSettings } from "../settings/calendarSettings";
-import { WeekDaySettings } from "../settings/weekDaySettings";
-import { WeeksDetermintaionStandardsSettings } from "../settings/weeksDetermintaionStandardsSettings";
-import { WeekStandards } from "./weekStandards";
+import {Calendar, CalendarFormat, WeekdayFormat} from "./calendar";
+import { WeekStandard } from "./weekStandard";
 import { Utils } from "../utils";
+import {CalendarSettingsCard} from "../timeLineSettingsModel";
 
 export class CalendarISO8061 extends Calendar {
 
     constructor() {
-        const isoCalendarSettings = new CalendarSettings();
-        isoCalendarSettings.month = 0;
-        isoCalendarSettings.day = 1;
-        const isoWeekDaySettings = new WeekDaySettings();
-        isoWeekDaySettings.daySelection = true;
-        isoWeekDaySettings.day = 1;
+        const isoCalendarSettings: CalendarFormat = {
+            month: CalendarSettingsCard.DefaultMonth,
+            day: CalendarSettingsCard.DefaultDay,
+        };
+
+        const isoWeekDaySettings: WeekdayFormat = {
+            daySelection: true,
+            day: 1,
+        };
 
         super(isoCalendarSettings, isoWeekDaySettings);
 
@@ -41,7 +42,7 @@ export class CalendarISO8061 extends Calendar {
 
         if (date < dateOfFirstWeek) {
             // This scenario works when the first date of ISO week year starts from the beginning of January: 1th, 2nd, 3rd, 4th
-            // 
+            //
             // Input date:                                   January 3, 2021 [left condition expression]
             // The first date of 2021 regarding ISO weeks:   January 4, 2021 [right condition expression]
             // Returning ISO week year for January 3, 2021:  2020
@@ -67,7 +68,7 @@ export class CalendarISO8061 extends Calendar {
         const dayOfFirstJanWeek = dateOfFirstJan.getDay();
         const firstJanDig = 1;
 
-        let dateOfFirstWeek = dateOfFirstJan;
+        const dateOfFirstWeek = dateOfFirstJan;
         // The first week regarding ISO has to contain Thursday (4th day in the week)
         if (dayOfFirstJanWeek <= 4) {
             // If 1st January is Monday, Tuesday, Wednesday or Thursday => the first week date should be adjusted to left up to Monday
@@ -102,10 +103,10 @@ export class CalendarISO8061 extends Calendar {
     }
 
     public isChanged(
-        calendarSettings: CalendarSettings,
-        weekDaySettings: WeekDaySettings,
-        weeksDetermintaionStandardsSettings: WeeksDetermintaionStandardsSettings
+        calendarSettings: CalendarFormat,
+        weekDaySettings: WeekdayFormat,
+        weekStandard: WeekStandard
     ): boolean {
-        return weeksDetermintaionStandardsSettings.weekStandard !== WeekStandards.ISO8061
+        return weekStandard !== WeekStandard.ISO8061
     }
 }

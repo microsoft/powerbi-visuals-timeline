@@ -25,11 +25,8 @@
  */
 
 import { GranularityData } from "../granularity/granularityData";
-import { CalendarSettings } from "../settings/calendarSettings";
-import { WeekDaySettings } from "../settings/weekDaySettings";
-import { WeeksDetermintaionStandardsSettings } from "../settings/weeksDetermintaionStandardsSettings";
 import { Utils } from "../utils";
-import { WeekStandards } from "./weekStandards";
+import { WeekStandard } from "./weekStandard";
 
 interface IDateDictionary {
     [year: number]: Date;
@@ -38,6 +35,16 @@ interface IDateDictionary {
 export interface IPeriodDates {
     startDate: Date;
     endDate: Date;
+}
+
+export interface CalendarFormat {
+    month: number;
+    day: number;
+}
+
+export interface WeekdayFormat {
+    daySelection: boolean;
+    day: number;
 }
 
 export class Calendar {
@@ -53,7 +60,7 @@ export class Calendar {
     protected EmptyYearOffset: number = 0;
     protected YearOffset: number = 1;
 
-    constructor(calendarFormat: CalendarSettings, weekDaySettings: WeekDaySettings) {
+    constructor(calendarFormat: CalendarFormat, weekDaySettings: WeekdayFormat) {
         this.isDaySelection = weekDaySettings.daySelection;
         this.firstDayOfWeek = weekDaySettings.day;
         this.firstMonthOfYear = calendarFormat.month;
@@ -67,7 +74,7 @@ export class Calendar {
         });
     }
 
-    public getFiscalYearAjustment(): number {
+    public getFiscalYearAdjustment(): number {
         const firstMonthOfYear = this.getFirstMonthOfYear();
         const firstDayOfYear = this.getFirstDayOfYear();
 
@@ -84,7 +91,7 @@ export class Calendar {
             firstDayOfYear,
         );
 
-        return date.getFullYear() + this.getFiscalYearAjustment() - ((firstDate <= date)
+        return date.getFullYear() + this.getFiscalYearAdjustment() - ((firstDate <= date)
             ? this.EmptyYearOffset
             : this.YearOffset);
     }
@@ -94,7 +101,7 @@ export class Calendar {
         // It's Ok until this year is used to calculate date of first week.
         // So, here is some adjustment was applied.
         const year: number = this.determineYear(date);
-        const fiscalYearAdjustment = this.getFiscalYearAjustment();
+        const fiscalYearAdjustment = this.getFiscalYearAdjustment();
 
         const dateOfFirstWeek: Date = this.getDateOfFirstWeek(year - fiscalYearAdjustment);
         const dateOfFirstFullWeek: Date = this.getDateOfFirstFullWeek(year - fiscalYearAdjustment);
@@ -190,14 +197,14 @@ export class Calendar {
     }
 
     public isChanged(
-        calendarSettings: CalendarSettings,
-        weekDaySettings: WeekDaySettings,
-        weeksDetermintaionStandardsSettings: WeeksDetermintaionStandardsSettings
+        calendarSettings: CalendarFormat,
+        weekDaySettings: WeekdayFormat,
+        weekStandard: WeekStandard
     ): boolean {
         return this.firstMonthOfYear !== calendarSettings.month
             || this.firstDayOfYear !== calendarSettings.day
             || this.firstDayOfWeek !== weekDaySettings.day
-            || weeksDetermintaionStandardsSettings.weekStandard !== WeekStandards.NotSet;
+            || weekStandard !== WeekStandard.NotSet;
     }
 
     public getDateOfFirstWeek(year: number): Date {

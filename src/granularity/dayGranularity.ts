@@ -40,7 +40,7 @@ export class DayGranularity extends GranularityBase {
     }
 
     public render(props: IGranularityRenderProps, isFirst: boolean): Selection<any, any, any, any> {
-        if (!props.granularSettings.granularityDayVisibility) {
+        if (!props.granularSettings.granularityDayVisibility.value) {
             return null;
         }
 

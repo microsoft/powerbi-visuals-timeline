@@ -26,11 +26,11 @@
 
 import { Selection } from "d3-selection";
 
-import { GranularitySettings } from "../settings/granularitySettings";
 import { GranularityType } from "./granularityType";
+import {GranularitySettingsCard} from "../timeLineSettingsModel";
 
 export interface IGranularityRenderProps {
     selection: Selection<any, any, any, any>;
-    granularSettings: GranularitySettings;
+    granularSettings: GranularitySettingsCard;
     selectPeriodCallback: (granularityType: GranularityType) => void;
 }
