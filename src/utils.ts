@@ -37,7 +37,7 @@ import {
 import { IGranularityName } from "./granularity/granularityName";
 import { GranularityNames } from "./granularity/granularityNames";
 import { GranularityType } from "./granularity/granularityType";
-import { CellsSettings } from "./settings/cellsSettings";
+import {CellsSettingsCard} from "./timeLineSettingsModel";
 
 export class Utils {
     public static DefaultCellColor: string = "transparent";
@@ -222,14 +222,14 @@ export class Utils {
     public static GET_CELL_COLOR(
         dataPoint: ITimelineDataPoint,
         timelineData: ITimelineData,
-        cellSettings: CellsSettings): string {
+        cellSettings: CellsSettingsCard): string {
 
         const inSelectedPeriods: boolean = dataPoint.datePeriod.startDate >= Utils.GET_START_SELECTION_DATE(timelineData)
             && dataPoint.datePeriod.endDate <= Utils.GET_END_SELECTION_DATE(timelineData);
 
         return inSelectedPeriods
-            ? cellSettings.fillSelected
-            : (cellSettings.fillUnselected || Utils.DefaultCellColor);
+            ? cellSettings.fillSelected.value.value
+            : (cellSettings.fillUnselected.value.value || Utils.DefaultCellColor);
     }
 
     public static IS_GRANULE_SELECTED(dataPoint: ITimelineDataPoint, timelineData: ITimelineData): boolean {
@@ -259,7 +259,7 @@ export class Utils {
 
     /**
      * Returns the name of the granularity type
-     * @param granularity The type of granularity
+     * @param granularityType The type of granularity
      */
     public static GET_GRANULARITY_NAME_KEY(granularityType: GranularityType): string {
         const index: number = Utils.FIND_INDEX(GranularityNames, (granularity: IGranularityName) => {

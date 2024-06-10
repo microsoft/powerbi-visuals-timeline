@@ -8,31 +8,8 @@ module.exports = {
         rules: [
             {
                 test: /\.ts$/,
-                enforce: 'pre',
-                exclude: /node_modules/,
-                use: [{
-                    loader: 'tslint-loader',
-                    options: {
-                        emitErrors: true,
-                        failOnHint: true,
-                        fix: false,
-                    }
-                }]
-            },
-            {
-                test: /\.ts$/,
                 use: 'ts-loader',
                 exclude: /(node_modules|dist|coverage|karma.conf.ts)/
-            },
-            {
-                test: /\.ts$/i,
-                enforce: 'post',
-                include: /(src)/,
-                exclude: /(specs|node_modules|resources\/js\/vendor)/,
-                loader: 'istanbul-instrumenter-loader',
-                options: {
-                    esModules: true
-                }
             },
             {
                 test: /\.less$/,

@@ -35,7 +35,6 @@ import { pixelConverter } from "powerbi-visuals-utils-typeutils";
 
 import { Calendar } from "../calendars/calendar";
 import { ITimelineDatePeriod } from "../datePeriod/datePeriod";
-import { GranularitySettings } from "../settings/granularitySettings";
 import { Utils } from "../utils";
 import { IGranularity } from "./granularity";
 import { IGranularityName } from "./granularityName";
@@ -45,6 +44,7 @@ import {
     IExtendedLabel,
     ITimelineLabel,
 } from "../dataInterfaces";
+import {GranularityType} from "./granularityType";
 
 export class GranularityBase implements IGranularity {
     private static DefaultFraction: number = 1;
@@ -118,10 +118,15 @@ export class GranularityBase implements IGranularity {
             .attr("dx", this.textLabelDx);
 
         // render slider
-        if (props.granularSettings.granularity === this.granularityProps.granularityType) {
+        const granularityType: GranularityType = props.granularSettings.granularity.value
+            ? <GranularityType>props.granularSettings.granularity.value.value
+            : GranularityType.month;
+
+        if (granularityType === this.granularityProps.granularityType) {
             this.renderSlider(
                 granularitySelection,
-                props.granularSettings,
+                props.granularSettings.sliderColor.value.value,
+                granularityType
             );
         }
 
@@ -133,11 +138,8 @@ export class GranularityBase implements IGranularity {
             .attr("width", pixelConverter.toString(this.clickableRectWidth))
             .attr("height", pixelConverter.toString(this.clickableRectHeight))
             .on("click", null)
-            .on("click", () => {
-                const event: MouseEvent = <MouseEvent>(require("d3").event);
-
+            .on("click", (event: MouseEvent) => {
                 event.stopPropagation();
-
                 props.selectPeriodCallback(this.granularityProps.granularityType);
 
                 const sliderSelection = selectAll("rect.periodSlicerRect");
@@ -148,11 +150,12 @@ export class GranularityBase implements IGranularity {
 
                 this.renderSlider(
                     granularitySelection,
-                    props.granularSettings,
+                    props.granularSettings.sliderColor.value.value,
+                    granularityType
                 );
             });
 
-        granularitySelection.attr("fill", props.granularSettings.scaleColor);
+        granularitySelection.attr("fill", props.granularSettings.scaleColor.value.value);
 
         return granularitySelection;
     }
@@ -292,17 +295,18 @@ export class GranularityBase implements IGranularity {
 
     private renderSlider(
         selection: Selection<any, any, any, any>,
-        granularSettings: GranularitySettings,
+        sliderColor: string,
+        granularity: GranularityType,
     ): void {
         selection
             .append("rect")
             .classed("periodSlicerRect", true)
-            .style("stroke", granularSettings.sliderColor)
+            .style("stroke", sliderColor)
             .attr("x", pixelConverter.toString(0 - this.sliderXOffset))
             .attr("y", pixelConverter.toString(0 - this.sliderYOffset))
             .attr("rx", pixelConverter.toString(this.sliderRx))
             .attr("width", pixelConverter.toString(this.sliderWidth))
             .attr("height", pixelConverter.toString(this.sliderHeight))
-            .data([granularSettings.granularity]);
+            .data([granularity]);
     }
 }

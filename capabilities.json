@@ -45,20 +45,32 @@
                 }
             }
         },
+        "cursor": {
+            "properties": {
+                "show": {
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "color": {
+                    "type": {
+                        "fill": {
+                            "solid": {
+                                "color": true
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "forceSelection": {
-            "displayName": "Force selection",
-            "displayNameKey": "Visual_ForceSelection",
             "properties": {
                 "currentPeriod": {
-                    "displayName": "Current period",
-                    "displayNameKey": "Visual_CurrentPeriod",
                     "type": {
                         "bool": true
                     }
                 },
                 "latestAvailableDate": {
-                    "displayName": "Latest available period",
-                    "displayNameKey": "Visual_LatestAvailableDate",
                     "type": {
                         "bool": true
                     }
@@ -66,12 +78,8 @@
             }
         },
         "weeksDetermintaionStandards": {
-            "displayName": "Weeks Determination Standards",
-            "displayNameKey": "Visual_Weeks_Determination_Standards",
             "properties": {
                 "weekStandard": {
-                    "displayName": "Standard",
-                    "displayNameKey": "Visual_Week_Standard",
                     "type": {
                         "enumeration": [
                             {
@@ -90,12 +98,8 @@
             }
         },
         "calendar": {
-            "displayName": "Fiscal Year",
-            "displayNameKey": "Visual_FiscalYear",
             "properties": {
                 "month": {
-                    "displayName": "Month",
-                    "displayNameKey": "Visual_Month",
                     "type": {
                         "enumeration": [
                             {
@@ -162,8 +166,6 @@
                     }
                 },
                 "day": {
-                    "displayName": "Day",
-                    "displayNameKey": "Visual_Day",
                     "type": {
                         "numeric": true
                     }
@@ -171,19 +173,13 @@
             }
         },
         "weekDay": {
-            "displayName": "First Day of Week",
-            "displayNameKey": "Visual_FirstDayOfWeek",
             "properties": {
                 "daySelection": {
-                    "displayName": "Day Selection",
-                    "displayNameKey": "Visual_Day_Selection",
                     "type": {
                         "bool": true
                     }
                 },
                 "day": {
-                    "displayName": "Day",
-                    "displayNameKey": "Visual_Day",
                     "type": {
                         "enumeration": [
                             {
@@ -227,19 +223,13 @@
             }
         },
         "rangeHeader": {
-            "displayName": "Range Header",
-            "displayNameKey": "Visual_RangeHeader",
             "properties": {
                 "show": {
-                    "displayName": "Show",
-                    "displayNameKey": "Visual_Show",
                     "type": {
                         "bool": true
                     }
                 },
                 "fontColor": {
-                    "displayName": "Font color",
-                    "displayNameKey": "Visual_FontColor",
                     "type": {
                         "fill": {
                             "solid": {
@@ -249,8 +239,6 @@
                     }
                 },
                 "textSize": {
-                    "displayName": "Text Size",
-                    "displayNameKey": "Visual_TextSize",
                     "type": {
                         "numeric": true
                     }
@@ -258,12 +246,17 @@
             }
         },
         "cells": {
-            "displayName": "Cells",
-            "displayNameKey": "Visual_Cells",
             "properties": {
                 "fillSelected": {
-                    "displayName": "Selected cell color",
-                    "displayNameKey": "Visual_Cell_SelectedColor",
+                    "type": {
+                        "fill": {
+                            "solid": {
+                                "color": true
+                            }
+                        }
+                    }
+                },
+                "strokeSelected": {
                     "type": {
                         "fill": {
                             "solid": {
@@ -273,8 +266,6 @@
                     }
                 },
                 "fillUnselected": {
-                    "displayName": "Unselected cell color",
-                    "displayNameKey": "Visual_Cell_UnselectedColor",
                     "type": {
                         "fill": {
                             "solid": {
@@ -284,23 +275,53 @@
                             }
                         }
                     }
+                },
+                "strokeUnselected": {
+                    "type": {
+                        "fill": {
+                            "solid": {
+                                "color": {
+                                    "nullable": true
+                                }
+                            }
+                        }
+                    }
+                },
+                "strokeWidth": {
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "gapWidth": {
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "enableManualSizing": {
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "width": {
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "height": {
+                    "type": {
+                        "numeric": true
+                    }
                 }
             }
         },
         "granularity": {
-            "displayName": "Granularity",
-            "displayNameKey": "Visual_Granularity",
             "properties": {
                 "show": {
-                    "displayName": "Show",
-                    "displayNameKey": "Visual_Show",
                     "type": {
                         "bool": true
                     }
                 },
                 "scaleColor": {
-                    "displayName": "Scale color",
-                    "displayNameKey": "Visual_ScaleColor",
                     "type": {
                         "fill": {
                             "solid": {
@@ -310,8 +331,6 @@
                     }
                 },
                 "sliderColor": {
-                    "displayName": "Slider color",
-                    "displayNameKey": "Visual_SliderColor",
                     "type": {
                         "fill": {
                             "solid": {
@@ -321,8 +340,6 @@
                     }
                 },
                 "granularity": {
-                    "displayName": "Granularity",
-                    "displayNameKey": "Visual_Granularity",
                     "type": {
                         "enumeration": [
                             {
@@ -355,36 +372,26 @@
                     "filterState": true
                 },
                 "granularityYearVisibility": {
-                    "displayName": "Year visibility",
-                    "displayNameKey": "Visual_GranularityYearVisibility",
                     "type": {
                         "bool": true
                     }
                 },
                 "granularityQuarterVisibility": {
-                    "displayName": "Quarter visibility",
-                    "displayNameKey": "Visual_GranularityQuarterVisibility",
                     "type": {
                         "bool": true
                     }
                 },
                 "granularityMonthVisibility": {
-                    "displayName": "Month visibility",
-                    "displayNameKey": "Visual_GranularityMonthVisibility",
                     "type": {
                         "bool": true
                     }
                 },
                 "granularityWeekVisibility": {
-                    "displayName": "Week visibility",
-                    "displayNameKey": "Visual_GranularityWeekVisibility",
                     "type": {
                         "bool": true
                     }
                 },
                 "granularityDayVisibility": {
-                    "displayName": "Day visibility",
-                    "displayNameKey": "Visual_GranularityDayVisibility",
                     "type": {
                         "bool": true
                     }
@@ -392,26 +399,18 @@
             }
         },
         "labels": {
-            "displayName": "Labels",
-            "displayNameKey": "Visual_Labels",
             "properties": {
                 "show": {
-                    "displayName": "Show",
-                    "displayNameKey": "Visual_Show",
                     "type": {
                         "bool": true
                     }
                 },
                 "displayAll": {
-                    "displayName": "Display all",
-                    "displayNameKey": "Visual_DisplayAll",
                     "type": {
                         "bool": true
                     }
                 },
                 "fontColor": {
-                    "displayName": "Font color",
-                    "displayNameKey": "Visual_FontColor",
                     "type": {
                         "fill": {
                             "solid": {
@@ -421,8 +420,6 @@
                     }
                 },
                 "textSize": {
-                    "displayName": "Text Size",
-                    "displayNameKey": "Visual_TextSize",
                     "type": {
                         "numeric": true
                     }
@@ -430,12 +427,8 @@
             }
         },
         "scrollAutoAdjustment": {
-            "displayName": "Scroll position auto adjustment",
-            "displayNameKey": "Visual_ScrollAutoAdjustment",
             "properties": {
                 "show": {
-                    "displayName": "Show",
-                    "displayNameKey": "Visual_Show",
                     "type": {
                         "bool": true
                     }
@@ -443,6 +436,7 @@
             }
         }
     },
+    "privileges": [],
     "supportsHighlight": true,
     "supportsSynchronizingFilterState": true
 }

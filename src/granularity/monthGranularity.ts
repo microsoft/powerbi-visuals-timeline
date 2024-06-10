@@ -40,7 +40,7 @@ export class MonthGranularity extends GranularityBase {
     }
 
     public render(props: IGranularityRenderProps, isFirst: boolean): Selection<any, any, any, any> {
-        if (!props.granularSettings.granularityMonthVisibility) {
+        if (!props.granularSettings.granularityMonthVisibility.value) {
             return null;
         }
 

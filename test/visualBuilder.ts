@@ -30,10 +30,7 @@ import {
     AdvancedFilter,
 } from "powerbi-models";
 
-import * as $ from "jquery";
-
 import {
-    d3Click,
     VisualBuilderBase,
 } from "powerbi-visuals-utils-testutils";
 
@@ -65,50 +62,71 @@ export class VisualBuilder extends VisualBuilderBase<Timeline> {
         return this.visual;
     }
 
-    public get rootElement(): JQuery {
-        return $(this.element).find(".timeline-component");
+    public get rootElement(): HTMLElement {
+        return this.element.querySelector<HTMLElement>(".timeline-component");
     }
 
-    public get mainElement(): JQuery {
-        return $(this.element).find("svg.timeline");
+    public get mainElement(): SVGElement {
+        return this.element.querySelector<SVGElement>("svg.timeline");
     }
 
-    public get headerElement(): JQuery {
-        return $(this.element).children("div")
-            .children("div")
-            .children("svg");
+    public get headerElement(): SVGElement {
+        return this.element
+            .querySelector("div.timeline-component")
+            .querySelector("div")
+            .querySelector<SVGElement>("svg");
     }
 
-    public get cellRects(): JQuery {
-        return this.mainArea
-            .children(".cellsArea")
-            .children(".cellRect");
+
+    public get mainArea(): SVGGElement {
+        return this.mainElement.querySelector<SVGGElement>("g.mainArea");
     }
 
-    public get mainArea() {
-        return this.mainElement
-            .children("g.mainArea");
+    public get allLabels(): NodeListOf<SVGTextElement> {
+        return this.mainArea.querySelectorAll<SVGTextElement>("text.label");
     }
 
-    public get allLabels() {
-        return this.mainArea
-            .children("g")
-            .children("text.label");
-    }
-
-    public get rangeHeaderText() {
+    public get rangeHeaderText(): SVGTextElement | undefined {
         return this.headerElement
-            .children("g.rangeTextArea")
-            .children("text.selectionRangeContainer");
+            .querySelector("g.rangeTextArea")
+            .querySelector<SVGTextElement>("text.selectionRangeContainer");
     }
 
-    public get timelineSlicer() {
-        return this.headerElement
-            .children("g.timelineSlicer");
+    public getRangeHeader(): SVGTextElement | null {
+        const rangeTextArea = this.headerElement.querySelector("g.rangeTextArea");
+        const rangeHeader = rangeTextArea?.querySelector<SVGTextElement>("text.selectionRangeContainer");
+        if (!rangeHeader) {
+            return null;
+        }
+
+        return rangeHeader;
     }
 
-    public selectTheLatestCell(): void {
-        d3Click(this.mainElement.find(".cellRect").last(), 0, 0);
+    public get timelineSlicer(): SVGGElement {
+        return this.headerElement.querySelector<SVGGElement>("g.timelineSlicer");
+    }
+
+    public get periodSlicer(): SVGRectElement {
+        return this.timelineSlicer.querySelector("rect.periodSlicerRect");
+    }
+
+    public get periodSlicerSelectionRects(): NodeListOf<SVGRectElement> {
+        return this.timelineSlicer.querySelectorAll<SVGRectElement>("rect.periodSlicerSelectionRect");
+    }
+
+    public get cellRects(): NodeListOf<SVGRectElement> {
+        return this.mainArea
+            .querySelector("g.cellsArea")
+            .querySelectorAll<SVGRectElement>("rect.cellRect");
+    }
+
+    public get lastCellRect(): SVGRectElement {
+        const cells = this.cellRects;
+        if (!cells || cells.length === 0) {
+            return undefined;
+        }
+
+        return cells[cells.length - 1];
     }
 
     public setFilter(startDate: Date, endDate: Date): void {
@@ -131,7 +149,7 @@ export class VisualBuilder extends VisualBuilderBase<Timeline> {
         this.jsonFilters = [filter];
     }
 
-    public update(dataView) {
+    public update(dataView: powerbiVisualsApi.DataView) {
         this.visual.update({
             dataViews: [].concat(dataView),
             jsonFilters: this.jsonFilters,
