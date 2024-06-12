@@ -99,6 +99,11 @@
         },
         "calendar": {
             "properties": {
+                "treatAsEndOfFiscalYear": {
+                    "type": {
+                        "bool": true
+                    }
+                },
                 "month": {
                     "type": {
                         "enumeration": [

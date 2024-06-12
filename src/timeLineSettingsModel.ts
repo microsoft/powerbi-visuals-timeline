@@ -118,6 +118,13 @@ export class CalendarSettingsCard extends Card {
     public static readonly DefaultMonth: number = 0;
     public static readonly DefaultDay: number = 1;
 
+    treatAsEndOfFiscalYear = new formattingSettings.ToggleSwitch({
+        name: "treatAsEndOfFiscalYear",
+        displayName: "Treat as end of fiscal year",
+        displayNameKey: "Visual_TreatAsEndOfFiscalYear",
+        value: true,
+    });
+
     month = new formattingSettings.ItemDropdown({
         name: "month",
         displayName: "Month",
@@ -141,7 +148,7 @@ export class CalendarSettingsCard extends Card {
     displayName: string = "Fiscal Year";
     displayNameKey: string = "Visual_FiscalYear";
     descriptionKey: string = "Visual_FiscalYear_Description";
-    slices = [this.month, this.day];
+    slices = [this.treatAsEndOfFiscalYear, this.month, this.day];
 }
 
 class WeekDaySettingsCard extends Card {

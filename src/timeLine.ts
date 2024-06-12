@@ -66,7 +66,7 @@ import {ITimelineDatePeriod, ITimelineDatePeriodBase,} from "./datePeriod/datePe
 
 import {DatePeriodBase} from "./datePeriod/datePeriodBase";
 
-import {Calendar, CalendarFormat, WeekdayFormat} from "./calendars/calendar";
+import {Calendar, CalendarFormat, CalendarFormattingSettings, WeekdayFormat} from "./calendars/calendar";
 import {Utils} from "./utils";
 import {WeekStandard} from "./calendars/weekStandard";
 import {CalendarFactory} from "./calendars/calendarFactory";
@@ -150,7 +150,9 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
         }
 
         if (!initialized || isCalendarChanged) {
-            calendar = new CalendarFactory().create(weekStandard, calendarFormat, weekDayFormat);
+            const calendarFormattingSettings: CalendarFormattingSettings = { treatAsEndOfFiscalYear: this.visualSettings.calendar.treatAsEndOfFiscalYear.value };
+
+            calendar = new CalendarFactory().create(weekStandard, calendarFormat, weekDayFormat, calendarFormattingSettings);
             const granularity: GranularityType = this.visualSettings.granularity.granularity.value
                     ? <GranularityType>this.visualSettings.granularity.granularity.value.value
                     : GranularityType.month;
@@ -1234,7 +1236,8 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
     ) {
         const { weekStandard, calendarFormat, weekDayFormat } = Timeline.computeCalendarFormat(timelineSettings);
 
-        const calendar: Calendar = this.calendarFactory.create(weekStandard, calendarFormat, weekDayFormat);
+        const calendarFormattingSettings: CalendarFormattingSettings = { treatAsEndOfFiscalYear: timelineSettings.calendar.treatAsEndOfFiscalYear.value };
+        const calendar: Calendar = this.calendarFactory.create(weekStandard, calendarFormat, weekDayFormat, calendarFormattingSettings);
 
         timelineGranularityData.createGranularities(calendar, locale, localizationManager);
         timelineGranularityData.createLabels();

@@ -1,11 +1,11 @@
-import {Calendar, CalendarFormat, WeekdayFormat} from "./calendar";
+import {Calendar, CalendarFormat, CalendarFormattingSettings, WeekdayFormat} from "./calendar";
 import { WeekStandard } from "./weekStandard";
 import { Utils } from "../utils";
 import {CalendarSettingsCard} from "../timeLineSettingsModel";
 
 export class CalendarISO8061 extends Calendar {
 
-    constructor() {
+    constructor(settings: CalendarFormattingSettings) {
         const isoCalendarSettings: CalendarFormat = {
             month: CalendarSettingsCard.DefaultMonth,
             day: CalendarSettingsCard.DefaultDay,
@@ -16,7 +16,7 @@ export class CalendarISO8061 extends Calendar {
             day: 1,
         };
 
-        super(isoCalendarSettings, isoWeekDaySettings);
+        super(isoCalendarSettings, isoWeekDaySettings, settings);
 
         //this.firstDayOfYear = calendarFormat.day;
     }
