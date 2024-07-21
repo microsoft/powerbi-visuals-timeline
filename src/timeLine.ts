@@ -35,7 +35,7 @@ import {arc as d3Arc} from "d3-shape";
 import powerbiVisualsApi from "powerbi-visuals-api";
 import powerbi from "powerbi-visuals-api";
 
-import {AdvancedFilter, IFilterColumnTarget,} from "powerbi-models";
+import {AdvancedFilter, IAdvancedFilterCondition, IFilterColumnTarget,} from "powerbi-models";
 
 import {CssConstants, manipulation as svgManipulation,} from "powerbi-visuals-utils-svgutils";
 
@@ -106,7 +106,9 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
         granularity: GranularityType,
         calendar: Calendar,
     ) {
-        return this.SELECT_PERIOD(datePeriod, granularity, calendar, Utils.RESET_TIME(new Date()));
+        const currentDate: Date = new Date(2024, 1, 14);
+        // const currentDate: Date = Utils.RESET_TIME(new Date());
+        return this.SELECT_PERIOD(datePeriod, granularity, calendar, currentDate);
     }
 
     public CONVERTER(
@@ -665,6 +667,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
         }
     }
 
+    // eslint-disable-next-line max-lines-per-function
     public update(options: powerbiVisualsApi.extensibility.visual.VisualUpdateOptions): void {
         try {
             this.host.eventService.renderingStarted(options);
@@ -679,8 +682,14 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
             // it contains dates from data view.
             this.datePeriod = this.createDatePeriod(this.dataView);
 
+            const isCurrentPeriodOld = this?.visualSettings?.forceSelection?.currentPeriod?.value;
+            const isLatestAvailableDateOld = this?.visualSettings?.forceSelection?.latestAvailableDate?.value;
+
             this.visualSettings = this.formattingSettingsService.populateFormattingSettingsModel(TimeLineSettingsModel, this.dataView);
             this.visualSettings.setLocalizedOptions(this.localizationManager);
+
+            const isCurrentPeriodNew = this.visualSettings.forceSelection.currentPeriod.value;
+            const isLatestAvailableDateNew = this.visualSettings.forceSelection.latestAvailableDate.value;
 
             if (!this.initialized) {
                 this.timelineData = {
@@ -691,6 +700,9 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
 
             this.parseJsonFilters(this.visualSettings, <AdvancedFilter[]>(this.options.jsonFilters));
             this.setHighContrastColors();
+
+
+            this.handleFilterChange(isLatestAvailableDateOld, isLatestAvailableDateNew, isCurrentPeriodOld, isCurrentPeriodNew);
 
             this.adjustHeightOfElements(options.viewport.width);
 
@@ -782,6 +794,76 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
             this.host.eventService.renderingFailed(options, JSON.stringify(ex));
         }
         this.host.eventService.renderingFinished(options);
+    }
+
+    private handleFilterChange(isLatestAvailableDateOld: boolean, isLatestAvailableDateNew: boolean,
+        isCurrentPeriodOld: boolean, isCurrentPeriodNew: boolean
+    ): void {
+        const filterDatePeriod: DatePeriodBase = <DatePeriodBase>this.filterDatePeriod;
+        const wasFilterChanged: boolean =
+            String(this.prevFilteredStartDate) !== String(this.datePeriod.startDate) ||
+            String(this.prevFilteredEndDate) !== String(this.datePeriod.endDate);
+
+        const isFirstUpdate =
+            (isLatestAvailableDateOld == null && isLatestAvailableDateNew === true) ||
+            (isCurrentPeriodOld == null && isCurrentPeriodNew === true);
+
+        const wasEndDateChanged = filterDatePeriod.endDate &&
+            filterDatePeriod.endDate.getTime() < this.datePeriod.endDate.getTime();
+
+        const shouldLatestAvailableDateBeDisabled =
+            this.visualSettings.forceSelection.latestAvailableDate.value &&
+            isFirstUpdate &&
+            wasFilterChanged &&
+            wasEndDateChanged;
+
+        const wasStartDateChanged = filterDatePeriod.startDate &&
+            filterDatePeriod.startDate.getTime() !== this.datePeriod.startDate.getTime();
+
+        const shouldCurrentPeriodBeDisabled =
+            this.visualSettings.forceSelection.currentPeriod.value &&
+            isFirstUpdate &&
+            wasFilterChanged &&
+            wasStartDateChanged;
+
+        if (shouldCurrentPeriodBeDisabled && shouldLatestAvailableDateBeDisabled) {
+            this.visualSettings.forceSelection.currentPeriod.value = false;
+            this.visualSettings.forceSelection.latestAvailableDate.value = false;
+            this.host.persistProperties({
+                merge: [{
+                    objectName: "forceSelection",
+                    properties: {
+                        currentPeriod: false,
+                        latestAvailableDate: false
+                    },
+                    selector: null,
+                }],
+            });
+
+            return;
+        }
+
+        if (shouldLatestAvailableDateBeDisabled) {
+            this.visualSettings.forceSelection.latestAvailableDate.value = false;
+            this.host.persistProperties({
+                merge: [{
+                    objectName: "forceSelection",
+                    properties: { latestAvailableDate: false },
+                    selector: null,
+                }],
+            });
+        }
+
+        if (shouldCurrentPeriodBeDisabled) {
+            this.visualSettings.forceSelection.currentPeriod.value = false;
+            this.host.persistProperties({
+                merge: [{
+                    objectName: "forceSelection",
+                    properties: { currentPeriod: false },
+                    selector: null,
+                }],
+            });
+        }
     }
 
     public fillCells(visSettings: TimeLineSettingsModel): void {
@@ -997,9 +1079,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
             return null;
         }
 
-        return new AdvancedFilter(
-            target,
-            "And",
+        const conditions: IAdvancedFilterCondition[] = [
             {
                 operator: "GreaterThanOrEqual",
                 value: startDate.toJSON(),
@@ -1008,7 +1088,9 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
                 operator: "LessThan",
                 value: endDate.toJSON(),
             },
-        );
+        ];
+
+        return new AdvancedFilter(target, "And", conditions);
     }
 
     public clearSelection(target: IFilterColumnTarget): void {
@@ -1148,7 +1230,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
         }
 
         if (filterDatePeriod.endDate && adaptedDataEndDate && filterDatePeriod.endDate.getTime() > adaptedDataEndDate.getTime()) {
-            filterDatePeriod.endDate = null;
+            filterDatePeriod.endDate = adaptedDataEndDate;
         }
 
         return {
