@@ -155,11 +155,8 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
             const calendarFormattingSettings: CalendarFormattingSettings = { treatAsEndOfFiscalYear: this.visualSettings.calendar.treatAsEndOfFiscalYear.value };
 
             calendar = new CalendarFactory().create(weekStandard, calendarFormat, weekDayFormat, calendarFormattingSettings);
-            const granularity: GranularityType = this.visualSettings.granularity.granularity.value
-                    ? <GranularityType>this.visualSettings.granularity.granularity.value.value
-                    : GranularityType.month;
-
-                this.timelineData.currentGranularity = this.timelineGranularityData.getGranularity(granularity);
+            const granularity: GranularityType = this.getGranularityType();
+            this.timelineData.currentGranularity = this.timelineGranularityData.getGranularity(granularity);
         } else {
             calendar = previousCalendar;
 
@@ -682,14 +679,8 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
             // it contains dates from data view.
             this.datePeriod = this.createDatePeriod(this.dataView);
 
-            const isCurrentPeriodOld = this?.visualSettings?.forceSelection?.currentPeriod?.value;
-            const isLatestAvailableDateOld = this?.visualSettings?.forceSelection?.latestAvailableDate?.value;
-
             this.visualSettings = this.formattingSettingsService.populateFormattingSettingsModel(TimeLineSettingsModel, this.dataView);
             this.visualSettings.setLocalizedOptions(this.localizationManager);
-
-            const isCurrentPeriodNew = this.visualSettings.forceSelection.currentPeriod.value;
-            const isLatestAvailableDateNew = this.visualSettings.forceSelection.latestAvailableDate.value;
 
             if (!this.initialized) {
                 this.timelineData = {
@@ -702,14 +693,11 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
             this.setHighContrastColors();
 
 
-            this.handleFilterChange(isLatestAvailableDateOld, isLatestAvailableDateNew, isCurrentPeriodOld, isCurrentPeriodNew);
-
             this.adjustHeightOfElements(options.viewport.width);
 
             this.timelineGranularityData = new GranularityData(this.datePeriod.startDate, this.datePeriod.endDate);
 
             this.createTimelineData(
-                this.visualSettings,
                 this.datePeriod.startDate,
                 this.datePeriod.endDate,
                 this.timelineGranularityData,
@@ -719,39 +707,13 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
 
             this.updateCalendar();
 
+            this.updateForceSelectionOnFilterChange();
+
             const adjustedPeriod: IAdjustedFilterDatePeriod = this.adjustFilterDatePeriod();
             const datePeriod: ITimelineDatePeriodBase = this.datePeriod;
-            const granularity: GranularityType = this.visualSettings.granularity.granularity.value
-                ? <GranularityType>this.visualSettings.granularity.granularity.value.value
-                : GranularityType.month;
+            const granularity: GranularityType = this.getGranularityType();
 
-            const isCurrentPeriodSelected: boolean = !this.isForceSelectionReset && this.visualSettings.forceSelection.currentPeriod.value;
-            const isLatestAvailableDateSelected: boolean = !this.isForceSelectionReset && this.visualSettings.forceSelection.latestAvailableDate.value;
-            const isForceSelected: boolean = !this.isForceSelectionReset && (isCurrentPeriodSelected || isLatestAvailableDateSelected);
-            this.isForceSelectionReset = false; // Reset it to default state to allow re-enabling Force Selection
-            let currentForceSelectionResult = { startDate: null, endDate: null };
-
-            if (isCurrentPeriodSelected) {
-                currentForceSelectionResult = ({
-                    endDate: adjustedPeriod.period.endDate,
-                    startDate: adjustedPeriod.period.startDate,
-                } = Timeline.SELECT_CURRENT_PERIOD(datePeriod, granularity, this.calendar));
-            }
-            if (isLatestAvailableDateSelected
-                && (
-                    !isCurrentPeriodSelected
-                    || (isCurrentPeriodSelected
-                        && !currentForceSelectionResult.startDate
-                        && !currentForceSelectionResult.endDate
-                    )
-                )
-            ) {
-                adjustedPeriod.period.endDate = adjustedPeriod.adaptedDataEndDate;
-                ({
-                    endDate: adjustedPeriod.period.endDate,
-                    startDate: adjustedPeriod.period.startDate,
-                } = Timeline.SELECT_PERIOD(datePeriod, granularity, this.calendar, this.datePeriod.endDate));
-            }
+            const isForceSelected: boolean = this.updateDatePeriodOnForceSelection(adjustedPeriod, datePeriod, granularity);
 
             this.updatePrevFilterState(adjustedPeriod, isForceSelected, this.timelineData.filterColumnTarget);
 
@@ -796,74 +758,87 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
         this.host.eventService.renderingFinished(options);
     }
 
-    private handleFilterChange(isLatestAvailableDateOld: boolean, isLatestAvailableDateNew: boolean,
-        isCurrentPeriodOld: boolean, isCurrentPeriodNew: boolean
-    ): void {
-        const filterDatePeriod: DatePeriodBase = <DatePeriodBase>this.filterDatePeriod;
+
+    /**
+     * When visual is initialized, we need to check if filter date is different from currentPeriodDate or latestAvailableDate
+     * It may happen when visual is synced with other visuals and filter date is changed, so we need to disable corresponding forceSelection options.
+     */
+    private updateForceSelectionOnFilterChange(): void {
         const wasFilterChanged: boolean =
             String(this.prevFilteredStartDate) !== String(this.datePeriod.startDate) ||
             String(this.prevFilteredEndDate) !== String(this.datePeriod.endDate);
 
-        const isFirstUpdate =
-            (isLatestAvailableDateOld == null && isLatestAvailableDateNew === true) ||
-            (isCurrentPeriodOld == null && isCurrentPeriodNew === true);
+        if (!wasFilterChanged) return;
 
-        const wasEndDateChanged = filterDatePeriod.endDate &&
-            filterDatePeriod.endDate.getTime() < this.datePeriod.endDate.getTime();
+        const filterDatePeriod: DatePeriodBase = <DatePeriodBase>this.filterDatePeriod;
+        const granularity: GranularityType = this.getGranularityType();
+        const latestPeriod = Timeline.SELECT_PERIOD(this.datePeriod, granularity, this.calendar, this.datePeriod.endDate);
+        const currentPeriod = Timeline.SELECT_CURRENT_PERIOD(this.datePeriod, granularity, this.calendar);
 
-        const shouldLatestAvailableDateBeDisabled =
-            this.visualSettings.forceSelection.latestAvailableDate.value &&
-            isFirstUpdate &&
-            wasFilterChanged &&
-            wasEndDateChanged;
+        const propertiesToUpdate: Record<string, boolean> = {};
 
-        const wasStartDateChanged = filterDatePeriod.startDate &&
-            filterDatePeriod.startDate.getTime() !== this.datePeriod.startDate.getTime();
+        // TODO: Consider how to make checking of currentPeriod more reliable when filter date is close to midnight
+        // currentPeriod is created and compared to filter date period.
+        // If filter date is different from current period then it means we need to disable forceSelection.currentPeriod toggle switch
+        // currentPeriod resets time and only considers date, so there's a possibility of a bug when time is close to midnight (23:59:59)
+        // so if filter is created close to midnight and current period is created after midnight, then it will be considered as different
+        // therefore occasionaly we will disable currentPeriod toggle switch when it's not necessary
+        if (this.visualSettings.forceSelection.currentPeriod.value &&
+            filterDatePeriod.startDate &&
+            filterDatePeriod.endDate &&
+            currentPeriod.startDate.getTime() !== filterDatePeriod.startDate.getTime() && 
+            currentPeriod.endDate.getTime() !== filterDatePeriod.endDate.getTime() &&
+            this.prevFilteredStartDate == null &&
+            this.prevFilteredEndDate == null
+        ) {
+            propertiesToUpdate.currentPeriod = false;
+        }
 
-        const shouldCurrentPeriodBeDisabled =
-            this.visualSettings.forceSelection.currentPeriod.value &&
-            isFirstUpdate &&
-            wasFilterChanged &&
-            wasStartDateChanged;
+        if (this.visualSettings.forceSelection.latestAvailableDate.value &&
+            filterDatePeriod.endDate &&
+            filterDatePeriod.endDate.getTime() !== latestPeriod.endDate.getTime() &&
+            this.prevFilteredEndDate == null
+        ) {
+            propertiesToUpdate.latestAvailableDate = false;
+        }
 
-        if (shouldCurrentPeriodBeDisabled && shouldLatestAvailableDateBeDisabled) {
-            this.visualSettings.forceSelection.currentPeriod.value = false;
-            this.visualSettings.forceSelection.latestAvailableDate.value = false;
+        if (Object.keys(propertiesToUpdate).length > 0) {
             this.host.persistProperties({
                 merge: [{
                     objectName: "forceSelection",
-                    properties: {
-                        currentPeriod: false,
-                        latestAvailableDate: false
-                    },
+                    properties: propertiesToUpdate,
                     selector: null,
-                }],
-            });
-
-            return;
-        }
-
-        if (shouldLatestAvailableDateBeDisabled) {
-            this.visualSettings.forceSelection.latestAvailableDate.value = false;
-            this.host.persistProperties({
-                merge: [{
-                    objectName: "forceSelection",
-                    properties: { latestAvailableDate: false },
-                    selector: null,
-                }],
+                }]
             });
         }
+    }
 
-        if (shouldCurrentPeriodBeDisabled) {
-            this.visualSettings.forceSelection.currentPeriod.value = false;
-            this.host.persistProperties({
-                merge: [{
-                    objectName: "forceSelection",
-                    properties: { currentPeriod: false },
-                    selector: null,
-                }],
-            });
+    private updateDatePeriodOnForceSelection(adjustedPeriod: IAdjustedFilterDatePeriod, datePeriod: ITimelineDatePeriodBase, granularity: GranularityType) {
+        const isCurrentPeriodSelected: boolean = !this.isForceSelectionReset && this.visualSettings.forceSelection.currentPeriod.value;
+        const isLatestAvailableDateSelected: boolean = !this.isForceSelectionReset && this.visualSettings.forceSelection.latestAvailableDate.value;
+        const isForceSelected: boolean = !this.isForceSelectionReset && (isCurrentPeriodSelected || isLatestAvailableDateSelected);
+        this.isForceSelectionReset = false; // Reset it to default state to allow re-enabling Force Selection
+
+        if (isCurrentPeriodSelected) {
+            const currentPeriod = Timeline.SELECT_CURRENT_PERIOD(datePeriod, granularity, this.calendar);
+            adjustedPeriod.period.startDate = currentPeriod.startDate;
+            adjustedPeriod.period.endDate = currentPeriod.endDate;
         }
+
+        if (isLatestAvailableDateSelected
+            && (
+                !isCurrentPeriodSelected
+                || (isCurrentPeriodSelected
+                    && !adjustedPeriod.period.startDate
+                    && !adjustedPeriod.period.endDate
+                )
+            )) {
+            const latestAvailablePeriod = Timeline.SELECT_PERIOD(datePeriod, granularity, this.calendar, this.datePeriod.endDate);
+            adjustedPeriod.period.startDate = latestAvailablePeriod.startDate;
+            adjustedPeriod.period.endDate = latestAvailablePeriod.endDate;
+        }
+
+        return isForceSelected;
     }
 
     public fillCells(visSettings: TimeLineSettingsModel): void {
@@ -1309,16 +1284,15 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
     }
 
     private createTimelineData(
-        timelineSettings: TimeLineSettingsModel,
         startDate: Date,
         endDate: Date,
         timelineGranularityData: GranularityData,
         locale: string,
         localizationManager: powerbiVisualsApi.extensibility.ILocalizationManager,
     ) {
-        const { weekStandard, calendarFormat, weekDayFormat } = Timeline.computeCalendarFormat(timelineSettings);
+        const { weekStandard, calendarFormat, weekDayFormat } = Timeline.computeCalendarFormat(this.visualSettings);
 
-        const calendarFormattingSettings: CalendarFormattingSettings = { treatAsEndOfFiscalYear: timelineSettings.calendar.treatAsEndOfFiscalYear.value };
+        const calendarFormattingSettings: CalendarFormattingSettings = { treatAsEndOfFiscalYear: this.visualSettings.calendar.treatAsEndOfFiscalYear.value };
         const calendar: Calendar = this.calendarFactory.create(weekStandard, calendarFormat, weekDayFormat, calendarFormattingSettings);
 
         timelineGranularityData.createGranularities(calendar, locale, localizationManager);
@@ -1340,9 +1314,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
                 ||
                 actualEndDate.getTime() !== prevEndDate.getTime();
 
-            const granularityType: GranularityType = timelineSettings.granularity.granularity.value
-                ? <GranularityType>timelineSettings.granularity.granularity.value.value
-                : GranularityType.month;
+            const granularityType: GranularityType = this.getGranularityType();
 
             if (!changedSelection) {
                 this.changeGranularity(
@@ -1708,5 +1680,12 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
         });
 
         this.isForceSelectionReset = true;
+    }
+
+    private getGranularityType(): GranularityType {
+        const granularityType: GranularityType = this.visualSettings.granularity.granularity.value
+            ? <GranularityType>this.visualSettings.granularity.granularity.value.value
+            : GranularityType.month;
+        return granularityType;
     }
 }
