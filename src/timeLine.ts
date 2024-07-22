@@ -706,7 +706,10 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
 
             this.updateCalendar();
 
-            this.updateForceSelectionOnFilterChange();
+            const shouldRefresh: boolean = this.updateForceSelectionOnFilterChange();
+            if (shouldRefresh) {
+                return;
+            }
 
             const adjustedPeriod: IAdjustedFilterDatePeriod = this.adjustFilterDatePeriod();
             const datePeriod: ITimelineDatePeriodBase = this.datePeriod;
@@ -762,7 +765,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
      * When visual is initialized, we need to check if filter date is different from currentPeriodDate or latestAvailableDate
      * It may happen when visual is synced with other visuals and filter date is changed, so we need to disable corresponding forceSelection options.
      */
-    private updateForceSelectionOnFilterChange(): void {
+    private updateForceSelectionOnFilterChange(): boolean {
         const wasFilterChanged: boolean =
             String(this.prevFilteredStartDate) !== String(this.datePeriod.startDate) ||
             String(this.prevFilteredEndDate) !== String(this.datePeriod.endDate);
@@ -785,6 +788,8 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
         if (this.visualSettings.forceSelection.currentPeriod.value &&
             filterDatePeriod.startDate &&
             filterDatePeriod.endDate &&
+            currentPeriod.startDate &&
+            currentPeriod.endDate &&
             currentPeriod.startDate.getTime() !== filterDatePeriod.startDate.getTime() && 
             currentPeriod.endDate.getTime() !== filterDatePeriod.endDate.getTime() &&
             this.prevFilteredStartDate == null &&
@@ -795,6 +800,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
 
         if (this.visualSettings.forceSelection.latestAvailableDate.value &&
             filterDatePeriod.endDate &&
+            latestPeriod.endDate &&
             filterDatePeriod.endDate.getTime() !== latestPeriod.endDate.getTime() &&
             this.prevFilteredEndDate == null
         ) {
@@ -809,7 +815,11 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
                     selector: null,
                 }]
             });
+
+            return true;
         }
+
+        return false;
     }
 
     private updateDatePeriodOnForceSelection(adjustedPeriod: IAdjustedFilterDatePeriod, datePeriod: ITimelineDatePeriodBase, granularity: GranularityType) {
