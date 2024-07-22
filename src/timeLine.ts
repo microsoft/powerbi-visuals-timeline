@@ -106,8 +106,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
         granularity: GranularityType,
         calendar: Calendar,
     ) {
-        const currentDate: Date = new Date(2024, 1, 14);
-        // const currentDate: Date = Utils.RESET_TIME(new Date());
+        const currentDate: Date = Utils.RESET_TIME(new Date());
         return this.SELECT_PERIOD(datePeriod, granularity, calendar, currentDate);
     }
 
