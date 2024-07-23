@@ -36,7 +36,7 @@ import { IGranularityRenderProps } from "./granularityRenderProps";
 import { GranularityType } from "./granularityType";
 
 export class WeekGranularity extends GranularityBase {
-    private localizationKey: string = "Visual_Granularity_Year";
+    private localizationKey: string = "Visual_Granularity_Week";
 
     constructor(
         calendar: Calendar,
