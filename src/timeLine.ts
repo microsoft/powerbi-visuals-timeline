@@ -79,7 +79,7 @@ import {
 import {FormattingSettingsService} from "powerbi-visuals-utils-formattingmodel";
 import ISelectionManager = powerbiVisualsApi.extensibility.ISelectionManager;
 import extractFilterColumnTarget = interactivityFilterService.extractFilterColumnTarget;
-import {Month} from "./calendars/month";
+import { Month } from './calendars/month';
 import {Weekday} from "./calendars/weekday";
 import {Behavior} from "./behavior";
 
@@ -1448,7 +1448,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
         let yPos: number = 0;
 
         if (settings.labels.show.value) {
-            if (settings.labels.displayAll.value || granularityType === GranularityType.year) {
+            if ((settings.labels.displayAll.value && settings.labels.displayYears.value) || granularityType === GranularityType.year) {
                 this.renderLabels(
                     extendedLabels.yearLabels,
                     this.yearLabelsSelection,
@@ -1459,7 +1459,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
                 }
             }
 
-            if (settings.labels.displayAll.value || granularityType === GranularityType.quarter) {
+            if ((settings.labels.displayAll.value && settings.labels.displayQuarters.value) || granularityType === GranularityType.quarter) {
                 this.renderLabels(
                     extendedLabels.quarterLabels,
                     this.quarterLabelsSelection,
@@ -1470,7 +1470,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
                 }
             }
 
-            if (settings.labels.displayAll.value || granularityType === GranularityType.month) {
+            if ((settings.labels.displayAll.value && settings.labels.displayMonths.value) || granularityType === GranularityType.month) {
                 this.renderLabels(
                     extendedLabels.monthLabels,
                     this.monthLabelsSelection,
@@ -1481,7 +1481,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
                 }
             }
 
-            if (settings.labels.displayAll.value || granularityType === GranularityType.week) {
+            if ((settings.labels.displayAll.value && settings.labels.displayWeeks.value) || granularityType === GranularityType.week) {
                 this.renderLabels(
                     extendedLabels.weekLabels,
                     this.weekLabelsSelection,
@@ -1492,7 +1492,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
                 }
             }
 
-            if (settings.labels.displayAll.value || granularityType === GranularityType.day) {
+            if ((settings.labels.displayAll.value && settings.labels.displayDays.value) || granularityType === GranularityType.day) {
                 this.renderLabels(
                     extendedLabels.dayLabels,
                     this.dayLabelsSelection,

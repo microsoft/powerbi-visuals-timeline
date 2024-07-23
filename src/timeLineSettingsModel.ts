@@ -401,6 +401,41 @@ export class LabelsSettingsCard extends Card {
         value: true,
     });
 
+    displayYears = new formattingSettings.ToggleSwitch({
+        name: "displayYears",
+        displayName: "Display years",
+        displayNameKey: "Visual_DisplayYears",
+        value: true,
+    });
+
+    displayQuarters = new formattingSettings.ToggleSwitch({
+        name: "displayQuarters",
+        displayName: "Display quarters",
+        displayNameKey: "Visual_DisplayQuarters",
+        value: true,
+    });
+
+    displayMonths = new formattingSettings.ToggleSwitch({
+        name: "displayMonths",
+        displayName: "Display months",
+        displayNameKey: "Visual_DisplayMonths",
+        value: true,
+    });
+
+    displayWeeks = new formattingSettings.ToggleSwitch({
+        name: "displayWeeks",
+        displayName: "Display weeks",
+        displayNameKey: "Visual_DisplayWeeks",
+        value: true,
+    });
+
+    displayDays = new formattingSettings.ToggleSwitch({
+        name: "displayDays",
+        displayName: "Display days",
+        displayNameKey: "Visual_DisplayDays",
+        value: true,
+    });
+
     fontColor = new formattingSettings.ColorPicker({
         name: "fontColor",
         displayName: "Font color",
@@ -423,7 +458,16 @@ export class LabelsSettingsCard extends Card {
     name: string = "labels";
     displayName: string = "Labels";
     displayNameKey: string = "Visual_Labels";
-    slices = [this.displayAll, this.fontColor, this.textSize];
+    slices = [
+        this.displayAll,
+        this.displayYears,
+        this.displayQuarters,
+        this.displayMonths,
+        this.displayWeeks,
+        this.displayDays,
+        this.fontColor,
+        this.textSize,
+    ];
 }
 
 class ScrollAutoAdjustmentSettingsCard extends Card {

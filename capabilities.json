@@ -415,6 +415,31 @@
                         "bool": true
                     }
                 },
+                "displayYears": {
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "displayQuarters": {
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "displayMonths": {
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "displayWeeks": {
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "displayDays": {
+                    "type": {
+                        "bool": true
+                    }
+                },
                 "fontColor": {
                     "type": {
                         "fill": {

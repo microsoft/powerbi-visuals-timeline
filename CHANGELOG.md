@@ -1,3 +1,7 @@
+## 2.5.6
+* Fix ignoring filters when "Force selection" is enabled. "Force selection" will automatically disable if filters select another period
+* Add labels toggle switches to allow users to customize which labels to show
+
 ## 2.5.5
 * Add toggle 'Treat as end of fiscal year'
 
