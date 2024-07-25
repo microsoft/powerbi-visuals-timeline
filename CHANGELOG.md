@@ -1,3 +1,6 @@
+## 2.5.7
+* Fix rendering visual when scroll is enabled. Fix scroll arrows not being clicked
+
 ## 2.5.6
 * Fix ignoring filters when "Force selection" is enabled. "Force selection" will automatically disable if filters select another period
 * Add labels toggle switches to allow users to customize which labels to show
