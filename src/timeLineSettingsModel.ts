@@ -195,10 +195,6 @@ export class RangeHeaderSettingsCard extends Card {
         displayName: "Text Size",
         displayNameKey: "Visual_TextSize",
         value: TextSizeDefaults.Default,
-        options: {
-            minValue: { value: TextSizeDefaults.Min, type: ValidatorType.Min },
-            maxValue: { value: TextSizeDefaults.Max, type: ValidatorType.Max },
-        }
     });
 
     topLevelSlice = this.show;
