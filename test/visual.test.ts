@@ -963,7 +963,6 @@ describe("Timeline", () => {
             beforeEach(() => {
                 dataView.metadata.objects = {
                     labels: {
-                        displayAll: true,
                         show: true,
                     },
                 };
@@ -978,16 +977,6 @@ describe("Timeline", () => {
                 visualBuilder.updateFlushAllD3Transitions(dataView);
 
                 expect(visualBuilder.allLabels.length).toBe(0);
-            });
-
-            it("shows only selected granularity label if displayAll is set to false", () => {
-                visualBuilder.updateFlushAllD3Transitions(dataView);
-                // All labels should be visible
-                expect(visualBuilder.allLabels.length).toBeGreaterThan(1);
-                (<any>(dataView.metadata.objects)).labels.displayAll = false;
-                visualBuilder.updateFlushAllD3Transitions(dataView);
-                // Only one label should be visible
-                expect(visualBuilder.allLabels.length).toBe(1);
             });
 
             it("font color", () => {
