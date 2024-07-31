@@ -410,11 +410,6 @@
                         "bool": true
                     }
                 },
-                "displayAll": {
-                    "type": {
-                        "bool": true
-                    }
-                },
                 "displayYears": {
                     "type": {
                         "bool": true

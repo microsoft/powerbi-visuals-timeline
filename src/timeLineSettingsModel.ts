@@ -390,13 +390,6 @@ export class LabelsSettingsCard extends Card {
         value: true,
     });
 
-    displayAll = new formattingSettings.ToggleSwitch({
-        name: "displayAll",
-        displayName: "Display all",
-        displayNameKey: "Visual_DisplayAll",
-        value: true,
-    });
-
     displayYears = new formattingSettings.ToggleSwitch({
         name: "displayYears",
         displayName: "Display years",
@@ -455,7 +448,6 @@ export class LabelsSettingsCard extends Card {
     displayName: string = "Labels";
     displayNameKey: string = "Visual_Labels";
     slices = [
-        this.displayAll,
         this.displayYears,
         this.displayQuarters,
         this.displayMonths,
