@@ -1,3 +1,15 @@
+## 2.5.7
+* Fix rendering visual when scroll is enabled. Fix scroll arrows not being clicked
+* Remove range header font size restrictions
+
+## 2.5.6
+* Fix ignoring filters when "Force selection" is enabled. "Force selection" will automatically disable if filters select another period
+* Add labels toggle switches to allow users to customize which labels to show
+* Fix week granularity label. Previously it showed 'Year 5 - 2014, Q1 Jan' instead of 'Week 5 - 2014, Q1 Jan'
+
+## 2.5.5
+* Add toggle 'Treat as end of fiscal year'
+
 ## 2.5.4
 * Disable "Calendar" and "First day of week" settings when WeekStandard is set to IS0 860
 * Fix uninitialized start date when date from filters is less than date from DataView

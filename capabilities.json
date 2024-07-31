@@ -99,6 +99,11 @@
         },
         "calendar": {
             "properties": {
+                "treatAsEndOfFiscalYear": {
+                    "type": {
+                        "bool": true
+                    }
+                },
                 "month": {
                     "type": {
                         "enumeration": [
@@ -405,7 +410,27 @@
                         "bool": true
                     }
                 },
-                "displayAll": {
+                "displayYears": {
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "displayQuarters": {
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "displayMonths": {
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "displayWeeks": {
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "displayDays": {
                     "type": {
                         "bool": true
                     }
