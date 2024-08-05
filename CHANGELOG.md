@@ -1,6 +1,7 @@
 ## 2.5.7
 * Fix rendering visual when scroll is enabled. Fix scroll arrows not being clicked
 * Remove range header font size restrictions
+* Downgrade to API 5.9.0
 
 ## 2.5.6
 * Fix ignoring filters when "Force selection" is enabled. "Force selection" will automatically disable if filters select another period
