@@ -27,7 +27,7 @@ import {select as d3Select} from "d3-selection";
 import powerbiVisualsApi from "powerbi-visuals-api";
 import {assertColorsMatch, d3Click, parseColorString, renderTimeout,} from "powerbi-visuals-utils-testutils";
 
-import {Calendar, CalendarFormat, WeekdayFormat} from "../src/calendars/calendar";
+import {Calendar, CalendarFormat, CalendarFormattingSettings, WeekdayFormat} from "../src/calendars/calendar";
 import {ITimelineCursorOverElement, ITimelineData} from "../src/dataInterfaces";
 import {ITimelineDatePeriod, ITimelineDatePeriodBase} from "../src/datePeriod/datePeriod";
 import {DatePeriodBase} from "../src/datePeriod/datePeriodBase";
@@ -963,7 +963,6 @@ describe("Timeline", () => {
             beforeEach(() => {
                 dataView.metadata.objects = {
                     labels: {
-                        displayAll: true,
                         show: true,
                     },
                 };
@@ -978,16 +977,6 @@ describe("Timeline", () => {
                 visualBuilder.updateFlushAllD3Transitions(dataView);
 
                 expect(visualBuilder.allLabels.length).toBe(0);
-            });
-
-            it("shows only selected granularity label if displayAll is set to false", () => {
-                visualBuilder.updateFlushAllD3Transitions(dataView);
-                // All labels should be visible
-                expect(visualBuilder.allLabels.length).toBeGreaterThan(1);
-                (<any>(dataView.metadata.objects)).labels.displayAll = false;
-                visualBuilder.updateFlushAllD3Transitions(dataView);
-                // Only one label should be visible
-                expect(visualBuilder.allLabels.length).toBe(1);
             });
 
             it("font color", () => {
@@ -1029,11 +1018,11 @@ describe("Timeline - Granularity - 1 Jan (Regular Calendar)", () => {
         calendar = createCalendar();
 
         granularities = [
-            new YearGranularity(calendar, null, null),
-            new QuarterGranularity(calendar, null),
-            new WeekGranularity(calendar, null, null),
-            new MonthGranularity(calendar, null),
-            new DayGranularity(calendar, null),
+            new YearGranularity(calendar, "en-US", null),
+            new QuarterGranularity(calendar, "en-US"),
+            new WeekGranularity(calendar, "en-US", null),
+            new MonthGranularity(calendar, "en-US"),
+            new DayGranularity(calendar, "en-US"),
         ];
     });
 
@@ -1075,11 +1064,11 @@ describe("Timeline - Granularity - 1 Apr (Fiscal Calendar)", () => {
         calendar = createCalendar(3);
 
         granularities = [
-            new YearGranularity(calendar, null, null),
-            new QuarterGranularity(calendar, null),
-            new WeekGranularity(calendar, null, null),
-            new MonthGranularity(calendar, null),
-            new DayGranularity(calendar, null),
+            new YearGranularity(calendar, "en-US", null),
+            new QuarterGranularity(calendar, "en-US"),
+            new WeekGranularity(calendar, "en-US", null),
+            new MonthGranularity(calendar, "en-US"),
+            new DayGranularity(calendar, "en-US"),
         ];
     });
 
@@ -1157,7 +1146,8 @@ describe("Timeline - Granularity - ISO 8601 Week numbering", () => {
     let calendar: Calendar;
 
     beforeEach(() => {
-        calendar = new CalendarISO8061();
+        const calendarFormattingSettings: CalendarFormattingSettings = { treatAsEndOfFiscalYear: true };
+        calendar = new CalendarISO8061(calendarFormattingSettings);
     });
 
     describe("ISO Calendar Methods", () => {
@@ -1723,6 +1713,7 @@ function createCalendar(
     day: number = 1,
     week: number = 1,
     dayOfWeekSelectionOn: boolean = false,
+    treatAsEndOfFiscalYear: boolean = true,
 ): Calendar {
 
     const calendarSettings: CalendarFormat = {
@@ -1735,7 +1726,7 @@ function createCalendar(
         daySelection: dayOfWeekSelectionOn,
     };
 
-    return new Calendar(calendarSettings, weekDaySettings);
+    return new Calendar(calendarSettings, weekDaySettings, { treatAsEndOfFiscalYear });
 }
 
 function createDatePeriod(dates: Date[]): ITimelineDatePeriod[] {
