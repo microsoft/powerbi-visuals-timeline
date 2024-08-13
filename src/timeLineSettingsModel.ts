@@ -118,6 +118,13 @@ export class CalendarSettingsCard extends Card {
     public static readonly DefaultMonth: number = 0;
     public static readonly DefaultDay: number = 1;
 
+    treatAsEndOfFiscalYear = new formattingSettings.ToggleSwitch({
+        name: "treatAsEndOfFiscalYear",
+        displayName: "Treat as end of fiscal year",
+        displayNameKey: "Visual_TreatAsEndOfFiscalYear",
+        value: true,
+    });
+
     month = new formattingSettings.ItemDropdown({
         name: "month",
         displayName: "Month",
@@ -141,7 +148,7 @@ export class CalendarSettingsCard extends Card {
     displayName: string = "Fiscal Year";
     displayNameKey: string = "Visual_FiscalYear";
     descriptionKey: string = "Visual_FiscalYear_Description";
-    slices = [this.month, this.day];
+    slices = [this.treatAsEndOfFiscalYear, this.month, this.day];
 }
 
 class WeekDaySettingsCard extends Card {
@@ -188,10 +195,6 @@ export class RangeHeaderSettingsCard extends Card {
         displayName: "Text Size",
         displayNameKey: "Visual_TextSize",
         value: TextSizeDefaults.Default,
-        options: {
-            minValue: { value: TextSizeDefaults.Min, type: ValidatorType.Min },
-            maxValue: { value: TextSizeDefaults.Max, type: ValidatorType.Max },
-        }
     });
 
     topLevelSlice = this.show;
@@ -387,10 +390,38 @@ export class LabelsSettingsCard extends Card {
         value: true,
     });
 
-    displayAll = new formattingSettings.ToggleSwitch({
-        name: "displayAll",
-        displayName: "Display all",
-        displayNameKey: "Visual_DisplayAll",
+    displayYears = new formattingSettings.ToggleSwitch({
+        name: "displayYears",
+        displayName: "Display years",
+        displayNameKey: "Visual_DisplayYears",
+        value: true,
+    });
+
+    displayQuarters = new formattingSettings.ToggleSwitch({
+        name: "displayQuarters",
+        displayName: "Display quarters",
+        displayNameKey: "Visual_DisplayQuarters",
+        value: true,
+    });
+
+    displayMonths = new formattingSettings.ToggleSwitch({
+        name: "displayMonths",
+        displayName: "Display months",
+        displayNameKey: "Visual_DisplayMonths",
+        value: true,
+    });
+
+    displayWeeks = new formattingSettings.ToggleSwitch({
+        name: "displayWeeks",
+        displayName: "Display weeks",
+        displayNameKey: "Visual_DisplayWeeks",
+        value: true,
+    });
+
+    displayDays = new formattingSettings.ToggleSwitch({
+        name: "displayDays",
+        displayName: "Display days",
+        displayNameKey: "Visual_DisplayDays",
         value: true,
     });
 
@@ -416,7 +447,15 @@ export class LabelsSettingsCard extends Card {
     name: string = "labels";
     displayName: string = "Labels";
     displayNameKey: string = "Visual_Labels";
-    slices = [this.displayAll, this.fontColor, this.textSize];
+    slices = [
+        this.displayYears,
+        this.displayQuarters,
+        this.displayMonths,
+        this.displayWeeks,
+        this.displayDays,
+        this.fontColor,
+        this.textSize,
+    ];
 }
 
 class ScrollAutoAdjustmentSettingsCard extends Card {

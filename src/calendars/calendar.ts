@@ -47,8 +47,13 @@ export interface WeekdayFormat {
     day: number;
 }
 
+export interface CalendarFormattingSettings {
+    treatAsEndOfFiscalYear: boolean;
+}
+
 export class Calendar {
     private static QuarterFirstMonths: number[] = [0, 3, 6, 9];
+    private settings: CalendarFormattingSettings;
 
     protected firstDayOfWeek: number;
     protected firstMonthOfYear: number;
@@ -60,7 +65,8 @@ export class Calendar {
     protected EmptyYearOffset: number = 0;
     protected YearOffset: number = 1;
 
-    constructor(calendarFormat: CalendarFormat, weekDaySettings: WeekdayFormat) {
+    constructor(calendarFormat: CalendarFormat, weekDaySettings: WeekdayFormat, settings: CalendarFormattingSettings) {
+        this.settings = settings;
         this.isDaySelection = weekDaySettings.daySelection;
         this.firstDayOfWeek = weekDaySettings.day;
         this.firstMonthOfYear = calendarFormat.month;
@@ -78,7 +84,11 @@ export class Calendar {
         const firstMonthOfYear = this.getFirstMonthOfYear();
         const firstDayOfYear = this.getFirstDayOfYear();
 
-        return ((firstMonthOfYear === 0 && firstDayOfYear === 1) ? 0 : 1);
+        if (firstMonthOfYear === 0 && firstDayOfYear === 1) {
+            return 0;
+        }
+
+        return this.settings.treatAsEndOfFiscalYear ? 1 : -1;
     }
 
     public determineYear(date: Date): number {
@@ -91,9 +101,18 @@ export class Calendar {
             firstDayOfYear,
         );
 
-        return date.getFullYear() + this.getFiscalYearAdjustment() - ((firstDate <= date)
-            ? this.EmptyYearOffset
-            : this.YearOffset);
+        let adjustment: number = this.getFiscalYearAdjustment();
+
+        if (adjustment === 0) {
+            return date.getFullYear();
+        }
+        else if (this.settings.treatAsEndOfFiscalYear) {
+            adjustment -= ((firstDate <= date) ? this.EmptyYearOffset : this.YearOffset);
+        } else {
+            adjustment += ((firstDate > date) ? this.EmptyYearOffset : this.YearOffset);
+        }
+
+        return date.getFullYear() + adjustment;
     }
 
     public determineWeek(date: Date): number[] {
@@ -101,7 +120,12 @@ export class Calendar {
         // It's Ok until this year is used to calculate date of first week.
         // So, here is some adjustment was applied.
         const year: number = this.determineYear(date);
-        const fiscalYearAdjustment = this.getFiscalYearAdjustment();
+        let fiscalYearAdjustment = this.getFiscalYearAdjustment();
+
+        // fiscal year starts with W1 (week 1), meaning previous week should be W52-53
+        if (fiscalYearAdjustment === -1) {
+            fiscalYearAdjustment = 0;
+        }
 
         const dateOfFirstWeek: Date = this.getDateOfFirstWeek(year - fiscalYearAdjustment);
         const dateOfFirstFullWeek: Date = this.getDateOfFirstFullWeek(year - fiscalYearAdjustment);
