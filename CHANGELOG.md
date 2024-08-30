@@ -1,3 +1,6 @@
+## 2.5.8
+* Fix the bug with dragging cursors
+
 ## 2.5.7
 * Fix rendering visual when scroll is enabled. Fix scroll arrows not being clicked
 * Remove range header font size restrictions
