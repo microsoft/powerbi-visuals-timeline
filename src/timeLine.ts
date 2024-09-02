@@ -1141,6 +1141,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
     }
 
     public onCursorDrag(event: D3DragEvent<any, ICursorDataPoint, ICursorDataPoint>, currentCursor: ICursorDataPoint): void {
+
         const cursorOverElement: ITimelineCursorOverElement = this.findCursorOverElement(event.x);
 
         if (!cursorOverElement) {
