@@ -678,7 +678,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
             this.datePeriod = this.createDatePeriod(this.dataView);
 
             this.visualSettings = this.formattingSettingsService.populateFormattingSettingsModel(TimeLineSettingsModel, this.dataView);
-            this.removeDiabledFormattingSettings(this.visualSettings);
+            this.removeDisabledFormattingSettings(this.visualSettings);
             this.visualSettings.setLocalizedOptions(this.localizationManager);
 
             if (!this.initialized) {
@@ -819,7 +819,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
             .style("stroke-width", cellsSettings.strokeWidth.value + "px");
     }
 
-    public removeDiabledFormattingSettings(visualSettings: TimeLineSettingsModel): void {
+    public removeDisabledFormattingSettings(visualSettings: TimeLineSettingsModel): void {
         if(visualSettings.labels.displayAll.value) {
             visualSettings.labels.slices = visualSettings.labels.slices.filter(slice => !slice.name.startsWith("label"));
         }
