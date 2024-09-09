@@ -410,6 +410,31 @@
                         "bool": true
                     }
                 },
+                "labelYearVisibility": {
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "labelQuarterVisibility": {
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "labelMonthVisibility": {
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "labelWeekVisibility": {
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "labelDayVisibility": {
+                    "type": {
+                        "bool": true
+                    }
+                },
                 "fontColor": {
                     "type": {
                         "fill": {
