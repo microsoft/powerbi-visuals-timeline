@@ -1382,7 +1382,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
         let yPos: number = 0;
 
         if (settings.labels.show.value) {
-            if (settings.labels.displayAll.value || granularityType === GranularityType.year) {
+            if (settings.labels.displayAll.value || granularityType === GranularityType.year || settings.labels.labelYearVisibility.value) {
                 this.renderLabels(
                     extendedLabels.yearLabels,
                     this.yearLabelsSelection,
@@ -1393,7 +1393,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
                 }
             }
 
-            if (settings.labels.displayAll.value || granularityType === GranularityType.quarter) {
+            if (settings.labels.displayAll.value || granularityType === GranularityType.quarter || settings.labels.labelQuarterVisibility.value) {
                 this.renderLabels(
                     extendedLabels.quarterLabels,
                     this.quarterLabelsSelection,
@@ -1404,7 +1404,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
                 }
             }
 
-            if (settings.labels.displayAll.value || granularityType === GranularityType.month) {
+            if (settings.labels.displayAll.value || granularityType === GranularityType.month || settings.labels.labelMonthVisibility.value) {
                 this.renderLabels(
                     extendedLabels.monthLabels,
                     this.monthLabelsSelection,
@@ -1415,7 +1415,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
                 }
             }
 
-            if (settings.labels.displayAll.value || granularityType === GranularityType.week) {
+            if (settings.labels.displayAll.value || granularityType === GranularityType.week || settings.labels.labelWeekVisibility.value) {
                 this.renderLabels(
                     extendedLabels.weekLabels,
                     this.weekLabelsSelection,
@@ -1426,7 +1426,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
                 }
             }
 
-            if (settings.labels.displayAll.value || granularityType === GranularityType.day) {
+            if (settings.labels.displayAll.value || granularityType === GranularityType.day || settings.labels.labelDayVisibility.value) {
                 this.renderLabels(
                     extendedLabels.dayLabels,
                     this.dayLabelsSelection,
