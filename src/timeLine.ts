@@ -678,23 +678,22 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
             this.datePeriod = this.createDatePeriod(this.dataView);
 
             this.visualSettings = this.formattingSettingsService.populateFormattingSettingsModel(TimeLineSettingsModel, this.dataView);
-            this.removeDisabledFormattingSettings(this.visualSettings);
             this.visualSettings.setLocalizedOptions(this.localizationManager);
-
+            
             if (!this.initialized) {
                 this.timelineData = {
                     cursorDataPoints: [],
                     timelineDataPoints: [],
                 };
             }
-
+            
             this.parseJsonFilters(this.visualSettings, <AdvancedFilter[]>(this.options.jsonFilters));
             this.setHighContrastColors();
-
+            
             this.adjustHeightOfElements(options.viewport.width);
-
+            
             this.timelineGranularityData = new GranularityData(this.datePeriod.startDate, this.datePeriod.endDate);
-
+            
             this.createTimelineData(
                 this.visualSettings,
                 this.datePeriod.startDate,
@@ -703,27 +702,31 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
                 this.locale,
                 this.localizationManager,
             );
-
+            
             this.updateCalendar();
-
+            
             const adjustedPeriod: IAdjustedFilterDatePeriod = this.adjustFilterDatePeriod();
             const datePeriod: ITimelineDatePeriodBase = this.datePeriod;
             const granularity: GranularityType = this.visualSettings.granularity.granularity.value
-                ? <GranularityType>this.visualSettings.granularity.granularity.value.value
-                : GranularityType.month;
-
+            ? <GranularityType>this.visualSettings.granularity.granularity.value.value
+            : GranularityType.month;
+            
+            
             const isCurrentPeriodSelected: boolean = !this.isForceSelectionReset && this.visualSettings.forceSelection.currentPeriod.value;
             const isLatestAvailableDateSelected: boolean = !this.isForceSelectionReset && this.visualSettings.forceSelection.latestAvailableDate.value;
             const isForceSelected: boolean = !this.isForceSelectionReset && (isCurrentPeriodSelected || isLatestAvailableDateSelected);
             this.isForceSelectionReset = false; // Reset it to default state to allow re-enabling Force Selection
             let currentForceSelectionResult = { startDate: null, endDate: null };
-
+            
             if (isCurrentPeriodSelected) {
                 currentForceSelectionResult = ({
                     endDate: adjustedPeriod.period.endDate,
                     startDate: adjustedPeriod.period.startDate,
                 } = Timeline.SELECT_CURRENT_PERIOD(datePeriod, granularity, this.calendar));
             }
+
+            this.removeDisabledFormattingSettings(this.visualSettings);
+            
             if (isLatestAvailableDateSelected
                 && (
                     !isCurrentPeriodSelected
@@ -819,9 +822,27 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
             .style("stroke-width", cellsSettings.strokeWidth.value + "px");
     }
 
-    public removeDisabledFormattingSettings(visualSettings: TimeLineSettingsModel): void {
+    private removeDisabledFormattingSettings(visualSettings: TimeLineSettingsModel): void {
+        const granularityType = this.timelineData.currentGranularity.getType();
+
         if(visualSettings.labels.displayAll.value) {
             visualSettings.labels.slices = visualSettings.labels.slices.filter(slice => !slice.name.startsWith("label"));
+        }
+
+        if(granularityType < GranularityType.quarter) {
+            visualSettings.labels.slices = visualSettings.labels.slices.filter(slice => slice.name !== "labelQuarterVisibility");
+        }
+
+        if(granularityType < GranularityType.month) {
+            visualSettings.labels.slices = visualSettings.labels.slices.filter(slice => slice.name !== "labelMonthVisibility");
+        }
+
+        if(granularityType < GranularityType.week) {
+            visualSettings.labels.slices = visualSettings.labels.slices.filter(slice => slice.name !== "labelWeekVisibility");
+        }
+
+        if(granularityType < GranularityType.day) {
+            visualSettings.labels.slices = visualSettings.labels.slices.filter(slice => slice.name !== "labelDayVisibility");
         }
     }
 
