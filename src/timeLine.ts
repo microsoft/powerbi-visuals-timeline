@@ -678,6 +678,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
             this.datePeriod = this.createDatePeriod(this.dataView);
 
             this.visualSettings = this.formattingSettingsService.populateFormattingSettingsModel(TimeLineSettingsModel, this.dataView);
+            this.removeDiabledFormattingSettings(this.visualSettings);
             this.visualSettings.setLocalizedOptions(this.localizationManager);
 
             if (!this.initialized) {
@@ -781,6 +782,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
         }
         this.host.eventService.renderingFinished(options);
     }
+    
 
     public fillCells(visSettings: TimeLineSettingsModel): void {
         const dataPoints: ITimelineDataPoint[] = this.timelineData.timelineDataPoints;
@@ -815,6 +817,12 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
                     : cellsSettings.strokeUnselected.value.value;
             })
             .style("stroke-width", cellsSettings.strokeWidth.value + "px");
+    }
+
+    public removeDiabledFormattingSettings(visualSettings: TimeLineSettingsModel): void {
+        if(visualSettings.labels.displayAll.value) {
+            visualSettings.labels.slices = visualSettings.labels.slices.filter(slice => !slice.name.startsWith("label"));
+        }
     }
 
     public renderCells(timelineData: ITimelineData, timelineProperties: ITimelineProperties, yPos: number): void {
