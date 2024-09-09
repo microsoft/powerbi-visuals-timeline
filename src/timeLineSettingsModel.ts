@@ -394,6 +394,41 @@ export class LabelsSettingsCard extends Card {
         value: true,
     });
 
+    labelYearVisibility = new formattingSettings.ToggleSwitch({
+        name: "labelYearVisibility",
+        displayName: "Year visibility",
+        displayNameKey: "Visual_LabelYearVisibility",
+        value: true,
+    });
+
+    labelQuarterVisibility = new formattingSettings.ToggleSwitch({
+        name: "labelQuarterVisibility",
+        displayName: "Quarter visibility",
+        displayNameKey: "Visual_LabelQuarterVisibility",
+        value: true,
+    });
+
+    labelMonthVisibility = new formattingSettings.ToggleSwitch({
+        name: "labelMonthVisibility",
+        displayName: "Month visibility",
+        displayNameKey: "Visual_LabelMonthVisibility",
+        value: true,
+    });
+
+    labelWeekVisibility = new formattingSettings.ToggleSwitch({
+        name: "labelWeekVisibility",
+        displayName: "Week visibility",
+        displayNameKey: "Visual_LabelWeekVisibility",
+        value: true,
+    });
+
+    labelDayVisibility = new formattingSettings.ToggleSwitch({
+        name: "labelDayVisibility",
+        displayName: "Day visibility",
+        displayNameKey: "Visual_LabelDayVisibility",
+        value: true,
+    });
+
     fontColor = new formattingSettings.ColorPicker({
         name: "fontColor",
         displayName: "Font color",
@@ -416,7 +451,16 @@ export class LabelsSettingsCard extends Card {
     name: string = "labels";
     displayName: string = "Labels";
     displayNameKey: string = "Visual_Labels";
-    slices = [this.displayAll, this.fontColor, this.textSize];
+    slices = [
+        this.displayAll, 
+        this.labelYearVisibility,
+        this.labelQuarterVisibility,
+        this.labelMonthVisibility,
+        this.labelWeekVisibility,
+        this.labelDayVisibility,
+        this.fontColor, 
+        this.textSize
+    ];
 }
 
 class ScrollAutoAdjustmentSettingsCard extends Card {
