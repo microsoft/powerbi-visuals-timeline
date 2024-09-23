@@ -632,6 +632,12 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
             .classed(Timeline.TimelineSelectors.TimelineVisual.className, true);
 
         this.addElements();
+
+        this.rootSelection.on("scroll", (event) => {
+            const target = event.target as HTMLDivElement;
+            const scrollLeft: number = target?.scrollLeft || 0;
+            this.headerSelection.attr("transform", `translate(${scrollLeft}, 0)`);
+        });
     }
 
     public clearUserSelection(): void {
@@ -1392,6 +1398,9 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
             + timelineProperties.cellWidth * timelineDatapointCount;
 
         this.renderTimeRangeText(timelineData, settings.rangeHeader);
+
+        // reset scroll position
+        this.headerSelection.attr("transform", null);
 
         this.rootSelection
             .attr("drag-resize-disabled", true)
