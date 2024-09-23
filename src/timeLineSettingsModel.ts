@@ -56,7 +56,7 @@ class TextSizeDefaults {
     public static readonly Max: number = 40;
 }
 
-class CursorSettingsCard extends Card {
+class PointerEdgeSettingsCard extends Card {
     show = new formattingSettings.ToggleSwitch({
         name: "show",
         displayName: "Show",
@@ -66,15 +66,15 @@ class CursorSettingsCard extends Card {
 
     color = new formattingSettings.ColorPicker({
         name: "color",
-        displayName: "Cursor color",
-        displayNameKey: "Visual_CursorColor",
+        displayName: "Color",
+        displayNameKey: "Visual_Color",
         value: { value: "#808080" },
     });
 
     topLevelSlice = this.show;
-    name: string = "cursor";
-    displayName: string = "Cursor";
-    displayNameKey: string = "Visual_Cursor";
+    name: string = "pointerEdge";
+    displayName: string = "PointerEdge";
+    displayNameKey: string = "Visual_PointerEdge";
     slices = [this.color];
 }
 
@@ -474,7 +474,7 @@ class ScrollAutoAdjustmentSettingsCard extends Card {
 
 
 export class TimeLineSettingsModel extends Model {
-    cursor = new CursorSettingsCard();
+    cursor = new PointerEdgeSettingsCard();
     forceSelection = new ForceSelectionSettingsCard();
     weekDay = new WeekDaySettingsCard();
     weeksDeterminationStandards = new WeeksDeterminationStandardsSettingsCard();

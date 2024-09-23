@@ -45,7 +45,7 @@
                 }
             }
         },
-        "cursor": {
+        "pointerEdge": {
             "properties": {
                 "show": {
                     "type": {
