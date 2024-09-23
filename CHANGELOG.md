@@ -1,5 +1,6 @@
 ## 2.5.9
 * Fix the bug with header not moving on scrolling horizontally
+* Fix npm vulnerabilities
 
 ## 2.5.8
 * Fix the bug with dragging cursors
