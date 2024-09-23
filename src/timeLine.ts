@@ -633,10 +633,17 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
 
         this.addElements();
 
+        let ticking = false;
         this.rootSelection.on("scroll", (event) => {
-            const target = event.target as HTMLDivElement;
-            const scrollLeft: number = target?.scrollLeft || 0;
-            this.headerSelection.attr("transform", `translate(${scrollLeft}, 0)`);
+            if (!ticking) {
+                window.requestAnimationFrame(() => {
+                    const target = event.target as HTMLDivElement;
+                    const scrollLeft: number = target?.scrollLeft || 0;
+                    this.headerSelection.attr("transform", `translate(${scrollLeft}, 0)`);
+                    ticking = false;
+                });
+                ticking = true;
+            }
         });
     }
 
@@ -698,6 +705,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
 
 
             this.adjustHeightOfElements(options.viewport.width);
+            this.resetScrollPosition();
 
             this.timelineGranularityData = new GranularityData(this.datePeriod.startDate, this.datePeriod.endDate);
 
@@ -1275,6 +1283,10 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
             .attr("height", this.timelineProperties.legendHeight);
     }
 
+    private resetScrollPosition(): void {
+        this.headerSelection.attr("transform", null);
+    }
+
     private renderGranularityFrame(granularity: GranularityType): void {
         d3SelectAll("g." + Timeline.TimelineSelectors.TimelineSlicer.className).remove();
 
@@ -1398,9 +1410,6 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
             + timelineProperties.cellWidth * timelineDatapointCount;
 
         this.renderTimeRangeText(timelineData, settings.rangeHeader);
-
-        // reset scroll position
-        this.headerSelection.attr("transform", null);
 
         this.rootSelection
             .attr("drag-resize-disabled", true)
