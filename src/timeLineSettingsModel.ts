@@ -209,20 +209,6 @@ export class CellsSettingsCard extends CompositeCard {
         }
     });
 
-    showEdges = new formattingSettings.ToggleSwitch({
-        name: "showEdges",
-        displayName: "Show edges",
-        displayNameKey: "Visual_ShowEdges",
-        value: true,
-    });
-
-    edgeColor = new formattingSettings.ColorPicker({
-        name: "edgeColor",
-        displayName: "Edge color",
-        displayNameKey: "Visual_EdgeColor",
-        value: { value: "#808080" },
-    });
-
     enableManualSizing = new formattingSettings.ToggleSwitch({
         name: "enableManualSizing",
         displayName: "Enable manual sizing",
@@ -254,7 +240,7 @@ export class CellsSettingsCard extends CompositeCard {
         name: "cellsGeneralGroup",
         displayName: "General",
         displayNameKey: "Visual_General",
-        slices: [this.strokeWidth, this.gapWidth, this.showEdges, this.edgeColor, this.enableManualSizing, this.width, this.height],
+        slices: [this.strokeWidth, this.gapWidth, this.enableManualSizing, this.width, this.height],
     })
 
     fillSelected = new formattingSettings.ColorPicker({
@@ -271,11 +257,25 @@ export class CellsSettingsCard extends CompositeCard {
         value: { value: "#333444" },
     })
 
+    showEdges = new formattingSettings.ToggleSwitch({
+        name: "showEdges",
+        displayName: "Show edges",
+        displayNameKey: "Visual_ShowEdges",
+        value: true,
+    });
+
+    edgeColor = new formattingSettings.ColorPicker({
+        name: "edgeColor",
+        displayName: "Edge color",
+        displayNameKey: "Visual_EdgeColor",
+        value: { value: "#808080" },
+    });
+
     selectedCellsGroup = new Group({
         name: "selectedCellsGroup",
         displayName: "Selected cells",
         displayNameKey: "Visual_SelectedCells",
-        slices: [this.fillSelected, this.strokeSelected],
+        slices: [this.fillSelected, this.strokeSelected, this.showEdges, this.edgeColor],
     });
 
     fillUnselected = new formattingSettings.ColorPicker({
