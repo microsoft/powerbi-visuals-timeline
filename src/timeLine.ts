@@ -522,7 +522,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
 
             this.visualSettings.labels.fontColor.value.value = foreground.value;
 
-            this.visualSettings.cursor.color.value.value = foreground.value;
+            this.visualSettings.cells.edgeColor.value.value = foreground.value;
         }
     }
 
@@ -632,6 +632,19 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
             .classed(Timeline.TimelineSelectors.TimelineVisual.className, true);
 
         this.addElements();
+
+        let ticking = false;
+        this.rootSelection.on("scroll", (event) => {
+            if (!ticking) {
+                window.requestAnimationFrame(() => {
+                    const target = event.target as HTMLDivElement;
+                    const scrollLeft: number = target?.scrollLeft || 0;
+                    this.headerSelection.attr("transform", `translate(${scrollLeft}, 0)`);
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        });
     }
 
     public clearUserSelection(): void {
@@ -692,6 +705,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
 
 
             this.adjustHeightOfElements(options.viewport.width);
+            this.resetScrollPosition();
 
             this.timelineGranularityData = new GranularityData(this.datePeriod.startDate, this.datePeriod.endDate);
 
@@ -963,7 +977,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
                     return cursorDataPoint.cursorIndex * Math.PI + 2 * Math.PI;
                 }),
             )
-            .style("fill", this.visualSettings.cursor.show.value ? this.visualSettings.cursor.color.value.value : "transparent")
+            .style("fill", this.visualSettings.cells.showEdges.value ? this.visualSettings.cells.edgeColor.value.value : "transparent")
     }
 
     public renderTimeRangeText(timelineData: ITimelineData, rangeHeaderSettings: RangeHeaderSettingsCard): void {
@@ -1084,6 +1098,11 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
     }
 
     public getFormattingModel(): powerbi.visuals.FormattingModel {
+        this.updateFormattingSettingsModel();
+        return this.formattingSettingsService.buildFormattingModel(this.visualSettings);
+    }
+
+    private updateFormattingSettingsModel(): void {
         // These options have no sense if ISO standard was picked
         if (<WeekStandard>this.visualSettings.weeksDeterminationStandards.weekStandard.value.value === WeekStandard.ISO8061) {
             this.visualSettings.weekDay.disabled = true;
@@ -1091,7 +1110,6 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
         }
 
         const granularity = this.getGranularityType();
-
         switch (granularity) {
             case GranularityType.year:
                 this.visualSettings.labels.displayQuarters.visible = false;
@@ -1120,7 +1138,14 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
                 break;
         }
 
-        return this.formattingSettingsService.buildFormattingModel(this.visualSettings);
+        if (!this.visualSettings.cells.enableManualSizing.value) {
+            this.visualSettings.cells.height.visible = false;
+            this.visualSettings.cells.width.visible = false;
+        }
+
+        if (!this.visualSettings.cells.showEdges.value) {
+            this.visualSettings.cells.edgeColor.visible = false;
+        }
     }
 
     public selectPeriod(granularityType: GranularityType): void {
@@ -1267,6 +1292,10 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
 
         this.headerSelection
             .attr("height", this.timelineProperties.legendHeight);
+    }
+
+    private resetScrollPosition(): void {
+        this.headerSelection.attr("transform", null);
     }
 
     private renderGranularityFrame(granularity: GranularityType): void {
