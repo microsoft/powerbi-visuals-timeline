@@ -6,6 +6,7 @@ import {Month} from "./calendars/month";
 import Card = formattingSettings.SimpleCard;
 import CompositeCard = formattingSettings.CompositeCard;
 import Model = formattingSettings.Model;
+import Group = formattingSettings.Group;
 import IEnumMember = powerbi.IEnumMember;
 import ValidatorType = powerbi.visuals.ValidatorType;
 import {Weekday} from "./calendars/weekday";
@@ -54,28 +55,6 @@ class TextSizeDefaults {
     public static readonly Default: number = 9;
     public static readonly Min: number = 7;
     public static readonly Max: number = 40;
-}
-
-class PointerEdgeSettingsCard extends Card {
-    show = new formattingSettings.ToggleSwitch({
-        name: "show",
-        displayName: "Show",
-        displayNameKey: "Visual_Show",
-        value: true,
-    });
-
-    color = new formattingSettings.ColorPicker({
-        name: "color",
-        displayName: "Color",
-        displayNameKey: "Visual_Color",
-        value: { value: "#808080" },
-    });
-
-    topLevelSlice = this.show;
-    name: string = "pointerEdge";
-    displayName: string = "PointerEdge";
-    displayNameKey: string = "Visual_PointerEdge";
-    slices = [this.color];
 }
 
 class ForceSelectionSettingsCard extends Card {
@@ -204,37 +183,9 @@ export class RangeHeaderSettingsCard extends Card {
     slices = [this.fontColor, this.textSize];
 }
 
-export class CellsSettingsCard extends Card {
+export class CellsSettingsCard extends CompositeCard {
     public static readonly FillSelectedDefaultColor: string = "#ADD8E6";
     public static readonly FillUnselectedDefaultColor: string = "#FFFFFF";
-
-    fillSelected = new formattingSettings.ColorPicker({
-        name: "fillSelected",
-        displayName: "Selected cell color",
-        displayNameKey: "Visual_Cell_SelectedColor",
-        value: { value: CellsSettingsCard.FillSelectedDefaultColor },
-    });
-
-    strokeSelected = new formattingSettings.ColorPicker({
-        name: "strokeSelected",
-        displayName: "Selected cell stroke color",
-        displayNameKey: "Visual_Cell_SelectedStrokeColor",
-        value: { value: "#333444" },
-    })
-
-    fillUnselected = new formattingSettings.ColorPicker({
-        name: "fillUnselected",
-        displayName: "Unselected cell color",
-        displayNameKey: "Visual_Cell_UnselectedColor",
-        value: { value: CellsSettingsCard.FillUnselectedDefaultColor },
-    });
-
-    strokeUnselected = new formattingSettings.ColorPicker({
-        name: "strokeUnselected",
-        displayName: "Unselected cell stroke color",
-        displayNameKey: "Visual_Cell_UnselectedStrokeColor",
-        value: { value: "#333444" },
-    });
 
     strokeWidth = new formattingSettings.NumUpDown({
         name: "strokeWidth",
@@ -256,6 +207,20 @@ export class CellsSettingsCard extends Card {
             minValue: { value: 0, type: powerbi.visuals.ValidatorType.Min },
             maxValue: { value: 30, type: powerbi.visuals.ValidatorType.Max },
         }
+    });
+
+    showEdges = new formattingSettings.ToggleSwitch({
+        name: "showEdges",
+        displayName: "Show edges",
+        displayNameKey: "Visual_ShowEdges",
+        value: true,
+    });
+
+    edgeColor = new formattingSettings.ColorPicker({
+        name: "edgeColor",
+        displayName: "Edge color",
+        displayNameKey: "Visual_EdgeColor",
+        value: { value: "#808080" },
     });
 
     enableManualSizing = new formattingSettings.ToggleSwitch({
@@ -285,20 +250,59 @@ export class CellsSettingsCard extends Card {
         },
     });
 
+    cellsGeneralGroup = new Group({
+        name: "cellsGeneralGroup",
+        displayName: "General",
+        displayNameKey: "Visual_General",
+        slices: [this.strokeWidth, this.gapWidth, this.showEdges, this.edgeColor, this.enableManualSizing, this.width, this.height],
+    })
+
+    fillSelected = new formattingSettings.ColorPicker({
+        name: "fillSelected",
+        displayName: "Color",
+        displayNameKey: "Visual_Color",
+        value: { value: CellsSettingsCard.FillSelectedDefaultColor },
+    });
+
+    strokeSelected = new formattingSettings.ColorPicker({
+        name: "strokeSelected",
+        displayName: "Stroke color",
+        displayNameKey: "Visual_StrokeColor",
+        value: { value: "#333444" },
+    })
+
+    selectedCellsGroup = new Group({
+        name: "selectedCellsGroup",
+        displayName: "Selected cells",
+        displayNameKey: "Visual_SelectedCells",
+        slices: [this.fillSelected, this.strokeSelected],
+    });
+
+    fillUnselected = new formattingSettings.ColorPicker({
+        name: "fillUnselected",
+        displayName: "Color",
+        displayNameKey: "Visual_Color",
+        value: { value: CellsSettingsCard.FillUnselectedDefaultColor },
+    });
+
+    strokeUnselected = new formattingSettings.ColorPicker({
+        name: "strokeUnselected",
+        displayName: "Stroke color",
+        displayNameKey: "Visual_StrokeColor",
+        value: { value: "#333444" },
+    });
+
+    unselectedCellsGroup = new Group({
+        name: "unselectedCellsGroup",
+        displayName: "Unselected cells",
+        displayNameKey: "Visual_UnselectedCells",
+        slices: [this.fillUnselected, this.strokeUnselected],
+    });
+
     name: string = "cells";
     displayName: string = "Cells";
     displayNameKey: string = "Visual_Cells";
-    slices = [
-        this.fillSelected,
-        this.strokeSelected,
-        this.fillUnselected,
-        this.strokeUnselected,
-        this.strokeWidth,
-        this.gapWidth,
-        this.enableManualSizing,
-        this.width,
-        this.height,
-    ];
+    groups = [this.cellsGeneralGroup, this.selectedCellsGroup, this.unselectedCellsGroup];
 }
 
 export class GranularitySettingsCard extends Card {
@@ -474,7 +478,6 @@ class ScrollAutoAdjustmentSettingsCard extends Card {
 
 
 export class TimeLineSettingsModel extends Model {
-    cursor = new PointerEdgeSettingsCard();
     forceSelection = new ForceSelectionSettingsCard();
     weekDay = new WeekDaySettingsCard();
     weeksDeterminationStandards = new WeeksDeterminationStandardsSettingsCard();
@@ -486,7 +489,6 @@ export class TimeLineSettingsModel extends Model {
     scrollAutoAdjustment = new ScrollAutoAdjustmentSettingsCard();
 
     cards: Array<Card | CompositeCard> = [
-        this.cursor,
         this.forceSelection,
         this.weeksDeterminationStandards,
         this.calendar,
