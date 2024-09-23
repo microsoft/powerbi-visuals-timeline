@@ -271,7 +271,7 @@ export class CellsSettingsCard extends CompositeCard {
         value: { value: "#808080" },
     });
 
-    selectedCellsGroup = new Group({
+    cellsSelectedGroup = new Group({
         name: "selectedCellsGroup",
         displayName: "Selected cells",
         displayNameKey: "Visual_SelectedCells",
@@ -292,7 +292,7 @@ export class CellsSettingsCard extends CompositeCard {
         value: { value: "#333444" },
     });
 
-    unselectedCellsGroup = new Group({
+    cellsUnselectedGroup = new Group({
         name: "unselectedCellsGroup",
         displayName: "Unselected cells",
         displayNameKey: "Visual_UnselectedCells",
@@ -302,7 +302,7 @@ export class CellsSettingsCard extends CompositeCard {
     name: string = "cells";
     displayName: string = "Cells";
     displayNameKey: string = "Visual_Cells";
-    groups = [this.cellsGeneralGroup, this.selectedCellsGroup, this.unselectedCellsGroup];
+    groups = [this.cellsGeneralGroup, this.cellsSelectedGroup, this.cellsUnselectedGroup];
 }
 
 export class GranularitySettingsCard extends Card {
