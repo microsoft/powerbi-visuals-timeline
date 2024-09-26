@@ -1,7 +1,10 @@
+## 2.5.10
+* Fix the bug with scroll area being too big
+* Update packages
+
 ## 2.5.9
 * Fix the bug with header not moving on scrolling horizontally
 * Fix npm vulnerabilities
-* Fix the bug with scroll area being too big
 
 ## 2.5.8
 * Fix the bug with dragging cursors
