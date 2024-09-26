@@ -33,7 +33,6 @@ import {D3DragEvent} from "d3-drag";
 import {arc as d3Arc} from "d3-shape";
 
 import powerbiVisualsApi from "powerbi-visuals-api";
-import powerbi from "powerbi-visuals-api";
 
 import {AdvancedFilter, IAdvancedFilterCondition, IFilterColumnTarget,} from "powerbi-models";
 
@@ -78,6 +77,7 @@ import {
 } from "./timeLineSettingsModel";
 import {FormattingSettingsService} from "powerbi-visuals-utils-formattingmodel";
 import ISelectionManager = powerbiVisualsApi.extensibility.ISelectionManager;
+import IViewport = powerbiVisualsApi.IViewport;
 import extractFilterColumnTarget = interactivityFilterService.extractFilterColumnTarget;
 import { Month } from './calendars/month';
 import {Weekday} from "./calendars/weekday";
@@ -567,6 +567,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
     private prevFilteredEndDate: Date | null = null;
 
     private initialized: boolean;
+    private viewport: IViewport;
 
     private host: powerbiVisualsApi.extensibility.visual.IVisualHost;
 
@@ -639,7 +640,8 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
                 window.requestAnimationFrame(() => {
                     const target = event.target as HTMLDivElement;
                     const scrollLeft: number = target?.scrollLeft || 0;
-                    this.headerSelection.attr("transform", `translate(${scrollLeft}, 0)`);
+                    const maxScrollLeft: number = Math.min(scrollLeft, this.svgWidth - this.viewport.width)
+                    this.headerSelection.attr("transform", `translate(${maxScrollLeft}, 0)`);
                     ticking = false;
                 });
                 ticking = true;
@@ -675,7 +677,6 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
         }
     }
 
-    // eslint-disable-next-line max-lines-per-function
     public update(options: powerbiVisualsApi.extensibility.visual.VisualUpdateOptions): void {
         try {
             this.host.eventService.renderingStarted(options);
@@ -687,6 +688,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
 
             this.options = options;
             this.dataView = options.dataViews[0];
+            this.viewport = options.viewport;
             // it contains dates from data view.
             this.datePeriod = this.createDatePeriod(this.dataView);
 
@@ -703,9 +705,8 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
             this.parseJsonFilters(this.visualSettings, <AdvancedFilter[]>(this.options.jsonFilters));
             this.setHighContrastColors();
 
-
-            this.adjustHeightOfElements(options.viewport.width);
-            this.resetScrollPosition();
+            this.adjustHeightOfElements();
+            this.recomputeScrollPosition();
 
             this.timelineGranularityData = new GranularityData(this.datePeriod.startDate, this.datePeriod.endDate);
 
@@ -766,7 +767,6 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
                 // spyOn changes clearUserSelection, anonymous function is used to have link to spied function
                 clearSelectionHandler: () => { this.clearUserSelection() },
             });
-
         } catch (ex) {
             this.host.eventService.renderingFailed(options, JSON.stringify(ex));
         }
@@ -1277,7 +1277,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
         }
     }
 
-    private adjustHeightOfElements(viewportWidth: number): void {
+    private adjustHeightOfElements(): void {
         this.timelineProperties.legendHeight = 0;
         if (this.visualSettings.rangeHeader.show.value) {
             this.timelineProperties.legendHeight = Timeline.TimelineMargins.LegendHeightRange;
@@ -1288,14 +1288,29 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
 
         this.headerWrapperSelection
             .style("height", this.timelineProperties.legendHeight + "px")
-            .style("width", viewportWidth + "px");
+            .style("width", this.viewport.width + "px");
 
         this.headerSelection
             .attr("height", this.timelineProperties.legendHeight);
     }
 
-    private resetScrollPosition(): void {
-        this.headerSelection.attr("transform", null);
+    /**
+     * When changing granularity from a smaller granularity to bigger one, the scrollWidth of the root div stays the same.
+     * The main content shrinks, but the header is translated and may go farther than the main content.
+     * We need to recompute header's position to prevent it from going too far.
+     * Also, we need to force the browser to recompute the scroll area; otherwise you'll be able to scroll past the main content and the header.
+     */
+    private recomputeScrollPosition(): void {
+        // apply the pending change
+        this.headerSelection.attr("transform", "translate(0, 0)");
+
+        // force browser to apply the change and recompute scroll area
+        requestAnimationFrame(() => {
+            const target = this.rootSelection.node() as HTMLDivElement;
+            const scrollLeft: number = target?.scrollLeft || 0;
+            const maxScrollLeft: number = Math.min(scrollLeft, this.svgWidth - this.viewport.width)
+            this.headerSelection.attr("transform", `translate(${maxScrollLeft}, 0)`);
+        })
     }
 
     private renderGranularityFrame(granularity: GranularityType): void {
