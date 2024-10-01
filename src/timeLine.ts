@@ -33,7 +33,6 @@ import {D3DragEvent} from "d3-drag";
 import {arc as d3Arc} from "d3-shape";
 
 import powerbiVisualsApi from "powerbi-visuals-api";
-import powerbi from "powerbi-visuals-api";
 
 import {AdvancedFilter, IAdvancedFilterCondition, IFilterColumnTarget,} from "powerbi-models";
 
@@ -78,6 +77,7 @@ import {
 } from "./timeLineSettingsModel";
 import {FormattingSettingsService} from "powerbi-visuals-utils-formattingmodel";
 import ISelectionManager = powerbiVisualsApi.extensibility.ISelectionManager;
+import IViewport = powerbiVisualsApi.IViewport;
 import extractFilterColumnTarget = interactivityFilterService.extractFilterColumnTarget;
 import { Month } from './calendars/month';
 import {Weekday} from "./calendars/weekday";
@@ -522,7 +522,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
 
             this.visualSettings.labels.fontColor.value.value = foreground.value;
 
-            this.visualSettings.cursor.color.value.value = foreground.value;
+            this.visualSettings.cells.edgeColor.value.value = foreground.value;
         }
     }
 
@@ -532,7 +532,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
     public timelineData: ITimelineData;
     public calendar: Calendar;
 
-    private visualSettings: TimeLineSettingsModel;
+    public visualSettings: TimeLineSettingsModel;
     private formattingSettingsService: FormattingSettingsService;
 
     private timelineProperties: ITimelineProperties;
@@ -567,6 +567,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
     private prevFilteredEndDate: Date | null = null;
 
     private initialized: boolean;
+    private viewport: IViewport;
 
     private host: powerbiVisualsApi.extensibility.visual.IVisualHost;
 
@@ -632,6 +633,20 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
             .classed(Timeline.TimelineSelectors.TimelineVisual.className, true);
 
         this.addElements();
+
+        let ticking = false;
+        this.rootSelection.on("scroll", (event) => {
+            if (!ticking) {
+                window.requestAnimationFrame(() => {
+                    const target = event.target as HTMLDivElement;
+                    const scrollLeft: number = target?.scrollLeft || 0;
+                    const maxScrollLeft: number = Math.min(scrollLeft, this.svgWidth - this.viewport.width)
+                    this.headerSelection.attr("transform", `translate(${maxScrollLeft}, 0)`);
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        });
     }
 
     public clearUserSelection(): void {
@@ -662,7 +677,6 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
         }
     }
 
-    // eslint-disable-next-line max-lines-per-function
     public update(options: powerbiVisualsApi.extensibility.visual.VisualUpdateOptions): void {
         try {
             this.host.eventService.renderingStarted(options);
@@ -674,6 +688,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
 
             this.options = options;
             this.dataView = options.dataViews[0];
+            this.viewport = options.viewport;
             // it contains dates from data view.
             this.datePeriod = this.createDatePeriod(this.dataView);
 
@@ -690,8 +705,8 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
             this.parseJsonFilters(this.visualSettings, <AdvancedFilter[]>(this.options.jsonFilters));
             this.setHighContrastColors();
 
-
-            this.adjustHeightOfElements(options.viewport.width);
+            this.adjustHeightOfElements();
+            this.recomputeScrollPosition();
 
             this.timelineGranularityData = new GranularityData(this.datePeriod.startDate, this.datePeriod.endDate);
 
@@ -752,7 +767,6 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
                 // spyOn changes clearUserSelection, anonymous function is used to have link to spied function
                 clearSelectionHandler: () => { this.clearUserSelection() },
             });
-
         } catch (ex) {
             this.host.eventService.renderingFailed(options, JSON.stringify(ex));
         }
@@ -872,7 +886,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
 
                 return isSelected
                     ? cellsSettings.fillSelected.value.value
-                    : (cellsSettings.fillUnselected.value.value || Utils.DefaultCellColor);
+                    : (cellsSettings.fillUnselected?.value?.value || Utils.DefaultCellColor);
             })
             .style("stroke", (dataPoint: ITimelineDataPoint) => {
                 const isSelected: boolean = Utils.IS_GRANULE_SELECTED(dataPoint, this.timelineData);
@@ -963,7 +977,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
                     return cursorDataPoint.cursorIndex * Math.PI + 2 * Math.PI;
                 }),
             )
-            .style("fill", this.visualSettings.cursor.show.value ? this.visualSettings.cursor.color.value.value : "transparent")
+            .style("fill", this.visualSettings.cells.showEdges.value ? this.visualSettings.cells.edgeColor.value.value : "transparent")
     }
 
     public renderTimeRangeText(timelineData: ITimelineData, rangeHeaderSettings: RangeHeaderSettingsCard): void {
@@ -1084,6 +1098,11 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
     }
 
     public getFormattingModel(): powerbi.visuals.FormattingModel {
+        this.updateFormattingSettingsModel();
+        return this.formattingSettingsService.buildFormattingModel(this.visualSettings);
+    }
+
+    private updateFormattingSettingsModel(): void {
         // These options have no sense if ISO standard was picked
         if (<WeekStandard>this.visualSettings.weeksDeterminationStandards.weekStandard.value.value === WeekStandard.ISO8061) {
             this.visualSettings.weekDay.disabled = true;
@@ -1091,7 +1110,6 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
         }
 
         const granularity = this.getGranularityType();
-
         switch (granularity) {
             case GranularityType.year:
                 this.visualSettings.labels.displayQuarters.visible = false;
@@ -1120,7 +1138,14 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
                 break;
         }
 
-        return this.formattingSettingsService.buildFormattingModel(this.visualSettings);
+        if (!this.visualSettings.cells.enableManualSizing.value) {
+            this.visualSettings.cells.height.visible = false;
+            this.visualSettings.cells.width.visible = false;
+        }
+
+        if (!this.visualSettings.cells.showEdges.value) {
+            this.visualSettings.cells.edgeColor.visible = false;
+        }
     }
 
     public selectPeriod(granularityType: GranularityType): void {
@@ -1252,7 +1277,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
         }
     }
 
-    private adjustHeightOfElements(viewportWidth: number): void {
+    private adjustHeightOfElements(): void {
         this.timelineProperties.legendHeight = 0;
         if (this.visualSettings.rangeHeader.show.value) {
             this.timelineProperties.legendHeight = Timeline.TimelineMargins.LegendHeightRange;
@@ -1263,10 +1288,29 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
 
         this.headerWrapperSelection
             .style("height", this.timelineProperties.legendHeight + "px")
-            .style("width", viewportWidth + "px");
+            .style("width", this.viewport.width + "px");
 
         this.headerSelection
             .attr("height", this.timelineProperties.legendHeight);
+    }
+
+    /**
+     * When changing granularity from a smaller granularity to bigger one, the scrollWidth of the root div stays the same.
+     * The main content shrinks, but the header is translated and may go farther than the main content.
+     * We need to recompute header's position to prevent it from going too far.
+     * Also, we need to force the browser to recompute the scroll area; otherwise you'll be able to scroll past the main content and the header.
+     */
+    private recomputeScrollPosition(): void {
+        // apply the pending change
+        this.headerSelection.attr("transform", "translate(0, 0)");
+
+        // force browser to apply the change and recompute scroll area
+        requestAnimationFrame(() => {
+            const target = this.rootSelection.node() as HTMLDivElement;
+            const scrollLeft: number = target?.scrollLeft || 0;
+            const maxScrollLeft: number = Math.min(scrollLeft, this.svgWidth - this.viewport.width)
+            this.headerSelection.attr("transform", `translate(${maxScrollLeft}, 0)`);
+        })
     }
 
     private renderGranularityFrame(granularity: GranularityType): void {

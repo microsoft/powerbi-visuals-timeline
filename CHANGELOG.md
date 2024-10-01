@@ -1,3 +1,14 @@
+## 2.5.11
+* Change the default color for "unselected cells" to transparent
+
+## 2.5.10
+* Fix the bug with scroll area being too big
+* Update packages
+
+## 2.5.9
+* Fix the bug with header not moving on scrolling horizontally
+* Fix npm vulnerabilities
+
 ## 2.5.8
 * Fix the bug with dragging cursors
 
