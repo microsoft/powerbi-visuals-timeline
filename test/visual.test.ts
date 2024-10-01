@@ -45,7 +45,7 @@ import {YearGranularity} from "../src/granularity/yearGranularity";
 import {Utils} from "../src/utils";
 import {areColorsEqual, getSolidColorStructuralObject} from "./helpers";
 import {Timeline} from "../src/timeLine";
-import {CellsSettingsCard} from "../src/timeLineSettingsModel";
+import { CellsSettingsCard } from '../src/timeLineSettingsModel';
 import {GranularityMock} from "./granularityMock";
 import {VisualBuilder} from "./visualBuilder";
 import {VisualData} from "./visualData";
@@ -336,7 +336,7 @@ describe("Timeline", () => {
             for (let i: number = 0; i < cellRects.length; i++) {
                 const fillColor: string = d3Select(cellRects[i]).attr("fill");
 
-                assertColorsMatch(fillColor, CellsSettingsCard.FillUnselectedDefaultColor, i === 0);
+                assertColorsMatch(fillColor, CellsSettingsCard.UnselectedDefaultFillColor, i === 0);
             }
         });
     });
@@ -443,14 +443,14 @@ describe("Timeline", () => {
                     const fill: string = getComputedStyle(element).fill;
 
                     const fillColorParsed = parseColorString(fill);
-                    const unselectedFillColor = parseColorString(CellsSettingsCard.FillUnselectedDefaultColor);
+                    const selectedFillColor = parseColorString(visualBuilder.visualPublic.visualSettings.cells.fillSelected.value.value);
 
                     if (fill !== "rgba(0, 0, 0, 0)" &&
                         fill !== Utils.DefaultCellColor &&
-                        (fillColorParsed.R !== unselectedFillColor.R ||
-                        fillColorParsed.G !== unselectedFillColor.G ||
-                        fillColorParsed.B !== unselectedFillColor.B )
-                    ) {
+                        (selectedFillColor.R === fillColorParsed.R &&
+                         selectedFillColor.G === fillColorParsed.G &&
+                         selectedFillColor.B === fillColorParsed.B))
+                    {
                         selectedElements.push(element);
                     }
                 });
@@ -473,13 +473,13 @@ describe("Timeline", () => {
                     const fill: string = getComputedStyle(element).fill;
 
                     const fillColorParsed = parseColorString(fill);
-                    const unselectedFillColor = parseColorString(CellsSettingsCard.FillUnselectedDefaultColor);
+                    const selectedFillColor = parseColorString(visualBuilder.visualPublic.visualSettings.cells.fillSelected.value.value);
 
                     if (fill !== "rgba(0, 0, 0, 0)" &&
                         fill !== Utils.DefaultCellColor &&
-                        fillColorParsed.R !== unselectedFillColor.R &&
-                        fillColorParsed.G !== unselectedFillColor.G &&
-                        fillColorParsed.B !== unselectedFillColor.B) {
+                        fillColorParsed.R === selectedFillColor.R &&
+                        fillColorParsed.G === selectedFillColor.G &&
+                        fillColorParsed.B === selectedFillColor.B) {
                         selectedElements.push(element);
                     }
                 });

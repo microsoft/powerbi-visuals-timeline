@@ -184,8 +184,8 @@ export class RangeHeaderSettingsCard extends Card {
 }
 
 export class CellsSettingsCard extends CompositeCard {
-    public static readonly FillSelectedDefaultColor: string = "#ADD8E6";
-    public static readonly FillUnselectedDefaultColor: string = "#FFFFFF";
+    public static readonly SelectedDefaultFillColor: string = "#ADD8E6";
+    public static readonly UnselectedDefaultFillColor: string = "";
 
     strokeWidth = new formattingSettings.NumUpDown({
         name: "strokeWidth",
@@ -247,7 +247,7 @@ export class CellsSettingsCard extends CompositeCard {
         name: "fillSelected",
         displayName: "Color",
         displayNameKey: "Visual_Color",
-        value: { value: CellsSettingsCard.FillSelectedDefaultColor },
+        value: { value: CellsSettingsCard.SelectedDefaultFillColor },
     });
 
     strokeSelected = new formattingSettings.ColorPicker({
@@ -282,7 +282,7 @@ export class CellsSettingsCard extends CompositeCard {
         name: "fillUnselected",
         displayName: "Color",
         displayNameKey: "Visual_Color",
-        value: { value: CellsSettingsCard.FillUnselectedDefaultColor },
+        value: { value: CellsSettingsCard.UnselectedDefaultFillColor },
     });
 
     strokeUnselected = new formattingSettings.ColorPicker({
