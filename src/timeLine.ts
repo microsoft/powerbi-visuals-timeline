@@ -532,7 +532,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
     public timelineData: ITimelineData;
     public calendar: Calendar;
 
-    private visualSettings: TimeLineSettingsModel;
+    public visualSettings: TimeLineSettingsModel;
     private formattingSettingsService: FormattingSettingsService;
 
     private timelineProperties: ITimelineProperties;
@@ -886,7 +886,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
 
                 return isSelected
                     ? cellsSettings.fillSelected.value.value
-                    : (cellsSettings.fillUnselected.value.value || Utils.DefaultCellColor);
+                    : (cellsSettings.fillUnselected?.value?.value || Utils.DefaultCellColor);
             })
             .style("stroke", (dataPoint: ITimelineDataPoint) => {
                 const isSelected: boolean = Utils.IS_GRANULE_SELECTED(dataPoint, this.timelineData);

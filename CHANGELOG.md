@@ -1,3 +1,6 @@
+## 2.5.11
+* Change the default color for "unselected cells" to transparent
+
 ## 2.5.10
 * Fix the bug with scroll area being too big
 * Update packages
