@@ -528,7 +528,6 @@ describe("Timeline", () => {
                 (<any>(dataView.metadata.objects)).rangeHeader.textSize = fontSize;
                 visualBuilder.updateFlushAllD3Transitions(dataView);
 
-                // expect(visualBuilder.rangeHeaderText.style["font-size"]).toBe(expectedFontSize);
                 expect(getComputedStyle(visualBuilder.rangeHeaderText).fontSize).toBe(expectedFontSize);
             });
         });
