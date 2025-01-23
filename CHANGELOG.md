@@ -1,3 +1,6 @@
+## 2.5.12
+* Fix labels settings for backwards compatibility
+
 ## 2.5.11
 * Change the default color for "unselected cells" to transparent
 
