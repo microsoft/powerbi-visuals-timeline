@@ -440,7 +440,35 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
         const labelSize: number = pixelConverter.fromPointToPixel(this.visualSettings.labels.textSize.value);
 
         if (this.visualSettings.labels.show.value) {
-            const granularityOffset: number = this.visualSettings.labels.show.value ? granularityType + 1 : 1;
+
+            let granularityOffset: number = 1;
+            if (this.visualSettings.labels.displayAll.value) {
+                granularityOffset += granularityType;
+            } else {
+                // compute the offset depending on the enabled labels
+                switch (granularityType) {
+                    case GranularityType.quarter:
+                        granularityOffset += this.visualSettings.labels.displayYears.value ? 1 : 0;
+                        break;
+                    case GranularityType.month:
+                        granularityOffset += this.visualSettings.labels.displayYears.value ? 1 : 0;
+                        granularityOffset += this.visualSettings.labels.displayQuarters.value ? 1 : 0;
+                        break;
+                    case GranularityType.week:
+                        granularityOffset += this.visualSettings.labels.displayYears.value ? 1 : 0;
+                        granularityOffset += this.visualSettings.labels.displayQuarters.value ? 1 : 0;
+                        granularityOffset += this.visualSettings.labels.displayMonths.value ? 1 : 0;
+                        break;
+                    case GranularityType.day:
+                        granularityOffset += this.visualSettings.labels.displayYears.value ? 1 : 0;
+                        granularityOffset += this.visualSettings.labels.displayQuarters.value ? 1 : 0;
+                        granularityOffset += this.visualSettings.labels.displayMonths.value ? 1 : 0;
+                        granularityOffset += this.visualSettings.labels.displayWeeks.value ? 1 : 0;
+                        break;
+                    default:
+                        break;
+                }
+            }
 
             this.timelineProperties.cellsYPosition += labelSize
                 * Timeline.LabelSizeFactor

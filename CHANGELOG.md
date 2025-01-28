@@ -1,5 +1,6 @@
 ## 2.5.12
 * Fix labels settings for backwards compatibility
+* Fix selecting or dragging cells when partial labels are enabled (edges have an incorrect offset)
 
 ## 2.5.11
 * Change the default color for "unselected cells" to transparent
