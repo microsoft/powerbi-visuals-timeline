@@ -60,6 +60,7 @@ import {
 import {GranularityData} from "./granularity/granularityData";
 import {GranularityNames} from "./granularity/granularityNames";
 import {GranularityType} from "./granularity/granularityType";
+import {GranularityLabel, granularityLevels} from "./granularity/granularityLabel";
 
 import {ITimelineDatePeriod, ITimelineDatePeriodBase,} from "./datePeriod/datePeriod";
 
@@ -445,29 +446,10 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
             if (this.visualSettings.labels.displayAll.value) {
                 granularityOffset += granularityType;
             } else {
-                // compute the offset depending on the enabled labels
-                switch (granularityType) {
-                    case GranularityType.quarter:
-                        granularityOffset += this.visualSettings.labels.displayYears.value ? 1 : 0;
-                        break;
-                    case GranularityType.month:
-                        granularityOffset += this.visualSettings.labels.displayYears.value ? 1 : 0;
-                        granularityOffset += this.visualSettings.labels.displayQuarters.value ? 1 : 0;
-                        break;
-                    case GranularityType.week:
-                        granularityOffset += this.visualSettings.labels.displayYears.value ? 1 : 0;
-                        granularityOffset += this.visualSettings.labels.displayQuarters.value ? 1 : 0;
-                        granularityOffset += this.visualSettings.labels.displayMonths.value ? 1 : 0;
-                        break;
-                    case GranularityType.day:
-                        granularityOffset += this.visualSettings.labels.displayYears.value ? 1 : 0;
-                        granularityOffset += this.visualSettings.labels.displayQuarters.value ? 1 : 0;
-                        granularityOffset += this.visualSettings.labels.displayMonths.value ? 1 : 0;
-                        granularityOffset += this.visualSettings.labels.displayWeeks.value ? 1 : 0;
-                        break;
-                    default:
-                        break;
-                }
+                const labelsToCheck: GranularityLabel[] = granularityLevels[granularityType] || [];
+                granularityOffset += labelsToCheck.reduce((offset, label) => {
+                    return offset + (this.visualSettings.labels[label].value ? 1 : 0)
+                }, 0);
             }
 
             this.timelineProperties.cellsYPosition += labelSize
