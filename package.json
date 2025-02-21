@@ -16,7 +16,7 @@
     "package": "pbiviz package",
     "test": "karma start",
     "watch": "karma start --single-run=false",
-    "eslint": "npx eslint . --ext .js,.jsx,.ts,.tsx"
+    "eslint": "npx eslint ."
   },
   "author": {
     "name": "Microsoft",
@@ -53,6 +53,7 @@
     "style-loader": "^4.0.0",
     "ts-loader": "^9.5.1",
     "typescript": "^5.6.2",
+    "typescript-eslint": "^8.24.1",
     "webpack": "^5.95.0"
   },
   "dependencies": {
@@ -62,8 +63,8 @@
     "d3-drag": "^3.0.0",
     "d3-selection": "^3.0.0",
     "d3-shape": "^3.2.0",
-    "eslint": "^8.57.0",
-    "eslint-plugin-powerbi-visuals": "^0.8.1",
+    "eslint": "^9.20.1",
+    "eslint-plugin-powerbi-visuals": "^1.0.0",
     "powerbi-models": "^1.15.2",
     "powerbi-visuals-utils-chartutils": "7.0.0",
     "powerbi-visuals-utils-formattingmodel": "^6.0.4",
