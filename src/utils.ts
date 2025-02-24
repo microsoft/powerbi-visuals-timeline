@@ -24,6 +24,9 @@
  *  THE SOFTWARE.
  */
 
+import powerbi from "powerbi-visuals-api";
+import PrimitiveValue = powerbi.PrimitiveValue;
+
 import {
     ITimelineDatePeriod,
     ITimelineDatePeriodBase,
@@ -85,7 +88,7 @@ export class Utils {
         return (endDateTzOffset - startDateTzOffset) * 60 * 1000;
     }
 
-    public static TO_STRING_DATE_WITHOUT_TIMEZONE(date: Date): string {
+    public static TO_STRING_DATE_WITHOUT_TIMEZONE(date: Date | null): string | null{
         if (!date) {
             return null;
         }
@@ -101,7 +104,7 @@ export class Utils {
         return currentDate;
     }
 
-    public static PARSE_DATE_WITHOUT_TIMEZONE(dateString: string): Date {
+    public static PARSE_DATE_WITHOUT_TIMEZONE(dateString: string | null): Date | null {
         if (dateString === null) {
             return null;
         }
@@ -125,13 +128,13 @@ export class Utils {
             date.getDate());
     }
 
-    public static GET_DATE_PERIOD(values: any[]): ITimelineDatePeriodBase {
+    public static GET_DATE_PERIOD(values: PrimitiveValue[] | undefined): ITimelineDatePeriodBase {
         let startDate: Date;
         let endDate: Date;
 
         values = [].concat(values);
 
-        values.forEach((value: any) => {
+        values.forEach((value: PrimitiveValue) => {
             const date: Date = Utils.PARSE_DATE(value);
 
             if (date < startDate || startDate === undefined) {
@@ -146,15 +149,14 @@ export class Utils {
         return { startDate, endDate };
     }
 
-    public static PARSE_DATE(value: any): Date {
-        const typeOfValue: string = typeof value;
-        let date: Date = value;
+    public static PARSE_DATE(value: PrimitiveValue): Date {
+        let date = value;
 
-        if (typeOfValue === "number") {
+        if (typeof value === "number") {
             date = new Date(value, 0);
         }
 
-        if (typeOfValue === "string") {
+        if (typeof value === "string") {
             date = new Date(value);
         }
 
@@ -184,7 +186,7 @@ export class Utils {
         return date.getDate();
     }
 
-    public static IS_VALUE_EMPTY(value: any): boolean {
+    public static IS_VALUE_EMPTY(value: number): boolean {
         return value === undefined || value === null || isNaN(value);
     }
 
@@ -242,7 +244,8 @@ export class Utils {
      * @param granularityName The name of the granularity
      */
     public static GET_GRANULARITY_TYPE(granularityName: string): GranularityType {
-        const index: number = Utils.FIND_INDEX(GranularityNames, (granularity: IGranularityName) => {
+        
+        const index: number = GranularityNames.findIndex((granularity: IGranularityName) => {
             return granularity.name === granularityName;
         });
 
@@ -250,7 +253,7 @@ export class Utils {
     }
 
     public static GET_GRANULARITY_PROPS_BY_MARKER(marker: string): IGranularityName {
-        const index: number = Utils.FIND_INDEX(GranularityNames, (granularity: IGranularityName) => {
+        const index: number = GranularityNames.findIndex((granularity: IGranularityName) => {
             return granularity.marker === marker;
         });
 
@@ -262,7 +265,7 @@ export class Utils {
      * @param granularityType The type of granularity
      */
     public static GET_GRANULARITY_NAME_KEY(granularityType: GranularityType): string {
-        const index: number = Utils.FIND_INDEX(GranularityNames, (granularity: IGranularityName) => {
+        const index: number = GranularityNames.findIndex((granularity: IGranularityName) => {
             return granularity.granularityType === granularityType;
         });
 
@@ -279,8 +282,8 @@ export class Utils {
     public static SEPARATE_SELECTION(timelineData: ITimelineData, startDate: Date, endDate: Date): void {
         const datePeriods: ITimelineDatePeriod[] = timelineData.currentGranularity.getDatePeriods();
 
-        let startDateIndex: number = Utils.FIND_INDEX(datePeriods, (x) => startDate < x.endDate);
-        let endDateIndex: number = Utils.FIND_INDEX(datePeriods, (x) => endDate <= x.endDate);
+        let startDateIndex: number = datePeriods.findIndex((x) => startDate < x.endDate);
+        let endDateIndex: number = datePeriods.findIndex((x) => endDate <= x.endDate);
 
         startDateIndex = startDateIndex >= 0
             ? startDateIndex
@@ -357,11 +360,7 @@ export class Utils {
      * @param datePeriods The list of date periods
      */
     public static UNSEPARATE_SELECTION(datePeriods: ITimelineDatePeriod[]): void {
-        const separationIndex: number = Utils.FIND_INDEX(
-            datePeriods,
-            (datePeriod: ITimelineDatePeriod) => {
-                return datePeriod.fraction < Utils.MinFraction;
-            });
+        const separationIndex = datePeriods.findIndex(x => x.fraction < Utils.MinFraction);
 
         if (separationIndex < 0) {
             return;
@@ -407,7 +406,7 @@ export class Utils {
         return 0;
     }
 
-    public static IS_ARRAYS_EQUAL(a: any[], b: any[]): boolean {
+    public static IS_ARRAYS_EQUAL(a: (string | number)[], b: (string | number)[]): boolean {
         if (a === b) {
             return true;
         }
@@ -430,22 +429,6 @@ export class Utils {
         }
 
         return true;
-    }
-
-    public static FIND_INDEX(
-        array: any[],
-        predicate: (value: any, index: number, array: any[]) => boolean,
-    ): number {
-        let value: any;
-
-        for (let i = 0; i < array.length; i++) {
-            value = array[i];
-            if (predicate(value, i, array)) {
-                return i;
-            }
-        }
-
-        return -1;
     }
 
     private static DateSplitter: string = " - ";

@@ -25,8 +25,8 @@
  */
 
 import {
-    selectAll,
-    Selection,
+    selectAll as d3SelectAll,
+    Selection as d3Selection,
 } from "d3-selection";
 
 import { valueFormatter } from "powerbi-visuals-utils-formattingutils";
@@ -86,7 +86,7 @@ export class GranularityBase implements IGranularity {
         this.granularityProps = granularityProps;
     }
 
-    public render(props: IGranularityRenderProps, isFirst: boolean): Selection<any, any, any, any> {
+    public render(props: IGranularityRenderProps, isFirst: boolean): d3Selection<SVGGElement, unknown, null, undefined> {
         const granularitySelection = props.selection
             .append("g")
             .attr("transform", svgManipulation.translate(0, 0));
@@ -142,7 +142,7 @@ export class GranularityBase implements IGranularity {
                 event.stopPropagation();
                 props.selectPeriodCallback(this.granularityProps.granularityType);
 
-                const sliderSelection = selectAll("rect.periodSlicerRect");
+                const sliderSelection = d3SelectAll("rect.periodSlicerRect");
 
                 if (sliderSelection) {
                     sliderSelection.remove();
@@ -294,7 +294,7 @@ export class GranularityBase implements IGranularity {
     }
 
     private renderSlider(
-        selection: Selection<any, any, any, any>,
+        selection: d3Selection<SVGGElement, unknown, null, undefined>,
         sliderColor: string,
         granularity: GranularityType,
     ): void {

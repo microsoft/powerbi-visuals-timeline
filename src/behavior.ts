@@ -4,21 +4,19 @@ import {ICursorDataPoint, ITimelineDataPoint} from "./dataInterfaces";
 import ISelectionManager = powerbi.extensibility.ISelectionManager;
 import {D3DragEvent, drag as d3Drag} from "d3-drag";
 
-type Selection<T1, T2 = T1> = d3Selection<any, T1, any, T2>;
-
 export interface BehaviorOptions {
     selectionManager: ISelectionManager;
     cells: {
-        selection: Selection<ITimelineDataPoint>;
+        selection: d3Selection<SVGRectElement, ITimelineDataPoint, SVGGElement, unknown>;
         callback: (dataPoint: ITimelineDataPoint, index: number, isMultiSelection: boolean) => void;
         cellWidth: number;
     };
     cursors: {
-        selection:  Selection<ICursorDataPoint>
-        onDrag: (event: D3DragEvent<any, ICursorDataPoint, ICursorDataPoint>, currentCursor: ICursorDataPoint) => void;
+        selection:  d3Selection<SVGPathElement, ICursorDataPoint, SVGGElement, unknown>
+        onDrag: (event: D3DragEvent<SVGPathElement, ICursorDataPoint, ICursorDataPoint>, currentCursor: ICursorDataPoint) => void;
         onEnd: () => void;
     }
-    clearCatcher: Selection<any>;
+    clearCatcher: d3Selection<HTMLDivElement, unknown, null, undefined>;
     clearSelectionHandler: () => void;
 }
 
@@ -30,8 +28,8 @@ export class Behavior {
     }
 
     private static handleCursorsDrag(options: BehaviorOptions) {
-        const dragBehavior = d3Drag<any, ICursorDataPoint>()
-            .subject((_: D3DragEvent<any, ICursorDataPoint, ICursorDataPoint>, cursorDataPoint: ICursorDataPoint) => {
+        const dragBehavior = d3Drag<SVGPathElement, ICursorDataPoint>()
+            .subject((_: D3DragEvent<SVGPathElement, ICursorDataPoint, ICursorDataPoint>, cursorDataPoint: ICursorDataPoint) => {
                 cursorDataPoint.x = cursorDataPoint.selectionIndex * options.cells.cellWidth;
 
                 return cursorDataPoint;

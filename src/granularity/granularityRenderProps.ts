@@ -24,13 +24,13 @@
  *  THE SOFTWARE.
  */
 
-import { Selection } from "d3-selection";
+import { Selection as d3Selection } from "d3-selection";
 
 import { GranularityType } from "./granularityType";
 import {GranularitySettingsCard} from "../timeLineSettingsModel";
 
 export interface IGranularityRenderProps {
-    selection: Selection<any, any, any, any>;
+    selection: d3Selection<SVGGElement, unknown, null, undefined>;
     granularSettings: GranularitySettingsCard;
     selectPeriodCallback: (granularityType: GranularityType) => void;
 }

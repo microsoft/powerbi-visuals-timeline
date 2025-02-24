@@ -24,7 +24,7 @@
  *  THE SOFTWARE.
  */
 
-import { Selection } from "d3-selection";
+import { Selection as d3Selection } from "d3-selection";
 
 import { ITimelineDatePeriod } from "../datePeriod/datePeriod";
 import { IGranularityRenderProps } from "./granularityRenderProps";
@@ -52,5 +52,5 @@ export interface IGranularity {
     render(
         props: IGranularityRenderProps,
         isFirst: boolean,
-    ): Selection<any, any, any, any>;
+    ): d3Selection<SVGGElement, unknown, null, undefined>;
 }
