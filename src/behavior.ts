@@ -25,9 +25,9 @@
  */
 
 import { Selection as d3Selection, local as d3local } from "d3-selection";
-import {ICursorDataPoint, ITimelineDataPoint} from "./dataInterfaces";
+import { ICursorDataPoint, ITimelineDataPoint } from "./dataInterfaces";
 import ISelectionManager = powerbi.extensibility.ISelectionManager;
-import {D3DragEvent, drag as d3Drag} from "d3-drag";
+import { D3DragEvent, drag as d3Drag } from "d3-drag";
 
 export interface BehaviorOptions {
     selectionManager: ISelectionManager;
@@ -37,7 +37,7 @@ export interface BehaviorOptions {
         cellWidth: number;
     };
     cursors: {
-        selection:  d3Selection<SVGPathElement, ICursorDataPoint, SVGGElement, unknown>
+        selection: d3Selection<SVGPathElement, ICursorDataPoint, SVGGElement, unknown>
         onDrag: (event: D3DragEvent<SVGPathElement, ICursorDataPoint, ICursorDataPoint>, currentCursor: ICursorDataPoint) => void;
         onEnd: () => void;
     }

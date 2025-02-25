@@ -23,32 +23,32 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
  */
-import {select as d3Select} from "d3-selection";
+import { select as d3Select } from "d3-selection";
 import powerbiVisualsApi from "powerbi-visuals-api";
-import {assertColorsMatch, d3Click, parseColorString, renderTimeout,} from "powerbi-visuals-utils-testutils";
+import { assertColorsMatch, d3Click, parseColorString, renderTimeout } from "powerbi-visuals-utils-testutils";
 
-import {Calendar, CalendarFormat, CalendarFormattingSettings, WeekdayFormat} from "../src/calendars/calendar";
-import {ITimelineCursorOverElement, ITimelineData} from "../src/dataInterfaces";
-import {ITimelineDatePeriod, ITimelineDatePeriodBase} from "../src/datePeriod/datePeriod";
-import {DatePeriodBase} from "../src/datePeriod/datePeriodBase";
-import {CalendarISO8061} from "../src/calendars/calendarISO8061";
-import {Weekday} from "../src/calendars/weekday";
+import { Calendar, CalendarFormat, CalendarFormattingSettings, WeekdayFormat } from "../src/calendars/calendar";
+import { ITimelineCursorOverElement, ITimelineData } from "../src/dataInterfaces";
+import { ITimelineDatePeriod, ITimelineDatePeriodBase } from "../src/datePeriod/datePeriod";
+import { DatePeriodBase } from "../src/datePeriod/datePeriodBase";
+import { CalendarISO8061 } from "../src/calendars/calendarISO8061";
+import { Weekday } from "../src/calendars/weekday";
 
-import {DayGranularity} from "../src/granularity/dayGranularity";
-import {IGranularity} from "../src/granularity/granularity";
-import {GranularityType} from "../src/granularity/granularityType";
-import {MonthGranularity} from "../src/granularity/monthGranularity";
-import {QuarterGranularity} from "../src/granularity/quarterGranularity";
-import {WeekGranularity} from "../src/granularity/weekGranularity";
-import {YearGranularity} from "../src/granularity/yearGranularity";
+import { DayGranularity } from "../src/granularity/dayGranularity";
+import { IGranularity } from "../src/granularity/granularity";
+import { GranularityType } from "../src/granularity/granularityType";
+import { MonthGranularity } from "../src/granularity/monthGranularity";
+import { QuarterGranularity } from "../src/granularity/quarterGranularity";
+import { WeekGranularity } from "../src/granularity/weekGranularity";
+import { YearGranularity } from "../src/granularity/yearGranularity";
 
-import {Utils} from "../src/utils";
-import {areColorsEqual, getSolidColorStructuralObject} from "./helpers";
-import {Timeline} from "../src/timeLine";
+import { Utils } from "../src/utils";
+import { areColorsEqual, getSolidColorStructuralObject } from "./helpers";
+import { Timeline } from "../src/timeLine";
 import { CellsSettingsCard } from '../src/timeLineSettingsModel';
-import {GranularityMock} from "./granularityMock";
-import {VisualBuilder} from "./visualBuilder";
-import {VisualData} from "./visualData";
+import { GranularityMock } from "./granularityMock";
+import { VisualBuilder } from "./visualBuilder";
+import { VisualData } from "./visualData";
 
 
 describe("Timeline", () => {
@@ -81,7 +81,7 @@ describe("Timeline", () => {
                 const countOfTextItems: number = visualBuilder
                     .mainElement
                     .querySelectorAll("g.mainArea > g")
-                    [4]
+                [4]
                     .querySelectorAll(".label > *")
                     .length;
 
@@ -450,9 +450,8 @@ describe("Timeline", () => {
                     if (fill !== "rgba(0, 0, 0, 0)" &&
                         fill !== Utils.DefaultCellColor &&
                         (selectedFillColor.R === fillColorParsed.R &&
-                         selectedFillColor.G === fillColorParsed.G &&
-                         selectedFillColor.B === fillColorParsed.B))
-                    {
+                            selectedFillColor.G === fillColorParsed.G &&
+                            selectedFillColor.B === fillColorParsed.B)) {
                         selectedElements.push(element);
                     }
                 });
@@ -472,19 +471,19 @@ describe("Timeline", () => {
             const lastElement = cells[cells.length - 1];
 
             cells.forEach((element: SVGRectElement) => {
-                    const fill: string = getComputedStyle(element).fill;
+                const fill: string = getComputedStyle(element).fill;
 
-                    const fillColorParsed = parseColorString(fill);
-                    const selectedFillColor = parseColorString(visualBuilder.visualPublic.visualSettings.cells.fillSelected.value.value);
+                const fillColorParsed = parseColorString(fill);
+                const selectedFillColor = parseColorString(visualBuilder.visualPublic.visualSettings.cells.fillSelected.value.value);
 
-                    if (fill !== "rgba(0, 0, 0, 0)" &&
-                        fill !== Utils.DefaultCellColor &&
-                        fillColorParsed.R === selectedFillColor.R &&
-                        fillColorParsed.G === selectedFillColor.G &&
-                        fillColorParsed.B === selectedFillColor.B) {
-                        selectedElements.push(element);
-                    }
-                });
+                if (fill !== "rgba(0, 0, 0, 0)" &&
+                    fill !== Utils.DefaultCellColor &&
+                    fillColorParsed.R === selectedFillColor.R &&
+                    fillColorParsed.G === selectedFillColor.G &&
+                    fillColorParsed.B === selectedFillColor.B) {
+                    selectedElements.push(element);
+                }
+            });
 
             expect(selectedElements.length).toEqual(1);
             expect(selectedElements[0]).toEqual(lastElement);
@@ -1629,7 +1628,7 @@ describe("Timeline - TimelineUtils", () => {
         });
     });
 
-    function getTime(date?: Date): number | Date | undefined{
+    function getTime(date?: Date): number | Date | undefined {
         return date && date.getTime
             ? date.getTime()
             : date;

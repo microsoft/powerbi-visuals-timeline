@@ -24,10 +24,10 @@
  *  THE SOFTWARE.
  */
 
-import {Calendar, CalendarFormat, CalendarFormattingSettings, WeekdayFormat} from "./calendar";
+import { Calendar, CalendarFormat, CalendarFormattingSettings, WeekdayFormat } from "./calendar";
 import { WeekStandard } from "./weekStandard";
 import { Utils } from "../utils";
-import {CalendarSettingsCard} from "../timeLineSettingsModel";
+import { CalendarSettingsCard } from "../timeLineSettingsModel";
 
 export class CalendarISO8061 extends Calendar {
 

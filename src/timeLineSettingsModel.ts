@@ -26,17 +26,17 @@
 
 import powerbi from "powerbi-visuals-api";
 
-import {formattingSettings} from "powerbi-visuals-utils-formattingmodel";
-import {WeekStandard} from "./calendars/weekStandard";
-import {Month} from "./calendars/month";
+import { formattingSettings } from "powerbi-visuals-utils-formattingmodel";
+import { WeekStandard } from "./calendars/weekStandard";
+import { Month } from "./calendars/month";
 import Card = formattingSettings.SimpleCard;
 import CompositeCard = formattingSettings.CompositeCard;
 import Model = formattingSettings.Model;
 import Group = formattingSettings.Group;
 import IEnumMember = powerbi.IEnumMember;
 import ValidatorType = powerbi.visuals.ValidatorType;
-import {Weekday} from "./calendars/weekday";
-import {GranularityType} from "./granularity/granularityType";
+import { Weekday } from "./calendars/weekday";
+import { GranularityType } from "./granularity/granularityType";
 import ILocalizationManager = powerbi.extensibility.ILocalizationManager;
 
 const weekStandardOptions: IEnumMember[] = [

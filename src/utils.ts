@@ -40,7 +40,7 @@ import {
 import { IGranularityName } from "./granularity/granularityName";
 import { GranularityNames } from "./granularity/granularityNames";
 import { GranularityType } from "./granularity/granularityType";
-import {CellsSettingsCard} from "./timeLineSettingsModel";
+import { CellsSettingsCard } from "./timeLineSettingsModel";
 
 export class Utils {
     public static DefaultCellColor: string = "transparent";
@@ -88,7 +88,7 @@ export class Utils {
         return (endDateTzOffset - startDateTzOffset) * 60 * 1000;
     }
 
-    public static TO_STRING_DATE_WITHOUT_TIMEZONE(date: Date | null): string | null{
+    public static TO_STRING_DATE_WITHOUT_TIMEZONE(date: Date | null): string | null {
         if (!date) {
             return null;
         }
@@ -244,7 +244,7 @@ export class Utils {
      * @param granularityName The name of the granularity
      */
     public static GET_GRANULARITY_TYPE(granularityName: string): GranularityType {
-        
+
         const index: number = GranularityNames.findIndex((granularity: IGranularityName) => {
             return granularity.name === granularityName;
         });

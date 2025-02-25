@@ -44,7 +44,7 @@ import {
     IExtendedLabel,
     ITimelineLabel,
 } from "../dataInterfaces";
-import {GranularityType} from "./granularityType";
+import { GranularityType } from "./granularityType";
 
 export class GranularityBase implements IGranularity {
     private static DefaultFraction: number = 1;

@@ -27,7 +27,7 @@
 import { Selection as d3Selection } from "d3-selection";
 
 import { GranularityType } from "./granularityType";
-import {GranularitySettingsCard} from "../timeLineSettingsModel";
+import { GranularitySettingsCard } from "../timeLineSettingsModel";
 
 export interface IGranularityRenderProps {
     selection: d3Selection<SVGGElement, unknown, null, undefined>;

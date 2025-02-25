@@ -26,25 +26,25 @@
 
 import "../style/visual.less";
 
-import {select as d3Select, selectAll as d3SelectAll, Selection as d3Selection,} from "d3-selection";
+import { select as d3Select, selectAll as d3SelectAll, Selection as d3Selection } from "d3-selection";
 
-import {D3DragEvent} from "d3-drag";
+import { D3DragEvent } from "d3-drag";
 
-import {arc as d3Arc} from "d3-shape";
+import { arc as d3Arc } from "d3-shape";
 
 import powerbiVisualsApi from "powerbi-visuals-api";
 
-import {AdvancedFilter, IAdvancedFilterCondition, IFilterColumnTarget,} from "powerbi-models";
+import { AdvancedFilter, IAdvancedFilterCondition, IFilterColumnTarget } from "powerbi-models";
 
-import {CssConstants, manipulation as svgManipulation,} from "powerbi-visuals-utils-svgutils";
+import { CssConstants, manipulation as svgManipulation } from "powerbi-visuals-utils-svgutils";
 
-import {pixelConverter} from "powerbi-visuals-utils-typeutils";
+import { pixelConverter } from "powerbi-visuals-utils-typeutils";
 
-import {interfaces as formattingInterfaces, textMeasurementService} from "powerbi-visuals-utils-formattingutils";
+import { interfaces as formattingInterfaces, textMeasurementService } from "powerbi-visuals-utils-formattingutils";
 
-import {interactivityFilterService} from "powerbi-visuals-utils-interactivityutils";
+import { interactivityFilterService } from "powerbi-visuals-utils-interactivityutils";
 
-import {dataLabelInterfaces, dataLabelUtils,} from "powerbi-visuals-utils-chartutils";
+import { dataLabelInterfaces, dataLabelUtils } from "powerbi-visuals-utils-chartutils";
 
 import {
     ICursorDataPoint,
@@ -57,30 +57,30 @@ import {
     ITimelineSelectors,
 } from "./dataInterfaces";
 
-import {GranularityData} from "./granularity/granularityData";
-import {GranularityNames} from "./granularity/granularityNames";
-import {GranularityType} from "./granularity/granularityType";
-import {GranularityLabel, granularityLevels} from "./granularity/granularityLabel";
+import { GranularityData } from "./granularity/granularityData";
+import { GranularityNames } from "./granularity/granularityNames";
+import { GranularityType } from "./granularity/granularityType";
+import { GranularityLabel, granularityLevels } from "./granularity/granularityLabel";
 
-import {ITimelineDatePeriod, ITimelineDatePeriodBase,} from "./datePeriod/datePeriod";
+import { ITimelineDatePeriod, ITimelineDatePeriodBase } from "./datePeriod/datePeriod";
 
-import {DatePeriodBase} from "./datePeriod/datePeriodBase";
+import { DatePeriodBase } from "./datePeriod/datePeriodBase";
 
-import {Calendar, CalendarFormat, CalendarFormattingSettings, WeekdayFormat} from "./calendars/calendar";
-import {Utils} from "./utils";
-import {WeekStandard} from "./calendars/weekStandard";
-import {CalendarFactory} from "./calendars/calendarFactory";
+import { Calendar, CalendarFormat, CalendarFormattingSettings, WeekdayFormat } from "./calendars/calendar";
+import { Utils } from "./utils";
+import { WeekStandard } from "./calendars/weekStandard";
+import { CalendarFactory } from "./calendars/calendarFactory";
 import {
     CalendarSettingsCard,
     CellsSettingsCard,
     RangeHeaderSettingsCard,
     TimeLineSettingsModel,
 } from "./timeLineSettingsModel";
-import {FormattingSettingsService} from "powerbi-visuals-utils-formattingmodel";
+import { FormattingSettingsService } from "powerbi-visuals-utils-formattingmodel";
 import extractFilterColumnTarget = interactivityFilterService.extractFilterColumnTarget;
 import { Month } from './calendars/month';
-import {Weekday} from "./calendars/weekday";
-import {Behavior} from "./behavior";
+import { Weekday } from "./calendars/weekday";
+import { Behavior } from "./behavior";
 
 import ISelectionManager = powerbiVisualsApi.extensibility.ISelectionManager;
 import ISQExpr = powerbiVisualsApi.data.ISQExpr
@@ -143,7 +143,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
             }];
         }
 
-        const {weekStandard, calendarFormat, weekDayFormat} = Timeline.computeCalendarFormat(this.visualSettings);
+        const { weekStandard, calendarFormat, weekDayFormat } = Timeline.computeCalendarFormat(this.visualSettings);
 
         const isCalendarChanged: boolean = previousCalendar
             && previousCalendar.isChanged(calendarFormat, weekDayFormat, weekStandard);
@@ -227,7 +227,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
                 : Weekday.Sunday,
         }
 
-        return {weekStandard, calendarFormat, weekDayFormat};
+        return { weekStandard, calendarFormat, weekDayFormat };
     }
 
     public static SELECT_PERIOD(
@@ -557,11 +557,11 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
 
     private rangeTextSelection: d3Selection<SVGTextElement, unknown, null, undefined>;
     private mainGroupSelection: d3Selection<SVGGElement, unknown, null, undefined>;
-    private yearLabelsSelection: d3Selection<SVGGElement, unknown, null, undefined> ;
-    private quarterLabelsSelection: d3Selection<SVGGElement, unknown, null, undefined> ;
-    private monthLabelsSelection: d3Selection<SVGGElement, unknown, null, undefined> ;
-    private weekLabelsSelection: d3Selection<SVGGElement, unknown, null, undefined> ;
-    private dayLabelsSelection: d3Selection<SVGGElement, unknown, null, undefined> ;
+    private yearLabelsSelection: d3Selection<SVGGElement, unknown, null, undefined>;
+    private quarterLabelsSelection: d3Selection<SVGGElement, unknown, null, undefined>;
+    private monthLabelsSelection: d3Selection<SVGGElement, unknown, null, undefined>;
+    private weekLabelsSelection: d3Selection<SVGGElement, unknown, null, undefined>;
+    private dayLabelsSelection: d3Selection<SVGGElement, unknown, null, undefined>;
     private cellsSelection: d3Selection<SVGGElement, unknown, null, undefined>;
     private cursorGroupSelection: d3Selection<SVGGElement, unknown, null, undefined>;
     private selectorSelection: d3Selection<SVGGElement, unknown, null, undefined>;
@@ -813,7 +813,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
             filterDatePeriod.endDate &&
             currentPeriod.startDate &&
             currentPeriod.endDate &&
-            currentPeriod.startDate.getTime() !== filterDatePeriod.startDate.getTime() && 
+            currentPeriod.startDate.getTime() !== filterDatePeriod.startDate.getTime() &&
             currentPeriod.endDate.getTime() !== filterDatePeriod.endDate.getTime() &&
             this.prevFilteredStartDate == null &&
             this.prevFilteredEndDate == null

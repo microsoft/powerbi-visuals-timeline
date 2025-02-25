@@ -24,7 +24,7 @@
  *  THE SOFTWARE.
  */
 
-import {Calendar, CalendarFormat, CalendarFormattingSettings, WeekdayFormat} from "./calendar";
+import { Calendar, CalendarFormat, CalendarFormattingSettings, WeekdayFormat } from "./calendar";
 import { WeekStandard } from "./weekStandard";
 import { CalendarISO8061 } from "./calendarISO8061";
 
@@ -33,7 +33,7 @@ export class CalendarFactory {
         weekStandard: WeekStandard,
         calendarSettings: CalendarFormat,
         weekDaySettings: WeekdayFormat,
-        settings: CalendarFormattingSettings) : Calendar {
+        settings: CalendarFormattingSettings): Calendar {
 
         let calendar: Calendar;
 
