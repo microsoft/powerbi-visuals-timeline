@@ -171,15 +171,6 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
         const category: powerbiVisualsApi.DataViewCategoryColumn = dataView.categorical.categories[0];
         this.timelineData.filterColumnTarget = extractFilterColumnTarget(category);
 
-        if (category.source.type.numeric) {
-            // This code does not make sense.
-            // Filter target can be either columnTarget (table, column) or hierarchyLevelTarget (table, hierarchy, hierarchyLevel).
-            // But 'ref' is not used in neither of them. It should be 'column' or 'hierarchyLevel'.
-            // Also, the column name is not necessarily 'Date'.
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            (<any>(this.timelineData.filterColumnTarget)).ref = "Date";
-        }
-
         if (isCalendarChanged && startDate && endDate) {
             Utils.UNSEPARATE_SELECTION(this.timelineData.currentGranularity.getDatePeriods());
             Utils.SEPARATE_SELECTION(this.timelineData, startDate, endDate);
