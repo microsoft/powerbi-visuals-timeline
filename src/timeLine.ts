@@ -26,25 +26,25 @@
 
 import "../style/visual.less";
 
-import {select as d3Select, selectAll as d3SelectAll, Selection as D3Selection,} from "d3-selection";
+import { select as d3Select, selectAll as d3SelectAll, Selection as d3Selection } from "d3-selection";
 
-import {D3DragEvent} from "d3-drag";
+import { D3DragEvent } from "d3-drag";
 
-import {arc as d3Arc} from "d3-shape";
+import { arc as d3Arc } from "d3-shape";
 
 import powerbiVisualsApi from "powerbi-visuals-api";
 
-import {AdvancedFilter, IAdvancedFilterCondition, IFilterColumnTarget,} from "powerbi-models";
+import { AdvancedFilter, IAdvancedFilterCondition, IFilterColumnTarget } from "powerbi-models";
 
-import {CssConstants, manipulation as svgManipulation,} from "powerbi-visuals-utils-svgutils";
+import { CssConstants, manipulation as svgManipulation } from "powerbi-visuals-utils-svgutils";
 
-import {pixelConverter} from "powerbi-visuals-utils-typeutils";
+import { pixelConverter } from "powerbi-visuals-utils-typeutils";
 
-import {interfaces as formattingInterfaces, textMeasurementService} from "powerbi-visuals-utils-formattingutils";
+import { interfaces as formattingInterfaces, textMeasurementService } from "powerbi-visuals-utils-formattingutils";
 
-import {interactivityFilterService} from "powerbi-visuals-utils-interactivityutils";
+import { interactivityFilterService } from "powerbi-visuals-utils-interactivityutils";
 
-import {dataLabelInterfaces, dataLabelUtils,} from "powerbi-visuals-utils-chartutils";
+import { dataLabelInterfaces, dataLabelUtils } from "powerbi-visuals-utils-chartutils";
 
 import {
     ICursorDataPoint,
@@ -57,32 +57,34 @@ import {
     ITimelineSelectors,
 } from "./dataInterfaces";
 
-import {GranularityData} from "./granularity/granularityData";
-import {GranularityNames} from "./granularity/granularityNames";
-import {GranularityType} from "./granularity/granularityType";
-import {GranularityLabel, granularityLevels} from "./granularity/granularityLabel";
+import { GranularityData } from "./granularity/granularityData";
+import { GranularityNames } from "./granularity/granularityNames";
+import { GranularityType } from "./granularity/granularityType";
+import { GranularityLabel, granularityLevels } from "./granularity/granularityLabel";
 
-import {ITimelineDatePeriod, ITimelineDatePeriodBase,} from "./datePeriod/datePeriod";
+import { ITimelineDatePeriod, ITimelineDatePeriodBase } from "./datePeriod/datePeriod";
 
-import {DatePeriodBase} from "./datePeriod/datePeriodBase";
+import { DatePeriodBase } from "./datePeriod/datePeriodBase";
 
-import {Calendar, CalendarFormat, CalendarFormattingSettings, WeekdayFormat} from "./calendars/calendar";
-import {Utils} from "./utils";
-import {WeekStandard} from "./calendars/weekStandard";
-import {CalendarFactory} from "./calendars/calendarFactory";
+import { Calendar, CalendarFormat, CalendarFormattingSettings, WeekdayFormat } from "./calendars/calendar";
+import { Utils } from "./utils";
+import { WeekStandard } from "./calendars/weekStandard";
+import { CalendarFactory } from "./calendars/calendarFactory";
 import {
     CalendarSettingsCard,
     CellsSettingsCard,
     RangeHeaderSettingsCard,
     TimeLineSettingsModel,
 } from "./timeLineSettingsModel";
-import {FormattingSettingsService} from "powerbi-visuals-utils-formattingmodel";
-import ISelectionManager = powerbiVisualsApi.extensibility.ISelectionManager;
-import IViewport = powerbiVisualsApi.IViewport;
+import { FormattingSettingsService } from "powerbi-visuals-utils-formattingmodel";
 import extractFilterColumnTarget = interactivityFilterService.extractFilterColumnTarget;
 import { Month } from './calendars/month';
-import {Weekday} from "./calendars/weekday";
-import {Behavior} from "./behavior";
+import { Weekday } from "./calendars/weekday";
+import { Behavior } from "./behavior";
+
+import ISelectionManager = powerbiVisualsApi.extensibility.ISelectionManager;
+import ISQExpr = powerbiVisualsApi.data.ISQExpr
+import IViewport = powerbiVisualsApi.IViewport;
 
 interface IAdjustedFilterDatePeriod {
     period: DatePeriodBase;
@@ -141,7 +143,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
             }];
         }
 
-        const {weekStandard, calendarFormat, weekDayFormat} = Timeline.computeCalendarFormat(this.visualSettings);
+        const { weekStandard, calendarFormat, weekDayFormat } = Timeline.computeCalendarFormat(this.visualSettings);
 
         const isCalendarChanged: boolean = previousCalendar
             && previousCalendar.isChanged(calendarFormat, weekDayFormat, weekStandard);
@@ -168,10 +170,6 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
 
         const category: powerbiVisualsApi.DataViewCategoryColumn = dataView.categorical.categories[0];
         this.timelineData.filterColumnTarget = extractFilterColumnTarget(category);
-
-        if (category.source.type.numeric) {
-            (<any>(this.timelineData.filterColumnTarget)).ref = "Date";
-        }
 
         if (isCalendarChanged && startDate && endDate) {
             Utils.UNSEPARATE_SELECTION(this.timelineData.currentGranularity.getDatePeriods());
@@ -229,7 +227,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
                 : Weekday.Sunday,
         }
 
-        return {weekStandard, calendarFormat, weekDayFormat};
+        return { weekStandard, calendarFormat, weekDayFormat };
     }
 
     public static SELECT_PERIOD(
@@ -292,12 +290,14 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
         }
 
         const dataView: powerbiVisualsApi.DataView = options.dataViews[0];
-        const columnExp: any = dataView.categorical.categories[0].source.expr;
+        const columnExp: ISQExpr = dataView.categorical.categories[0].source.expr;
 
-        const valueType: string = columnExp
+        // Read column name from hierarchy if possible.
+        const valueType: string = (columnExp && 'level' in columnExp && typeof columnExp.level === 'string')
             ? columnExp.level
             : null;
 
+        // Check if the column is of type date or numeric (inside the hierarchy)
         if (!(dataView.categorical.categories[0].source.type.dateTime
             || (dataView.categorical.categories[0].source.type.numeric
                 && (valueType === "Year" || valueType === "Date")))) {
@@ -549,22 +549,22 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
 
     private timelineGranularityData: GranularityData;
 
-    private rootSelection: D3Selection<any, any, any, any>;
-    private headerWrapperSelection: D3Selection<any, any, any, any>;
-    private headerSelection: D3Selection<any, any, any, any>;
-    private mainSvgSelection: D3Selection<any, any, any, any>;
-    private mainSvgWrapperSelection: D3Selection<any, any, any, any>;
+    private rootSelection: d3Selection<HTMLDivElement, unknown, null, undefined>;
+    private headerWrapperSelection: d3Selection<HTMLDivElement, unknown, null, undefined>;
+    private headerSelection: d3Selection<SVGSVGElement, unknown, null, undefined>;
+    private mainSvgSelection: d3Selection<SVGSVGElement, unknown, null, undefined>;
+    private mainSvgWrapperSelection: d3Selection<HTMLDivElement, unknown, null, undefined>;
 
-    private rangeTextSelection: D3Selection<any, any, any, any>;
-    private mainGroupSelection: D3Selection<any, any, any, any>;
-    private yearLabelsSelection: D3Selection<any, any, any, any>;
-    private quarterLabelsSelection: D3Selection<any, any, any, any>;
-    private monthLabelsSelection: D3Selection<any, any, any, any>;
-    private weekLabelsSelection: D3Selection<any, any, any, any>;
-    private dayLabelsSelection: D3Selection<any, any, any, any>;
-    private cellsSelection: D3Selection<any, any, any, any>;
-    private cursorGroupSelection: D3Selection<any, any, any, any>;
-    private selectorSelection: D3Selection<any, any, any, any>;
+    private rangeTextSelection: d3Selection<SVGTextElement, unknown, null, undefined>;
+    private mainGroupSelection: d3Selection<SVGGElement, unknown, null, undefined>;
+    private yearLabelsSelection: d3Selection<SVGGElement, unknown, null, undefined>;
+    private quarterLabelsSelection: d3Selection<SVGGElement, unknown, null, undefined>;
+    private monthLabelsSelection: d3Selection<SVGGElement, unknown, null, undefined>;
+    private weekLabelsSelection: d3Selection<SVGGElement, unknown, null, undefined>;
+    private dayLabelsSelection: d3Selection<SVGGElement, unknown, null, undefined>;
+    private cellsSelection: d3Selection<SVGGElement, unknown, null, undefined>;
+    private cursorGroupSelection: d3Selection<SVGGElement, unknown, null, undefined>;
+    private selectorSelection: d3Selection<SVGGElement, unknown, null, undefined>;
 
     private options: powerbiVisualsApi.extensibility.visual.VisualUpdateOptions;
     private dataView: powerbiVisualsApi.DataView;
@@ -813,7 +813,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
             filterDatePeriod.endDate &&
             currentPeriod.startDate &&
             currentPeriod.endDate &&
-            currentPeriod.startDate.getTime() !== filterDatePeriod.startDate.getTime() && 
+            currentPeriod.startDate.getTime() !== filterDatePeriod.startDate.getTime() &&
             currentPeriod.endDate.getTime() !== filterDatePeriod.endDate.getTime() &&
             this.prevFilteredStartDate == null &&
             this.prevFilteredEndDate == null
@@ -876,8 +876,8 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
     public fillCells(visSettings: TimeLineSettingsModel): void {
         const dataPoints: ITimelineDataPoint[] = this.timelineData.timelineDataPoints;
 
-        const cellSelection: D3Selection<any, ITimelineDataPoint, any, any> = this.mainGroupSelection
-            .selectAll(Timeline.TimelineSelectors.CellRect.selectorName)
+        const cellSelection: d3Selection<SVGRectElement, ITimelineDataPoint, SVGGElement, unknown> = this.mainGroupSelection
+            .selectAll<SVGRectElement, ITimelineDataPoint>(Timeline.TimelineSelectors.CellRect.selectorName)
             .data(dataPoints);
 
         const cellsSettings: CellsSettingsCard = visSettings.cells;
@@ -889,7 +889,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
                 const isSelected: boolean = Utils.IS_GRANULE_SELECTED(dataPoint, this.timelineData);
 
                 if (visSettings.scrollAutoAdjustment.show.value && isSelected && !singleCaseDone) {
-                    const selectedGranulaPos: number = (<any>(cellSelection.nodes()[index])).x.baseVal.value;
+                    const selectedGranulaPos: number = ((cellSelection.nodes()[index])).x.baseVal.value;
                     this.selectedGranulaPos = selectedGranulaPos;
                     singleCaseDone = true;
                 }
@@ -912,8 +912,8 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
         const dataPoints: ITimelineDataPoint[] = timelineData.timelineDataPoints;
         let totalX: number = 0;
 
-        const cellsSelection: D3Selection<any, ITimelineDataPoint, any, any> = this.cellsSelection
-            .selectAll(Timeline.TimelineSelectors.CellRect.selectorName)
+        const cellsSelection: d3Selection<SVGRectElement, ITimelineDataPoint, SVGGElement, unknown> = this.cellsSelection
+            .selectAll<SVGRectElement, ITimelineDataPoint>(Timeline.TimelineSelectors.CellRect.selectorName)
             .data(dataPoints);
 
         d3SelectAll(`rect.${Timeline.TimelineSelectors.CellRect.className} title`).remove();
@@ -951,9 +951,9 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
         timelineData: ITimelineData,
         cellHeight: number,
         cellsYPosition: number,
-    ): D3Selection<any, any, any, any> {
-        const cursorSelection: D3Selection<any, ICursorDataPoint, any, any> = this.cursorGroupSelection
-            .selectAll(Timeline.TimelineSelectors.SelectionCursor.selectorName)
+    ): d3Selection<SVGPathElement, ICursorDataPoint, SVGGElement, unknown> {
+        const cursorSelection: d3Selection<SVGPathElement, ICursorDataPoint, SVGGElement, unknown> = this.cursorGroupSelection
+            .selectAll<SVGPathElement, ICursorDataPoint>(Timeline.TimelineSelectors.SelectionCursor.selectorName)
             .data(timelineData.cursorDataPoints);
 
         cursorSelection
@@ -1190,7 +1190,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
         this.visualSettings.granularity.granularity.value = selectedGranularity;
     }
 
-    public onCursorDrag(event: D3DragEvent<any, ICursorDataPoint, ICursorDataPoint>, currentCursor: ICursorDataPoint): void {
+    public onCursorDrag(event: D3DragEvent<SVGPathElement, ICursorDataPoint, ICursorDataPoint>, currentCursor: ICursorDataPoint): void {
 
         const cursorOverElement: ITimelineCursorOverElement = this.findCursorOverElement(event.x);
 
@@ -1288,7 +1288,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
         // This means that we need to correct it before check.
         let adaptedDataEndDate: Date = null;
         if (this.datePeriod.endDate) {
-            adaptedDataEndDate = new Date(<any>(this.datePeriod.endDate));
+            adaptedDataEndDate = new Date(this.datePeriod.endDate);
             adaptedDataEndDate.setDate(adaptedDataEndDate.getDate() + 1);
         }
 
@@ -1618,19 +1618,19 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
 
     private renderLabels(
         labels: ITimelineLabel[],
-        labelsElement: D3Selection<any, any, any, any>,
+        labelsElement: d3Selection<SVGGElement, unknown, null, undefined>,
         yPosition: number,
         isLast: boolean,
     ): void {
-        const labelTextSelection: D3Selection<any, ITimelineLabel, any, any> = labelsElement
-            .selectAll(Timeline.TimelineSelectors.TextLabel.selectorName);
+        const labelTextSelection: d3Selection<SVGTextElement, ITimelineLabel, SVGGElement, unknown> = labelsElement
+            .selectAll<SVGTextElement, ITimelineLabel>(Timeline.TimelineSelectors.TextLabel.selectorName);
 
         if (!this.visualSettings.labels.show.value) {
             labelTextSelection.remove();
             return;
         }
 
-        const labelsGroupSelection: D3Selection<any, ITimelineLabel, any, any> = labelTextSelection.data(labels);
+        const labelsGroupSelection: d3Selection<SVGTextElement, ITimelineLabel, SVGGElement, unknown> = labelTextSelection.data(labels);
         const fontSize: string = pixelConverter.fromPoint(this.visualSettings.labels.textSize.value);
 
         labelsGroupSelection
