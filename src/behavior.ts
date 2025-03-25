@@ -1,24 +1,47 @@
+/*
+ *  Power BI Visualizations
+ *
+ *  Copyright (c) Microsoft Corporation
+ *  All rights reserved.
+ *  MIT License
+ *
+ *  Permission is hereby granted, free of charge, to any person obtaining a copy
+ *  of this software and associated documentation files (the ""Software""), to deal
+ *  in the Software without restriction, including without limitation the rights
+ *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ *  copies of the Software, and to permit persons to whom the Software is
+ *  furnished to do so, subject to the following conditions:
+ *
+ *  The above copyright notice and this permission notice shall be included in
+ *  all copies or substantial portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED *AS IS*, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ *  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ *  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ *  THE SOFTWARE.
+ */
 
 import { Selection as d3Selection, local as d3local } from "d3-selection";
-import {ICursorDataPoint, ITimelineDataPoint} from "./dataInterfaces";
+import { ICursorDataPoint, ITimelineDataPoint } from "./dataInterfaces";
 import ISelectionManager = powerbi.extensibility.ISelectionManager;
-import {D3DragEvent, drag as d3Drag} from "d3-drag";
-
-type Selection<T1, T2 = T1> = d3Selection<any, T1, any, T2>;
+import { D3DragEvent, drag as d3Drag } from "d3-drag";
 
 export interface BehaviorOptions {
     selectionManager: ISelectionManager;
     cells: {
-        selection: Selection<ITimelineDataPoint>;
+        selection: d3Selection<SVGRectElement, ITimelineDataPoint, SVGGElement, unknown>;
         callback: (dataPoint: ITimelineDataPoint, index: number, isMultiSelection: boolean) => void;
         cellWidth: number;
     };
     cursors: {
-        selection:  Selection<ICursorDataPoint>
-        onDrag: (event: D3DragEvent<any, ICursorDataPoint, ICursorDataPoint>, currentCursor: ICursorDataPoint) => void;
+        selection: d3Selection<SVGPathElement, ICursorDataPoint, SVGGElement, unknown>
+        onDrag: (event: D3DragEvent<SVGPathElement, ICursorDataPoint, ICursorDataPoint>, currentCursor: ICursorDataPoint) => void;
         onEnd: () => void;
     }
-    clearCatcher: Selection<any>;
+    clearCatcher: d3Selection<HTMLDivElement, unknown, null, undefined>;
     clearSelectionHandler: () => void;
 }
 
@@ -30,8 +53,8 @@ export class Behavior {
     }
 
     private static handleCursorsDrag(options: BehaviorOptions) {
-        const dragBehavior = d3Drag<any, ICursorDataPoint>()
-            .subject((_: D3DragEvent<any, ICursorDataPoint, ICursorDataPoint>, cursorDataPoint: ICursorDataPoint) => {
+        const dragBehavior = d3Drag<SVGPathElement, ICursorDataPoint>()
+            .subject((_: D3DragEvent<SVGPathElement, ICursorDataPoint, ICursorDataPoint>, cursorDataPoint: ICursorDataPoint) => {
                 cursorDataPoint.x = cursorDataPoint.selectionIndex * options.cells.cellWidth;
 
                 return cursorDataPoint;

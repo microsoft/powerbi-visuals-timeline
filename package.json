@@ -1,6 +1,6 @@
 {
   "name": "powerbi-visuals-timeline",
-  "version": "2.5.11.0",
+  "version": "2.5.13.0",
   "description": "Timeline slicer is a graphical date range selector used as a filtering component in the report canvas",
   "repository": {
     "type": "git",
@@ -16,7 +16,7 @@
     "package": "pbiviz package",
     "test": "karma start",
     "watch": "karma start --single-run=false",
-    "eslint": "npx eslint . --ext .js,.jsx,.ts,.tsx"
+    "eslint": "npx eslint ."
   },
   "author": {
     "name": "Microsoft",
@@ -34,7 +34,7 @@
     "@types/d3-shape": "^3.1.6",
     "@types/jasmine": "^5.1.4",
     "@types/karma": "^6.3.8",
-    "@types/node": "^20.14.12",
+    "@types/node": "^22.13.4",
     "css-loader": "^7.1.2",
     "jasmine": "^5.3.0",
     "karma": "^6.4.4",
@@ -48,11 +48,12 @@
     "less-loader": "^12.2.0",
     "playwright-chromium": "^1.47.2",
     "powerbi-visuals-api": "5.11.0",
-    "powerbi-visuals-tools": "5.5.1",
+    "powerbi-visuals-tools": "^5.6.0",
     "powerbi-visuals-utils-testutils": "^6.1.1",
     "style-loader": "^4.0.0",
     "ts-loader": "^9.5.1",
     "typescript": "^5.6.2",
+    "typescript-eslint": "^8.24.1",
     "webpack": "^5.95.0"
   },
   "dependencies": {
@@ -62,8 +63,8 @@
     "d3-drag": "^3.0.0",
     "d3-selection": "^3.0.0",
     "d3-shape": "^3.2.0",
-    "eslint": "^8.57.0",
-    "eslint-plugin-powerbi-visuals": "^0.8.1",
+    "eslint": "^9.20.1",
+    "eslint-plugin-powerbi-visuals": "^1.0.0",
     "powerbi-models": "^1.15.2",
     "powerbi-visuals-utils-chartutils": "7.0.0",
     "powerbi-visuals-utils-formattingmodel": "^6.0.4",
