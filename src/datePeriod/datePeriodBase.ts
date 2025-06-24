@@ -36,7 +36,7 @@ export class DatePeriodBase implements ITimelineDatePeriodBase {
 
         try {
             datePeriod = JSON.parse(jsonString);
-        } catch (_) {
+        } catch {
             datePeriod = null;
         }
 

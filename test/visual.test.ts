@@ -23,32 +23,32 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
  */
-import {select as d3Select} from "d3-selection";
+import { select as d3Select } from "d3-selection";
 import powerbiVisualsApi from "powerbi-visuals-api";
-import {assertColorsMatch, d3Click, parseColorString, renderTimeout,} from "powerbi-visuals-utils-testutils";
+import { assertColorsMatch, d3Click, parseColorString, renderTimeout } from "powerbi-visuals-utils-testutils";
 
-import {Calendar, CalendarFormat, WeekdayFormat} from "../src/calendars/calendar";
-import {ITimelineCursorOverElement, ITimelineData} from "../src/dataInterfaces";
-import {ITimelineDatePeriod, ITimelineDatePeriodBase} from "../src/datePeriod/datePeriod";
-import {DatePeriodBase} from "../src/datePeriod/datePeriodBase";
-import {CalendarISO8061} from "../src/calendars/calendarISO8061";
-import {Weekday} from "../src/calendars/weekday";
+import { Calendar, CalendarFormat, CalendarFormattingSettings, WeekdayFormat } from "../src/calendars/calendar";
+import { ITimelineCursorOverElement, ITimelineData } from "../src/dataInterfaces";
+import { ITimelineDatePeriod, ITimelineDatePeriodBase } from "../src/datePeriod/datePeriod";
+import { DatePeriodBase } from "../src/datePeriod/datePeriodBase";
+import { CalendarISO8061 } from "../src/calendars/calendarISO8061";
+import { Weekday } from "../src/calendars/weekday";
 
-import {DayGranularity} from "../src/granularity/dayGranularity";
-import {IGranularity} from "../src/granularity/granularity";
-import {GranularityType} from "../src/granularity/granularityType";
-import {MonthGranularity} from "../src/granularity/monthGranularity";
-import {QuarterGranularity} from "../src/granularity/quarterGranularity";
-import {WeekGranularity} from "../src/granularity/weekGranularity";
-import {YearGranularity} from "../src/granularity/yearGranularity";
+import { DayGranularity } from "../src/granularity/dayGranularity";
+import { IGranularity } from "../src/granularity/granularity";
+import { GranularityType } from "../src/granularity/granularityType";
+import { MonthGranularity } from "../src/granularity/monthGranularity";
+import { QuarterGranularity } from "../src/granularity/quarterGranularity";
+import { WeekGranularity } from "../src/granularity/weekGranularity";
+import { YearGranularity } from "../src/granularity/yearGranularity";
 
-import {Utils} from "../src/utils";
-import {areColorsEqual, getSolidColorStructuralObject} from "./helpers";
-import {Timeline} from "../src/timeLine";
-import {CellsSettingsCard} from "../src/timeLineSettingsModel";
-import {GranularityMock} from "./granularityMock";
-import {VisualBuilder} from "./visualBuilder";
-import {VisualData} from "./visualData";
+import { Utils } from "../src/utils";
+import { areColorsEqual, getSolidColorStructuralObject } from "./helpers";
+import { Timeline } from "../src/timeLine";
+import { CellsSettingsCard } from '../src/timeLineSettingsModel';
+import { GranularityMock } from "./granularityMock";
+import { VisualBuilder } from "./visualBuilder";
+import { VisualData } from "./visualData";
 
 
 describe("Timeline", () => {
@@ -81,12 +81,12 @@ describe("Timeline", () => {
                 const countOfTextItems: number = visualBuilder
                     .mainElement
                     .querySelectorAll("g.mainArea > g")
-                    [4]
+                [4]
                     .querySelectorAll(".label > *")
                     .length;
 
-                expect(countOfDays).toBe(dataView.categorical.categories[0].values.length);
-                expect(countOfTextItems).toBe(dataView.categorical.categories[0].values.length);
+                expect(countOfDays).toBe(dataView.categorical!.categories![0].values.length);
+                expect(countOfTextItems).toBe(dataView.categorical!.categories![0].values.length);
 
                 const cellRects: NodeListOf<SVGRectElement> = visualBuilder.cellRects
                 const lastCell = cellRects[cellRects.length - 1];
@@ -100,7 +100,7 @@ describe("Timeline", () => {
                 expect(selectedCellColor.G).not.toBe(unselectedCellColor.G);
                 expect(selectedCellColor.B).not.toBe(unselectedCellColor.B);
 
-                const cellHeightStr: string = cellRects[0].attributes.getNamedItem("height").value;
+                const cellHeightStr: string = cellRects[0].attributes.getNamedItem("height")!.value;
                 const cellHeight: number = parseInt(cellHeightStr.replace("px", ""), 10);
 
                 expect(cellHeight).toBeLessThan(60.1);
@@ -120,14 +120,14 @@ describe("Timeline", () => {
             visualBuilder.update(dataView);
 
             renderTimeout(() => {
-                dataView.categorical.categories[0].values.push(null);
+                dataView.categorical!.categories![0].values.push(null as unknown as string);
 
                 visualBuilder.updateRenderTimeout(dataView, () => {
                     const countOfDays: number = visualBuilder
                         .cellRects
                         .length;
 
-                    expect(countOfDays).toBe(dataView.categorical.categories[0].values.length - 1);
+                    expect(countOfDays).toBe(dataView.categorical!.categories![0].values.length - 1);
 
                     done();
                 });
@@ -145,9 +145,11 @@ describe("Timeline", () => {
 
             renderTimeout(() => {
                 // TimeRangeText check visibility when visual is small
-                const textRangeText: string | null = visualBuilder.getRangeHeader().firstElementChild.textContent
+                const textRangeText: string | null | undefined = visualBuilder.getRangeHeader()?.firstElementChild?.textContent
 
-                expect(textRangeText).toContain("2016");
+                expect(textRangeText).not.toBeNull();
+                expect(textRangeText).not.toBeUndefined();
+                expect(textRangeText!).toContain("2016");
 
                 done();
             });
@@ -336,7 +338,7 @@ describe("Timeline", () => {
             for (let i: number = 0; i < cellRects.length; i++) {
                 const fillColor: string = d3Select(cellRects[i]).attr("fill");
 
-                assertColorsMatch(fillColor, CellsSettingsCard.FillUnselectedDefaultColor, i === 0);
+                assertColorsMatch(fillColor, CellsSettingsCard.UnselectedDefaultFillColor, i === 0);
             }
         });
     });
@@ -432,7 +434,7 @@ describe("Timeline", () => {
             granularity: GranularityType | string,
             expectedElementsAmount: number,
         ): void {
-            dataView.metadata.objects.granularity.granularity = granularity;
+            dataView.metadata.objects!.granularity.granularity = granularity;
 
             visualBuilder.updateFlushAllD3Transitions(dataView);
 
@@ -443,14 +445,13 @@ describe("Timeline", () => {
                     const fill: string = getComputedStyle(element).fill;
 
                     const fillColorParsed = parseColorString(fill);
-                    const unselectedFillColor = parseColorString(CellsSettingsCard.FillUnselectedDefaultColor);
+                    const selectedFillColor = parseColorString(visualBuilder.visualPublic.visualSettings.cells.fillSelected.value.value);
 
                     if (fill !== "rgba(0, 0, 0, 0)" &&
                         fill !== Utils.DefaultCellColor &&
-                        (fillColorParsed.R !== unselectedFillColor.R ||
-                        fillColorParsed.G !== unselectedFillColor.G ||
-                        fillColorParsed.B !== unselectedFillColor.B )
-                    ) {
+                        (selectedFillColor.R === fillColorParsed.R &&
+                            selectedFillColor.G === fillColorParsed.G &&
+                            selectedFillColor.B === fillColorParsed.B)) {
                         selectedElements.push(element);
                     }
                 });
@@ -461,7 +462,7 @@ describe("Timeline", () => {
         function checkSelectedElementIsLatestAvailable(
             granularity: string,
         ): void {
-            dataView.metadata.objects.granularity.granularity = granularity;
+            dataView.metadata.objects!.granularity.granularity = granularity;
 
             visualBuilder.updateFlushAllD3Transitions(dataView);
 
@@ -470,19 +471,19 @@ describe("Timeline", () => {
             const lastElement = cells[cells.length - 1];
 
             cells.forEach((element: SVGRectElement) => {
-                    const fill: string = getComputedStyle(element).fill;
+                const fill: string = getComputedStyle(element).fill;
 
-                    const fillColorParsed = parseColorString(fill);
-                    const unselectedFillColor = parseColorString(CellsSettingsCard.FillUnselectedDefaultColor);
+                const fillColorParsed = parseColorString(fill);
+                const selectedFillColor = parseColorString(visualBuilder.visualPublic.visualSettings.cells.fillSelected.value.value);
 
-                    if (fill !== "rgba(0, 0, 0, 0)" &&
-                        fill !== Utils.DefaultCellColor &&
-                        fillColorParsed.R !== unselectedFillColor.R &&
-                        fillColorParsed.G !== unselectedFillColor.G &&
-                        fillColorParsed.B !== unselectedFillColor.B) {
-                        selectedElements.push(element);
-                    }
-                });
+                if (fill !== "rgba(0, 0, 0, 0)" &&
+                    fill !== Utils.DefaultCellColor &&
+                    fillColorParsed.R === selectedFillColor.R &&
+                    fillColorParsed.G === selectedFillColor.G &&
+                    fillColorParsed.B === selectedFillColor.B) {
+                    selectedElements.push(element);
+                }
+            });
 
             expect(selectedElements.length).toEqual(1);
             expect(selectedElements[0]).toEqual(lastElement);
@@ -517,7 +518,7 @@ describe("Timeline", () => {
 
                 visualBuilder.updateFlushAllD3Transitions(dataView);
 
-                const fill: string = getComputedStyle(visualBuilder.rangeHeaderText).fill;
+                const fill: string = getComputedStyle(visualBuilder.rangeHeaderText!).fill;
                 assertColorsMatch(fill, color);
             });
 
@@ -528,7 +529,7 @@ describe("Timeline", () => {
                 (<any>(dataView.metadata.objects)).rangeHeader.textSize = fontSize;
                 visualBuilder.updateFlushAllD3Transitions(dataView);
 
-                expect(visualBuilder.rangeHeaderText.style["font-size"]).toBe(expectedFontSize);
+                expect(getComputedStyle(visualBuilder.rangeHeaderText!).fontSize).toBe(expectedFontSize);
             });
         });
 
@@ -710,7 +711,7 @@ describe("Timeline", () => {
 
                 visualBuilder.updateFlushAllD3Transitions(dataView);
 
-                const periods: any[] = visualBuilder.visualObject.timelineData.currentGranularity.getDatePeriods();
+                const periods: any[] = visualBuilder.visualObject.timelineData.currentGranularity!.getDatePeriods();
                 expect(periods.length).toEqual(55);
                 expect(<Date>(periods[0].startDate)).toEqual(new Date(2015, 0, 1));
                 expect(<Date>(periods[53].startDate)).toEqual(new Date(2016, 0, 1));
@@ -890,7 +891,7 @@ describe("Timeline", () => {
 
                         const amountOfMonths: number = amountOfMonthsInYearsDiff + amountOfMonthsThisYear;
 
-                        let expectedElementsAmount: number;
+                        let expectedElementsAmount: number = 0;
                         switch (granularityValue) {
                             case GranularityType.year:
                                 expectedElementsAmount = amountOfYears;
@@ -963,7 +964,6 @@ describe("Timeline", () => {
             beforeEach(() => {
                 dataView.metadata.objects = {
                     labels: {
-                        displayAll: true,
                         show: true,
                     },
                 };
@@ -978,16 +978,6 @@ describe("Timeline", () => {
                 visualBuilder.updateFlushAllD3Transitions(dataView);
 
                 expect(visualBuilder.allLabels.length).toBe(0);
-            });
-
-            it("shows only selected granularity label if displayAll is set to false", () => {
-                visualBuilder.updateFlushAllD3Transitions(dataView);
-                // All labels should be visible
-                expect(visualBuilder.allLabels.length).toBeGreaterThan(1);
-                (<any>(dataView.metadata.objects)).labels.displayAll = false;
-                visualBuilder.updateFlushAllD3Transitions(dataView);
-                // Only one label should be visible
-                expect(visualBuilder.allLabels.length).toBe(1);
             });
 
             it("font color", () => {
@@ -1029,11 +1019,11 @@ describe("Timeline - Granularity - 1 Jan (Regular Calendar)", () => {
         calendar = createCalendar();
 
         granularities = [
-            new YearGranularity(calendar, null, null),
-            new QuarterGranularity(calendar, null),
-            new WeekGranularity(calendar, null, null),
-            new MonthGranularity(calendar, null),
-            new DayGranularity(calendar, null),
+            new YearGranularity(calendar, "en-US"),
+            new QuarterGranularity(calendar, "en-US"),
+            new WeekGranularity(calendar, "en-US"),
+            new MonthGranularity(calendar, "en-US"),
+            new DayGranularity(calendar, "en-US"),
         ];
     });
 
@@ -1075,11 +1065,11 @@ describe("Timeline - Granularity - 1 Apr (Fiscal Calendar)", () => {
         calendar = createCalendar(3);
 
         granularities = [
-            new YearGranularity(calendar, null, null),
-            new QuarterGranularity(calendar, null),
-            new WeekGranularity(calendar, null, null),
-            new MonthGranularity(calendar, null),
-            new DayGranularity(calendar, null),
+            new YearGranularity(calendar, "en-US"),
+            new QuarterGranularity(calendar, "en-US"),
+            new WeekGranularity(calendar, "en-US"),
+            new MonthGranularity(calendar, "en-US"),
+            new DayGranularity(calendar, "en-US"),
         ];
     });
 
@@ -1157,7 +1147,8 @@ describe("Timeline - Granularity - ISO 8601 Week numbering", () => {
     let calendar: Calendar;
 
     beforeEach(() => {
-        calendar = new CalendarISO8061();
+        const calendarFormattingSettings: CalendarFormattingSettings = { treatAsEndOfFiscalYear: true };
+        calendar = new CalendarISO8061(calendarFormattingSettings);
     });
 
     describe("ISO Calendar Methods", () => {
@@ -1344,8 +1335,8 @@ describe("Timeline - TimelineUtils", () => {
             checkStringWithoutTimezone(date, expectedString);
         });
 
-        function checkStringWithoutTimezone(date: Date, expectedString: string): void {
-            const actualString: string = Utils.TO_STRING_DATE_WITHOUT_TIMEZONE(date);
+        function checkStringWithoutTimezone(date: Date | null, expectedString: string | null): void {
+            const actualString: string | null = Utils.TO_STRING_DATE_WITHOUT_TIMEZONE(date);
 
             expect(actualString).toBe(expectedString);
         }
@@ -1353,7 +1344,7 @@ describe("Timeline - TimelineUtils", () => {
 
     describe("parseDateWithoutTimezone", () => {
         it("should return null when a dateString is null", () => {
-            const actualDate: Date = Utils.PARSE_DATE_WITHOUT_TIMEZONE(null);
+            const actualDate: Date | null = Utils.PARSE_DATE_WITHOUT_TIMEZONE(null);
 
             expect(actualDate).toBe(null);
         });
@@ -1362,9 +1353,10 @@ describe("Timeline - TimelineUtils", () => {
             const actualString: string = "2008-02-01T23:59:59.999Z";
             const expectedDate: Date = new Date(2008, 1, 1, 23, 59, 59, 999);
 
-            const actualDate: Date = Utils.PARSE_DATE_WITHOUT_TIMEZONE(actualString);
+            const actualDate: Date | null = Utils.PARSE_DATE_WITHOUT_TIMEZONE(actualString);
 
-            expect(actualDate.getTime()).toBe(expectedDate.getTime());
+            expect(actualDate).not.toBeNull();
+            expect(actualDate!.getTime()).toBe(expectedDate.getTime());
         });
     });
 
@@ -1562,7 +1554,7 @@ describe("Timeline - TimelineUtils", () => {
             checkBoundsOfDates(dates, minDate, maxDate);
         });
 
-        function checkBoundsOfDates(values: any[], startDate: any, endDate: any): void {
+        function checkBoundsOfDates(values: Date[] | undefined, startDate: any, endDate: any): void {
             const actualDatePeriod: ITimelineDatePeriodBase = Utils.GET_DATE_PERIOD(values);
 
             expect(getTime(actualDatePeriod.startDate)).toBe(getTime(startDate));
@@ -1636,7 +1628,7 @@ describe("Timeline - TimelineUtils", () => {
         });
     });
 
-    function getTime(date: Date): number | Date {
+    function getTime(date?: Date): number | Date | undefined {
         return date && date.getTime
             ? date.getTime()
             : date;
@@ -1723,6 +1715,7 @@ function createCalendar(
     day: number = 1,
     week: number = 1,
     dayOfWeekSelectionOn: boolean = false,
+    treatAsEndOfFiscalYear: boolean = true,
 ): Calendar {
 
     const calendarSettings: CalendarFormat = {
@@ -1735,7 +1728,7 @@ function createCalendar(
         daySelection: dayOfWeekSelectionOn,
     };
 
-    return new Calendar(calendarSettings, weekDaySettings);
+    return new Calendar(calendarSettings, weekDaySettings, { treatAsEndOfFiscalYear });
 }
 
 function createDatePeriod(dates: Date[]): ITimelineDatePeriod[] {

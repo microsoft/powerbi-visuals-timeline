@@ -45,24 +45,6 @@
                 }
             }
         },
-        "cursor": {
-            "properties": {
-                "show": {
-                    "type": {
-                        "bool": true
-                    }
-                },
-                "color": {
-                    "type": {
-                        "fill": {
-                            "solid": {
-                                "color": true
-                            }
-                        }
-                    }
-                }
-            }
-        },
         "forceSelection": {
             "properties": {
                 "currentPeriod": {
@@ -99,6 +81,11 @@
         },
         "calendar": {
             "properties": {
+                "treatAsEndOfFiscalYear": {
+                    "type": {
+                        "bool": true
+                    }
+                },
                 "month": {
                     "type": {
                         "enumeration": [
@@ -311,6 +298,20 @@
                     "type": {
                         "numeric": true
                     }
+                },
+                "showEdges": {
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "edgeColor": {
+                    "type": {
+                        "fill": {
+                            "solid": {
+                                "color": true
+                            }
+                        }
+                    }
                 }
             }
         },
@@ -406,6 +407,31 @@
                     }
                 },
                 "displayAll": {
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "displayYears": {
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "displayQuarters": {
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "displayMonths": {
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "displayWeeks": {
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "displayDays": {
                     "type": {
                         "bool": true
                     }

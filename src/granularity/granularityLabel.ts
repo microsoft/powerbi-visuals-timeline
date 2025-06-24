@@ -24,7 +24,20 @@
  *  THE SOFTWARE.
  */
 
-export enum WeekStandard {
-    NotSet = 0,
-    ISO8061 = 1
+import { GranularityType } from "./granularityType";
+
+export enum GranularityLabel {
+    displayYears = 'displayYears',
+    displayQuarters = 'displayQuarters',
+    displayMonths = 'displayMonths',
+    displayWeeks = 'displayWeeks',
+    displayDays = 'displayDays',
 }
+
+export const granularityLevels: Record<GranularityType, GranularityLabel[]> = {
+    [GranularityType.year]: [],
+    [GranularityType.quarter]: [GranularityLabel.displayYears],
+    [GranularityType.month]: [GranularityLabel.displayYears, GranularityLabel.displayQuarters],
+    [GranularityType.week]: [GranularityLabel.displayYears, GranularityLabel.displayQuarters, GranularityLabel.displayMonths],
+    [GranularityType.day]: [GranularityLabel.displayYears, GranularityLabel.displayQuarters, GranularityLabel.displayMonths, GranularityLabel.displayWeeks],
+};
