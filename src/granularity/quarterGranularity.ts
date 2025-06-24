@@ -24,7 +24,7 @@
  *  THE SOFTWARE.
  */
 
-import { Selection } from "d3-selection";
+import { Selection as d3Selection } from "d3-selection";
 
 import { Calendar } from "../calendars/calendar";
 import { ITimelineLabel } from "../dataInterfaces";
@@ -39,7 +39,7 @@ export class QuarterGranularity extends GranularityBase {
         super(calendar, locale, Utils.GET_GRANULARITY_PROPS_BY_MARKER("Q"));
     }
 
-    public render(props: IGranularityRenderProps, isFirst: boolean): Selection<any, any, any, any> {
+    public render(props: IGranularityRenderProps, isFirst: boolean): d3Selection<SVGGElement, unknown, null, undefined> {
         if (!props.granularSettings.granularityQuarterVisibility.value) {
             return null;
         }

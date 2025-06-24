@@ -59,7 +59,7 @@ module.exports = (config) => {
         files: [
             testRecursivePath,
         ],
-        frameworks: ["jasmine"],
+        frameworks: ["jasmine", "webpack"],
         junitReporter: {
             outputDir: path.join(__dirname, coverageFolder),
             outputFile: "TESTS-report.xml",

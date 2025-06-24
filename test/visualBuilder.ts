@@ -48,6 +48,10 @@ export class VisualBuilder extends VisualBuilderBase<Timeline> {
         };
     }
 
+    public get visualPublic() {
+        return this.visual;
+    }
+
     private jsonFilters: powerbiVisualsApi.IFilter[] = [];
 
     constructor(width: number, height: number) {
@@ -63,11 +67,11 @@ export class VisualBuilder extends VisualBuilderBase<Timeline> {
     }
 
     public get rootElement(): HTMLElement {
-        return this.element.querySelector<HTMLElement>(".timeline-component");
+        return this.element.querySelector<HTMLElement>(".timeline-component")!;
     }
 
     public get mainElement(): SVGElement {
-        return this.element.querySelector<SVGElement>("svg.timeline");
+        return this.element.querySelector<SVGElement>("svg.timeline")!;
     }
 
     public get headerElement(): SVGElement {

@@ -24,7 +24,7 @@
  *  THE SOFTWARE.
  */
 
-import { Selection } from "d3-selection";
+import { Selection as d3Selection } from "d3-selection";
 import powerbiVisualsApi from "powerbi-visuals-api";
 
 import { Calendar } from "../calendars/calendar";
@@ -41,7 +41,7 @@ export class YearGranularity extends GranularityBase {
     constructor(
         calendar: Calendar,
         locale: string,
-        protected localizationManager: powerbiVisualsApi.extensibility.ILocalizationManager,
+        protected localizationManager?: powerbiVisualsApi.extensibility.ILocalizationManager,
     ) {
         super(calendar, locale, Utils.GET_GRANULARITY_PROPS_BY_MARKER("Y"));
     }
@@ -50,7 +50,7 @@ export class YearGranularity extends GranularityBase {
         return GranularityType.year;
     }
 
-    public render(props: IGranularityRenderProps, isFirst: boolean): Selection<any, any, any, any> {
+    public render(props: IGranularityRenderProps, isFirst: boolean): d3Selection<SVGGElement, unknown, null, undefined> {
         if (!props.granularSettings.granularityYearVisibility.value) {
             return null;
         }
