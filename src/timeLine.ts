@@ -730,11 +730,6 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
 
             this.updateCalendar();
 
-            const shouldRefresh: boolean = this.updateForceSelectionOnFilterChange();
-            if (shouldRefresh) {
-                return;
-            }
-
             const adjustedPeriod: IAdjustedFilterDatePeriod = this.adjustFilterDatePeriod();
             const datePeriod: ITimelineDatePeriodBase = this.datePeriod;
             const granularity: GranularityType = this.getGranularityType();
@@ -781,68 +776,6 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
             this.host.eventService.renderingFailed(options, JSON.stringify(ex));
         }
         this.host.eventService.renderingFinished(options);
-    }
-
-
-    /**
-     * When visual is initialized, we need to check if filter date is different from currentPeriodDate or latestAvailableDate
-     * It may happen when visual is synced with other visuals and filter date is changed, so we need to disable corresponding forceSelection options.
-     */
-    private updateForceSelectionOnFilterChange(): boolean {
-        const wasFilterChanged: boolean =
-            String(this.prevFilteredStartDate) !== String(this.datePeriod.startDate) ||
-            String(this.prevFilteredEndDate) !== String(this.datePeriod.endDate);
-
-        if (!wasFilterChanged) return;
-
-        const filterDatePeriod: DatePeriodBase = <DatePeriodBase>this.filterDatePeriod;
-        const granularity: GranularityType = this.getGranularityType();
-        const latestPeriod = Timeline.SELECT_PERIOD(this.datePeriod, granularity, this.calendar, this.datePeriod.endDate);
-        const currentPeriod = Timeline.SELECT_CURRENT_PERIOD(this.datePeriod, granularity, this.calendar);
-
-        const propertiesToUpdate: Record<string, boolean> = {};
-
-        // TODO: Consider how to make checking of currentPeriod more reliable when filter date is close to midnight
-        // currentPeriod is created and compared to filter date period.
-        // If filter date is different from current period then it means we need to disable forceSelection.currentPeriod toggle switch
-        // currentPeriod resets time and only considers date, so there's a possibility of a bug when time is close to midnight (23:59:59)
-        // so if filter is created close to midnight and current period is created after midnight, then it will be considered as different
-        // therefore occasionaly we will disable currentPeriod toggle switch when it's not necessary
-        if (this.visualSettings.forceSelection.currentPeriod.value &&
-            filterDatePeriod.startDate &&
-            filterDatePeriod.endDate &&
-            currentPeriod.startDate &&
-            currentPeriod.endDate &&
-            currentPeriod.startDate.getTime() !== filterDatePeriod.startDate.getTime() &&
-            currentPeriod.endDate.getTime() !== filterDatePeriod.endDate.getTime() &&
-            this.prevFilteredStartDate == null &&
-            this.prevFilteredEndDate == null
-        ) {
-            propertiesToUpdate.currentPeriod = false;
-        }
-
-        if (this.visualSettings.forceSelection.latestAvailableDate.value &&
-            filterDatePeriod.endDate &&
-            latestPeriod.endDate &&
-            filterDatePeriod.endDate.getTime() !== latestPeriod.endDate.getTime() &&
-            this.prevFilteredEndDate == null
-        ) {
-            propertiesToUpdate.latestAvailableDate = false;
-        }
-
-        if (Object.keys(propertiesToUpdate).length > 0) {
-            this.host.persistProperties({
-                merge: [{
-                    objectName: "forceSelection",
-                    properties: propertiesToUpdate,
-                    selector: null,
-                }]
-            });
-
-            return true;
-        }
-
-        return false;
     }
 
     private updateDatePeriodOnForceSelection(adjustedPeriod: IAdjustedFilterDatePeriod, datePeriod: ITimelineDatePeriodBase, granularity: GranularityType) {
