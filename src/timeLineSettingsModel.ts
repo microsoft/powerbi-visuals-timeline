@@ -26,55 +26,55 @@
 
 import powerbi from "powerbi-visuals-api";
 
-import { formattingSettings } from "powerbi-visuals-utils-formattingmodel";
+import { formattingSettings, formattingSettingsInterfaces } from "powerbi-visuals-utils-formattingmodel";
 import { WeekStandard } from "./calendars/weekStandard";
 import { Month } from "./calendars/month";
 import Card = formattingSettings.SimpleCard;
 import CompositeCard = formattingSettings.CompositeCard;
 import Model = formattingSettings.Model;
 import Group = formattingSettings.Group;
-import IEnumMember = powerbi.IEnumMember;
+import ILocalizedItemMember = formattingSettingsInterfaces.ILocalizedItemMember;
 import ValidatorType = powerbi.visuals.ValidatorType;
 import { Weekday } from "./calendars/weekday";
 import { GranularityType } from "./granularity/granularityType";
 import ILocalizationManager = powerbi.extensibility.ILocalizationManager;
 
-const weekStandardOptions: IEnumMember[] = [
-    { value: WeekStandard.NotSet, displayName: "Visual_Week_Standard_None" },
-    { value: WeekStandard.ISO8061, displayName: "Visual_Week_Standard_ISO8601" },
+const weekStandardOptions: ILocalizedItemMember[] = [
+    { value: WeekStandard.NotSet, displayNameKey: "Visual_Week_Standard_None" },
+    { value: WeekStandard.ISO8061, displayNameKey: "Visual_Week_Standard_ISO8601" },
 ];
 
-const monthOptions: IEnumMember[] = [
-    { value: Month.January, displayName: "Visual_Month_January" },
-    { value: Month.February, displayName: "Visual_Month_February" },
-    { value: Month.March, displayName: "Visual_Month_March" },
-    { value: Month.April, displayName: "Visual_Month_April" },
-    { value: Month.May, displayName: "Visual_Month_May" },
-    { value: Month.June, displayName: "Visual_Month_June" },
-    { value: Month.July, displayName: "Visual_Month_July" },
-    { value: Month.August, displayName: "Visual_Month_August" },
-    { value: Month.September, displayName: "Visual_Month_September" },
-    { value: Month.October, displayName: "Visual_Month_October" },
-    { value: Month.November, displayName: "Visual_Month_November" },
-    { value: Month.December, displayName: "Visual_Month_December" },
+const monthOptions: ILocalizedItemMember[] = [
+    { value: Month.January, displayNameKey: "Visual_Month_January" },
+    { value: Month.February, displayNameKey: "Visual_Month_February" },
+    { value: Month.March, displayNameKey: "Visual_Month_March" },
+    { value: Month.April, displayNameKey: "Visual_Month_April" },
+    { value: Month.May, displayNameKey: "Visual_Month_May" },
+    { value: Month.June, displayNameKey: "Visual_Month_June" },
+    { value: Month.July, displayNameKey: "Visual_Month_July" },
+    { value: Month.August, displayNameKey: "Visual_Month_August" },
+    { value: Month.September, displayNameKey: "Visual_Month_September" },
+    { value: Month.October, displayNameKey: "Visual_Month_October" },
+    { value: Month.November, displayNameKey: "Visual_Month_November" },
+    { value: Month.December, displayNameKey: "Visual_Month_December" },
 ];
 
-const weekdayOptions: IEnumMember[] = [
-    { value: Weekday.Sunday, displayName: "Visual_Day_Sunday" },
-    { value: Weekday.Monday, displayName: "Visual_Day_Monday" },
-    { value: Weekday.Tuesday, displayName: "Visual_Day_Tuesday" },
-    { value: Weekday.Wednesday, displayName: "Visual_Day_Wednesday" },
-    { value: Weekday.Thursday, displayName: "Visual_Day_Thursday" },
-    { value: Weekday.Friday, displayName: "Visual_Day_Friday" },
-    { value: Weekday.Saturday, displayName: "Visual_Day_Saturday" },
+const weekdayOptions: ILocalizedItemMember[] = [
+    { value: Weekday.Sunday, displayNameKey: "Visual_Day_Sunday" },
+    { value: Weekday.Monday, displayNameKey: "Visual_Day_Monday" },
+    { value: Weekday.Tuesday, displayNameKey: "Visual_Day_Tuesday" },
+    { value: Weekday.Wednesday, displayNameKey: "Visual_Day_Wednesday" },
+    { value: Weekday.Thursday, displayNameKey: "Visual_Day_Thursday" },
+    { value: Weekday.Friday, displayNameKey: "Visual_Day_Friday" },
+    { value: Weekday.Saturday, displayNameKey: "Visual_Day_Saturday" },
 ];
 
-const granularityOptions: IEnumMember[] = [
-    { value: GranularityType.year, displayName: "Visual_Granularity_Year" },
-    { value: GranularityType.quarter, displayName: "Visual_Granularity_Quarter" },
-    { value: GranularityType.month, displayName: "Visual_Granularity_Month" },
-    { value: GranularityType.week, displayName: "Visual_Granularity_Week" },
-    { value: GranularityType.day, displayName: "Visual_Granularity_Day" },
+const granularityOptions: ILocalizedItemMember[] = [
+    { value: GranularityType.year, displayNameKey: "Visual_Granularity_Year" },
+    { value: GranularityType.quarter, displayNameKey: "Visual_Granularity_Quarter" },
+    { value: GranularityType.month, displayNameKey: "Visual_Granularity_Month" },
+    { value: GranularityType.week, displayNameKey: "Visual_Granularity_Week" },
+    { value: GranularityType.day, displayNameKey: "Visual_Granularity_Day" },
 ];
 
 class TextSizeDefaults {
@@ -533,17 +533,4 @@ export class TimeLineSettingsModel extends Model {
         this.labels,
         this.scrollAutoAdjustment,
     ];
-
-    public setLocalizedOptions(localizationManager: ILocalizationManager) {
-        this.setLocalizedDisplayName(weekStandardOptions, localizationManager);
-        this.setLocalizedDisplayName(monthOptions, localizationManager);
-        this.setLocalizedDisplayName(weekdayOptions, localizationManager);
-        this.setLocalizedDisplayName(granularityOptions, localizationManager);
-    }
-
-    private setLocalizedDisplayName(options: IEnumMember[], localizationManager: ILocalizationManager) {
-        options.forEach(option => {
-            option.displayName = localizationManager.getDisplayName(option.displayName.toString())
-        });
-    }
 }

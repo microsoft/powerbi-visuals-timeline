@@ -703,7 +703,6 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
             this.datePeriod = this.createDatePeriod(this.dataView);
 
             this.visualSettings = this.formattingSettingsService.populateFormattingSettingsModel(TimeLineSettingsModel, this.dataView);
-            this.visualSettings.setLocalizedOptions(this.localizationManager);
 
             if (!this.initialized) {
                 this.timelineData = {
