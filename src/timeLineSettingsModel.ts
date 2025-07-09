@@ -37,7 +37,6 @@ import ILocalizedItemMember = formattingSettingsInterfaces.ILocalizedItemMember;
 import ValidatorType = powerbi.visuals.ValidatorType;
 import { Weekday } from "./calendars/weekday";
 import { GranularityType } from "./granularity/granularityType";
-import ILocalizationManager = powerbi.extensibility.ILocalizationManager;
 
 const weekStandardOptions: ILocalizedItemMember[] = [
     { value: WeekStandard.NotSet, displayNameKey: "Visual_Week_Standard_None" },
