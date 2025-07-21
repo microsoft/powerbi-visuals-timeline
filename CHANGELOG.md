@@ -1,3 +1,11 @@
+## 2.5.14
+
+### Fixes
+* Prioritize currentPeriod setting
+
+### Development
+* Update formatting model
+
 ## 2.5.13
 * Update packages, migrate to eslint v9
 

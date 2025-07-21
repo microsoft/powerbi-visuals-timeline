@@ -703,7 +703,6 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
             this.datePeriod = this.createDatePeriod(this.dataView);
 
             this.visualSettings = this.formattingSettingsService.populateFormattingSettingsModel(TimeLineSettingsModel, this.dataView);
-            this.visualSettings.setLocalizedOptions(this.localizationManager);
 
             if (!this.initialized) {
                 this.timelineData = {
@@ -715,9 +714,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
             this.parseJsonFilters(this.visualSettings, <AdvancedFilter[]>(this.options.jsonFilters));
             this.setHighContrastColors();
 
-            this.adjustHeightOfElements();
-            this.recomputeScrollPosition();
-
+            this.timelineProperties = this.adjustHeightOfElements(this.timelineProperties, this.visualSettings);
             this.timelineGranularityData = new GranularityData(this.datePeriod.startDate, this.datePeriod.endDate);
 
             this.createTimelineData(
@@ -729,11 +726,6 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
             );
 
             this.updateCalendar();
-
-            const shouldRefresh: boolean = this.updateForceSelectionOnFilterChange();
-            if (shouldRefresh) {
-                return;
-            }
 
             const adjustedPeriod: IAdjustedFilterDatePeriod = this.adjustFilterDatePeriod();
             const datePeriod: ITimelineDatePeriodBase = this.datePeriod;
@@ -754,11 +746,13 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
 
             this.renderGranularityFrame(granularity);
 
+            this.svgWidth = Timeline.computeSvgWidth(this.timelineProperties, this.timelineData.timelineDataPoints);
             this.render(
                 this.timelineData,
                 this.visualSettings,
                 this.timelineProperties,
                 options,
+                this.svgWidth
             );
 
             Behavior.bindEvents({
@@ -781,68 +775,6 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
             this.host.eventService.renderingFailed(options, JSON.stringify(ex));
         }
         this.host.eventService.renderingFinished(options);
-    }
-
-
-    /**
-     * When visual is initialized, we need to check if filter date is different from currentPeriodDate or latestAvailableDate
-     * It may happen when visual is synced with other visuals and filter date is changed, so we need to disable corresponding forceSelection options.
-     */
-    private updateForceSelectionOnFilterChange(): boolean {
-        const wasFilterChanged: boolean =
-            String(this.prevFilteredStartDate) !== String(this.datePeriod.startDate) ||
-            String(this.prevFilteredEndDate) !== String(this.datePeriod.endDate);
-
-        if (!wasFilterChanged) return;
-
-        const filterDatePeriod: DatePeriodBase = <DatePeriodBase>this.filterDatePeriod;
-        const granularity: GranularityType = this.getGranularityType();
-        const latestPeriod = Timeline.SELECT_PERIOD(this.datePeriod, granularity, this.calendar, this.datePeriod.endDate);
-        const currentPeriod = Timeline.SELECT_CURRENT_PERIOD(this.datePeriod, granularity, this.calendar);
-
-        const propertiesToUpdate: Record<string, boolean> = {};
-
-        // TODO: Consider how to make checking of currentPeriod more reliable when filter date is close to midnight
-        // currentPeriod is created and compared to filter date period.
-        // If filter date is different from current period then it means we need to disable forceSelection.currentPeriod toggle switch
-        // currentPeriod resets time and only considers date, so there's a possibility of a bug when time is close to midnight (23:59:59)
-        // so if filter is created close to midnight and current period is created after midnight, then it will be considered as different
-        // therefore occasionaly we will disable currentPeriod toggle switch when it's not necessary
-        if (this.visualSettings.forceSelection.currentPeriod.value &&
-            filterDatePeriod.startDate &&
-            filterDatePeriod.endDate &&
-            currentPeriod.startDate &&
-            currentPeriod.endDate &&
-            currentPeriod.startDate.getTime() !== filterDatePeriod.startDate.getTime() &&
-            currentPeriod.endDate.getTime() !== filterDatePeriod.endDate.getTime() &&
-            this.prevFilteredStartDate == null &&
-            this.prevFilteredEndDate == null
-        ) {
-            propertiesToUpdate.currentPeriod = false;
-        }
-
-        if (this.visualSettings.forceSelection.latestAvailableDate.value &&
-            filterDatePeriod.endDate &&
-            latestPeriod.endDate &&
-            filterDatePeriod.endDate.getTime() !== latestPeriod.endDate.getTime() &&
-            this.prevFilteredEndDate == null
-        ) {
-            propertiesToUpdate.latestAvailableDate = false;
-        }
-
-        if (Object.keys(propertiesToUpdate).length > 0) {
-            this.host.persistProperties({
-                merge: [{
-                    objectName: "forceSelection",
-                    properties: propertiesToUpdate,
-                    selector: null,
-                }]
-            });
-
-            return true;
-        }
-
-        return false;
     }
 
     private updateDatePeriodOnForceSelection(adjustedPeriod: IAdjustedFilterDatePeriod, datePeriod: ITimelineDatePeriodBase, granularity: GranularityType) {
@@ -990,13 +922,13 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
             .style("fill", this.visualSettings.cells.showEdges.value ? this.visualSettings.cells.edgeColor.value.value : "transparent")
     }
 
-    public renderTimeRangeText(timelineData: ITimelineData, rangeHeaderSettings: RangeHeaderSettingsCard): void {
+    public renderTimeRangeText(timelineData: ITimelineData, rangeHeaderSettings: RangeHeaderSettingsCard, svgWidth: number, timelineProperties: ITimelineProperties): void {
         const leftMargin: number = (GranularityNames.length + Timeline.GranularityNamesLength)
-            * this.timelineProperties.elementWidth;
+            * timelineProperties.elementWidth;
 
-        const maxWidth: number = this.svgWidth
+        const maxWidth: number = svgWidth
             - leftMargin
-            - this.timelineProperties.leftMargin
+            - timelineProperties.leftMargin
             - rangeHeaderSettings.textSize.value;
 
         d3SelectAll("g." + Timeline.TimelineSelectors.RangeTextArea.className).remove();
@@ -1017,12 +949,12 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
 
             const actualText: string = dataLabelUtils.getLabelFormattedText(labelFormattedTextOptions);
 
-            const positionOffset: number = Timeline.TimelineMargins.LegendHeight - this.timelineProperties.legendHeight;
+            const positionOffset: number = Timeline.TimelineMargins.LegendHeight - timelineProperties.legendHeight;
             this.rangeTextSelection
                 .classed(Timeline.TimelineSelectors.SelectionRangeContainer.className, true)
 
                 .attr("x", GranularityNames.length
-                    * (this.timelineProperties.elementWidth + this.timelineProperties.leftMargin))
+                    * (timelineProperties.elementWidth + timelineProperties.leftMargin))
                 .attr("y", Timeline.DefaultRangeTextSelectionY - positionOffset)
                 .attr("fill", rangeHeaderSettings.fontColor.value.value)
                 .style("font-size", pixelConverter.fromPointToPixel(rangeHeaderSettings.textSize.value))
@@ -1220,7 +1152,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
             this.timelineProperties.cellHeight,
             this.timelineProperties.cellsYPosition);
 
-        this.renderTimeRangeText(this.timelineData, this.visualSettings.rangeHeader);
+        this.renderTimeRangeText(this.timelineData, this.visualSettings.rangeHeader, this.svgWidth, this.timelineProperties);
     }
 
     /**
@@ -1302,21 +1234,25 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
         }
     }
 
-    private adjustHeightOfElements(): void {
-        this.timelineProperties.legendHeight = 0;
-        if (this.visualSettings.rangeHeader.show.value) {
-            this.timelineProperties.legendHeight = Timeline.TimelineMargins.LegendHeightRange;
+    private adjustHeightOfElements(timelineProperties: ITimelineProperties, settings: TimeLineSettingsModel): ITimelineProperties {
+        const newTimelineProperties: ITimelineProperties = {...timelineProperties};
+        newTimelineProperties.legendHeight = 0;
+
+        if (settings.rangeHeader.show.value) {
+            newTimelineProperties.legendHeight = Timeline.TimelineMargins.LegendHeightRange;
         }
-        if (this.visualSettings.granularity.show.value) {
-            this.timelineProperties.legendHeight = Timeline.TimelineMargins.LegendHeight;
+        if (settings.granularity.show.value) {
+            newTimelineProperties.legendHeight = Timeline.TimelineMargins.LegendHeight;
         }
 
         this.headerWrapperSelection
-            .style("height", this.timelineProperties.legendHeight + "px")
+            .style("height", newTimelineProperties.legendHeight + "px")
             .style("width", this.viewport.width + "px");
 
         this.headerSelection
-            .attr("height", this.timelineProperties.legendHeight);
+            .attr("height", newTimelineProperties.legendHeight);
+
+        return newTimelineProperties;
     }
 
     /**
@@ -1325,7 +1261,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
      * We need to recompute header's position to prevent it from going too far.
      * Also, we need to force the browser to recompute the scroll area; otherwise you'll be able to scroll past the main content and the header.
      */
-    private recomputeScrollPosition(): void {
+    private recomputeScrollPosition(svgWidth: number): void {
         // apply the pending change
         this.headerSelection.attr("transform", "translate(0, 0)");
 
@@ -1333,7 +1269,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
         requestAnimationFrame(() => {
             const target = this.rootSelection.node() as HTMLDivElement;
             const scrollLeft: number = target?.scrollLeft || 0;
-            const maxScrollLeft: number = Math.min(scrollLeft, this.svgWidth - this.viewport.width)
+            const maxScrollLeft: number = Math.min(scrollLeft, svgWidth - this.viewport.width)
             this.headerSelection.attr("transform", `translate(${maxScrollLeft}, 0)`);
         })
     }
@@ -1449,18 +1385,11 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
         settings: TimeLineSettingsModel,
         timelineProperties: ITimelineProperties,
         options: powerbiVisualsApi.extensibility.visual.VisualUpdateOptions,
+        svgWidth: number
     ): void {
-        const timelineDatapointCount = this.timelineData.timelineDataPoints
-            .filter((dataPoint: ITimelineDataPoint) => {
-                return dataPoint.index % 1 === 0;
-            })
-            .length;
+        this.recomputeScrollPosition(svgWidth);
 
-        this.svgWidth = Timeline.SvgWidthOffset
-            + this.timelineProperties.cellHeight
-            + timelineProperties.cellWidth * timelineDatapointCount;
-
-        this.renderTimeRangeText(timelineData, settings.rangeHeader);
+        this.renderTimeRangeText(timelineData, settings.rangeHeader, svgWidth, timelineProperties);
 
         this.rootSelection
             .attr("drag-resize-disabled", true)
@@ -1484,11 +1413,11 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
                 mainSvgWrapperHeight,
             )))
             .style("width",
-                this.svgWidth < options.viewport.width
+                svgWidth < options.viewport.width
                     ? "100%"
                     : pixelConverter.toString(Math.max(
                         Timeline.MinSizeOfViewport,
-                        this.svgWidth,
+                        svgWidth,
                     )));
 
         this.mainSvgSelection
@@ -1537,6 +1466,18 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
         );
 
         this.scrollAutoFocusFunc(this.selectedGranulaPos);
+    }
+
+    private static computeSvgWidth(timelineProperties: ITimelineProperties, dataPoints: ITimelineDataPoint[]): number {
+         const dataPointCount = dataPoints
+            .filter((dataPoint: ITimelineDataPoint) => {
+                return dataPoint.index % 1 === 0;
+            })
+            .length;
+
+        return Timeline.SvgWidthOffset
+            + timelineProperties.cellHeight
+            + timelineProperties.cellWidth * dataPointCount;
     }
 
     private renderBunchOfLabels(settings: TimeLineSettingsModel): number {
@@ -1751,7 +1692,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
             timelineProperties.cellsYPosition,
         );
 
-        this.renderTimeRangeText(timelineData, this.visualSettings.rangeHeader);
+        this.renderTimeRangeText(timelineData, this.visualSettings.rangeHeader, this.svgWidth, timelineProperties);
 
         this.setSelection(timelineData);
         this.toggleForceSelectionOptions();
