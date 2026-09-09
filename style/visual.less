@@ -34,6 +34,21 @@
 .timeline-component {
     cursor: default;
 
+    box-sizing: border-box;
+
+    &.autoAdjustedLayout {
+        display: flex;
+        flex-direction: column;
+
+        > div {
+            flex-shrink: 0;
+        }
+
+        > .timelineWrapper {
+            margin-top: auto;
+        }
+    }
+
     .timeline {
         font-family: helvetica, arial, sans-serif;
 

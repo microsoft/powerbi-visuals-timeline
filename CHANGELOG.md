@@ -1,3 +1,9 @@
+## 2.5.15
+
+### Features
+* Add "Position" option to place the period slicer at any corner or at the center of the top or the bottom edge
+* Add "Layout" card with auto adjustment and manual top/bottom paddings
+
 ## 2.5.14
 
 ### Fixes
