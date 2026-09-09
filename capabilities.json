@@ -372,6 +372,42 @@
                     },
                     "filterState": true
                 },
+                "position": {
+                    "type": {
+                        "enumeration": [
+                            {
+                                "value": "topLeft",
+                                "displayName": "Top left",
+                                "displayNameKey": "Visual_Position_TopLeft"
+                            },
+                            {
+                                "value": "topCenter",
+                                "displayName": "Top center",
+                                "displayNameKey": "Visual_Position_TopCenter"
+                            },
+                            {
+                                "value": "topRight",
+                                "displayName": "Top right",
+                                "displayNameKey": "Visual_Position_TopRight"
+                            },
+                            {
+                                "value": "bottomLeft",
+                                "displayName": "Bottom left",
+                                "displayNameKey": "Visual_Position_BottomLeft"
+                            },
+                            {
+                                "value": "bottomCenter",
+                                "displayName": "Bottom center",
+                                "displayNameKey": "Visual_Position_BottomCenter"
+                            },
+                            {
+                                "value": "bottomRight",
+                                "displayName": "Bottom right",
+                                "displayNameKey": "Visual_Position_BottomRight"
+                            }
+                        ]
+                    }
+                },
                 "granularityYearVisibility": {
                     "type": {
                         "bool": true
@@ -446,6 +482,25 @@
                     }
                 },
                 "textSize": {
+                    "type": {
+                        "numeric": true
+                    }
+                }
+            }
+        },
+        "layout": {
+            "properties": {
+                "autoAdjust": {
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "topPadding": {
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "bottomPadding": {
                     "type": {
                         "numeric": true
                     }

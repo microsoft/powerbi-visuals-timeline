@@ -34,6 +34,8 @@ export enum GranularityLabel {
     displayDays = 'displayDays',
 }
 
+export const granularityLabels: GranularityLabel[] = Object.values(GranularityLabel);
+
 export const granularityLevels: Record<GranularityType, GranularityLabel[]> = {
     [GranularityType.year]: [],
     [GranularityType.quarter]: [GranularityLabel.displayYears],

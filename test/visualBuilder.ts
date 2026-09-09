@@ -75,9 +75,8 @@ export class VisualBuilder extends VisualBuilderBase<Timeline> {
     }
 
     public get headerElement(): SVGElement {
-        return this.element
-            .querySelector("div.timeline-component")
-            .querySelector("div")
+        return this.rootElement
+            .querySelector("div.timelineHeader")
             .querySelector<SVGElement>("svg");
     }
 
@@ -107,15 +106,25 @@ export class VisualBuilder extends VisualBuilderBase<Timeline> {
     }
 
     public get timelineSlicer(): SVGGElement {
-        return this.headerElement.querySelector<SVGGElement>("g.timelineSlicer");
+        return this.periodSlicerGroup;
+    }
+
+    public get footerElement(): SVGElement {
+        return this.rootElement
+            .querySelector("div.timelineFooter")
+            .querySelector<SVGElement>("svg");
+    }
+
+    public get periodSlicerGroup(): SVGGElement | null {
+        return this.rootElement.querySelector<SVGGElement>("g.timelineSlicer");
     }
 
     public get periodSlicer(): SVGRectElement {
-        return this.timelineSlicer.querySelector("rect.periodSlicerRect");
+        return this.periodSlicerGroup.querySelector("rect.periodSlicerRect");
     }
 
     public get periodSlicerSelectionRects(): NodeListOf<SVGRectElement> {
-        return this.timelineSlicer.querySelectorAll<SVGRectElement>("rect.periodSlicerSelectionRect");
+        return this.periodSlicerGroup.querySelectorAll<SVGRectElement>("rect.periodSlicerSelectionRect");
     }
 
     public get cellRects(): NodeListOf<SVGRectElement> {

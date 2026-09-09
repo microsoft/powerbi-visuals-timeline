@@ -60,7 +60,13 @@ import {
 import { GranularityData } from "./granularity/granularityData";
 import { GranularityNames } from "./granularity/granularityNames";
 import { GranularityType } from "./granularity/granularityType";
-import { GranularityLabel, granularityLevels } from "./granularity/granularityLabel";
+import { GranularityLabel, granularityLabels, granularityLevels } from "./granularity/granularityLabel";
+import {
+    IPeriodSlicerPlacement,
+    PeriodSlicerHorizontalPosition,
+    PeriodSlicerPosition,
+    periodSlicerPlacements,
+} from "./granularity/periodSlicerPosition";
 
 import { ITimelineDatePeriod, ITimelineDatePeriodBase } from "./datePeriod/datePeriod";
 
@@ -73,6 +79,8 @@ import { CalendarFactory } from "./calendars/calendarFactory";
 import {
     CalendarSettingsCard,
     CellsSettingsCard,
+    GranularitySettingsCard,
+    LayoutSettingsCard,
     RangeHeaderSettingsCard,
     TimeLineSettingsModel,
 } from "./timeLineSettingsModel";
@@ -351,6 +359,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
 
     private static LabelSizeFactor: number = 1.5;
     private static TimelinePropertiesHeightOffset: number = 30;
+    private static PeriodSlicerCenterDivider: number = 2;
 
     private static DefaultCursorDatapointX: number = 0;
     private static DefaultCursorDatapointY: number = 0;
@@ -384,10 +393,13 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
     };
 
     private static TimelineSelectors: ITimelineSelectors = {
+        AutoAdjustedLayout: CssConstants.createClassAndSelector("autoAdjustedLayout"),
         Cell: CssConstants.createClassAndSelector("cell"),
         CellRect: CssConstants.createClassAndSelector("cellRect"),
         CellsArea: CssConstants.createClassAndSelector("cellsArea"),
         CursorsArea: CssConstants.createClassAndSelector("cursorsArea"),
+        Footer: CssConstants.createClassAndSelector("timelineFooter"),
+        Header: CssConstants.createClassAndSelector("timelineHeader"),
         LowerTextArea: CssConstants.createClassAndSelector("lowerTextArea"),
         LowerTextCell: CssConstants.createClassAndSelector("lowerTextCell"),
         MainArea: CssConstants.createClassAndSelector("mainArea"),
@@ -457,7 +469,11 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
                 * granularityOffset;
         }
 
-        const svgHeight: number = Math.max(0, viewport.height - timelineMargins.TopMargin);
+        const layoutPadding = Timeline.GET_LAYOUT_PADDING(this.visualSettings.layout);
+        const svgHeight: number = Math.max(
+            0,
+            viewport.height - timelineMargins.TopMargin - layoutPadding.top - layoutPadding.bottom,
+        );
 
         const height: number = Math.max(timelineMargins.MinCellHeight,
             Math.min(
@@ -465,6 +481,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
                 svgHeight
                 - this.timelineProperties.cellsYPosition
                 - Timeline.TimelinePropertiesHeightOffset
+                - this.timelineProperties.footerHeight
                 + (Timeline.TimelineMargins.LegendHeight - this.timelineProperties.legendHeight),
             ));
 
@@ -552,6 +569,8 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
     private rootSelection: d3Selection<HTMLDivElement, unknown, null, undefined>;
     private headerWrapperSelection: d3Selection<HTMLDivElement, unknown, null, undefined>;
     private headerSelection: d3Selection<SVGSVGElement, unknown, null, undefined>;
+    private footerWrapperSelection: d3Selection<HTMLDivElement, unknown, null, undefined>;
+    private footerSelection: d3Selection<SVGSVGElement, unknown, null, undefined>;
     private mainSvgSelection: d3Selection<SVGSVGElement, unknown, null, undefined>;
     private mainSvgWrapperSelection: d3Selection<HTMLDivElement, unknown, null, undefined>;
 
@@ -613,6 +632,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
             cellWidth: Timeline.TimelineMargins.CellWidth,
             cellsYPosition: Timeline.TimelineMargins.TopMargin * Timeline.CellsYPositionFactor + Timeline.CellsYPositionOffset,
             elementWidth: Timeline.TimelineMargins.ElementWidth,
+            footerHeight: 0,
             leftMargin: Timeline.TimelineMargins.LeftMargin,
             legendHeight: Timeline.TimelineMargins.LegendHeight,
             rightMargin: Timeline.TimelineMargins.RightMargin,
@@ -627,7 +647,8 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
             .classed("timeline-component", true);
 
         this.headerWrapperSelection = this.rootSelection
-            .append("div");
+            .append("div")
+            .classed(Timeline.TimelineSelectors.Header.className, true);
 
         this.headerSelection = this.headerWrapperSelection
             .append("svg")
@@ -642,6 +663,15 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
             .append("svg")
             .classed(Timeline.TimelineSelectors.TimelineVisual.className, true);
 
+        this.footerWrapperSelection = this.rootSelection
+            .append("div")
+            .classed(Timeline.TimelineSelectors.Footer.className, true);
+
+        this.footerSelection = this.footerWrapperSelection
+            .append("svg")
+            .attr("width", "100%")
+            .style("display", "block");
+
         this.addElements();
 
         let ticking = false;
@@ -649,9 +679,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
             if (!ticking) {
                 window.requestAnimationFrame(() => {
                     const target = event.target as HTMLDivElement;
-                    const scrollLeft: number = target?.scrollLeft || 0;
-                    const maxScrollLeft: number = Math.min(scrollLeft, this.svgWidth - this.viewport.width)
-                    this.headerSelection.attr("transform", `translate(${maxScrollLeft}, 0)`);
+                    this.translateStickyElements(target?.scrollLeft || 0, this.svgWidth);
                     ticking = false;
                 });
                 ticking = true;
@@ -1051,49 +1079,11 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
             this.visualSettings.calendar.disabled = true;
         }
 
-        if (this.visualSettings.labels.displayAll.value) {
-            this.visualSettings.labels.displayYears.visible = false;
-            this.visualSettings.labels.displayQuarters.visible = false;
-            this.visualSettings.labels.displayMonths.visible = false;
-            this.visualSettings.labels.displayWeeks.visible = false;
-            this.visualSettings.labels.displayDays.visible = false;
-        }
+        this.updateLabelsVisibility();
 
-        const granularity = this.getGranularityType();
-        switch (granularity) {
-            case GranularityType.year:
-                this.visualSettings.labels.displayYears.visible = false;
-                this.visualSettings.labels.displayQuarters.visible = false;
-                this.visualSettings.labels.displayMonths.visible = false;
-                this.visualSettings.labels.displayWeeks.visible = false;
-                this.visualSettings.labels.displayDays.visible = false;
-                break;
-            case GranularityType.quarter:
-                this.visualSettings.labels.displayQuarters.visible = false;
-                this.visualSettings.labels.displayMonths.visible = false;
-                this.visualSettings.labels.displayWeeks.visible = false;
-                this.visualSettings.labels.displayDays.visible = false;
-                break;
-            case GranularityType.month:
-                this.visualSettings.labels.displayMonths.visible = false;
-                this.visualSettings.labels.displayWeeks.visible = false;
-                this.visualSettings.labels.displayDays.visible = false;
-                break;
-            case GranularityType.week:
-                this.visualSettings.labels.displayWeeks.visible = false;
-                this.visualSettings.labels.displayDays.visible = false;
-                break;
-            case GranularityType.day:
-                this.visualSettings.labels.displayDays.visible = false;
-                break;
-            default:
-                this.visualSettings.labels.displayMonths.visible = true;
-                this.visualSettings.labels.displayQuarters.visible = true;
-                this.visualSettings.labels.displayMonths.visible = true;
-                this.visualSettings.labels.displayWeeks.visible = true;
-                this.visualSettings.labels.displayDays.visible = true;
-                break;
-        }
+        const isAutoAdjustEnabled: boolean = this.visualSettings.layout.autoAdjust.value;
+        this.visualSettings.layout.topPadding.visible = !isAutoAdjustEnabled;
+        this.visualSettings.layout.bottomPadding.visible = !isAutoAdjustEnabled;
 
         if (!this.visualSettings.cells.enableManualSizing.value) {
             this.visualSettings.cells.height.visible = false;
@@ -1102,6 +1092,19 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
 
         if (!this.visualSettings.cells.showEdges.value) {
             this.visualSettings.cells.edgeColor.visible = false;
+        }
+    }
+
+    /**
+     * The label of the current granularity is always rendered, so only the labels of the higher
+     * granularities can be toggled individually.
+     */
+    private updateLabelsVisibility(): void {
+        const availableLabels: GranularityLabel[] = granularityLevels[this.getGranularityType()] || [];
+        const isDisplayAllEnabled: boolean = this.visualSettings.labels.displayAll.value;
+
+        for (const label of granularityLabels) {
+            this.visualSettings.labels[label].visible = !isDisplayAllEnabled && availableLabels.indexOf(label) !== -1;
         }
     }
 
@@ -1234,16 +1237,50 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
         }
     }
 
+    private applyLayoutSettings(layoutSettings: LayoutSettingsCard, viewport: powerbiVisualsApi.IViewport): void {
+        const isAutoAdjustEnabled: boolean = layoutSettings.autoAdjust.value;
+        const layoutPadding = Timeline.GET_LAYOUT_PADDING(layoutSettings);
+
+        this.rootSelection
+            .attr("drag-resize-disabled", true)
+            .classed(Timeline.TimelineSelectors.AutoAdjustedLayout.className, isAutoAdjustEnabled)
+            .style("overflow-x", Timeline.DefaultOverflow)
+            .style("overflow-y", Timeline.DefaultOverflow)
+                .style("padding-top", pixelConverter.toString(layoutPadding.top))
+                .style("padding-bottom", pixelConverter.toString(layoutPadding.bottom))
+            .style("height", pixelConverter.toString(viewport.height))
+            .style("width", pixelConverter.toString(viewport.width));
+    }
+
+            private static GET_LAYOUT_PADDING(layoutSettings: LayoutSettingsCard): { top: number; bottom: number } {
+            return layoutSettings.autoAdjust.value
+                ? { top: 0, bottom: 0 }
+                : { top: layoutSettings.topPadding.value, bottom: layoutSettings.bottomPadding.value };
+            }
+
     private adjustHeightOfElements(timelineProperties: ITimelineProperties, settings: TimeLineSettingsModel): ITimelineProperties {
         const newTimelineProperties: ITimelineProperties = {...timelineProperties};
+        const isPeriodSlicerShown: boolean = settings.granularity.show.value;
+        const periodSlicerPlacement: IPeriodSlicerPlacement = Timeline.GET_PERIOD_SLICER_PLACEMENT(settings.granularity);
+        const isPeriodSlicerAtBottom: boolean = periodSlicerPlacement.isAtBottom;
+
         newTimelineProperties.legendHeight = 0;
 
         if (settings.rangeHeader.show.value) {
             newTimelineProperties.legendHeight = Timeline.TimelineMargins.LegendHeightRange;
         }
-        if (settings.granularity.show.value) {
+        if (isPeriodSlicerShown && !isPeriodSlicerAtBottom) {
             newTimelineProperties.legendHeight = Timeline.TimelineMargins.LegendHeight;
+
+            if (settings.rangeHeader.show.value
+                && periodSlicerPlacement.horizontalPosition !== PeriodSlicerHorizontalPosition.left) {
+                newTimelineProperties.legendHeight += Timeline.TimelineMargins.LegendHeightRange;
+            }
         }
+
+        newTimelineProperties.footerHeight = isPeriodSlicerShown && isPeriodSlicerAtBottom
+            ? Timeline.TimelineMargins.LegendHeight
+            : 0;
 
         this.headerWrapperSelection
             .style("height", newTimelineProperties.legendHeight + "px")
@@ -1252,7 +1289,32 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
         this.headerSelection
             .attr("height", newTimelineProperties.legendHeight);
 
+        this.footerWrapperSelection
+            .style("height", newTimelineProperties.footerHeight + "px")
+            .style("width", this.viewport.width + "px");
+
+        this.footerSelection
+            .attr("height", newTimelineProperties.footerHeight);
+
         return newTimelineProperties;
+    }
+
+    private static IS_PERIOD_SLICER_AT_BOTTOM(granularitySettings: GranularitySettingsCard): boolean {
+        return Timeline.GET_PERIOD_SLICER_PLACEMENT(granularitySettings).isAtBottom;
+    }
+
+    private static GET_PERIOD_SLICER_PLACEMENT(granularitySettings: GranularitySettingsCard): IPeriodSlicerPlacement {
+        const position = <PeriodSlicerPosition>granularitySettings.position.value.value;
+
+        return periodSlicerPlacements[position] || periodSlicerPlacements[PeriodSlicerPosition.topLeft];
+    }
+
+    private translateStickyElements(scrollLeft: number, svgWidth: number): void {
+        const maxScrollLeft: number = Math.min(scrollLeft, svgWidth - this.viewport.width);
+        const transform: string = `translate(${maxScrollLeft}, 0)`;
+
+        this.headerSelection.attr("transform", transform);
+        this.footerSelection.attr("transform", transform);
     }
 
     /**
@@ -1264,24 +1326,29 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
     private recomputeScrollPosition(svgWidth: number): void {
         // apply the pending change
         this.headerSelection.attr("transform", "translate(0, 0)");
+        this.footerSelection.attr("transform", "translate(0, 0)");
 
         // force browser to apply the change and recompute scroll area
         requestAnimationFrame(() => {
             const target = this.rootSelection.node() as HTMLDivElement;
-            const scrollLeft: number = target?.scrollLeft || 0;
-            const maxScrollLeft: number = Math.min(scrollLeft, svgWidth - this.viewport.width)
-            this.headerSelection.attr("transform", `translate(${maxScrollLeft}, 0)`);
+            this.translateStickyElements(target?.scrollLeft || 0, svgWidth);
         })
     }
 
     private renderGranularityFrame(granularity: GranularityType): void {
         d3SelectAll("g." + Timeline.TimelineSelectors.TimelineSlicer.className).remove();
 
+        this.selectorSelection = null;
+
         if (this.visualSettings.granularity.show.value) {
             const startXPoint: number = this.timelineProperties.startXpoint;
             const elementWidth: number = this.timelineProperties.elementWidth;
 
-            this.selectorSelection = this.headerSelection
+            const periodSlicerContainerSelection = Timeline.IS_PERIOD_SLICER_AT_BOTTOM(this.visualSettings.granularity)
+                ? this.footerSelection
+                : this.headerSelection;
+
+            this.selectorSelection = periodSlicerContainerSelection
                 .append("g")
                 .classed(Timeline.TimelineSelectors.TimelineSlicer.className, true);
 
@@ -1391,12 +1458,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
 
         this.renderTimeRangeText(timelineData, settings.rangeHeader, svgWidth, timelineProperties);
 
-        this.rootSelection
-            .attr("drag-resize-disabled", true)
-            .style("overflow-x", Timeline.DefaultOverflow)
-            .style("overflow-y", Timeline.DefaultOverflow)
-            .style("height", pixelConverter.toString(options.viewport.height))
-            .style("width", pixelConverter.toString(options.viewport.width));
+        this.applyLayoutSettings(settings.layout, options.viewport);
 
         const mainAreaHeight: number = timelineProperties.cellsYPosition
             + timelineProperties.cellHeight
@@ -1427,11 +1489,6 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
             )))
             .attr("width", "100%");
 
-        const fixedTranslateString: string = svgManipulation.translate(
-            timelineProperties.leftMargin,
-            timelineProperties.topMargin + this.timelineProperties.startYpoint,
-        );
-
         // Here still Timeline.TimelineMargins.LegendHeight is used because it always must have permanent negative offset.
         const translateString: string = svgManipulation.translate(
             timelineProperties.cellHeight / Timeline.CellHeightDivider,
@@ -1441,7 +1498,7 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
         this.mainGroupSelection.attr("transform", translateString);
 
         if (this.selectorSelection) {
-            this.selectorSelection.attr("transform", fixedTranslateString);
+            this.positionPeriodSlicer(settings.granularity, options.viewport.width);
         }
 
         this.cursorGroupSelection.attr("transform", translateString);
@@ -1548,6 +1605,39 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
         return yPos;
     }
 
+    /**
+     * A hidden visual reports an empty box, so the slicer stays left-aligned until Power BI
+     * issues the next update with a measurable viewport.
+     */
+    private calculatePeriodSlicerXOffset(granularitySettings: GranularitySettingsCard, viewportWidth: number): number {
+        const leftMargin: number = this.timelineProperties.leftMargin;
+        const horizontalPosition: PeriodSlicerHorizontalPosition = Timeline.GET_PERIOD_SLICER_PLACEMENT(granularitySettings).horizontalPosition;
+
+        if (!this.selectorSelection || horizontalPosition === PeriodSlicerHorizontalPosition.left) {
+            return leftMargin;
+        }
+
+        const periodSlicerNode: SVGGElement = this.selectorSelection.node();
+        const periodSlicerBox: DOMRect = periodSlicerNode?.getBBox();
+
+        if (!periodSlicerBox || !periodSlicerBox.width) {
+            return leftMargin;
+        }
+
+        const xOffset: number = horizontalPosition === PeriodSlicerHorizontalPosition.center
+            ? (viewportWidth - periodSlicerBox.width) / Timeline.PeriodSlicerCenterDivider - periodSlicerBox.x
+            : viewportWidth - this.timelineProperties.rightMargin - periodSlicerBox.width - periodSlicerBox.x;
+
+        return Math.max(leftMargin, xOffset);
+    }
+
+    private positionPeriodSlicer(granularitySettings: GranularitySettingsCard, viewportWidth: number): void {
+        this.selectorSelection.attr("transform", svgManipulation.translate(
+            this.calculatePeriodSlicerXOffset(granularitySettings, viewportWidth),
+            this.timelineProperties.topMargin + this.timelineProperties.startYpoint,
+        ));
+    }
+
     private calculateYOffset(index: number): number {
         if (!this.visualSettings.labels.show.value) {
             return this.timelineProperties.textYPosition;
@@ -1647,14 +1737,22 @@ export class Timeline implements powerbiVisualsApi.extensibility.visual.IVisual 
             .selectAll(Timeline.TimelineSelectors.SelectionCursor.selectorName)
             .remove();
 
-        this.mainSvgSelection
+        this.mainSvgSelection.attr("width", 0);
+
+        // The range header and the period slicer live in the header/footer, not in the main svg
+        this.headerSelection
             .selectAll(Timeline.TimelineSelectors.RangeTextArea.selectorName)
             .remove();
 
-        this.mainSvgSelection
-            .attr("width", 0)
+        this.headerSelection
             .selectAll(Timeline.TimelineSelectors.TimelineSlicer.selectorName)
             .remove();
+
+        this.footerSelection
+            .selectAll(Timeline.TimelineSelectors.TimelineSlicer.selectorName)
+            .remove();
+
+        this.selectorSelection = null;
     }
 
     private onCellClickHandler(

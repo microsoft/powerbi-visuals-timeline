@@ -53,10 +53,13 @@ export interface ITimelineMargins {
 }
 
 export interface ITimelineSelectors {
+    AutoAdjustedLayout: CssConstants.ClassAndSelector;
     Cell: CssConstants.ClassAndSelector;
     CellRect: CssConstants.ClassAndSelector;
     CellsArea: CssConstants.ClassAndSelector;
     CursorsArea: CssConstants.ClassAndSelector;
+    Footer: CssConstants.ClassAndSelector;
+    Header: CssConstants.ClassAndSelector;
     LowerTextArea: CssConstants.ClassAndSelector;
     LowerTextCell: CssConstants.ClassAndSelector;
     MainArea: CssConstants.ClassAndSelector;
@@ -112,6 +115,7 @@ export interface ITimelineProperties {
     cellHeight: number;
     cellsYPosition: number;
     legendHeight: number;
+    footerHeight: number;
 }
 
 export interface ITimelineData {

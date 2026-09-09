@@ -1007,6 +1007,354 @@ describe("Timeline", () => {
                         expect(fontSize).toBe(expectedFontSize);
                     });
             });
+
+            describe("selective toggling", () => {
+                function updateAndBuildFormattingModel(): void {
+                    visualBuilder.updateFlushAllD3Transitions(dataView);
+                    visualBuilder.visualObject.getFormattingModel();
+                }
+
+                it("individual toggles are shown for higher granularities only", () => {
+                    dataView.metadata.objects = {
+                        labels: { show: true, displayAll: false },
+                        granularity: { granularity: GranularityType.month },
+                    };
+
+                    updateAndBuildFormattingModel();
+
+                    const labels = visualBuilder.visualObject.visualSettings.labels;
+
+                    expect(labels.displayYears.visible).toBe(true);
+                    expect(labels.displayQuarters.visible).toBe(true);
+                    expect(labels.displayMonths.visible).toBe(false);
+                    expect(labels.displayWeeks.visible).toBe(false);
+                    expect(labels.displayDays.visible).toBe(false);
+                });
+
+                it("individual toggles are hidden when 'display all' is turned on", () => {
+                    dataView.metadata.objects = {
+                        labels: { show: true, displayAll: true },
+                        granularity: { granularity: GranularityType.day },
+                    };
+
+                    updateAndBuildFormattingModel();
+
+                    const labels = visualBuilder.visualObject.visualSettings.labels;
+
+                    expect(labels.displayYears.visible).toBe(false);
+                    expect(labels.displayQuarters.visible).toBe(false);
+                    expect(labels.displayMonths.visible).toBe(false);
+                    expect(labels.displayWeeks.visible).toBe(false);
+                });
+
+                it("individual toggles are shown when 'display all' is turned off", () => {
+                    dataView.metadata.objects = {
+                        labels: { show: true, displayAll: false },
+                        granularity: { granularity: GranularityType.day },
+                    };
+
+                    updateAndBuildFormattingModel();
+
+                    const labels = visualBuilder.visualObject.visualSettings.labels;
+
+                    expect(labels.displayYears.visible).toBe(true);
+                    expect(labels.displayQuarters.visible).toBe(true);
+                    expect(labels.displayMonths.visible).toBe(true);
+                    expect(labels.displayWeeks.visible).toBe(true);
+                });
+
+                it("visibility of individual toggles is recalculated after granularity change", () => {
+                    dataView.metadata.objects = {
+                        labels: { show: true, displayAll: false },
+                        granularity: { granularity: GranularityType.day },
+                    };
+
+                    updateAndBuildFormattingModel();
+
+                    expect(visualBuilder.visualObject.visualSettings.labels.displayWeeks.visible).toBe(true);
+
+                    (<any>(dataView.metadata.objects)).granularity.granularity = GranularityType.year;
+
+                    updateAndBuildFormattingModel();
+
+                    const labels = visualBuilder.visualObject.visualSettings.labels;
+
+                    expect(labels.displayYears.visible).toBe(false);
+                    expect(labels.displayQuarters.visible).toBe(false);
+                    expect(labels.displayMonths.visible).toBe(false);
+                    expect(labels.displayWeeks.visible).toBe(false);
+                    expect(labels.displayDays.visible).toBe(false);
+                });
+
+                it("renders only the selected higher granularity labels", () => {
+                    dataView.metadata.objects = {
+                        labels: {
+                            show: true,
+                            displayAll: false,
+                            displayYears: true,
+                            displayQuarters: false,
+                        },
+                        granularity: { granularity: GranularityType.month },
+                    };
+
+                    visualBuilder.updateFlushAllD3Transitions(dataView);
+
+                    const labelGroups: NodeListOf<SVGGElement> = visualBuilder.mainElement.querySelectorAll("g.mainArea > g");
+
+                    expect(labelGroups[0].querySelectorAll("text.label").length).toBeGreaterThan(0);
+                    expect(labelGroups[1].querySelectorAll("text.label").length).toBe(0);
+                });
+            });
+        });
+
+        describe("Layout", () => {
+            it("keeps the default layout when auto adjust is turned off", () => {
+                dataView.metadata.objects = {
+                    layout: { autoAdjust: false },
+                };
+
+                visualBuilder.updateFlushAllD3Transitions(dataView);
+
+                const rootElement: HTMLElement = visualBuilder.rootElement;
+
+                expect(rootElement.classList.contains("autoAdjustedLayout")).toBe(false);
+                expect(rootElement.style["padding-top"]).toBe("0px");
+                expect(rootElement.style["padding-bottom"]).toBe("0px");
+            });
+
+            it("pins the timeline to the bottom when auto adjust is turned on", () => {
+                dataView.metadata.objects = {
+                    layout: { autoAdjust: true },
+                };
+
+                visualBuilder.updateFlushAllD3Transitions(dataView);
+
+                expect(visualBuilder.rootElement.classList.contains("autoAdjustedLayout")).toBe(true);
+            });
+
+            it("applies manual paddings when auto adjust is turned off", () => {
+                dataView.metadata.objects = {
+                    layout: {
+                        autoAdjust: false,
+                        topPadding: 12,
+                        bottomPadding: 24,
+                    },
+                };
+
+                visualBuilder.updateFlushAllD3Transitions(dataView);
+
+                const rootElement: HTMLElement = visualBuilder.rootElement;
+
+                expect(rootElement.style["padding-top"]).toBe("12px");
+                expect(rootElement.style["padding-bottom"]).toBe("24px");
+            });
+
+            it("accounts for manual paddings when auto sizing cells", () => {
+                const compactVisualBuilder = new VisualBuilder(1000, 220);
+
+                dataView.metadata.objects = {
+                    layout: { autoAdjust: false },
+                };
+                compactVisualBuilder.updateFlushAllD3Transitions(dataView);
+
+                const heightWithoutPadding: number = parseFloat(compactVisualBuilder.cellRects[0].getAttribute("height"));
+
+                dataView.metadata.objects = {
+                    layout: {
+                        autoAdjust: false,
+                        topPadding: 50,
+                        bottomPadding: 50,
+                    },
+                };
+                compactVisualBuilder.updateFlushAllD3Transitions(dataView);
+
+                const heightWithPadding: number = parseFloat(compactVisualBuilder.cellRects[0].getAttribute("height"));
+
+                expect(heightWithPadding).toBeLessThan(heightWithoutPadding);
+            });
+
+            it("ignores manual paddings when auto adjust is turned on", () => {
+                dataView.metadata.objects = {
+                    layout: {
+                        autoAdjust: true,
+                        topPadding: 12,
+                        bottomPadding: 24,
+                    },
+                };
+
+                visualBuilder.updateFlushAllD3Transitions(dataView);
+
+                const rootElement: HTMLElement = visualBuilder.rootElement;
+
+                expect(rootElement.style["padding-top"]).toBe("0px");
+                expect(rootElement.style["padding-bottom"]).toBe("0px");
+            });
+
+            it("padding inputs are shown only when auto adjust is turned off", () => {
+                dataView.metadata.objects = {
+                    layout: { autoAdjust: true },
+                };
+
+                visualBuilder.updateFlushAllD3Transitions(dataView);
+                visualBuilder.visualObject.getFormattingModel();
+
+                expect(visualBuilder.visualObject.visualSettings.layout.topPadding.visible).toBe(false);
+                expect(visualBuilder.visualObject.visualSettings.layout.bottomPadding.visible).toBe(false);
+
+                (<any>(dataView.metadata.objects)).layout.autoAdjust = false;
+
+                visualBuilder.updateFlushAllD3Transitions(dataView);
+                visualBuilder.visualObject.getFormattingModel();
+
+                expect(visualBuilder.visualObject.visualSettings.layout.topPadding.visible).toBe(true);
+                expect(visualBuilder.visualObject.visualSettings.layout.bottomPadding.visible).toBe(true);
+            });
+        });
+
+        describe("Period slicer position", () => {
+            function getPeriodSlicerXOffset(): number {
+                const transform: string = visualBuilder.periodSlicerGroup?.getAttribute("transform") || "";
+                const parsedOffset: RegExpMatchArray | null = transform.match(/translate\(\s*([-\d.]+)/);
+
+                return parsedOffset ? parseFloat(parsedOffset[1]) : NaN;
+            }
+
+            it("renders the period slicer in the header by default", () => {
+                dataView.metadata.objects = {
+                    granularity: { granularity: GranularityType.month },
+                };
+
+                visualBuilder.updateFlushAllD3Transitions(dataView);
+
+                expect(visualBuilder.headerElement.querySelector("g.timelineSlicer")).not.toBeNull();
+                expect(visualBuilder.footerElement.querySelector("g.timelineSlicer")).toBeNull();
+                expect(visualBuilder.footerElement.getAttribute("height")).toBe("0");
+            });
+
+            it("moves the period slicer to the footer when position is at the bottom", () => {
+                dataView.metadata.objects = {
+                    granularity: { position: "bottomLeft" },
+                };
+
+                visualBuilder.updateFlushAllD3Transitions(dataView);
+
+                expect(visualBuilder.footerElement.querySelector("g.timelineSlicer")).not.toBeNull();
+                expect(visualBuilder.headerElement.querySelector("g.timelineSlicer")).toBeNull();
+                expect(visualBuilder.footerElement.getAttribute("height")).not.toBe("0");
+            });
+
+            it("shrinks the header when the period slicer is moved to the footer", () => {
+                dataView.metadata.objects = {
+                    granularity: { position: "topLeft" },
+                    rangeHeader: { show: true },
+                };
+
+                visualBuilder.updateFlushAllD3Transitions(dataView);
+
+                const headerHeightOnTop: string = visualBuilder.headerElement.getAttribute("height");
+
+                (<any>(dataView.metadata.objects)).granularity.position = "bottomLeft";
+
+                visualBuilder.updateFlushAllD3Transitions(dataView);
+
+                expect(parseFloat(visualBuilder.headerElement.getAttribute("height")))
+                    .toBeLessThan(parseFloat(headerHeightOnTop));
+            });
+
+            it("uses the top-left position by default", () => {
+                dataView.metadata.objects = {
+                    granularity: { granularity: GranularityType.month },
+                };
+
+                visualBuilder.updateFlushAllD3Transitions(dataView);
+
+                const defaultOffset: number = getPeriodSlicerXOffset();
+
+                dataView.metadata.objects = {
+                    granularity: {
+                        granularity: GranularityType.month,
+                        position: "topLeft",
+                    },
+                };
+
+                visualBuilder.updateFlushAllD3Transitions(dataView);
+
+                expect(getPeriodSlicerXOffset()).toBe(defaultOffset);
+            });
+
+            it("aligns the period slicer horizontally", () => {
+                const offsets: number[] = ["topLeft", "topCenter", "topRight"].map((position: string) => {
+                    dataView.metadata.objects = {
+                        granularity: { position },
+                    };
+
+                    visualBuilder.updateFlushAllD3Transitions(dataView);
+
+                    return getPeriodSlicerXOffset();
+                });
+
+                expect(offsets[0]).toBeLessThan(offsets[1]);
+                expect(offsets[1]).toBeLessThan(offsets[2]);
+            });
+
+            it("places the range header on a separate row for a centered top slicer", () => {
+                dataView.metadata.objects = {
+                    granularity: { position: "topCenter" },
+                    rangeHeader: { show: true },
+                };
+
+                visualBuilder.updateFlushAllD3Transitions(dataView);
+
+                const slicerBox: DOMRect = visualBuilder.periodSlicerGroup.getBBox();
+                const slicerTransform: string = visualBuilder.periodSlicerGroup.getAttribute("transform");
+                const parsedY: RegExpMatchArray | null = slicerTransform.match(/translate\([^,]+,\s*([-\d.]+)/);
+                const slicerBottom: number = (parsedY ? parseFloat(parsedY[1]) : 0) + slicerBox.y + slicerBox.height;
+                const rangeHeaderY: number = parseFloat(visualBuilder.getRangeHeader().getAttribute("y"));
+
+                expect(rangeHeaderY).toBeGreaterThan(slicerBottom);
+            });
+
+            it("aligns the period slicer horizontally while it is placed at the bottom", () => {
+                dataView.metadata.objects = {
+                    granularity: { position: "bottomLeft" },
+                };
+
+                visualBuilder.updateFlushAllD3Transitions(dataView);
+
+                const leftOffset: number = getPeriodSlicerXOffset();
+
+                dataView.metadata.objects = {
+                    granularity: { position: "bottomCenter" },
+                };
+
+                visualBuilder.updateFlushAllD3Transitions(dataView);
+
+                expect(visualBuilder.footerElement.querySelector("g.timelineSlicer")).not.toBeNull();
+                expect(getPeriodSlicerXOffset()).toBeGreaterThan(leftOffset);
+            });
+
+            it("keeps the period slicer at the bottom while the layout is auto adjusted", () => {
+                dataView.metadata.objects = {
+                    granularity: { position: "bottomLeft" },
+                    layout: { autoAdjust: true },
+                };
+
+                visualBuilder.updateFlushAllD3Transitions(dataView);
+
+                const leftOffset: number = getPeriodSlicerXOffset();
+
+                dataView.metadata.objects = {
+                    granularity: { position: "bottomCenter" },
+                    layout: { autoAdjust: true },
+                };
+
+                visualBuilder.updateFlushAllD3Transitions(dataView);
+
+                expect(visualBuilder.rootElement.classList.contains("autoAdjustedLayout")).toBe(true);
+                expect(visualBuilder.footerElement.querySelector("g.timelineSlicer")).not.toBeNull();
+                expect(visualBuilder.cellRects.length).toBeGreaterThan(0);
+                expect(getPeriodSlicerXOffset()).toBeGreaterThan(leftOffset);
+            });
         });
     });
 });

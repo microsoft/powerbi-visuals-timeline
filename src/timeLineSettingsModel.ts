@@ -37,6 +37,7 @@ import ILocalizedItemMember = formattingSettingsInterfaces.ILocalizedItemMember;
 import ValidatorType = powerbi.visuals.ValidatorType;
 import { Weekday } from "./calendars/weekday";
 import { GranularityType } from "./granularity/granularityType";
+import { PeriodSlicerPosition } from "./granularity/periodSlicerPosition";
 
 const weekStandardOptions: ILocalizedItemMember[] = [
     { value: WeekStandard.NotSet, displayNameKey: "Visual_Week_Standard_None" },
@@ -68,6 +69,15 @@ const weekdayOptions: ILocalizedItemMember[] = [
     { value: Weekday.Saturday, displayNameKey: "Visual_Day_Saturday" },
 ];
 
+const positionOptions: ILocalizedItemMember[] = [
+    { value: PeriodSlicerPosition.topLeft, displayNameKey: "Visual_Position_TopLeft" },
+    { value: PeriodSlicerPosition.topCenter, displayNameKey: "Visual_Position_TopCenter" },
+    { value: PeriodSlicerPosition.topRight, displayNameKey: "Visual_Position_TopRight" },
+    { value: PeriodSlicerPosition.bottomLeft, displayNameKey: "Visual_Position_BottomLeft" },
+    { value: PeriodSlicerPosition.bottomCenter, displayNameKey: "Visual_Position_BottomCenter" },
+    { value: PeriodSlicerPosition.bottomRight, displayNameKey: "Visual_Position_BottomRight" },
+];
+
 const granularityOptions: ILocalizedItemMember[] = [
     { value: GranularityType.year, displayNameKey: "Visual_Granularity_Year" },
     { value: GranularityType.quarter, displayNameKey: "Visual_Granularity_Quarter" },
@@ -80,6 +90,12 @@ class TextSizeDefaults {
     public static readonly Default: number = 9;
     public static readonly Min: number = 7;
     public static readonly Max: number = 40;
+}
+
+class PaddingDefaults {
+    public static readonly Default: number = 0;
+    public static readonly Min: number = 0;
+    public static readonly Max: number = 100;
 }
 
 class ForceSelectionSettingsCard extends Card {
@@ -360,6 +376,14 @@ export class GranularitySettingsCard extends Card {
         value: granularityOptions[2], // month
     });
 
+    position = new formattingSettings.ItemDropdown({
+        name: "position",
+        displayName: "Position",
+        displayNameKey: "Visual_Position",
+        items: positionOptions,
+        value: positionOptions[0],
+    });
+
     granularityYearVisibility = new formattingSettings.ToggleSwitch({
         name: "granularityYearVisibility",
         displayName: "Year visibility",
@@ -403,6 +427,7 @@ export class GranularitySettingsCard extends Card {
         this.scaleColor,
         this.sliderColor,
         this.granularity,
+        this.position,
         this.granularityYearVisibility,
         this.granularityQuarterVisibility,
         this.granularityMonthVisibility,
@@ -495,6 +520,46 @@ export class LabelsSettingsCard extends Card {
     ];
 }
 
+export class LayoutSettingsCard extends Card {
+    autoAdjust = new formattingSettings.ToggleSwitch({
+        name: "autoAdjust",
+        displayName: "Auto adjust",
+        displayNameKey: "Visual_AutoAdjust",
+        value: false,
+    });
+
+    topPadding = new formattingSettings.NumUpDown({
+        name: "topPadding",
+        displayName: "Top padding",
+        displayNameKey: "Visual_TopPadding",
+        value: PaddingDefaults.Default,
+        options: {
+            minValue: { value: PaddingDefaults.Min, type: ValidatorType.Min },
+            maxValue: { value: PaddingDefaults.Max, type: ValidatorType.Max },
+        },
+    });
+
+    bottomPadding = new formattingSettings.NumUpDown({
+        name: "bottomPadding",
+        displayName: "Bottom padding",
+        displayNameKey: "Visual_BottomPadding",
+        value: PaddingDefaults.Default,
+        options: {
+            minValue: { value: PaddingDefaults.Min, type: ValidatorType.Min },
+            maxValue: { value: PaddingDefaults.Max, type: ValidatorType.Max },
+        },
+    });
+
+    name: string = "layout";
+    displayName: string = "Layout";
+    displayNameKey: string = "Visual_Layout";
+    slices = [
+        this.autoAdjust,
+        this.topPadding,
+        this.bottomPadding,
+    ];
+}
+
 class ScrollAutoAdjustmentSettingsCard extends Card {
     show = new formattingSettings.ToggleSwitch({
         name: "show",
@@ -519,6 +584,7 @@ export class TimeLineSettingsModel extends Model {
     cells = new CellsSettingsCard();
     granularity = new GranularitySettingsCard();
     labels = new LabelsSettingsCard();
+    layout = new LayoutSettingsCard();
     scrollAutoAdjustment = new ScrollAutoAdjustmentSettingsCard();
 
     cards: Array<Card | CompositeCard> = [
@@ -530,6 +596,7 @@ export class TimeLineSettingsModel extends Model {
         this.cells,
         this.granularity,
         this.labels,
+        this.layout,
         this.scrollAutoAdjustment,
     ];
 }
