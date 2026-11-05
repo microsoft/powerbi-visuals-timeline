@@ -49,12 +49,12 @@
     "less-loader": "^12.2.0",
     "playwright-chromium": "^1.43.1",
     "powerbi-visuals-api": "~5.9.0",
-    "powerbi-visuals-tools": "^5.4.3",
+    "powerbi-visuals-tools": "^7.1.0",
     "powerbi-visuals-utils-testutils": "^6.1.1",
     "style-loader": "^4.0.0",
     "ts-loader": "^9.5.1",
     "typescript": "^5.4.5",
-    "webpack": "^5.91.0"
+    "webpack": "^5.108.3"
   },
   "dependencies": {
     "@typescript-eslint/eslint-plugin": "^7.7.1",
